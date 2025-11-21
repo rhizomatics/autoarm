@@ -1,0 +1,38 @@
+autoarm:
+  alarm_panel: alarm_panel.testing
+  auto_arm: true
+  arm_away_delay: 180
+  sleep_start: "09:00:00"
+  sleep_end: "22:00:00"
+  sunrise_cutoff: "06:30:00"
+  reset_button: binary_sensor.button_left
+  away_button: binary_sensor.button_right
+  disarm_button: binary_sensor.button_middle
+  throttle_seconds: 30
+  throttle_calls: 6
+  occupants:
+    - person.house_owner
+    - person.tenant
+  notify:
+    common:
+      service: notify.supernotifier
+      data:
+        actions:
+          action_groups: alarm_panel
+          action_category: alarm_panel
+    quiet:
+      data:
+        priority: low
+    normal:
+      data:
+        priority: medium
+  actions:
+    - action: ALARM_PANEL_DISARM
+      title: Disarm Alarm Panel
+      icon: sfsymbols:bell.slash
+    - action: ALARM_PANEL_RESET
+      title: Reset Alarm Panel
+      icon: sfsymbols:bell
+    - action: ALARM_PANEL_AWAY
+      title: Arm Alarm Panel for Going Away
+      icon: sfsymbols:airplane

@@ -1,0 +1,8 @@
+mkdocs-minify-plugin
+pymdown-extensions
+mkdocs-material
+mkdocs-autorefs
+mkdocs-coverage
+mkdocs-pagetree-plugin
+mkdocs
+voluptuous-openapi>=0.2.0

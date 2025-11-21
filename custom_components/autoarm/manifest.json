@@ -1,0 +1,22 @@
+{
+    "domain":"autoarm",
+    "name":"Auto Arm",
+    "version":"0.4.0",
+    "integration_type":"hub",
+    "iot_class":"calculated",
+    "dependencies":[
+        "sun",
+        "alarm_control_panel"
+    ],
+    "after_dependencies":[
+        "supernotifier",
+        "mobile_app"
+    ],
+    "requirements":[
+    ],
+    "config_flow": false,
+    "documentation": "https://github.com/jeyrb/hass_autoarm",
+    "issue_tracker": "https://github.com/jeyrb/hass_autoarm/issues",
+    "codeowners":["@jeyrb"]
+
+    }

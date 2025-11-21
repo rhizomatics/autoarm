@@ -1,0 +1,10 @@
+pytest==8.4.2
+pytest-cov
+pytest-homeassistant-custom-component>=0.13.295
+pytest-unordered
+pytest-mock
+pytest-xdist
+pytest-icdiff
+pre-commit
+ruff
+mypy
