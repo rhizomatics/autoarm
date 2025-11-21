@@ -2,7 +2,7 @@
     "domain": "autoarm",
     "name": "Auto Arm",
     "after_dependencies": [
-        "supernotifier",
+        "supernotify",
         "mobile_app"
     ],
     "codeowners": [
@@ -13,10 +13,10 @@
         "sun",
         "alarm_control_panel"
     ],
-    "documentation": "https://github.com/jeyrb/hass_autoarm",
+    "documentation": "https://autoarm.rhizomatics.org.uk",
     "integration_type": "hub",
     "iot_class": "calculated",
-    "issue_tracker": "https://github.com/jeyrb/hass_autoarm/issues",
+    "issue_tracker": "https://github.com/rhizomatics/autoarm/issues",
     "requirements": [],
     "version": "0.4.0"
 }

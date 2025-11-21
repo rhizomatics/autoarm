@@ -9,17 +9,17 @@ dependencies = ["homeassistant>=2025.11.1"]
 [tool.poetry]
 package-mode = false
 version = "0.4.0"
-packages = [{ include = "custom_components.supernotify" }]
+packages = [{ include = "custom_components.autoarm" }]
 
 [tool.setuptools.packages.find]
 where = [
     "custom_components",
 ] # list of folders that contain the packages (["."] by default)
 include = [
-    "supernotify*",
+    "autoarm*",
 ] # package names should match these glob patterns (["*"] by default)
 exclude = [
-    "supernotify.tests*",
+    "autoarm.tests*",
 ] # exclude packages matching these glob patterns (empty by default)
 namespaces = true # to disable scanning PEP 420 namespaces (true by default)
 
