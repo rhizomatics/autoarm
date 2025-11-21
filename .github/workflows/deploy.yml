@@ -43,7 +43,7 @@ jobs:
       uses: "hacs/action@94334b7ff014b150ad280ca09a20fa43f858c544"
       with:
         category: "integration"
-        ignore: brands"
+        ignore: brands
     - name: HACS Hassfest
       uses: "home-assistant/actions/hassfest@01a62fa0b7ab4a0ac894184f48a82477812dca4b"
     - name: Upload pytest test results
