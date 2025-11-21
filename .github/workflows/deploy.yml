@@ -45,7 +45,7 @@ jobs:
         category: "integration"
         ignore: brands"
     - name: HACS Hassfest
-      uses: "home-assistant/actions/hassfest@8ca6e134c077479b26138bd33520707e8d94ef59"
+      uses: "home-assistant/actions/hassfest@01a62fa0b7ab4a0ac894184f48a82477812dca4b"
     - name: Upload pytest test results
       uses: actions/upload-artifact@v5
       with:
