@@ -1,10 +1,12 @@
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import patch
 
 import pytest
 
 
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations):
+def auto_enable_custom_integrations(enable_custom_integrations) -> None:  # noqa: ANN001, ARG001
     """Enable custom integrations in all tests."""
     return
 
@@ -15,7 +17,7 @@ def auto_enable_custom_integrations(enable_custom_integrations):
 
 
 @pytest.fixture(name="skip_notifications", autouse=True)
-def skip_notifications_fixture():
+def skip_notifications_fixture() -> Generator[None, Any, None]:
     """Skip notification calls."""
     with (
         patch("homeassistant.components.persistent_notification.async_create"),

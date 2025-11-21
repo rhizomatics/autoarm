@@ -7,8 +7,8 @@ from functools import partial
 from typing import cast
 
 import homeassistant.util.dt as dt_util
-from homeassistant.components.alarm_control_panel import AlarmControlPanelState
-from homeassistant.components.sun import STATE_BELOW_HORIZON
+from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
+from homeassistant.components.sun.const import STATE_BELOW_HORIZON
 from homeassistant.const import (
     EVENT_HOMEASSISTANT_START,
     EVENT_HOMEASSISTANT_STOP,
@@ -66,7 +66,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     config = config.get(DOMAIN, {})
     hass.states.async_set(
         f"{DOMAIN}.configured",
-        True,
+        "True",
         {
             CONF_ALARM_PANEL: config.get(CONF_ALARM_PANEL),
             CONF_AUTO_ARM: config.get(CONF_AUTO_ARM, True),
@@ -89,9 +89,9 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         hass,
         alarm_panel=config[CONF_ALARM_PANEL],
         auto_disarm=config[CONF_AUTO_ARM],
-        sleep_start=cast(datetime.time, config.get(CONF_SLEEP_START)),
-        sleep_end=cast(datetime.time, config.get(CONF_SLEEP_END)),
-        sunrise_cutoff=cast(datetime.time, config.get(CONF_SUNRISE_CUTOFF)),
+        sleep_start=cast("datetime.time", config.get(CONF_SLEEP_START)),
+        sleep_end=cast("datetime.time", config.get(CONF_SLEEP_END)),
+        sunrise_cutoff=cast("datetime.time", config.get(CONF_SUNRISE_CUTOFF)),
         arm_away_delay=config[CONF_ARM_AWAY_DELAY],
         reset_button=config.get(CONF_BUTTON_ENTITY_RESET),
         away_button=config.get(CONF_BUTTON_ENTITY_AWAY),
@@ -256,7 +256,7 @@ class AlarmArmer:
         if self.disarm_button:
             setup_button("disarm", self.disarm_button, self.on_disarm_button)
 
-    def safe_state(self, state: State) -> str | None:
+    def safe_state(self, state: State | None) -> str | None:
         try:
             return state.state if state is not None else None
         except Exception as e:
@@ -352,7 +352,7 @@ class AlarmArmer:
                 awake = True
         else:
             awake = not self.is_night()
-        self.hass.states.async_set(f"{DOMAIN}.awake", awake, {})
+        self.hass.states.async_set(f"{DOMAIN}.awake", str(awake), {})
         return awake
 
     async def reset_armed_state(self, force_arm: bool = True, hint_arming: str | None = None) -> str | None:
@@ -441,7 +441,7 @@ class AlarmArmer:
             self.arming_in_progress.set()
             existing_state = self.armed_state()
             if arming_state != existing_state:
-                self.hass.states.async_set(self.alarm_panel, arming_state)
+                self.hass.states.async_set(self.alarm_panel, str(arming_state))
                 _LOGGER.info(
                     "AUTOARM Setting %s from %s to %s",
                     self.alarm_panel,
