@@ -42,6 +42,7 @@ repos:
           - --explicit-package-bases
           - --show-error-codes
           - --show-error-context
+          - --follow-untyped-imports
         exclude: docgen/.*\.py
         additional_dependencies:
           - homeassistant-stubs==2025.11.1
@@ -52,6 +53,7 @@ repos:
           - types-aiofiles
           - pytest_unordered
           - pytest_mock
+          - pytest-homeassistant-custom-component
 
 ci:
     autofix_commit_msg: |
