@@ -12,6 +12,20 @@
 Automate the arming and disarming of the built-in Home Assistant [Alarm
 Control Panel](https://www.home-assistant.io/integrations/alarm_control_panel/), with additional support for calendar integration, manual override via remote control buttons, and mobile push actionable notifications.
 
+!!! question inline end "Why use alarm control panels?"
+    A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful,
+    even if there is no real alarm system, as a single central place to hold the **overall state of
+    the home**, and then use that to drive automations, notifications etc
+
+    For example, it is likely that many things will change if `ARMED_VACATION` applies, and
+    you may want to have all PIR alerts silenced if alarm state is `DISARMED`. This builds
+    on how real alarm systems have worked for decades.
+
+    One big obstacle to using Alarm Control Panel is having to remember to change the
+    alarm panel state when people are in or out of the house, at night or when away on holiday.
+    *AutoArm* solves that problem, and makes the Alarm Control Panel essential for any
+    well-automated home.
+
 ## Setup
 
 Register this GitHub repo as a custom repo in your [HACS]( https://hacs.xyz) configuration.
@@ -72,12 +86,9 @@ rate limiting is applied around the arm call, limited to a set number of calls w
 the past so many seconds.
 
 
-```
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-
 ## Alarm Panel Configuration
 
-Autoarm will work with any Home Assistant [Alarm Control Panel](https://www.home-assistant.io/integrations/alarm_control_panel/) based integration, whether with a physical panel, virtual, virtual with generic switches for some modes, or entirely automated.
+Autoarm will work with any Home Assistant [Alarm Control Panel](https://www.home-assistant.io/integrations/alarm_control_panel/) based integration.
 
 If you don't already have an alarm panel, set up a default manual as below, which creates the
 state machine for armed/disarmed status. This is all you need in the way of alarm support for AutoArm to function. You can also choose whether a PIN code is needed or not to arm or disarm.
@@ -93,6 +104,13 @@ alarm_control_panel:
     trigger_time: 0
 ```
 
-See [Home Assistant Manual Control Panel docs](https://www.home-assistant.io/integrations/manual/) for more info.
+## Home Assistant features
 
-There's also a handy [Dashboard Alarm Panel](https://www.home-assistant.io/dashboards/alarm-panel/) widget to add to your Home Assistant dashboard.
+- The component is reloadable from the *Developer Tools* page
+- Autoarm exposes *entities* for its configuration, awake status and last calendar event.
+
+## References
+
+* [Home Assistant Calendar Integration](https://www.home-assistant.io/integrations/calendar/)
+* [Home Assistant Manual Control Panel docs](https://www.home-assistant.io/integrations/manual/) for more info.
+* Handy [Dashboard Alarm Panel](https://www.home-assistant.io/dashboards/alarm-panel/) widget to add to your Home Assistant dashboard.
