@@ -71,7 +71,7 @@ Arming can happen strictly by sunset and sunrise, and by occupancy.
 | night         | occupied        | ARMED_NIGHT    |
 | night         | occupied        | ARMED_AWAY     |
 
-(*) This can be overriden using `occupied_daytime_state` in the configuration, for example
+(*) This can be overridden using `occupied_daytime_state` in the configuration, for example
 if you prefer to have the alarm set to `disarmed` when people are home and its daylight.
 
 Two other states, `ARMED_VACATION` and `DISARMED` can be set manually, by buttons, or calendar.

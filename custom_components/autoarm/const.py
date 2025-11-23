@@ -57,12 +57,10 @@ PUSH_ACTION_SCHEMA = vol.Schema(
     extra=vol.ALLOW_EXTRA,
 )
 
-NOTIFY_DEF_SCHEMA = vol.Schema(
-    {vol.Optional(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict})
+NOTIFY_DEF_SCHEMA = vol.Schema({vol.Optional(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict})
 
 NOTIFY_SCHEMA = vol.Schema({
-    vol.Optional(NOTIFY_COMMON): {vol.Required(CONF_SERVICE): cv.service,
-                                  vol.Optional(CONF_DATA): dict},
+    vol.Optional(NOTIFY_COMMON): {vol.Required(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict},
     vol.Optional(NOTIFY_QUIET): NOTIFY_DEF_SCHEMA,
     vol.Optional(NOTIFY_NORMAL): NOTIFY_DEF_SCHEMA,
 })
@@ -78,8 +76,7 @@ CALENDAR_SCHEMA = vol.Schema({
     vol.Optional(CONF_ALIAS): cv.string,
     vol.Optional(CONF_CALENDAR_POLL_INTERVAL, default=30): cv.positive_int,
     vol.Optional(CONF_CALENDAR_EVENT_STATES, default=DEFAULT_CALENDAR_MAPPINGS): dict[  # type: ignore
-        vol.All(vol.Lower, vol.In(AlarmControlPanelState.__members__)
-                ), vol.All(cv.ensure_list, [cv.string])
+        vol.All(vol.Lower, vol.In(AlarmControlPanelState.__members__)), vol.All(cv.ensure_list, [cv.string])
     ],
 })
 CALENDAR_CONTROL_SCHEMA = vol.Schema({
@@ -96,7 +93,9 @@ CONFIG_SCHEMA = vol.Schema(
             vol.Optional(CONF_SUNRISE_CUTOFF): cv.time,
             vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
             vol.Optional(CONF_ARM_AWAY_DELAY, default=180): cv.positive_int,
-            vol.Optional(CONF_OCCUPIED_DAY_DEFAULT, default=AlarmControlPanelState.ARMED_HOME.value): vol.All(vol.Upper, vol.In(AlarmControlPanelState.__members__)),
+            vol.Optional(CONF_OCCUPIED_DAY_DEFAULT, default=AlarmControlPanelState.ARMED_HOME.value): vol.All(
+                vol.Upper, vol.In(AlarmControlPanelState.__members__)
+            ),
             vol.Optional(CONF_BUTTON_ENTITY_RESET): cv.entity_id,
             vol.Optional(CONF_BUTTON_ENTITY_AWAY): cv.entity_id,
             vol.Optional(CONF_BUTTON_ENTITY_DISARM): cv.entity_id,

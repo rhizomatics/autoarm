@@ -67,8 +67,7 @@ async def test_reset_sets_disarmed_from_unknown(hass: HomeAssistant, autoarmer: 
 
 
 async def test_reset_armed_state_uses_daytime_defaulr(hass: HomeAssistant) -> None:
-    autoarmer = AlarmArmer(hass, TEST_PANEL, occupied_daytime_default="disarmed", occupants=[
-                     "person.tester_bob"])
+    autoarmer = AlarmArmer(hass, TEST_PANEL, occupied_daytime_default="disarmed", occupants=["person.tester_bob"])
     await autoarmer.initialize()
     hass.states.async_set("sun.sun", "above_horizon")
     hass.states.async_set("person.tester_bob", "home")
