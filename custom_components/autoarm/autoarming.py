@@ -215,6 +215,7 @@ class AlarmArmer:
         self.notify_profiles: dict[str, dict] = notify or {}
         self.unsubscribes: list = []
         self.last_request: datetime.datetime | None = None
+        self.last_state_source: str | None = None
         self.calendar_events: dict[str, TrackedCalendarEvent] = {}
         self.button_device: dict[str, str] = {}
         self.arming_in_progress: asyncio.Event = asyncio.Event()
@@ -362,15 +363,19 @@ class AlarmArmer:
         _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", event.id, triggered_at)
         if event.arming_state != self.armed_state():
             _LOGGER.info("AUTOARM Calendar event %s changing arming to %s at %s", event.id, event.arming_state, triggered_at)
-            await self.arm(arming_state=event.arming_state)
-        self.hass.states.async_set(f"{DOMAIN}.last_calendar_event",
-                                   str(event.id),
-                                   attributes={"calendar": event.calendar_id,
-                                               "start": event.event.start_datetime_local,
-                                               "end": event.event.end_datetime_local,
-                                               "summary": event.event.summary,
-                                               "description": event.event.description,
-                                               "uid": event.event.uid})
+            await self.arm(arming_state=event.arming_state, source="calendar")
+        self.hass.states.async_set(
+            f"{DOMAIN}.last_calendar_event",
+            str(event.id),
+            attributes={
+                "calendar": event.calendar_id,
+                "start": event.event.start_datetime_local,
+                "end": event.event.end_datetime_local,
+                "summary": event.event.summary,
+                "description": event.event.description,
+                "uid": event.event.uid,
+            },
+        )
 
     async def on_calendar_event_end(self, event: TrackedCalendarEvent, ended_at: datetime.datetime) -> None:
         _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", event.id, ended_at)
@@ -378,8 +383,10 @@ class AlarmArmer:
             _LOGGER.info("AUTOARM Calendar event %s ended, and arming state", event.id)
             await self.reset_armed_state()
         elif self.calendar_no_event_mode in AlarmControlPanelState:
-            _LOGGER.info("AUTOARM Calendar event %s ended, and returning to fixed state %s", event.id, self.calendar_no_event_mode)
-            await self.arm(self.calendar_no_event_mode)
+            _LOGGER.info(
+                "AUTOARM Calendar event %s ended, and returning to fixed state %s", event.id, self.calendar_no_event_mode
+            )
+            await self.arm(self.calendar_no_event_mode, source="calendar")
         else:
             _LOGGER.debug("AUTOARM No action on calendar event end in manual mode")
 
@@ -506,7 +513,7 @@ class AlarmArmer:
             AlarmControlPanelState.ARMED_NIGHT,
         ):
             _LOGGER.info("AUTOARM Now unoccupied, arming")
-            await self.arm(AlarmControlPanelState.ARMED_AWAY)
+            await self.arm(AlarmControlPanelState.ARMED_AWAY, source="occupancy")
         elif self.is_occupied() and existing_state == AlarmControlPanelState.ARMED_AWAY:
             _LOGGER.info("AUTOARM Now occupied, resetting armed state")
             await self.reset_armed_state()
@@ -546,47 +553,51 @@ class AlarmArmer:
                 _LOGGER.debug("AUTOARM Ignoring reset while calendar configured, no active event, and default mode is manual")
                 return existing_state
             if self.calendar_no_event_mode in AlarmControlPanelState:
-                return await self.arm(self.calendar_no_event_mode)
+                return await self.arm(self.calendar_no_event_mode, "calendar")
             if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
                 _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
+                if self.last_state_source == "calendar":
+                    # force reset, may have been left in holiday state by a calendar entry
+                    force_arm = True
             else:
                 _LOGGER.warning("AUTOARM Unexpected state for calendar no event mode: %s", self.calendar_no_event_mode)
-        if existing_state == AlarmControlPanelState.DISARMED and not force_arm:
-            _LOGGER.debug("AUTOARM Ignoring unforced reset for disarmed")
-            return existing_state
 
-        if existing_state in OVERRIDE_STATES and not force_arm:
-            _LOGGER.debug("AUTOARM Ignoring reset for existing state: %s", existing_state)
-            return existing_state
+        if not force_arm:
+            if existing_state in OVERRIDE_STATES:
+                _LOGGER.debug("AUTOARM Ignoring reset for existing state: %s", existing_state)
+                return existing_state
+            if existing_state == AlarmControlPanelState.DISARMED:
+                _LOGGER.debug("AUTOARM Ignoring unforced reset for disarmed")
+                return existing_state
 
         if self.is_occupied():
             if self.auto_disarm and self.is_awake() and not force_arm:
                 _LOGGER.info("AUTOARM Disarming for occupied during waking hours")
-                return await self.arm(AlarmControlPanelState.DISARMED)
+                return await self.arm(AlarmControlPanelState.DISARMED, source="reset")
             if not self.is_awake():
                 _LOGGER.info("AUTOARM Arming for occupied out of waking hours")
-                return await self.arm(AlarmControlPanelState.ARMED_NIGHT)
+                return await self.arm(AlarmControlPanelState.ARMED_NIGHT, source="reset")
             if hint_arming:
                 _LOGGER.info("AUTOARM Using hinted arming state: %s", hint_arming)
-                return await self.arm(hint_arming)
+                return await self.arm(hint_arming, source="reset")
             _LOGGER.info("AUTOARM Defaulting to armed home")
-            return await self.arm(AlarmControlPanelState.ARMED_HOME)
+            return await self.arm(AlarmControlPanelState.ARMED_HOME, source="reset")
 
         if hint_arming:
             _LOGGER.info("AUTOARM Using hinted arming state: %s", hint_arming)
-            return await self.arm(hint_arming)
+            return await self.arm(hint_arming, source="reset")
         _LOGGER.info("AUTOARM Defaulting to armed away")
-        return await self.arm(AlarmControlPanelState.ARMED_AWAY)
+        return await self.arm(AlarmControlPanelState.ARMED_AWAY, source="reset")
 
     async def delayed_arm(
-        self, arming_state: str, reset: bool, requested_at: datetime.datetime, triggered_at: datetime.datetime
+        self,
+        arming_state: str,
+        reset: bool,
+        requested_at: datetime.datetime,
+        triggered_at: datetime.datetime,
+        source: str | None = None,
     ) -> None:
-        _LOGGER.debug(
-            "Delayed_arm %s, reset: %s, triggered at: %s",
-            arming_state,
-            reset,
-            triggered_at,
-        )
+        _LOGGER.debug("Delayed_arm %s, reset: %s, triggered at: %s, source%s", arming_state, reset, triggered_at, source)
 
         if self.last_request is not None and requested_at is not None:
             if self.last_request > requested_at:
@@ -603,15 +614,16 @@ class AlarmArmer:
         if reset:
             await self.reset_armed_state(force_arm=True, hint_arming=arming_state)
         else:
-            await self.arm(arming_state=arming_state)
+            await self.arm(arming_state=arming_state, source=source)
         return
 
-    async def arm(self, arming_state: str | None = None) -> str | None:
+    async def arm(self, arming_state: str | None = None, source: str | None = None) -> str | None:
         """Change alarm panel state
 
         Args:
         ----
             arming_state (str, optional): _description_. Defaults to None.
+            source (str,optional): Source of the change, for example 'calendar' or 'button'
 
         Returns:
         -------
@@ -632,6 +644,7 @@ class AlarmArmer:
                     existing_state,
                     arming_state,
                 )
+                self.last_state_source = source
                 return arming_state
             _LOGGER.debug("Skipping arm, as %s already %s", self.alarm_panel, arming_state)
             return existing_state
@@ -693,11 +706,11 @@ class AlarmArmer:
         self.register_request()
         match event.data.get("action"):
             case "ALARM_PANEL_DISARM":
-                await self.arm(AlarmControlPanelState.DISARMED)
+                await self.arm(AlarmControlPanelState.DISARMED, source="mobile")
             case "ALARM_PANEL_RESET":
                 await self.reset_armed_state(force_arm=True)
             case "ALARM_PANEL_AWAY":
-                await self.arm(AlarmControlPanelState.ARMED_AWAY)
+                await self.arm(AlarmControlPanelState.ARMED_AWAY, source="mobile")
             case _:
                 _LOGGER.debug("AUTOARM Ignoring mobile action: %s", event.data)
 
@@ -705,12 +718,12 @@ class AlarmArmer:
     async def on_disarm_button(self, event: Event) -> None:
         _LOGGER.info("AUTOARM Disarm Button: %s", event)
         self.register_request()
-        await self.arm(AlarmControlPanelState.DISARMED)
+        await self.arm(AlarmControlPanelState.DISARMED, source="button")
 
     @callback
     async def on_vacation_button(self, event: Event) -> None:
         _LOGGER.info("AUTOARM Vacation Button: %s", event)
-        await self.arm(AlarmControlPanelState.ARMED_VACATION)
+        await self.arm(AlarmControlPanelState.ARMED_VACATION, source="button")
 
     def register_request(self) -> None:
         self.last_request = datetime.datetime.now(datetime.UTC)
@@ -728,6 +741,7 @@ class AlarmArmer:
                         AlarmControlPanelState.ARMED_AWAY,
                         False,
                         dt_util.utc_from_timestamp(time.time()),
+                        source="button",
                     ),
                     dt_util.utc_from_timestamp(time.time() + self.arm_away_delay),
                 )
@@ -737,7 +751,7 @@ class AlarmArmer:
                 title="Arm for away process starting",
             )
         else:
-            await self.arm(AlarmControlPanelState.ARMED_AWAY)
+            await self.arm(AlarmControlPanelState.ARMED_AWAY, source="button")
 
     @callback
     async def on_sunrise(self) -> None:
@@ -754,7 +768,9 @@ class AlarmArmer:
             trigger = datetime.datetime.combine(now.date(), self.sunrise_cutoff, tzinfo=self.local_tz)
             self.unsubscribes.append(
                 async_track_point_in_time(
-                    self.hass, partial(self.delayed_arm, AlarmControlPanelState.ARMED_HOME, True, now), trigger
+                    self.hass,
+                    partial(self.delayed_arm, AlarmControlPanelState.ARMED_HOME, True, now, source="sunrise"),
+                    trigger,
                 )
             )
 

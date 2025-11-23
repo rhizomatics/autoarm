@@ -71,7 +71,7 @@ async def test_arm_on_away(hass: HomeAssistant) -> None:
     hass.states.async_set("person.house_owner", "not_home")
     hass.states.async_set("person.tenant", "not_home")
     await hass.async_block_till_done()
-    assert hass.states.get("alarm_panel.testing").state == "armed_away"
+    assert hass.states.get("alarm_panel.testing").state == "armed_away"  # type: ignore
 
 
 async def test_disarm_on_button(hass: HomeAssistant) -> None:
@@ -81,7 +81,7 @@ async def test_disarm_on_button(hass: HomeAssistant) -> None:
 
     hass.states.async_set("binary_sensor.button_middle", "on")
     await hass.async_block_till_done()
-    assert hass.states.get("alarm_panel.testing").state == "disarmed"
+    assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
 
 
 async def test_disarm_on_mobile_action(hass: HomeAssistant) -> None:
@@ -91,7 +91,7 @@ async def test_disarm_on_mobile_action(hass: HomeAssistant) -> None:
 
     hass.bus.async_fire("mobile_app_notification_action", {"action": "ALARM_PANEL_DISARM"})
     await hass.async_block_till_done()
-    assert hass.states.get("alarm_panel.testing").state == "disarmed"
+    assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
 
 
 async def test_delayed_arm_on_button(hass: HomeAssistant) -> None:
@@ -102,4 +102,4 @@ async def test_delayed_arm_on_button(hass: HomeAssistant) -> None:
     hass.states.async_set("binary_sensor.button_right", "on")
     await hass.async_block_till_done()
     await asyncio.sleep(2)
-    assert hass.states.get("alarm_panel.testing").state == "armed_away"
+    assert hass.states.get("alarm_panel.testing").state == "armed_away"  # type: ignore
