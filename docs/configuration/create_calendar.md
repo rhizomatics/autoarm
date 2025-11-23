@@ -7,9 +7,9 @@ This is one way of using AutoArm, you can choose to use other types of calendars
 
 1. From the *Settings* | *Integration* screen, choose **Add Integration**.
 2. From this dialogue, choose **Local Calendar**
-![Add Integration](../assets/images/add_calendar_integration.png)
+![Add Integration](../assets/images/add_calendar_integration.png){width=480}
 3. Configure the integration by choosing its name
-![Configure Integration](../assets/images/configure_calendar.png)
+![Configure Integration](../assets/images/configure_calendar.png){width=480}
 
 ## Configure AutoArm
 
@@ -30,13 +30,13 @@ automatically handle the other times.
 
 If you don't have a **Calendar** option in the Home Assistant side-bar, then go to the personal settings ( bottom left corner, with your name against it) and change the visibility as:
 
-![Make Calendar Visible in Side Bar](../assets/images/edit_sidebar.png)
+![Make Calendar Visible in Side Bar](../assets/images/edit_sidebar.png){width=480}
 
 ## Setup a Disarm Schedule
 
 Now that you have access to the calendar screen, add a recurring event for disarming.
 
-![Add Event](../assets/images/add_event.png)
+![Add Event](../assets/images/add_event.png){width=480}
 
 ## Changing your Mind
 
