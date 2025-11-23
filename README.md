@@ -49,7 +49,7 @@ for more information.
 ### Calendar Integration
 
 Use a Home Assistant [calendar integration](https://www.home-assistant.io/integrations/?cat=calendar) to
-define when and how to arm the control panel.
+define when and how to arm the control panel. If you don't have one, follow these [instructions](configuration/create_calendar.md).
 
 This can be an entry for that purpose, for example a recurring entry on a [Local Calendar](https://www.home-assistant.io/integrations/local_calendar/) dedicated to AutoArm, or looking up an existing calendar to find vacations by pattern.
 
