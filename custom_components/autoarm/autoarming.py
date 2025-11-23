@@ -49,6 +49,7 @@ from .const import (
     CONFIG_SCHEMA,
     DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
+    NO_CAL_EVENT_MODE_MANUAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -361,7 +362,7 @@ class AlarmArmer:
     async def on_calendar_event_end(self, event: TrackedCalendarEvent, ended_at: datetime.datetime) -> None:
         _LOGGER.debug("AUTOARM Calendar event %s ended at %s", event.id, ended_at)
         if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
-            await self.reset_armed_state(force_arm=True)
+            await self.reset_armed_state()
         elif self.calendar_no_event_mode in AlarmControlPanelState:
             await self.arm(self.calendar_no_event_mode)
         else:
@@ -522,9 +523,19 @@ class AlarmArmer:
         )
 
         existing_state = self.armed_state()
-        if self.active_calendar_event() and not force_arm:
-            _LOGGER.debug("AUTOARM Ignoring unforced reset while calendar event active")
-            return existing_state
+        if self.calendar_entity:
+            if self.active_calendar_event():
+                _LOGGER.debug("AUTOARM Ignoring reset while calendar event active")
+                return existing_state
+            if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_MANUAL:
+                _LOGGER.debug("AUTOARM Ignoring reset while calendar configured, no active event, and default mode is manual")
+                return existing_state
+            if self.calendar_no_event_mode in AlarmControlPanelState:
+                return await self.arm(self.calendar_no_event_mode)
+            if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
+                _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
+            else:
+                _LOGGER.warning("AUTOARM Unexpected state for calendar no event mode: %s", self.calendar_no_event_mode)
         if existing_state == AlarmControlPanelState.DISARMED and not force_arm:
             _LOGGER.debug("AUTOARM Ignoring unforced reset for disarmed")
             return existing_state
@@ -629,19 +640,21 @@ class AlarmArmer:
                 merged_profile.update(selected_profile)
                 merged_profile_data.update(selected_profile_data)
             merged_profile["data"] = merged_profile_data
-            notify_service = merged_profile["service"].replace("notify.", "")
+            notify_service = merged_profile.get("service", "").replace("notify.", "")
 
             title = title or "Alarm Auto Arming"
-            if merged_profile:
+            if notify_service and merged_profile:
                 data = merged_profile.get("data", {})
                 await self.hass.services.async_call(
                     "notify",
                     notify_service,
                     service_data={"message": message, "title": title, "data": data},
                 )
+            else:
+                _LOGGER.debug("AUTOARM Skipped notification, service: %s, data: %s", notify_service, merged_profile)
 
-        except Exception as e:
-            _LOGGER.error("AUTOARM %s failed %s", notify_service, e)
+        except Exception:
+            _LOGGER.exception("AUTOARM %s failed", notify_service)
 
     @callback
     async def on_sleep_start(self, called_time: datetime.datetime) -> None:
