@@ -3,6 +3,7 @@ import datetime as dt
 from typing import TYPE_CHECKING
 
 import homeassistant.util.dt as dt_util
+from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.setup import async_setup_component
 
 from custom_components.autoarm.const import (
@@ -18,8 +19,9 @@ from custom_components.autoarm.const import (
 
 if TYPE_CHECKING:
     from homeassistant.components.calendar import CalendarEvent
+    from homeassistant.helpers.typing import ConfigType
 from homeassistant.components.calendar import CalendarEntity
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, State
 
 CONFIG = {
     DOMAIN: {
@@ -32,6 +34,15 @@ CONFIG = {
         CONF_CALENDAR_EVENT_STATES: {"armed_away": ["Away"], "armed_vacation": ["Holiday.*"]},
     }
 }
+
+
+def panel_state(hass: HomeAssistant) -> AlarmControlPanelState | None:
+    state = hass.states.get("alarm_panel.testing")
+    if state is None:
+        return None
+    if state.state in AlarmControlPanelState:
+        return AlarmControlPanelState(state.state)
+    return None
 
 
 async def test_fragile_calendar_fixture(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
@@ -72,8 +83,8 @@ async def test_calendar_live_event(local_calendar: CalendarEntity, hass: HomeAss
     assert await async_setup_component(hass, "autoarm", CONFIG)
     await hass.async_block_till_done()
 
-    assert hass.states.get("alarm_panel.testing").state == "armed_vacation"  # type: ignore
-    last_event = hass.states.get("autoarm.last_calendar_event")
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
+    last_event: State | None = hass.states.get("autoarm.last_calendar_event")
     assert last_event is not None
     assert last_event.attributes["calendar"] == "calendar.testing_calendar"
     assert last_event.attributes["summary"] == "Holidays in Bahamas!!"
@@ -95,7 +106,7 @@ async def test_calendar_dead_events(local_calendar: CalendarEntity, hass: HomeAs
     assert await async_setup_component(hass, "autoarm", CONFIG)
     await hass.async_block_till_done()
 
-    assert hass.states.get("alarm_panel.testing").state == "armed_away"  # type: ignore
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
 
 
 async def test_calendar_near_future_event(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
@@ -111,14 +122,14 @@ async def test_calendar_near_future_event(local_calendar: CalendarEntity, hass: 
     await hass.async_block_till_done()
     await asyncio.sleep(2)
 
-    assert hass.states.get("alarm_panel.testing").state == "armed_vacation"  # type: ignore
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
 
 
 async def test_calendar_event_ending_shortly(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
     hass.states.async_set("person.tenant", "home", {"friendly_name": "Jill"})
 
-    start = dt_util.start_of_local_day()
-    end = dt_util.now() + dt.timedelta(seconds=2)
+    start: dt.datetime = dt_util.start_of_local_day()
+    end: dt.datetime = dt_util.now() + dt.timedelta(seconds=2)
     await local_calendar.async_create_event(
         dtstart=start,
         dtend=end,
@@ -127,10 +138,10 @@ async def test_calendar_event_ending_shortly(local_calendar: CalendarEntity, has
     hass.states.async_set("alarm_panel.testing", "armed_away")
     assert await async_setup_component(hass, "autoarm", CONFIG)
     await hass.async_block_till_done()
-    assert hass.states.get("alarm_panel.testing").state == "armed_vacation"  # type: ignore
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
     await asyncio.sleep(3)
 
-    assert hass.states.get("alarm_panel.testing").state in ("armed_home", "armed_night")  # type: ignore
+    assert panel_state(hass) in (AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
 
 
 async def test_calendar_event_ending_fixed_mode(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
@@ -144,28 +155,49 @@ async def test_calendar_event_ending_fixed_mode(local_calendar: CalendarEntity, 
         summary="Holidays in Bahamas!!",
     )
     hass.states.async_set("alarm_panel.testing", "armed_away")
-    local_config = CONFIG.copy()
+    local_config: ConfigType = CONFIG.copy()
     local_config[DOMAIN][CONF_CALENDAR_NO_EVENT] = "disarmed"
     assert await async_setup_component(hass, "autoarm", local_config)
     await hass.async_block_till_done()
-    assert hass.states.get("alarm_panel.testing").state == "armed_vacation"  # type: ignore
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
     await asyncio.sleep(3)
 
-    assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
+    assert panel_state(hass) == AlarmControlPanelState.DISARMED
+
+
+async def test_calendar_event_ending_manual_mode(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
+    hass.states.async_set("person.tenant", "home", {"friendly_name": "Jill"})
+
+    start: dt.datetime = dt_util.start_of_local_day()
+    end: dt.datetime = dt_util.now() + dt.timedelta(seconds=2)
+    await local_calendar.async_create_event(
+        dtstart=start,
+        dtend=end,
+        summary="Holidays in Bahamas!!",
+    )
+    hass.states.async_set("alarm_panel.testing", "armed_away")
+    local_config: ConfigType = CONFIG.copy()
+    local_config[DOMAIN][CONF_CALENDAR_NO_EVENT] = "manual"
+    assert await async_setup_component(hass, "autoarm", local_config)
+    await hass.async_block_till_done()
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
+    await asyncio.sleep(3)
+
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
 
 
 async def test_calendar_multiple_calendars(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
-    start_of_day = dt_util.start_of_local_day()
-    end_of_day = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
+    start_of_day: dt.datetime = dt_util.start_of_local_day()
+    end_of_day: dt.datetime = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
     await local_calendar.async_create_event(
         dtstart=start_of_day,
         dtend=end_of_day,
         summary="Holidays in Bahamas!!",
     )
-    local_config = CONFIG.copy()
+    local_config: ConfigType = CONFIG.copy()
     local_config[DOMAIN][CONF_CALENDAR_ENTITY] = ["calendar.testing_calendar", "calendar.google", "calendar.workday"]
     hass.states.async_set("alarm_panel.testing", "armed_away")
     assert await async_setup_component(hass, "autoarm", CONFIG)
     await hass.async_block_till_done()
 
-    assert hass.states.get("alarm_panel.testing").state == "armed_vacation"  # type: ignore
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION

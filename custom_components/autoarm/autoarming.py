@@ -121,10 +121,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 
 class TrackedCalendarEvent:
-    def __init__(self, calendar_id: str,
-                  event: CalendarEvent, 
-                  arming_state: str, 
-                  armer: "AlarmArmer") -> None:
+    def __init__(self, calendar_id: str, event: CalendarEvent, arming_state: str, armer: "AlarmArmer") -> None:
         self.tracked_at = dt_util.now()
         self.calendar_id = calendar_id
         self.id = TrackedCalendarEvent.event_id(calendar_id, event)
