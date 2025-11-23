@@ -41,8 +41,7 @@ NOTIFY_CATEGORIES = [NOTIFY_COMMON, NOTIFY_QUIET, NOTIFY_NORMAL]
 
 _LOGGER = logging.getLogger(__name__)
 
-NOTIFY_DEF_SCHEMA = vol.Schema(
-    {vol.Optional(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict})
+NOTIFY_DEF_SCHEMA = vol.Schema({vol.Optional(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict})
 
 NOTIFY_SCHEMA = vol.Schema({
     vol.Optional(NOTIFY_COMMON): {vol.Required(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict},
@@ -61,8 +60,7 @@ CALENDAR_SCHEMA = vol.Schema({
     vol.Optional(CONF_ALIAS): cv.string,
     vol.Optional(CONF_CALENDAR_POLL_INTERVAL, default=30): cv.positive_int,
     vol.Optional(CONF_CALENDAR_EVENT_STATES, default=DEFAULT_CALENDAR_MAPPINGS): dict[  # type: ignore
-        vol.All(vol.Lower, vol.In(AlarmControlPanelState.__members__)
-                ), vol.All(cv.ensure_list, [cv.string])
+        vol.All(vol.Lower, vol.In(AlarmControlPanelState.__members__)), vol.All(cv.ensure_list, [cv.string])
     ],
 })
 CALENDAR_CONTROL_SCHEMA = vol.Schema({

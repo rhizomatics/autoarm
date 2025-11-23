@@ -1,7 +1,7 @@
 # Create a Calendar
 
 This *How To* will show you how to create a new calendar dedicated for controlling alarm control panel state.
-This is one way of using AutoArm, you can choose to use other types of calendars, re-use events from existing calendars, or mix-n-match.
+This is one way of using AutoArm, you can choose to use other types of calendars, reuse events from existing calendars, or mix-n-match.
 
 ## Add the Calendar Integration
 
@@ -24,7 +24,7 @@ autoarm:
 ```
 
 This calendar is going to be used very simply to disarm the alarm during set periods, and let AutoArm
-automatically handle the other times. 
+automatically handle the other times.
 
 ## Access the Calendar
 
@@ -46,7 +46,7 @@ day or all the recurring entries. Similarly you can delete one day from a recurr
 ## Adding Vacations
 
 You may have vacation events already on another calendar integration ( like Remote or Google Calendar ),
-or may want to add them to this one. 
+or may want to add them to this one.
 
 Here's how that might look:
 
@@ -58,7 +58,7 @@ autoarm:
             disarmed: Disarmed
       - entity_id: calendar.family_happenings
         state_patterns:
-            armed_vacation: 
+            armed_vacation:
               - Camping Trip.*
               - .*Holidays.*
             armed_away:

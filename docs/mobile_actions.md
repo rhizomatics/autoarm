@@ -7,7 +7,7 @@ AutoArm listens out for the result of [Actionable Notifications](https://compani
 | ALARM_PANEL_DISARM |
 | ALARM_PANEL_RESET  |
 | ALARM_PANEL_AWAY   |
-           
+
 Here's how to send a notification to a mobile app, with a Disarm action:
 
 ```yaml
