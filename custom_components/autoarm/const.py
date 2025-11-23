@@ -4,12 +4,12 @@ import logging
 
 import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
-from homeassistant.const import CONF_ALIAS, CONF_ENTITY_ID, CONF_ICON, CONF_SERVICE
+from homeassistant.const import CONF_ALIAS, CONF_ENTITY_ID, CONF_SERVICE
 from homeassistant.helpers import config_validation as cv
 
 DOMAIN = "autoarm"
 
-ATTR_ACTION="action"
+ATTR_ACTION = "action"
 CONF_DATA = "data"
 CONF_NOTIFY = "notify"
 CONF_ALARM_PANEL = "alarm_panel"
@@ -41,7 +41,8 @@ NOTIFY_CATEGORIES = [NOTIFY_COMMON, NOTIFY_QUIET, NOTIFY_NORMAL]
 
 _LOGGER = logging.getLogger(__name__)
 
-NOTIFY_DEF_SCHEMA = vol.Schema({vol.Optional(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict})
+NOTIFY_DEF_SCHEMA = vol.Schema(
+    {vol.Optional(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict})
 
 NOTIFY_SCHEMA = vol.Schema({
     vol.Optional(NOTIFY_COMMON): {vol.Required(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict},
@@ -60,7 +61,8 @@ CALENDAR_SCHEMA = vol.Schema({
     vol.Optional(CONF_ALIAS): cv.string,
     vol.Optional(CONF_CALENDAR_POLL_INTERVAL, default=30): cv.positive_int,
     vol.Optional(CONF_CALENDAR_EVENT_STATES, default=DEFAULT_CALENDAR_MAPPINGS): dict[  # type: ignore
-        vol.All(vol.Lower, vol.In(AlarmControlPanelState.__members__)), vol.All(cv.ensure_list, [cv.string])
+        vol.All(vol.Lower, vol.In(AlarmControlPanelState.__members__)
+                ), vol.All(cv.ensure_list, [cv.string])
     ],
 })
 CALENDAR_CONTROL_SCHEMA = vol.Schema({

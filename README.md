@@ -130,7 +130,7 @@ notify:
         priority: medium
 ```
 
-For more notification flexibility, try [Supernotify][https://supernotify.rhizomatics.org.uk]
+For more notification flexibility, try [Supernotify](https://supernotify.rhizomatics.org.uk)
 
 ## Home Assistant features
 
