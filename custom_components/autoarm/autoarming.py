@@ -125,23 +125,37 @@ class TrackedCalendarEvent:
         self.tracked_at = dt_util.now()
         self.calendar_id = calendar_id
         self.id = TrackedCalendarEvent.event_id(calendar_id, event)
-        _LOGGER.info("AUTOARM Now tracking %s event %s, %s", calendar_id, event.uid, event.summary)
         self.event: CalendarEvent = event
         self.arming_state: str = arming_state
         self.start_listener: Callable | None = None
         self.end_listener: Callable | None = None
-        if event.start_datetime_local > self.tracked_at:
+        self.armer = armer
+
+    async def initialize(self) -> None:
+
+        if self.event.start_datetime_local > self.tracked_at:
             self.start_listener = async_track_point_in_time(
-                armer.hass,
-                partial(armer.on_calendar_event_start, self),
-                event.start_datetime_local,
+                self.armer.hass,
+                partial(self.armer.on_calendar_event_start, self),
+                self.event.start_datetime_local,
             )
-        if event.end_datetime_local > self.tracked_at:
+            self.track_state = "pending"
+        else:
+            await self.armer.on_calendar_event_start(self, dt_util.now())
+            self.track_state = "started"
+        if self.event.end_datetime_local > self.tracked_at:
             self.end_listener = async_track_point_in_time(
-                armer.hass,
-                partial(armer.on_calendar_event_end, self),
-                event.end_datetime_local,
+                self.armer.hass,
+                self.end,
+                self.event.end_datetime_local,
             )
+        _LOGGER.info("AUTOARM Now tracking %s event %s, %s", self.calendar_id, self.event.uid, self.event.summary)
+
+    async def end(self, event_time: datetime.datetime) -> None:
+        _LOGGER.debug("AUTOARM Calendar event %s ended, event_time: %s", self.id, event_time)
+        await self.armer.on_calendar_event_end(self, dt_util.now())
+        self.track_state = "ended"
+        self.cancel_listeners()
 
     @classmethod
     def event_id(cls, calendar_id: str, event: CalendarEvent) -> str:
@@ -149,10 +163,14 @@ class TrackedCalendarEvent:
         return f"{calendar_id}:{uid}"
 
     def is_current(self) -> bool:
+        if self.track_state == "ended":
+            return False
         now_local: datetime.datetime = dt_util.now()
         return now_local >= self.event.start_datetime_local and now_local <= self.event.end_datetime_local
 
     def is_future(self) -> bool:
+        if self.track_state == "ended":
+            return False
         now_local: datetime.datetime = dt_util.now()
         return self.event.start_datetime_local > now_local
 
@@ -343,16 +361,14 @@ class AlarmArmer:
                             _LOGGER.debug("AUTOARM Calendar matched %d events for state %s", len(events), state)
                             if event_id not in self.calendar_events:
                                 self.calendar_events[event_id] = TrackedCalendarEvent(calendar.entity_id, event, state, self)
-                            tracked_event: TrackedCalendarEvent = self.calendar_events[event_id]
-                            if tracked_event.is_current():
-                                await self.on_calendar_event_start(tracked_event, dt_util.now())
+                                await self.calendar_events[event_id].initialize()
 
             to_remove: list[str] = []
             for event_id, tevent in self.calendar_events.items():
                 if not tevent.is_current() and not tevent.is_future():
                     _LOGGER.debug("AUTOARM Pruning expire calendar event: %s", tevent.event.uid)
                     to_remove.append(event_id)
-                    tevent.cancel_listeners()
+                    await tevent.end(dt_util.now())
             for event_id in to_remove:
                 del self.calendar_events[event_id]
 
@@ -379,6 +395,9 @@ class AlarmArmer:
 
     async def on_calendar_event_end(self, event: TrackedCalendarEvent, ended_at: datetime.datetime) -> None:
         _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", event.id, ended_at)
+        if any(tevent.is_current() for tevent in self.calendar_events.values()):
+            _LOGGER.debug("AUTOARM No action on event end since other cal event active")
+            return
         if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
             _LOGGER.info("AUTOARM Calendar event %s ended, and arming state", event.id)
             await self.reset_armed_state()
