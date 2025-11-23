@@ -2,8 +2,6 @@ autoarm:
   alarm_panel: alarm_panel.testing
   auto_arm: true
   arm_away_delay: 180
-  sleep_start: "09:00:00"
-  sleep_end: "22:00:00"
   sunrise_cutoff: "06:30:00"
   reset_button: binary_sensor.button_left
   away_button: binary_sensor.button_right

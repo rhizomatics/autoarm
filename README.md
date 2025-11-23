@@ -2,22 +2,65 @@
 
 # Alarm Auto Arming
 
+
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/rhizomatics/autoarm)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/rhizomatics/autoarm/main.svg)](https://results.pre-commit.ci/latest/github/rhizomatics/autoarm/main)
+[![Github Deploy](https://github.com/rhizomatics/autoarm/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/rhizomatics/autoarm/actions/workflows/deploy.yml)
+[![CodeQL](https://github.com/rhizomatics/autoarm/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/rhizomatics/autoarm/actions/workflows/github-code-scanning/codeql)
+[![Dependabot Updates](https://github.com/rhizomatics/autoarm/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/rhizomatics/autoarm/actions/workflows/dependabot/dependabot-updates)
+
 Automate the arming and disarming of the built-in Home Assistant [Alarm
-Control Panel](https://www.home-assistant.io/integrations/alarm_control_panel/), with additional support for manual override via remote control buttons, and mobile push actionable notifications.
+Control Panel](https://www.home-assistant.io/integrations/alarm_control_panel/), with additional support for calendar integration, manual override via remote control buttons, and mobile push actionable notifications.
 
 ## Setup
 
-Register this GitHub repo as a custom repo
-in your [HACS]( https://hacs.xyz) configuration.
+Register this GitHub repo as a custom repo in your [HACS]( https://hacs.xyz) configuration.
 
-Notifications will work with any HomeAssistant notification implementation
-but works best with [Supernotifier](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
+Notifications will work with any HomeAssistant notification implementation, and works best with [Supernotifier](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
 
-## Diurnal settings
+## Automated Arming
 
-Arming can happen strictly by sunset and sunrise.
-Alternatively, a defined `sleep_start` and `sleep_end` can be specified, so there's more
-predictability, especially for high latitudes where sunrise varies wildly through the year.
+Arming has 4 complementary modes of operation:
+
+### Button Integration
+
+Handy if you have a Zigbee, 433Mhz or similar button panel by the door - choose a button
+for `DISARMED`,`ARMED_AWAY` etc, or a *Reset* button to set the panel by the default algorithm.
+
+### Mobile Action
+
+This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/)
+
+### Calendar Integration
+
+Use a Home Assistant [calendar integration](https://www.home-assistant.io/integrations/?cat=calendar) to
+define when and how to arm the control panel.
+
+This can be an entry for that purpose, for example a recurring entry on a [Local Calendar](https://www.home-assistant.io/integrations/local_calendar/) dedicated to AutoArm, or looking up an existing calendar to find vacations by pattern.
+
+Using a [Remote Calendar](https://www.home-assistant.io/integrations/remote_calendar/), [Google Calendar](https://www.home-assistant.io/integrations/google/) or similar also means that alarm scheduling
+can be done remotely, even if you have no remote access to Home Assistant.
+
+Multiple calendars, of different types, can be configured, and specific alarm states / match patterns per calendar. See the [example configuration](configuration/examples/typical.md)
+
+If there's no calendar event live, then arming state can fall back to the Sun and Occupancy Automation,
+or fixed at a default state, or left to manual control.
+
+### Default Algorithm - Sun and Occupancy
+
+Arming can happen strictly by sunset and sunrise, and by occupancy.
+
+| Diurnal State | Occupancy State | Alarm State  |
+| ------------- | --------------- | ------------ |
+| day           | occupied        | ARMED_HOME   |
+| day           | empty           | ARMED_AWAY   |
+| night         | occupied        | ARMED_NIGHT  |
+| night         | occupied        | ARMED_AWAY   |
+
+Two other states, `ARMED_VACATION` and `DISARMED` can be set manually, by buttons, or calendar.
+
+If you need more predictability, especially for high latitudes where sunrise varies wildly through the year,
+set up a calendar and define exactly when you want disarming or arming to happen.
 
 Similarly, there's a `sunrise_cutoff` option to prevent alarm being armed at
 4am if you live far North, like Norway or Scotland.
@@ -28,50 +71,6 @@ To guard against loops, or other reasons why arming might be triggered too often
 rate limiting is applied around the arm call, limited to a set number of calls within
 the past so many seconds.
 
-## Example Configuration
-
-Configure in the Home Assistant config, either as a block in a config file, or as a file
-of its own using an ``include``.
-
-```yaml
-autoarm:
-    alarm_panel: alarm_panel.testing
-    auto_arm: True
-    sleep_start: "09:00:00"
-    sleep_end: "22:00:00"
-    sunrise_cutoff: "06:30:00"
-    arm_away_delay: 180
-    reset_button: binary_sensor.button_left
-    away_button: binary_sensor.button_right
-    disarm_button: binary_sensor.button_middle
-    throttle_seconds: 30
-    throttle_calls: 6
-    occupants:
-        - person.house_owner
-        - person.tenant
-    notify:
-        common:
-            service: notify.supernotifier
-            data:
-                actions:
-                    action_groups: alarm_panel
-                    action_category: alarm_panel
-        quiet:
-            data:
-                priority: low
-        normal:
-            data:
-                priority: medium
-    actions:
-        - action: ALARM_PANEL_DISARM
-          title: Disarm Alarm Panel
-          icon: sfsymbols:bell.slash
-        - action: ALARM_PANEL_RESET
-          title: Reset Alarm Panel
-          icon: sfsymbols:bell
-        - action: ALARM_PANEL_AWAY
-          title: Arm Alarm Panel for Going Away
-          icon: sfsymbols:airplane
 
 ```
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
