@@ -1,4 +1,3 @@
-
 import asyncio
 import datetime as dt
 from unittest.mock import ANY
@@ -16,15 +15,18 @@ from custom_components.autoarm.const import (
 )
 
 
-async def test_calendar_bare_lifecycle(local_calendar: CalendarEntity,
-                              calendar_platform: EntityPlatform,
-                              mock_armer_real_hass: AlarmArmer) -> None:
+async def test_calendar_bare_lifecycle(
+    local_calendar: CalendarEntity, calendar_platform: EntityPlatform, mock_armer_real_hass: AlarmArmer
+) -> None:
 
-    uut = TrackedCalendar({CONF_ENTITY_ID: local_calendar.entity_id,
-                CONF_CALENDAR_POLL_INTERVAL: 10,
-                CONF_CALENDAR_EVENT_STATES: {"armed_away": [
-                    "Away"], "armed_vacation": ["Holiday.*"]}
-                }, mock_armer_real_hass)
+    uut = TrackedCalendar(
+        {
+            CONF_ENTITY_ID: local_calendar.entity_id,
+            CONF_CALENDAR_POLL_INTERVAL: 10,
+            CONF_CALENDAR_EVENT_STATES: {"armed_away": ["Away"], "armed_vacation": ["Holiday.*"]},
+        },
+        mock_armer_real_hass,
+    )
 
     await uut.initialize(calendar_platform)
     assert uut.enabled
@@ -35,15 +37,18 @@ async def test_calendar_bare_lifecycle(local_calendar: CalendarEntity,
     assert not uut.enabled
 
 
-async def test_calendar_tracks_event(local_calendar: CalendarEntity,
-                              calendar_platform: EntityPlatform,
-                              mock_armer_real_hass: AlarmArmer) -> None:
+async def test_calendar_tracks_event(
+    local_calendar: CalendarEntity, calendar_platform: EntityPlatform, mock_armer_real_hass: AlarmArmer
+) -> None:
 
-    uut = TrackedCalendar({CONF_ENTITY_ID: local_calendar.entity_id,
-                CONF_CALENDAR_POLL_INTERVAL: 10,
-                CONF_CALENDAR_EVENT_STATES: {"armed_away": [
-                    "Away"], "armed_vacation": ["Holiday.*"]}
-                }, mock_armer_real_hass)
+    uut = TrackedCalendar(
+        {
+            CONF_ENTITY_ID: local_calendar.entity_id,
+            CONF_CALENDAR_POLL_INTERVAL: 10,
+            CONF_CALENDAR_EVENT_STATES: {"armed_away": ["Away"], "armed_vacation": ["Holiday.*"]},
+        },
+        mock_armer_real_hass,
+    )
     await local_calendar.async_create_event(
         dtstart=dt_util.now() - dt.timedelta(minutes=2),
         dtend=dt_util.now() + dt.timedelta(minutes=2),
@@ -64,15 +69,18 @@ async def test_calendar_tracks_event(local_calendar: CalendarEntity,
     assert not uut.has_active_event()
 
 
-async def test_calendar_prunes_events(local_calendar: CalendarEntity,
-                              calendar_platform: EntityPlatform,
-                              mock_armer_real_hass: AlarmArmer) -> None:
+async def test_calendar_prunes_events(
+    local_calendar: CalendarEntity, calendar_platform: EntityPlatform, mock_armer_real_hass: AlarmArmer
+) -> None:
 
-    uut = TrackedCalendar({CONF_ENTITY_ID: local_calendar.entity_id,
-                CONF_CALENDAR_POLL_INTERVAL: 10,
-                CONF_CALENDAR_EVENT_STATES: {"armed_away": [
-                    "Away"], "armed_vacation": ["Holiday.*"]}
-                }, mock_armer_real_hass)
+    uut = TrackedCalendar(
+        {
+            CONF_ENTITY_ID: local_calendar.entity_id,
+            CONF_CALENDAR_POLL_INTERVAL: 10,
+            CONF_CALENDAR_EVENT_STATES: {"armed_away": ["Away"], "armed_vacation": ["Holiday.*"]},
+        },
+        mock_armer_real_hass,
+    )
     await local_calendar.async_create_event(
         dtstart=dt_util.now() - dt.timedelta(minutes=20),
         dtend=dt_util.now() + dt.timedelta(seconds=2),

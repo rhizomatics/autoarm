@@ -1,17 +1,20 @@
 import asyncio
+import contextlib
 import datetime
 import logging
 import time
 from collections.abc import Callable
+from dataclasses import dataclass
 from functools import partial
-from typing import cast
+from typing import Any, cast
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
-from homeassistant.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP, STATE_HOME
-from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
+from homeassistant.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP, SERVICE_RELOAD, STATE_HOME
+from homeassistant.core import Event, EventStateChangedData, HomeAssistant, ServiceCall, State, callback
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.event import (
     async_track_point_in_time,
@@ -20,7 +23,12 @@ from homeassistant.helpers.event import (
     async_track_sunset,
     async_track_utc_time_change,
 )
+from homeassistant.helpers.reload import (
+    async_integration_yaml_config,
+)
+from homeassistant.helpers.service import async_register_admin_service
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.util.hass_dict import HassKey
 
 from .calendar import TrackedCalendar, TrackedCalendarEvent
 from .const import (
@@ -58,11 +66,55 @@ EPHEMERAL_STATES = (
 )
 ZOMBIE_STATES = ("unknown", "unavailable")
 NS_MOBILE_ACTIONS = "mobile_actions"
+PLATFORMS = ["autoarm"]
+
+HASS_DATA_KEY: HassKey["AutoArmData"] = HassKey(DOMAIN)
 
 
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+@dataclass
+class AutoArmData:
+    armer: "AlarmArmer"
+    other_data: dict[str, Any]
+
+
+# async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+async def async_setup(
+    hass: HomeAssistant,
+    config: ConfigType,
+) -> bool:
     _ = CONFIG_SCHEMA
+    if DOMAIN not in config:
+        _LOGGER.warning("AUTOARM No config found")
+        return True
     config = config.get(DOMAIN, {})
+    expose_config_entity(hass, config)
+    hass.data[HASS_DATA_KEY] = AutoArmData(_async_process_config(hass, config), {})
+    await hass.data[HASS_DATA_KEY].armer.initialize()
+
+    async def reload_service_handler(service_call: ServiceCall) -> None:
+        """Reload yaml entities."""
+        config = None
+        _LOGGER.info("AUTOARM Reloading %s.%s component, data %s", service_call.domain, service_call.service, service_call.data)
+        with contextlib.suppress(HomeAssistantError):
+            config = await async_integration_yaml_config(hass, DOMAIN)
+        if config is None or DOMAIN not in config:
+            _LOGGER.warning("AUTOARM reload rejected for lack of config: %s", config)
+            return
+        hass.data[HASS_DATA_KEY].armer.shutdown()
+        expose_config_entity(hass, config[DOMAIN])
+        hass.data[HASS_DATA_KEY].armer = _async_process_config(hass, config[DOMAIN])
+        await hass.data[HASS_DATA_KEY].armer.initialize()
+
+    async_register_admin_service(
+        hass,
+        DOMAIN,
+        SERVICE_RELOAD,
+        reload_service_handler,
+    )
+    return True
+
+
+def expose_config_entity(hass: HomeAssistant, config: ConfigType) -> None:
     hass.states.async_set(
         f"{DOMAIN}.configured",
         "True",
@@ -84,8 +136,11 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             CONF_THROTTLE_CALLS: config.get(CONF_THROTTLE_CALLS, 6),
         },
     )
+
+
+def _async_process_config(hass: HomeAssistant, config: ConfigType) -> "AlarmArmer":
     calendar_config: ConfigType = config.get(CONF_CALENDAR_CONTROL, {})
-    armer = AlarmArmer(
+    return AlarmArmer(
         hass,
         alarm_panel=config[CONF_ALARM_PANEL],
         auto_disarm=config[CONF_AUTO_ARM],
@@ -104,10 +159,14 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         calendars=calendar_config.get(CONF_CALENDARS, []),
         calendar_no_event_mode=calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO),
     )
-    await armer.initialize()
-    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, armer.async_shutdown)
 
-    return True
+
+def unlisten(listener: Callable[[], None] | None) -> None:
+    if listener:
+        try:
+            listener()
+        except Exception as e:
+            _LOGGER.debug("AUTOARM Failure closing listener %s: %s", listener, e)
 
 
 class AlarmArmer:
@@ -174,6 +233,10 @@ class AlarmArmer:
         self.initialize_buttons()
         await self.reset_armed_state(force_arm=False)
         self.initialize_integration()
+        self.stop_listener: Callable[[], None] | None = self.hass.bus.async_listen_once(
+            EVENT_HOMEASSISTANT_STOP, self.async_shutdown
+        )
+
         _LOGGER.info("AUTOARM Initialized, state: %s", self.armed_state())
 
     def initialize_integration(self) -> None:
@@ -186,14 +249,18 @@ class AlarmArmer:
         await self.reset_armed_state(force_arm=False)
 
     async def async_shutdown(self, _event: Event) -> None:
-        _LOGGER.info("AUTOARM shutting down")
+        _LOGGER.info("AUTOARM shut down event received")
+        self.stop_listener = None
         self.shutdown()
 
     def shutdown(self) -> None:
+        _LOGGER.info("AUTOARM shutting down")
         for calendar in self.calendars:
             calendar.shutdown()
-        for unsub in self.unsubscribes:
-            unsub()
+        while self.unsubscribes:
+            unlisten(self.unsubscribes.pop())
+        unlisten(self.stop_listener)
+        self.stop_listener = None
         _LOGGER.info("AUTOARM shut down")
 
     def initialize_alarm_panel(self) -> None:
@@ -222,11 +289,7 @@ class AlarmArmer:
 
     async def initialize_calendar(self) -> None:
         """Configure calendar polling (optional)"""
-        self.hass.states.async_set(
-            f"{DOMAIN}.last_calendar_event",
-            "unavailable",
-            attributes={}
-        )
+        self.hass.states.async_set(f"{DOMAIN}.last_calendar_event", "unavailable", attributes={})
         if not self.calendar_configs:
             return
         try:
@@ -523,22 +586,17 @@ class AlarmArmer:
 
         """
         if self.rate_limiter.triggered():
-            _LOGGER.debug("AUTOARM Rate limit triggered, skipping arm")
+            _LOGGER.debug("AUTOARM Rate limit triggered by %s, skipping arm", source)
             return None
         try:
             self.arming_in_progress.set()
             existing_state = self.armed_state()
             if arming_state != existing_state:
                 self.hass.states.async_set(self.alarm_panel, str(arming_state))
-                _LOGGER.info(
-                    "AUTOARM Setting %s from %s to %s",
-                    self.alarm_panel,
-                    existing_state,
-                    arming_state,
-                )
+                _LOGGER.info("AUTOARM Setting %s from %s to %s for %s", self.alarm_panel, existing_state, arming_state, source)
                 self.last_state_source = source
                 return arming_state
-            _LOGGER.debug("Skipping arm, as %s already %s", self.alarm_panel, arming_state)
+            _LOGGER.debug("Skipping arm for %s, as %s already %s", source, self.alarm_panel, arming_state)
             return existing_state
         except Exception as e:
             _LOGGER.debug("AUTOARM Failed to arm: %s", e)
@@ -574,7 +632,7 @@ class AlarmArmer:
                 _LOGGER.debug("AUTOARM Skipped notification, service: %s, data: %s", notify_service, merged_profile)
 
         except Exception:
-            _LOGGER.exception("AUTOARM %s failed", notify_service)
+            _LOGGER.exception("AUTOARM notify.%s failed", notify_service)
 
     @callback
     async def on_sleep_start(self, called_time: datetime.datetime) -> None:

@@ -1,6 +1,7 @@
 import datetime
 import logging
 import re
+from collections.abc import Callable
 from functools import partial
 from typing import TYPE_CHECKING, cast
 
@@ -20,11 +21,17 @@ from .const import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from homeassistant.core import CALLBACK_TYPE
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def unlisten(listener: Callable[[], None] | None) -> None:
+    if listener:
+        try:
+            listener()
+        except Exception as e:
+            _LOGGER.debug("AUTOARM Failure closing calendar listener %s: %s", listener, e)
 
 
 class TrackedCalendar:
@@ -33,24 +40,19 @@ class TrackedCalendar:
         self.armer = armer
         self.alias: str = cast("str", calendar_config.get(CONF_ALIAS, ""))
         self.entity_id: str = cast("str", calendar_config.get(CONF_ENTITY_ID))
-        self.poll_interval: int = calendar_config.get(
-            CONF_CALENDAR_POLL_INTERVAL, 30)
-        self.state_mappings: dict[str, list[str]] = cast(
-            "dict", calendar_config.get(CONF_CALENDAR_EVENT_STATES))
+        self.poll_interval: int = calendar_config.get(CONF_CALENDAR_POLL_INTERVAL, 30)
+        self.state_mappings: dict[str, list[str]] = cast("dict", calendar_config.get(CONF_CALENDAR_EVENT_STATES))
         self.tracked_events: dict[str, TrackedCalendarEvent] = {}
         self.poller_listener: CALLBACK_TYPE | None = None
 
     async def initialize(self, calendar_platform: entity_platform.EntityPlatform) -> None:
         try:
-            calendar_entity: CalendarEntity = cast(
-                "CalendarEntity", calendar_platform.domain_entities[self.entity_id])
+            calendar_entity: CalendarEntity = cast("CalendarEntity", calendar_platform.domain_entities[self.entity_id])
             if calendar_entity is None:
-                _LOGGER.warning(
-                    "AUTOARM Unable to access calendar %s", self.entity_id)
+                _LOGGER.warning("AUTOARM Unable to access calendar %s", self.entity_id)
             else:
                 self.calendar_entity = calendar_entity
-                _LOGGER.info("AUTOARM Configured calendar %s from %s",
-                             self.entity_id, calendar_platform.platform_name)
+                _LOGGER.info("AUTOARM Configured calendar %s from %s", self.entity_id, calendar_platform.platform_name)
                 self.poller_listener = async_track_utc_time_change(
                     self.armer.hass,
                     self.on_timed_poll,
@@ -64,13 +66,11 @@ class TrackedCalendar:
                 await self.match_events()
 
         except Exception as _e:
-            _LOGGER.exception(
-                "AUTOARM Failed to initialize calendar entity %s", self.entity_id)
+            _LOGGER.exception("AUTOARM Failed to initialize calendar entity %s", self.entity_id)
 
     def shutdown(self) -> None:
-        if self.poller_listener:
-            self.poller_listener()
-            self.poller_listener = None
+        unlisten(self.poller_listener)
+        self.poller_listener = None
         for tracked_event in self.tracked_events.values():
             tracked_event.shutdown()
         self.enabled = False
@@ -93,8 +93,7 @@ class TrackedCalendar:
 
         for event in events:
             # presume the events are sorted by start time
-            event_id = TrackedCalendarEvent.event_id(
-                self.calendar_entity.entity_id, event)
+            event_id = TrackedCalendarEvent.event_id(self.calendar_entity.entity_id, event)
             _LOGGER.debug("AUTOARM Calendar Event: %s", event_id)
             for state, patterns in self.state_mappings.items():
                 if any(
@@ -104,19 +103,23 @@ class TrackedCalendar:
                     )
                     for patt in patterns
                 ):
-                    _LOGGER.debug(
-                        "AUTOARM Calendar matched %d events for state %s", len(events), state)
+                    _LOGGER.info(
+                        "AUTOARM Calendar %s matched event %s for state %s",
+                        self.calendar_entity.entity_id,
+                        event.summary,
+                        state,
+                    )
                     if event_id not in self.tracked_events:
                         self.tracked_events[event_id] = TrackedCalendarEvent(
-                            self.calendar_entity.entity_id, event, state, self.armer)
+                            self.calendar_entity.entity_id, event, state, self.armer
+                        )
                         await self.tracked_events[event_id].initialize()
 
     async def prune_events(self) -> None:
         to_remove: list[str] = []
         for event_id, tevent in self.tracked_events.items():
             if not tevent.is_current() and not tevent.is_future():
-                _LOGGER.debug(
-                    "AUTOARM Pruning expire calendar event: %s", tevent.event.uid)
+                _LOGGER.debug("AUTOARM Pruning expire calendar event: %s", tevent.event.uid)
                 to_remove.append(event_id)
                 await tevent.end(dt_util.now())
         for event_id in to_remove:
@@ -153,20 +156,17 @@ class TrackedCalendarEvent:
                 self.end,
                 self.event.end_datetime_local,
             )
-        _LOGGER.info("AUTOARM Now tracking %s event %s, %s",
-                     self.calendar_id, self.event.uid, self.event.summary)
+        _LOGGER.info("AUTOARM Now tracking %s event %s, %s", self.calendar_id, self.event.uid, self.event.summary)
 
     async def end(self, event_time: datetime.datetime) -> None:
-        _LOGGER.debug(
-            "AUTOARM Calendar event %s ended, event_time: %s", self.id, event_time)
+        _LOGGER.debug("AUTOARM Calendar event %s ended, event_time: %s", self.id, event_time)
         self.track_state = "ended"
         await self.armer.on_calendar_event_end(self, dt_util.now())
         self.shutdown()
 
     @classmethod
     def event_id(cls, calendar_id: str, event: CalendarEvent) -> str:
-        uid = event.uid or str(hash(
-            (event.summary, event.description, event.start.isoformat(), event.end.isoformat())))
+        uid = event.uid or str(hash((event.summary, event.description, event.start.isoformat(), event.end.isoformat())))
         return f"{calendar_id}:{uid}"
 
     def is_current(self) -> bool:
@@ -182,12 +182,10 @@ class TrackedCalendarEvent:
         return self.event.start_datetime_local > now_local
 
     def shutdown(self) -> None:
-        if self.start_listener:
-            self.start_listener()
-            self.start_listener = None
-        if self.end_listener:
-            self.end_listener()
-            self.end_listener = None
+        unlisten(self.start_listener)
+        self.start_listener = None
+        unlisten(self.end_listener)
+        self.end_listener = None
 
     def __eq__(self, other: object) -> bool:
         """Compare two events based on underlying calendar event"""
