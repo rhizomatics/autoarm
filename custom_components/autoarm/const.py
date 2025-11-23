@@ -82,7 +82,7 @@ CONFIG_SCHEMA = vol.Schema(
             vol.Optional(CONF_SLEEP_END): cv.time,
             vol.Optional(CONF_SUNRISE_CUTOFF): cv.time,
             vol.Optional(CONF_CALENDAR_POLL_INTERVAL, default=30): cv.positive_int,
-            vol.Optional(CONF_CALENDAR_ENTITY): cv.entity_id,
+            vol.Optional(CONF_CALENDAR_ENTITY, default=[]): vol.All(cv.ensure_list, [cv.entity_id]),
             vol.Optional(CONF_CALENDAR_NO_EVENT, default=NO_CAL_EVENT_MODE_AUTO): vol.All(
                 vol.Lower, vol.In(NO_CAL_EVENT_OPTIONS)
             ),

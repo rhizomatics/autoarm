@@ -10,6 +10,7 @@ from typing import cast
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
+from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
 from homeassistant.const import (
     EVENT_HOMEASSISTANT_START,
@@ -53,11 +54,6 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def total_secs(t: datetime.time) -> int:
-    return t.hour * 3600 + t.minute * 60 + t.second
-
 
 OVERRIDE_STATES = (AlarmControlPanelState.ARMED_VACATION, AlarmControlPanelState.ARMED_CUSTOM_BYPASS)
 EPHEMERAL_STATES = (
@@ -113,7 +109,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         notify=config[CONF_NOTIFY],
         throttle_calls=config.get(CONF_THROTTLE_CALLS, 6),
         throttle_seconds=config.get(CONF_THROTTLE_SECONDS, 60),
-        calendar_entity=config.get(CONF_CALENDAR_ENTITY),
+        calendar_entity_ids=config.get(CONF_CALENDAR_ENTITY, []),
         calendar_interval=config.get(CONF_CALENDAR_POLL_INTERVAL, 30),
         calendar_event_patterns=config.get(CONF_CALENDAR_EVENT_STATES, {}),
         calendar_no_event_mode=config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO),
@@ -125,9 +121,11 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 
 class TrackedCalendarEvent:
-    def __init__(self, event: CalendarEvent, arming_state: str, armer: "AlarmArmer") -> None:
+    def __init__(self, calendar_id: str, event: CalendarEvent, arming_state: str, armer: "AlarmArmer") -> None:
         self.tracked_at = dt_util.now()
-        self.id = TrackedCalendarEvent.event_id(event)
+        self.calendar_id = calendar_id
+        self.id = TrackedCalendarEvent.event_id(calendar_id, event)
+        _LOGGER.info("AUTOARM N")
         self.event: CalendarEvent = event
         self.arming_state: str = arming_state
         self.start_listener: Callable | None = None
@@ -146,8 +144,9 @@ class TrackedCalendarEvent:
             )
 
     @classmethod
-    def event_id(cls, event: CalendarEvent) -> str:
-        return event.uid or str(hash((event.summary, event.description, event.start.isoformat(), event.end.isoformat())))
+    def event_id(cls, calendar_id: str, event: CalendarEvent) -> str:
+        uid = event.uid or str(hash((event.summary, event.description, event.start.isoformat(), event.end.isoformat())))
+        return f"{calendar_id}:{uid}"
 
     def is_current(self) -> bool:
         now_local: datetime.datetime = dt_util.now()
@@ -190,16 +189,17 @@ class AlarmArmer:
         notify: dict | None = None,
         throttle_calls: int = 6,
         throttle_seconds: int = 60,
-        calendar_entity: str | None = None,
+        calendar_entity_ids: list[str] | None = None,
         calendar_no_event_mode: str | None = None,
         calendar_interval: int = 15,
         calendar_event_patterns: dict[str, list[str]] | None = None,
     ) -> None:
         self.hass: HomeAssistant = hass
         self.local_tz = dt_util.get_time_zone(self.hass.config.time_zone)
-        self.calendar_entity: str | None = calendar_entity
+        self.calendar_entity_ids: list[str] | None = calendar_entity_ids or []
         self.calendar_interval: int = calendar_interval
         self.calendar_no_event_mode = calendar_no_event_mode
+        self.calendars: list[CalendarEntity] = []
         self.calendar_event_patterns: dict[str, list[str]] = calendar_event_patterns or {}
         self.alarm_panel: str = alarm_panel
         self.auto_disarm: bool = auto_disarm
@@ -287,19 +287,22 @@ class AlarmArmer:
 
     async def initialize_calendar(self, interval: int = 15) -> None:
         """Configure calendar polling (optional)"""
-        if not self.calendar_entity:
+        if not self.calendar_entity_ids:
             return
         try:
-            platform: entity_platform.EntityPlatform = entity_platform.async_get_platforms(self.hass, "calendar")[0]
-            # type: ignore
-            calendar: CalendarEntity = cast("CalendarEntity", platform.domain_entities[self.calendar_entity])
-            self.calendar = calendar
+            platform: entity_platform.EntityPlatform = entity_platform.async_get_platforms(self.hass, CALENDAR_DOMAIN)[0]
         except Exception as e:
-            _LOGGER.error("AUTOARM Failed to initialize calendar entity %s: %s", self.calendar_entity, e)
+            _LOGGER.error("AUTOARM Unable to access calendar platform", self.calendar_entity_ids, e)
             return
-        if not self.calendar:
-            _LOGGER.error("AUTOARM Calendar entity %s not found", self.calendar_entity)
-            return
+        for entity_id in self.calendar_entity_ids:
+            try:
+                calendar: CalendarEntity = cast("CalendarEntity", platform.domain_entities[entity_id])
+                if calendar is None:
+                    _LOGGER.warning("AUTOARM Unable to access calendar %s", entity_id)
+                else:
+                    self.calendars.append(calendar)
+            except Exception as e:
+                _LOGGER.error("AUTOARM Failed to initialize calendar entity %s: %s", self.calendar_entity_ids, e)
 
         await self.on_calendar_poll(datetime.datetime.now(tz=datetime.UTC))
 
@@ -316,31 +319,32 @@ class AlarmArmer:
 
     async def on_calendar_poll(self, _called_time: datetime.datetime) -> None:
         _LOGGER.debug("AUTOARM Calendar Poll")
-        if self.calendar:
+        if self.calendars:
             now_local = dt_util.now()
             start_dt = now_local - datetime.timedelta(minutes=15)
             end_dt = now_local + datetime.timedelta(minutes=self.calendar_interval + 5)
-            events: list[CalendarEvent] = await self.calendar.async_get_events(self.hass, start_dt, end_dt)
+            for calendar in self.calendars:
+                events: list[CalendarEvent] = await calendar.async_get_events(self.hass, start_dt, end_dt)
 
-            for event in events:
-                # presume the events are sorted by start time
-                event_id = TrackedCalendarEvent.event_id(event)
-                _LOGGER.debug("AUTOARM Calendar Event: %s", event_id)
-                for state, patterns in self.calendar_event_patterns.items():
-                    if any(
-                        re.match(
-                            patt,
-                            event.summary,
-                        )
-                        for patt in patterns
-                    ):
-                        _LOGGER.info("AUTOARM Calendar matched %d events for state %s", len(events), state)
-                        tracked_event: TrackedCalendarEvent = self.calendar_events.get(
-                            event_id, TrackedCalendarEvent(event, state, self)
-                        )
-                        self.calendar_events[event_id] = tracked_event
-                        if tracked_event.is_current():
-                            await self.on_calendar_event_start(tracked_event, dt_util.now())
+                for event in events:
+                    # presume the events are sorted by start time
+                    event_id = TrackedCalendarEvent.event_id(calendar.entity_id, event)
+                    _LOGGER.debug("AUTOARM Calendar Event: %s", event_id)
+                    for state, patterns in self.calendar_event_patterns.items():
+                        if any(
+                            re.match(
+                                patt,
+                                event.summary,
+                            )
+                            for patt in patterns
+                        ):
+                            _LOGGER.debug("AUTOARM Calendar matched %d events for state %s", len(events), state)
+                            tracked_event: TrackedCalendarEvent = self.calendar_events.get(
+                                event_id, TrackedCalendarEvent(calendar.entity_id, event, state, self)
+                            )
+                            self.calendar_events[event_id] = tracked_event
+                            if tracked_event.is_current():
+                                await self.on_calendar_event_start(tracked_event, dt_util.now())
 
             to_remove: list[str] = []
             for event_id, tevent in self.calendar_events.items():
@@ -523,7 +527,7 @@ class AlarmArmer:
         )
 
         existing_state = self.armed_state()
-        if self.calendar_entity:
+        if self.calendar_entity_ids:
             if self.active_calendar_event():
                 _LOGGER.debug("AUTOARM Ignoring reset while calendar event active")
                 return existing_state

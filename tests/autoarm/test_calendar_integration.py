@@ -148,3 +148,20 @@ async def test_calendar_event_ending_fixed_mode(local_calendar: CalendarEntity, 
     await asyncio.sleep(3)
 
     assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
+
+
+async def test_calendar_multiple_calendars(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
+    start_of_day = dt_util.start_of_local_day()
+    end_of_day = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
+    await local_calendar.async_create_event(
+        dtstart=start_of_day,
+        dtend=end_of_day,
+        summary="Holidays in Bahamas!!",
+    )
+    local_config = CONFIG.copy()
+    local_config[DOMAIN][CONF_CALENDAR_ENTITY] = ["calendar.testing_calendar", "calendar.google", "calendar.workday"]
+    hass.states.async_set("alarm_panel.testing", "armed_away")
+    assert await async_setup_component(hass, "autoarm", CONFIG)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("alarm_panel.testing").state == "armed_vacation"  # type: ignore
