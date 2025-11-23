@@ -4,7 +4,7 @@ import logging
 
 import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
-from homeassistant.const import CONF_ICON, CONF_SERVICE
+from homeassistant.const import CONF_ALIAS, CONF_ENTITY_ID, CONF_ICON, CONF_SERVICE
 from homeassistant.helpers import config_validation as cv
 
 DOMAIN = "autoarm"
@@ -21,10 +21,11 @@ CONF_ALARM_PANEL = "alarm_panel"
 CONF_AUTO_ARM = "auto_arm"
 CONF_SLEEP_START = "sleep_start"
 CONF_SLEEP_END = "sleep_end"
-CONF_CALENDAR_POLL_INTERVAL = "calendar_poll_interval"
-CONF_CALENDAR_ENTITY = "calendar_entity"
-CONF_CALENDAR_EVENT_STATES = "calendar_event_states"
-CONF_CALENDAR_NO_EVENT = "calendar_no_event"
+CONF_CALENDAR_CONTROL = "calendar_control"
+CONF_CALENDARS = "calendars"
+CONF_CALENDAR_POLL_INTERVAL = "poll_interval"
+CONF_CALENDAR_EVENT_STATES = "state_patterns"
+CONF_CALENDAR_NO_EVENT = "no_event_mode"
 CONF_SUNRISE_CUTOFF = "sunrise_cutoff"
 CONF_ARM_AWAY_DELAY = "arm_away_delay"
 CONF_BUTTON_ENTITY_RESET = "reset_button"
@@ -71,6 +72,18 @@ DEFAULT_CALENDAR_MAPPINGS = {
     AlarmControlPanelState.ARMED_VACATION: "Vacation",
     AlarmControlPanelState.ARMED_VACATION: "Night",
 }
+CALENDAR_SCHEMA = vol.Schema({
+    vol.Required(CONF_ENTITY_ID): cv.entity_id,
+    vol.Optional(CONF_ALIAS): cv.string,
+    vol.Optional(CONF_CALENDAR_POLL_INTERVAL, default=30): cv.positive_int,
+    vol.Optional(CONF_CALENDAR_EVENT_STATES, default=DEFAULT_CALENDAR_MAPPINGS): dict[  # type: ignore
+        vol.All(vol.Lower, vol.In(AlarmControlPanelState.__members__)), vol.All(cv.ensure_list, [cv.string])
+    ],
+})
+CALENDAR_CONTROL_SCHEMA = vol.Schema({
+    vol.Optional(CONF_CALENDAR_NO_EVENT, default=NO_CAL_EVENT_MODE_AUTO): vol.All(vol.Lower, vol.In(NO_CAL_EVENT_OPTIONS)),
+    vol.Optional(CONF_CALENDARS, default=[]): vol.All(cv.ensure_list, [CALENDAR_SCHEMA]),
+})
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -81,19 +94,11 @@ CONFIG_SCHEMA = vol.Schema(
             vol.Optional(CONF_SLEEP_START): cv.time,
             vol.Optional(CONF_SLEEP_END): cv.time,
             vol.Optional(CONF_SUNRISE_CUTOFF): cv.time,
-            vol.Optional(CONF_CALENDAR_POLL_INTERVAL, default=30): cv.positive_int,
-            vol.Optional(CONF_CALENDAR_ENTITY, default=[]): vol.All(cv.ensure_list, [cv.entity_id]),
-            vol.Optional(CONF_CALENDAR_NO_EVENT, default=NO_CAL_EVENT_MODE_AUTO): vol.All(
-                vol.Lower, vol.In(NO_CAL_EVENT_OPTIONS)
-            ),
-            vol.Optional(CONF_CALENDAR_EVENT_STATES, default=DEFAULT_CALENDAR_MAPPINGS): dict[  # type: ignore
-                vol.All(vol.Lower, vol.In(AlarmControlPanelState.__members__)), vol.All(cv.ensure_list, [cv.string])
-            ],
+            vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
             vol.Optional(CONF_ARM_AWAY_DELAY, default=180): cv.positive_int,
             vol.Optional(CONF_BUTTON_ENTITY_RESET): cv.entity_id,
             vol.Optional(CONF_BUTTON_ENTITY_AWAY): cv.entity_id,
             vol.Optional(CONF_BUTTON_ENTITY_DISARM): cv.entity_id,
-            # type: ignore
             vol.Optional(CONF_OCCUPANTS, default=[]): vol.All(cv.ensure_list, [cv.entity_id]),
             # type: ignore
             vol.Optional(CONF_ACTIONS, default=[]): vol.All(cv.ensure_list, [PUSH_ACTION_SCHEMA]),

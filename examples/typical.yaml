@@ -13,6 +13,24 @@ autoarm:
   occupants:
     - person.house_owner
     - person.tenant
+  calendar_control:
+    no_event_mode: auto
+    calendars:
+      - entity_id: calendar.alarm_control
+        alias: Local Calendar only used for autoarm
+        poll_interval: 60
+        state_patterns:
+          disarmed:
+            - Disarmed
+      - entity_id: calendar.family_events
+        poll_interval: 300
+        state_patterns:
+          armed_vacation:
+            - Holiday.*
+            - Camping Trip.*
+          armed_away:
+            - Working at Office
+
   notify:
     common:
       service: notify.supernotifier

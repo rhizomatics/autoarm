@@ -10,10 +10,13 @@ from homeassistant.components.local_calendar.store import LocalCalendarStore
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import DependencyError
 from homeassistant.helpers import entity_platform
 from homeassistant.setup import async_setup_component
 from homeassistant.util import slugify
 from pytest_homeassistant_custom_component.common import AsyncMock, MockConfigEntry
+
+from custom_components.autoarm.autoarming import AlarmArmer
 
 
 @pytest.fixture(autouse=True)
@@ -38,9 +41,10 @@ def skip_notifications_fixture() -> Generator[None, Any, None]:
 
 
 @pytest.fixture
-async def local_calendar(hass: HomeAssistant, name: str = "testing_calendar") -> CalendarEntity:
+async def local_calendar(
+    hass: HomeAssistant, calendar_platform: entity_platform.EntityPlatform, name: str = "testing_calendar"
+) -> CalendarEntity:
 
-    await async_setup_component(hass=hass, domain="calendar", config={})
     await async_setup_component(hass=hass, domain=LOCAL_CALENDAR_DOMAIN, config={})
     await hass.async_block_till_done()
     config_entry = MockConfigEntry(
@@ -52,6 +56,21 @@ async def local_calendar(hass: HomeAssistant, name: str = "testing_calendar") ->
     await hass.config_entries.async_forward_entry_setups(config_entry, [Platform.CALENDAR])
     await hass.async_block_till_done()
 
-    platform: entity_platform.EntityPlatform = entity_platform.async_get_platforms(hass, "calendar")[0]
-    calendar: CalendarEntity = platform.domain_entities[f"calendar.{slugify(name)}"]  # type: ignore
+    calendar: CalendarEntity = calendar_platform.domain_entities[f"calendar.{slugify(name)}"]  # type: ignore
     return calendar
+
+
+@pytest.fixture
+async def calendar_platform(hass: HomeAssistant) -> entity_platform.EntityPlatform:
+    await async_setup_component(hass=hass, domain="calendar", config={})
+    platforms: list[entity_platform.EntityPlatform] = entity_platform.async_get_platforms(hass, "calendar")
+    if platforms:
+        return platforms[0]
+    raise DependencyError(["calendar"])
+
+
+@pytest.fixture
+def mock_armer_real_hass(hass: HomeAssistant) -> AlarmArmer:
+    mocked = AsyncMock(spec=AlarmArmer)
+    mocked.hass = hass
+    return mocked
