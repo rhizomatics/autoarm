@@ -121,7 +121,10 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 
 class TrackedCalendarEvent:
-    def __init__(self, calendar_id: str, event: CalendarEvent, arming_state: str, armer: "AlarmArmer") -> None:
+    def __init__(self, calendar_id: str,
+                  event: CalendarEvent, 
+                  arming_state: str, 
+                  armer: "AlarmArmer") -> None:
         self.tracked_at = dt_util.now()
         self.calendar_id = calendar_id
         self.id = TrackedCalendarEvent.event_id(calendar_id, event)
@@ -130,6 +133,8 @@ class TrackedCalendarEvent:
         self.start_listener: Callable | None = None
         self.end_listener: Callable | None = None
         self.armer = armer
+        self.previous_state: str | None = armer.armed_state()
+        self.track_state: str = "pending"
 
     async def initialize(self) -> None:
 
@@ -139,7 +144,6 @@ class TrackedCalendarEvent:
                 partial(self.armer.on_calendar_event_start, self),
                 self.event.start_datetime_local,
             )
-            self.track_state = "pending"
         else:
             await self.armer.on_calendar_event_start(self, dt_util.now())
             self.track_state = "started"
@@ -407,7 +411,8 @@ class AlarmArmer:
             )
             await self.arm(self.calendar_no_event_mode, source="calendar")
         else:
-            _LOGGER.debug("AUTOARM No action on calendar event end in manual mode")
+            _LOGGER.debug("AUTOARM Reinstate previous state on calendar event end in manual mode")
+            await self.arm(event.previous_state, source="calendar")
 
     def initialize_bedtime(self) -> None:
         """Configure usual bed time (optional)"""
