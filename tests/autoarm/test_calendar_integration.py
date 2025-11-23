@@ -73,6 +73,10 @@ async def test_calendar_live_event(local_calendar: CalendarEntity, hass: HomeAss
     await hass.async_block_till_done()
 
     assert hass.states.get("alarm_panel.testing").state == "armed_vacation"  # type: ignore
+    last_event = hass.states.get("autoarm.last_calendar_event")
+    assert last_event is not None
+    assert last_event.attributes["calendar"] == "calendar.testing_calendar"
+    assert last_event.attributes["summary"] == "Holidays in Bahamas!!"
 
 
 async def test_calendar_dead_events(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:

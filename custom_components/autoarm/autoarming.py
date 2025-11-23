@@ -150,7 +150,7 @@ class TrackedCalendarEvent:
 
     def is_current(self) -> bool:
         now_local: datetime.datetime = dt_util.now()
-        return self.event.start_datetime_local <= now_local <= self.event.end_datetime_local
+        return now_local >= self.event.start_datetime_local and now_local <= self.event.end_datetime_local
 
     def is_future(self) -> bool:
         now_local: datetime.datetime = dt_util.now()
@@ -339,10 +339,9 @@ class AlarmArmer:
                             for patt in patterns
                         ):
                             _LOGGER.debug("AUTOARM Calendar matched %d events for state %s", len(events), state)
-                            tracked_event: TrackedCalendarEvent = self.calendar_events.get(
-                                event_id, TrackedCalendarEvent(calendar.entity_id, event, state, self)
-                            )
-                            self.calendar_events[event_id] = tracked_event
+                            if event_id not in self.calendar_events:
+                                self.calendar_events[event_id] = TrackedCalendarEvent(calendar.entity_id, event, state, self)
+                            tracked_event: TrackedCalendarEvent = self.calendar_events[event_id]
                             if tracked_event.is_current():
                                 await self.on_calendar_event_start(tracked_event, dt_util.now())
 
@@ -359,15 +358,26 @@ class AlarmArmer:
         return any(tevent.is_current() for tevent in self.calendar_events.values())
 
     async def on_calendar_event_start(self, event: TrackedCalendarEvent, triggered_at: datetime.datetime) -> None:
+        _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", event.id, triggered_at)
         if event.arming_state != self.armed_state():
             _LOGGER.info("AUTOARM Calendar event %s changing arming to %s at %s", event.id, event.arming_state, triggered_at)
             await self.arm(arming_state=event.arming_state)
+        self.hass.states.async_set(f"{DOMAIN}.last_calendar_event",
+                                   str(event.id),
+                                   attributes={"calendar": event.calendar_id,
+                                               "start": event.event.start_datetime_local,
+                                               "end": event.event.end_datetime_local,
+                                               "summary": event.event.summary,
+                                               "description": event.event.description,
+                                               "uid": event.event.uid})
 
     async def on_calendar_event_end(self, event: TrackedCalendarEvent, ended_at: datetime.datetime) -> None:
-        _LOGGER.debug("AUTOARM Calendar event %s ended at %s", event.id, ended_at)
+        _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", event.id, ended_at)
         if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
+            _LOGGER.info("AUTOARM Calendar event %s ended, and arming state", event.id)
             await self.reset_armed_state()
         elif self.calendar_no_event_mode in AlarmControlPanelState:
+            _LOGGER.info("AUTOARM Calendar event %s ended, and returning to fixed state %s", event.id, self.calendar_no_event_mode)
             await self.arm(self.calendar_no_event_mode)
         else:
             _LOGGER.debug("AUTOARM No action on calendar event end in manual mode")
