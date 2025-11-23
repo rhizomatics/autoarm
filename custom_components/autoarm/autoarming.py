@@ -222,6 +222,11 @@ class AlarmArmer:
 
     async def initialize_calendar(self) -> None:
         """Configure calendar polling (optional)"""
+        self.hass.states.async_set(
+            f"{DOMAIN}.last_calendar_event",
+            "unavailable",
+            attributes={}
+        )
         if not self.calendar_configs:
             return
         try:
