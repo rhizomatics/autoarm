@@ -153,8 +153,8 @@ class TrackedCalendarEvent:
 
     async def end(self, event_time: datetime.datetime) -> None:
         _LOGGER.debug("AUTOARM Calendar event %s ended, event_time: %s", self.id, event_time)
-        await self.armer.on_calendar_event_end(self, dt_util.now())
         self.track_state = "ended"
+        await self.armer.on_calendar_event_end(self, dt_util.now())
         self.cancel_listeners()
 
     @classmethod
