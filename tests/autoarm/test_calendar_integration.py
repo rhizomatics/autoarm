@@ -9,7 +9,6 @@ from homeassistant.setup import async_setup_component
 
 from custom_components.autoarm.const import (
     CONF_ALARM_PANEL,
-    CONF_AUTO_ARM,
     CONF_CALENDAR_CONTROL,
     CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_NO_EVENT,
@@ -28,7 +27,6 @@ from homeassistant.core import HomeAssistant, State
 CONFIG = {
     DOMAIN: {
         CONF_ALARM_PANEL: "alarm_panel.testing",
-        CONF_AUTO_ARM: True,
         CONF_OCCUPANTS: ["person.house_owner", "person.tenant"],
         CONF_CALENDAR_CONTROL: {
             CONF_CALENDAR_NO_EVENT: "auto",

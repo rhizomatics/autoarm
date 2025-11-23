@@ -103,13 +103,14 @@ class TrackedCalendar:
                     )
                     for patt in patterns
                 ):
-                    _LOGGER.info(
-                        "AUTOARM Calendar %s matched event %s for state %s",
-                        self.calendar_entity.entity_id,
-                        event.summary,
-                        state,
-                    )
+
                     if event_id not in self.tracked_events:
+                        _LOGGER.info(
+                        "AUTOARM Calendar %s matched event %s for state %s",
+                            self.calendar_entity.entity_id,
+                            event.summary,
+                            state,
+                        )
                         self.tracked_events[event_id] = TrackedCalendarEvent(
                             self.calendar_entity.entity_id, event, state, self.armer
                         )

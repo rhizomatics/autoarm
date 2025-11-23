@@ -9,16 +9,10 @@ from homeassistant.helpers import config_validation as cv
 
 DOMAIN = "autoarm"
 
-CONF_ACTIONS = "actions"
-CONF_ACTION = "action"
-CONF_ACTION_TEMPLATE = "action_template"
-CONF_TITLE_TEMPLATE = "title_template"
+ATTR_ACTION="action"
 CONF_DATA = "data"
-CONF_TITLE = "title"
-CONF_URI = "uri"
 CONF_NOTIFY = "notify"
 CONF_ALARM_PANEL = "alarm_panel"
-CONF_AUTO_ARM = "auto_arm"
 CONF_CALENDAR_CONTROL = "calendar_control"
 CONF_CALENDARS = "calendars"
 CONF_CALENDAR_POLL_INTERVAL = "poll_interval"
@@ -46,16 +40,6 @@ NOTIFY_NORMAL = "normal"
 NOTIFY_CATEGORIES = [NOTIFY_COMMON, NOTIFY_QUIET, NOTIFY_NORMAL]
 
 _LOGGER = logging.getLogger(__name__)
-
-PUSH_ACTION_SCHEMA = vol.Schema(
-    {
-        vol.Exclusive(CONF_ACTION, CONF_ACTION_TEMPLATE): cv.string,
-        vol.Exclusive(CONF_TITLE, CONF_TITLE_TEMPLATE): cv.string,
-        vol.Optional(CONF_URI): cv.url,
-        vol.Optional(CONF_ICON): cv.string,
-    },
-    extra=vol.ALLOW_EXTRA,
-)
 
 NOTIFY_DEF_SCHEMA = vol.Schema({vol.Optional(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict})
 
@@ -88,8 +72,6 @@ CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.Schema({
             vol.Required(CONF_ALARM_PANEL): cv.entity_id,
-            # type: ignore
-            vol.Optional(CONF_AUTO_ARM, default=True): cv.boolean,
             vol.Optional(CONF_SUNRISE_CUTOFF): cv.time,
             vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
             vol.Optional(CONF_ARM_AWAY_DELAY, default=180): cv.positive_int,
@@ -100,8 +82,6 @@ CONFIG_SCHEMA = vol.Schema(
             vol.Optional(CONF_BUTTON_ENTITY_AWAY): cv.entity_id,
             vol.Optional(CONF_BUTTON_ENTITY_DISARM): cv.entity_id,
             vol.Optional(CONF_OCCUPANTS, default=[]): vol.All(cv.ensure_list, [cv.entity_id]),
-            # type: ignore
-            vol.Optional(CONF_ACTIONS, default=[]): vol.All(cv.ensure_list, [PUSH_ACTION_SCHEMA]),
             # type: ignore
             vol.Optional(CONF_NOTIFY, default={}): NOTIFY_SCHEMA,
             # type: ignore

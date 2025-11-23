@@ -18,5 +18,5 @@
     "iot_class": "calculated",
     "issue_tracker": "https://github.com/rhizomatics/autoarm/issues",
     "requirements": [],
-    "version": "0.5.1"
+    "version": "0.5.2"
 }

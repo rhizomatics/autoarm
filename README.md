@@ -43,7 +43,8 @@ for `DISARMED`,`ARMED_AWAY` etc, or a *Reset* button to set the panel by the def
 
 ### Mobile Action
 
-This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/)
+This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](mobile_actions.md)
+for more information.
 
 ### Calendar Integration
 
@@ -106,6 +107,30 @@ alarm_control_panel:
     disarm_after_trigger: false
     trigger_time: 0
 ```
+
+## Notifications
+
+Two notifications are sent:
+
+- Alarm status has changed, by any means
+- A button has been pressed, and the arm status will be actioned with a few seconds delay
+
+The alarm status message uses the `quiet` profile, and the other one `normal` profile. This
+lets you change the priority, or any of the other message content.
+
+```yaml
+notify:
+    common:
+      service: notify.supernotify
+    quiet:
+      data:
+        priority: low
+    normal:
+      data:
+        priority: medium
+```
+
+For more notification flexibility, try [Supernotify][https://supernotify.rhizomatics.org.uk]
 
 ## Home Assistant features
 

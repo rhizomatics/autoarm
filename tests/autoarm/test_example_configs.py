@@ -29,7 +29,6 @@ async def test_examples(hass: HomeAssistant, config_name: str, reload: bool) -> 
     autoarm_state: State | None = hass.states.get("autoarm.configured")
     assert autoarm_state is not None
     assert autoarm_state.state
-    assert autoarm_state.attributes["auto_arm"]
     assert autoarm_state.attributes["alarm_panel"] == "alarm_panel.testing"
 
     if reload:

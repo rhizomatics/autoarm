@@ -1,6 +1,5 @@
 autoarm:
   alarm_panel: alarm_panel.testing
-  auto_arm: true
   arm_away_delay: 180
   sunrise_cutoff: "06:30:00"
   reset_button: binary_sensor.button_left
@@ -32,24 +31,22 @@ autoarm:
 
   notify:
     common:
-      service: notify.supernotifier
+      service: notify.supernotify
       data:
         actions:
-          action_groups: alarm_panel
-          action_category: alarm_panel
+          - action: ALARM_PANEL_DISARM
+            title: Disarm Alarm Panel
+            icon: sfsymbols:bell.slash
+          - action: ALARM_PANEL_RESET
+            title: Reset Alarm Panel
+            icon: sfsymbols:bell
+          - action: ALARM_PANEL_AWAY
+            title: Arm Alarm Panel for Going Away
+            icon: sfsymbols:airplane
     quiet:
       data:
         priority: low
     normal:
       data:
         priority: medium
-  actions:
-    - action: ALARM_PANEL_DISARM
-      title: Disarm Alarm Panel
-      icon: sfsymbols:bell.slash
-    - action: ALARM_PANEL_RESET
-      title: Reset Alarm Panel
-      icon: sfsymbols:bell
-    - action: ALARM_PANEL_AWAY
-      title: Arm Alarm Panel for Going Away
-      icon: sfsymbols:airplane
+

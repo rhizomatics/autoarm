@@ -31,10 +31,8 @@ from homeassistant.util.hass_dict import HassKey
 
 from .calendar import TrackedCalendar, TrackedCalendarEvent
 from .const import (
-    CONF_ACTIONS,
     CONF_ALARM_PANEL,
     CONF_ARM_AWAY_DELAY,
-    CONF_AUTO_ARM,
     CONF_BUTTON_ENTITY_AWAY,
     CONF_BUTTON_ENTITY_DISARM,
     CONF_BUTTON_ENTITY_RESET,
@@ -118,7 +116,6 @@ def expose_config_entity(hass: HomeAssistant, config: ConfigType) -> None:
         "True",
         {
             CONF_ALARM_PANEL: config.get(CONF_ALARM_PANEL),
-            CONF_AUTO_ARM: config.get(CONF_AUTO_ARM, True),
             CONF_SUNRISE_CUTOFF: config.get(CONF_SUNRISE_CUTOFF),
             CONF_OCCUPIED_DAY_DEFAULT: config.get(CONF_OCCUPIED_DAY_DEFAULT),
             CONF_CALENDAR_CONTROL: config.get(CONF_CALENDAR_CONTROL),
@@ -127,7 +124,6 @@ def expose_config_entity(hass: HomeAssistant, config: ConfigType) -> None:
             CONF_BUTTON_ENTITY_AWAY: config.get(CONF_BUTTON_ENTITY_AWAY),
             CONF_BUTTON_ENTITY_DISARM: config.get(CONF_BUTTON_ENTITY_DISARM),
             CONF_OCCUPANTS: config.get(CONF_OCCUPANTS, []),
-            CONF_ACTIONS: config.get(CONF_ACTIONS, []),
             CONF_NOTIFY: config.get(CONF_NOTIFY, {}),
             CONF_THROTTLE_SECONDS: config.get(CONF_THROTTLE_SECONDS, 60),
             CONF_THROTTLE_CALLS: config.get(CONF_THROTTLE_CALLS, 6),
@@ -140,14 +136,12 @@ def _async_process_config(hass: HomeAssistant, config: ConfigType) -> "AlarmArme
     return AlarmArmer(
         hass,
         alarm_panel=config[CONF_ALARM_PANEL],
-        auto_disarm=config[CONF_AUTO_ARM],
         sunrise_cutoff=cast("datetime.time", config.get(CONF_SUNRISE_CUTOFF)),
         arm_away_delay=config[CONF_ARM_AWAY_DELAY],
         reset_button=config.get(CONF_BUTTON_ENTITY_RESET),
         away_button=config.get(CONF_BUTTON_ENTITY_AWAY),
         disarm_button=config.get(CONF_BUTTON_ENTITY_DISARM),
         occupants=config[CONF_OCCUPANTS],
-        actions=config[CONF_ACTIONS],
         notify=config[CONF_NOTIFY],
         occupied_daytime_default=config[CONF_OCCUPIED_DAY_DEFAULT],
         throttle_calls=config.get(CONF_THROTTLE_CALLS, 6),
@@ -170,7 +164,6 @@ class AlarmArmer:
         self,
         hass: HomeAssistant,
         alarm_panel: str,
-        auto_disarm: bool = True,
         sunrise_cutoff: datetime.time | None = None,
         arm_away_delay: int | None = None,
         reset_button: str | None = None,
@@ -191,7 +184,6 @@ class AlarmArmer:
         self.calendar_no_event_mode = calendar_no_event_mode
         self.calendars: list[TrackedCalendar] = []
         self.alarm_panel: str = alarm_panel
-        self.auto_disarm: bool = auto_disarm
         self.sunrise_cutoff: datetime.time | None = sunrise_cutoff
         occupied_daytime_default = (
             occupied_daytime_default.lower() if occupied_daytime_default else AlarmControlPanelState.ARMED_HOME.value
@@ -214,8 +206,7 @@ class AlarmArmer:
     async def initialize(self) -> None:
         """Async initialization"""
         _LOGGER.info(
-            "AUTOARM auto_disarm=%s, arm_delay=%s, occupied=%s, state=%s",
-            self.auto_disarm,
+            "AUTOARM arm_delay=%s, occupied=%s, state=%s",
             self.arm_away_delay,
             self.is_occupied(),
             self.armed_state(),
