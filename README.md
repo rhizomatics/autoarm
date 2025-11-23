@@ -64,12 +64,15 @@ or fixed at a default state, or left to manual control.
 
 Arming can happen strictly by sunset and sunrise, and by occupancy.
 
-| Diurnal State | Occupancy State | Alarm State  |
-| ------------- | --------------- | ------------ |
-| day           | occupied        | ARMED_HOME   |
-| day           | empty           | ARMED_AWAY   |
-| night         | occupied        | ARMED_NIGHT  |
-| night         | occupied        | ARMED_AWAY   |
+| Diurnal State | Occupancy State | Alarm State    |
+| ------------- | --------------- | -------------- |
+| day           | occupied        | ARMED_HOME(*)  |
+| day           | empty           | ARMED_AWAY     |
+| night         | occupied        | ARMED_NIGHT    |
+| night         | occupied        | ARMED_AWAY     |
+
+(*) This can be overriden using `occupied_daytime_state` in the configuration, for example
+if you prefer to have the alarm set to `disarmed` when people are home and its daylight.
 
 Two other states, `ARMED_VACATION` and `DISARMED` can be set manually, by buttons, or calendar.
 
@@ -107,7 +110,7 @@ alarm_control_panel:
 ## Home Assistant features
 
 - The component is reloadable from the *Developer Tools* page
-- Autoarm exposes *entities* for its configuration, awake status and last calendar event.
+- Autoarm exposes *entities* for its configuration and last calendar event.
 
 ## References
 

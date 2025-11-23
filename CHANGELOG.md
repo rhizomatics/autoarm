@@ -1,4 +1,4 @@
-# 0.5.0
+# 0.5.1
 - Productionizing of private code
 - Component now reloadable
 - Multiple calendar integration

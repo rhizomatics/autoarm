@@ -6,6 +6,7 @@ autoarm:
   reset_button: binary_sensor.button_left
   away_button: binary_sensor.button_right
   disarm_button: binary_sensor.button_middle
+  occupied_daytime_state: disarmed
   throttle_seconds: 30
   throttle_calls: 6
   occupants:
