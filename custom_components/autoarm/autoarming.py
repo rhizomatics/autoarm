@@ -317,7 +317,7 @@ class AlarmArmer:
             await self.arm(arming_state=event.arming_state, source="calendar")
         self.hass.states.async_set(
             f"{DOMAIN}.last_calendar_event",
-            str(event.id),
+            new_state=event.event.summary or str(event.id),
             attributes={
                 "calendar": event.calendar_id,
                 "start": event.event.start_datetime_local,
