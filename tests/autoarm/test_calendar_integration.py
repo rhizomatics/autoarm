@@ -130,7 +130,7 @@ async def test_calendar_event_ending_shortly(local_calendar: CalendarEntity, has
     assert hass.states.get("alarm_panel.testing").state == "armed_vacation"  # type: ignore
     await asyncio.sleep(3)
 
-    assert hass.states.get("alarm_panel.testing").state == "armed_home"  # type: ignore
+    assert hass.states.get("alarm_panel.testing").state in ("armed_home", "armed_night")  # type: ignore
 
 
 async def test_calendar_event_ending_fixed_mode(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:

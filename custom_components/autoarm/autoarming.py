@@ -125,7 +125,7 @@ class TrackedCalendarEvent:
         self.tracked_at = dt_util.now()
         self.calendar_id = calendar_id
         self.id = TrackedCalendarEvent.event_id(calendar_id, event)
-        _LOGGER.info("AUTOARM N")
+        _LOGGER.info("AUTOARM Now tracking %s event %s, %s", calendar_id, event.uid, event.summary)
         self.event: CalendarEvent = event
         self.arming_state: str = arming_state
         self.start_listener: Callable | None = None
@@ -301,6 +301,7 @@ class AlarmArmer:
                     _LOGGER.warning("AUTOARM Unable to access calendar %s", entity_id)
                 else:
                     self.calendars.append(calendar)
+                    _LOGGER.info("AUTOARM Configured calendar %s from %s", entity_id, calendar.platform.platform_name)
             except Exception as e:
                 _LOGGER.error("AUTOARM Failed to initialize calendar entity %s: %s", self.calendar_entity_ids, e)
 
