@@ -39,6 +39,15 @@ jobs:
     - name: Test with pytest
       run: |
         pytest . --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=custom_components.autoarm --cov-report=xml --cov-report=html
+    - name: Generate badges
+      run: |
+        genbadge coverage -i coverage.xml -o badges/coverage.svg
+        genbadge tests -i junit/test-results-${{ matrix.python-version }}.xml -o badges.coverage.svg
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com" 
+        git add badges
+        git commit -m "genbadge images updated
+        git push
     - name: HACS Action
       uses: "hacs/action@94334b7ff014b150ad280ca09a20fa43f858c544"
       with:
