@@ -43,13 +43,6 @@ jobs:
       run: |
         genbadge coverage -i coverage.xml -o badges/coverage.svg
         genbadge tests -i junit/test-results-${{ matrix.python-version }}.xml -o badges/tests.svg
-    - uses: action-badges/create-orphan-branch@0.1.1
-      with:
-        branch-name: badges
-    - name: Create Orphan Branch
-      uses: action-badges/create-orphan-branch@0.1.1
-      with:
-        branch-name: badges
     - uses: stefanzweifel/git-auto-commit-action@v7
       with:
         commit_message: Automated badges update from GHA
