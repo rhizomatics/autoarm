@@ -9,7 +9,7 @@ theme:
   name: material
   highlightjs: true
   language: en
-  logo: assets/images/logo-blank-256x256.png
+  logo: assets/images/autoarm-dark-256x256.png
   features:
     - content.code.copy
     - content.code.select
@@ -28,6 +28,7 @@ plugins:
   - search
   - autorefs
   - pagetree
+  - optimize
   - tags
   - minify:
       minify_html: true
@@ -42,6 +43,8 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - attr_list
+  - md_in_html
+  - pymdownx.blocks.caption
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg

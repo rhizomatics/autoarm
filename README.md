@@ -1,13 +1,23 @@
-[![Rhizomatics Open Source](https://avatars.githubusercontent.com/u/162821163?s=96&v=4)](https://github.com/rhizomatics)
+
+![AutoArm](assets/images/autoarm-dark-256x256.png){ align=left }
+
 
 # Alarm Auto Arming
 
+[![Rhizomatics Open Source](https://img.shields.io/badge/rhizomatics%20open%20source-lightseagreen)](https://github.com/rhizomatics)
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/rhizomatics/autoarm)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/rhizomatics/autoarm/main.svg)](https://results.pre-commit.ci/latest/github/rhizomatics/autoarm/main)
+![Coverage](https://raw.githubusercontent.com/rhizomatics/autoarm/56db7352359d70e71e9d7215568943ea07916dc0/badges/coverage.svg)
+![Tests](https://raw.githubusercontent.com/rhizomatics/autoarm/56db7352359d70e71e9d7215568943ea07916dc0/badges/tests.svg)
 [![Github Deploy](https://github.com/rhizomatics/autoarm/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/rhizomatics/autoarm/actions/workflows/deploy.yml)
 [![CodeQL](https://github.com/rhizomatics/autoarm/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/rhizomatics/autoarm/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/rhizomatics/autoarm/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/rhizomatics/autoarm/actions/workflows/dependabot/dependabot-updates)
+
+<br/>
+<br/>
+<br/>
+
 
 Automate the arming and disarming of the built-in Home Assistant [Alarm
 Control Panel](https://www.home-assistant.io/integrations/alarm_control_panel/), with additional support for calendar integration, manual override via remote control buttons, and mobile push actionable notifications.
@@ -142,3 +152,5 @@ For more notification flexibility, try [Supernotify](https://supernotify.rhizoma
 * [Home Assistant Calendar Integration](https://www.home-assistant.io/integrations/calendar/)
 * [Home Assistant Manual Control Panel docs](https://www.home-assistant.io/integrations/manual/) for more info.
 * Handy [Dashboard Alarm Panel](https://www.home-assistant.io/dashboards/alarm-panel/) widget to add to your Home Assistant dashboard.
+
+[![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?style=for-the-badge&logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)

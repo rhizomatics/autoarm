@@ -43,7 +43,8 @@ jobs:
       run: |
         genbadge coverage -i coverage.xml -o badges/coverage.svg
         genbadge tests -i junit/test-results-${{ matrix.python-version }}.xml -o badges/tests.svg
-    - uses: stefanzweifel/git-auto-commit-action@v7
+    - name: Push Badges
+      uses: stefanzweifel/git-auto-commit-action@v7
       with:
         commit_message: Automated badges update from GHA
         branch: badges
