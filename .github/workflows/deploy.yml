@@ -42,12 +42,17 @@ jobs:
     - name: Generate badges
       run: |
         genbadge coverage -i coverage.xml -o badges/coverage.svg
-        genbadge tests -i junit/test-results-${{ matrix.python-version }}.xml -o badges.coverage.svg
-        git config --global user.name "${{ github.actor }}"
-        git config --global user.email "${{ github.actor }}@users.noreply.github.com" 
-        git add badges
-        git commit -m "genbadge images updated
-        git push
+        genbadge tests -i junit/test-results-${{ matrix.python-version }}.xml -o badges/tests.svg
+    - name: Store coverage badge
+      uses: actions/upload-artifact@v4
+      with:
+          name: coverage-badge
+          path: badges/coverage.svg
+    - name: Store tests badge
+      uses: actions/upload-artifact@v4
+      with:
+          name: tests-badge
+          path: badges/tests.svg
     - name: HACS Action
       uses: "hacs/action@94334b7ff014b150ad280ca09a20fa43f858c544"
       with:
