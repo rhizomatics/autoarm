@@ -43,16 +43,18 @@ jobs:
       run: |
         genbadge coverage -i coverage.xml -o badges/coverage.svg
         genbadge tests -i junit/test-results-${{ matrix.python-version }}.xml -o badges/tests.svg
-    - name: Store coverage badge
-      uses: actions/upload-artifact@v4
+    - uses: action-badges/create-orphan-branch@0.1.1
       with:
-          name: coverage-badge
-          path: badges/coverage.svg
-    - name: Store tests badge
-      uses: actions/upload-artifact@v4
+        branch-name: badges
+    - name: Create Orphan Branch
+      uses: action-badges/create-orphan-branch@0.1.1
       with:
-          name: tests-badge
-          path: badges/tests.svg
+        branch-name: badges
+    - uses: stefanzweifel/git-auto-commit-action@v7
+      with:
+        commit_message: Automated badges update from GHA
+        branch: badges
+        file_pattern: badges/*.svg
     - name: HACS Action
       uses: "hacs/action@94334b7ff014b150ad280ca09a20fa43f858c544"
       with:
