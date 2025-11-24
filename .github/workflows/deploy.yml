@@ -53,8 +53,12 @@ jobs:
         git clone --single-branch --branch badges https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git . 2>/dev/null
         cp -r ${{ github.workspace }}/badges .
         git add badges
-        git commit -m "Update badges [skip ci]"
-        git push origin badges --force
+        if git commit -m "Update badges [skip ci]"; then
+          git push origin badges --force
+          echo "Badges updated successfully"
+        else
+          echo "No changes to badges"
+        fi
     - name: HACS Action
       uses: "hacs/action@94334b7ff014b150ad280ca09a20fa43f858c544"
       with:
