@@ -4,7 +4,8 @@
     "after_dependencies": [
         "mobile_app",
         "calendar",
-        "local_calendar"
+        "local_calendar",
+        "notify"
     ],
     "codeowners": [
         "@jeyrb"
