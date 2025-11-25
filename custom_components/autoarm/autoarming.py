@@ -285,10 +285,11 @@ class AlarmArmer:
                     _LOGGER.info(f"AUTOARM Validated transition logic for {state_str}")
                     self.transitions[state] = cond
                 else:
-                    _LOGGER.info(f"AUTOARM Failed to validate transition logic for {state_str}")
+                    _LOGGER.warning(f"AUTOARM Failed to validate transition logic for {state_str}")
                     error = "Condition validation failed"
             except ValueError as ve:
                 self.record_error(stage)
+                error = f"Invalid state {ve}"
                 _LOGGER.error(f"AUTOARM Invalid state in {state_str} transition - {ve}")
             except vol.Invalid as vi:
                 self.record_error(stage)
@@ -299,6 +300,7 @@ class AlarmArmer:
                 _LOGGER.exception("AUTOARM Disabling transition %s with error validating %s", state_str, condition_config)
                 error = f"Unknown error {e}"
             if error is not None:
+                _LOGGER.warning(f"AUTOARM raising report issue for {error} on {state_str}")
                 self.hass_api.raise_issue(
                     f"transition_condition_{state_str}",
                     is_fixable=False,
