@@ -299,7 +299,7 @@ class AlarmArmer:
                 self.record_error(stage)
                 _LOGGER.exception("AUTOARM Disabling transition %s with error validating %s", state_str, condition_config)
                 error = f"Unknown error {e}"
-            if error is not None:
+            if error:
                 _LOGGER.warning(f"AUTOARM raising report issue for {error} on {state_str}")
                 self.hass_api.raise_issue(
                     f"transition_condition_{state_str}",
