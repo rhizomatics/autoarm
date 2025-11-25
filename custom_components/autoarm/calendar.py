@@ -21,6 +21,7 @@ from .const import (
 )
 
 if TYPE_CHECKING:
+    from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
     from homeassistant.core import CALLBACK_TYPE
 
 _LOGGER = logging.getLogger(__name__)
@@ -84,6 +85,9 @@ class TrackedCalendar:
     def has_active_event(self) -> bool:
         return any(tevent.is_current() for tevent in self.tracked_events.values())
 
+    def active_events(self) -> list[CalendarEvent]:
+        return [v.event for v in self.tracked_events.values() if v.is_current()]
+
     async def match_events(self) -> None:
         now_local = dt_util.now()
         start_dt = now_local - datetime.timedelta(minutes=15)
@@ -136,11 +140,15 @@ class TrackedCalendarEvent:
         self.start_listener: Callable | None = None
         self.end_listener: Callable | None = None
         self.armer = armer
-        self.previous_state: str | None = armer.armed_state()
+        self.previous_state: AlarmControlPanelState | None = armer.armed_state()
         self.track_state: str = "pending"
 
     async def initialize(self) -> None:
 
+        if self.event.end_datetime_local < self.tracked_at:
+            _LOGGER.debug("AUTOARM Ignoring past event")
+            self.track_state = "ended"
+            return
         if self.event.start_datetime_local > self.tracked_at:
             self.start_listener = async_track_point_in_time(
                 self.armer.hass,

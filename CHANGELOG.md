@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+### Features
+- Internal logic for automatic state calc replaced by regular Home Assistant conditions
+### Internal
+- All manual actions now recorded as interventions
+- Further typing with ChangeSource and AlarmControlPanelState
 ## 0.5.2
 - Clean up dead code for mobile actions
 

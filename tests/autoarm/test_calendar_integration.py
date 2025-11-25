@@ -101,12 +101,12 @@ async def test_calendar_dead_events(local_calendar: CalendarEntity, hass: HomeAs
     await local_calendar.async_create_event(
         dtstart=dt_util.now() - dt.timedelta(hours=1),
         dtend=dt_util.now() - dt.timedelta(seconds=1),
-        summary="Holidays in Bahamas!!",
+        summary="Holidays in Bahamas was great!!",
     )
     await local_calendar.async_create_event(
         dtstart=dt_util.now() + dt.timedelta(minutes=2),
         dtend=dt_util.now() + dt.timedelta(minutes=10),
-        summary="Holidays in Bahamas!!",
+        summary="Holidays in Bahamas will be amazing!!",
     )
     hass.states.async_set("alarm_panel.testing", "armed_away")
     assert await async_setup_component(hass, "autoarm", CONFIG)

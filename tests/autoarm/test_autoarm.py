@@ -1,9 +1,12 @@
 from collections.abc import AsyncGenerator
 
+import homeassistant.util.dt as dt_util
 import pytest
+from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.core import HomeAssistant
 
-from custom_components.autoarm.autoarming import AlarmArmer
+from custom_components.autoarm.autoarming import AlarmArmer, Intervention
+from custom_components.autoarm.const import ChangeSource
 
 TEST_PANEL = "alarm_control_panel.test_panel"
 
@@ -16,6 +19,57 @@ async def autoarmer(hass: HomeAssistant) -> AsyncGenerator[AlarmArmer]:
     uut.shutdown()
 
 
+@pytest.fixture
+def day(hass: HomeAssistant) -> None:
+    hass.states.async_set("sun.sun", "above_horizon")
+
+
+@pytest.fixture
+def night(hass: HomeAssistant) -> None:
+    hass.states.async_set("sun.sun", "below_horizon")
+
+
+@pytest.fixture
+def occupied(hass: HomeAssistant) -> None:
+    hass.states.async_set("person.tester_bob", "home")
+
+
+@pytest.fixture
+def unoccupied(hass: HomeAssistant) -> None:
+    hass.states.async_set("person.tester_bob", "away")
+
+
+def test_vacation_day_occupied(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
+    autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
+    assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_VACATION
+
+
+def test_vacation_day_unoccupied(autoarmer: AlarmArmer, day: None, unoccupied: None) -> None:  # noqa: ARG001
+    autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
+    assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_VACATION
+
+
+def test_occupied_day_armed_default(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
+    assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_HOME
+
+
+def test_occupied_day_disarmed_default(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
+    autoarmer.occupied_daytime_default = AlarmControlPanelState.DISARMED
+    assert autoarmer.determine_state() == AlarmControlPanelState.DISARMED
+
+
+def test_occupied_night(autoarmer: AlarmArmer, night: None, occupied: None) -> None:  # noqa: ARG001
+    assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_NIGHT
+
+
+def test_unoccupied_day(autoarmer: AlarmArmer, day: None, unoccupied: None) -> None:  # noqa: ARG001
+    assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_AWAY
+
+
+def test_unoccupied_night(autoarmer: AlarmArmer, night: None, unoccupied: None) -> None:  # noqa: ARG001
+    assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_AWAY
+
+
 def test_not_occupied(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     hass.states.async_set("person.tester_bob", "away")
     assert autoarmer.is_occupied() is False
@@ -26,50 +80,69 @@ def test_occupied(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     assert autoarmer.is_occupied() is True
 
 
-def test_day(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
+async def test_day(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     hass.states.async_set("sun.sun", "above_horizon")
+    await hass.async_block_till_done()
     assert autoarmer.is_night() is False
 
 
-async def test_reset_armed_state_sets_night(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
+async def test_manual_disarmed_ignores_occupied_night(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
+    hass.states.async_set("person.tester_bob", "home")
+    await hass.async_block_till_done()
     hass.states.async_set(TEST_PANEL, "disarmed")
+    await hass.async_block_till_done()
     hass.states.async_set("sun.sun", "below_horizon")
-    hass.states.async_set("person.tester_bob", "home")
-    assert await autoarmer.reset_armed_state() == "armed_night"
+    await hass.async_block_till_done()
+    assert await autoarmer.reset_armed_state(source=ChangeSource.SUNSET) == "disarmed"
 
 
-async def test_reset_armed_state_sets_home(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
-    hass.states.async_set("sun.sun", "above_horizon")
+async def test_manual_disarmed_ignores_occupied_day(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     hass.states.async_set("person.tester_bob", "home")
+    await hass.async_block_till_done()
     hass.states.async_set(TEST_PANEL, "disarmed")
-    assert await autoarmer.reset_armed_state() == "armed_home"
+    await hass.async_block_till_done()
+    hass.states.async_set("sun.sun", "above_horizon")
+    assert await autoarmer.reset_armed_state(source=ChangeSource.SUNRISE) == "disarmed"
 
 
 async def test_unforced_reset_leaves_disarmed(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     hass.states.async_set("sun.sun", "above_horizon")
     hass.states.async_set("person.tester_bob", "home")
+    await hass.async_block_till_done()
     hass.states.async_set(TEST_PANEL, "disarmed")
-    assert await autoarmer.reset_armed_state(force_arm=False) == "disarmed"
+    await hass.async_block_till_done()
+    assert await autoarmer.reset_armed_state() == "disarmed"
+
+
+async def test_disarmed_intervention_overridden_by_occupancy(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
+    hass.states.async_set("sun.sun", "above_horizon")
+    hass.states.async_set("person.tester_bob", "not_home")
+    hass.states.async_set(TEST_PANEL, "disarmed")
+    await hass.async_block_till_done()
+    assert await autoarmer.reset_armed_state() == "armed_away"
 
 
 async def test_forced_reset_sets_armed_home_from_disarmed(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     hass.states.async_set("sun.sun", "above_horizon")
     hass.states.async_set("person.tester_bob", "home")
     hass.states.async_set(TEST_PANEL, "disarmed")
-    assert await autoarmer.reset_armed_state(force_arm=True) == "armed_home"
+    await hass.async_block_till_done()
+    assert await autoarmer.reset_armed_state(Intervention(dt_util.now(), ChangeSource.BUTTON, None)) == "armed_home"
 
 
 async def test_reset_sets_disarmed_from_unknown(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     hass.states.async_set("sun.sun", "above_horizon")
     hass.states.async_set("person.tester_bob", "home")
     hass.states.async_set(TEST_PANEL, "unknown")
-    assert await autoarmer.reset_armed_state(force_arm=False) == "armed_home"
+    await hass.async_block_till_done()
+    assert await autoarmer.reset_armed_state() == "armed_home"
 
 
-async def test_reset_armed_state_uses_daytime_defaulr(hass: HomeAssistant) -> None:
+async def test_reset_armed_state_uses_daytime_default(hass: HomeAssistant) -> None:
     autoarmer = AlarmArmer(hass, TEST_PANEL, occupied_daytime_default="disarmed", occupants=["person.tester_bob"])
     await autoarmer.initialize()
     hass.states.async_set("sun.sun", "above_horizon")
     hass.states.async_set("person.tester_bob", "home")
     hass.states.async_set(TEST_PANEL, "unknown")
-    assert await autoarmer.reset_armed_state(force_arm=False) == "disarmed"
+    await hass.async_block_till_done()
+    assert await autoarmer.reset_armed_state() == "disarmed"

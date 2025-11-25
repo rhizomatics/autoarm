@@ -11,6 +11,13 @@ autoarm:
   occupants:
     - person.house_owner
     - person.tenant
+  transitions:
+    armed_home:
+      conditions: "{{ occupied and not night }}"
+    armed_away:
+      conditions: "{{ not occupied }}"
+    armed_night:
+      conditions: "{{ occupied and night }}"
   calendar_control:
     no_event_mode: auto
     calendars:
@@ -31,7 +38,7 @@ autoarm:
 
   notify:
     common:
-      service: notify.supernotify
+      service: notify.send_message
       data:
         actions:
           - action: ALARM_PANEL_DISARM

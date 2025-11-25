@@ -1,11 +1,15 @@
 """The Auto Arm integration"""
 
 import logging
+from dataclasses import dataclass
+from enum import StrEnum, auto
 
 import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
+from homeassistant.components.calendar import CalendarEvent
 from homeassistant.const import CONF_ALIAS, CONF_ENTITY_ID, CONF_SERVICE
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.typing import ConfigType
 
 DOMAIN = "autoarm"
 
@@ -19,6 +23,7 @@ CONF_CALENDAR_POLL_INTERVAL = "poll_interval"
 CONF_CALENDAR_EVENT_STATES = "state_patterns"
 CONF_CALENDAR_NO_EVENT = "no_event_mode"
 CONF_OCCUPIED_DAY_DEFAULT = "occupied_daytime_state"
+CONF_CALENDAR_OCCUPANCY_OVERRIDE = "occupancy_override"
 CONF_SUNRISE_CUTOFF = "sunrise_cutoff"
 CONF_ARM_AWAY_DELAY = "arm_away_delay"
 CONF_BUTTON_ENTITY_RESET = "reset_button"
@@ -27,7 +32,8 @@ CONF_BUTTON_ENTITY_DISARM = "disarm_button"
 CONF_OCCUPANTS = "occupants"
 CONF_THROTTLE_SECONDS = "throttle_seconds"
 CONF_THROTTLE_CALLS = "throttle_calls"
-
+CONF_TRANSITIONS = "transitions"
+CONF_ALARM_STATES = "alarm_states"
 NO_CAL_EVENT_MODE_AUTO = "auto"
 NO_CAL_EVENT_MODE_MANUAL = "manual"
 NO_CAL_EVENT_OPTIONS: list[str] = [NO_CAL_EVENT_MODE_AUTO, NO_CAL_EVENT_MODE_MANUAL] + [
@@ -48,6 +54,15 @@ NOTIFY_SCHEMA = vol.Schema({
     vol.Optional(NOTIFY_QUIET): NOTIFY_DEF_SCHEMA,
     vol.Optional(NOTIFY_NORMAL): NOTIFY_DEF_SCHEMA,
 })
+
+DEFAULT_TRANSITIONS = {
+    "armed_home": "{{ occupied and not night and computed and occupied_daytime_state == 'armed_home'}}",
+    "armed_away": "{{ not occupied and computed}}",
+    "disarmed": "{{ occupied and not night and computed and occupied_daytime_state == 'disarmed'}}",
+    "armed_night": "{{ occupied and night and computed}}",
+    "armed_vacation": "{{ vacation }}",
+}
+
 DEFAULT_CALENDAR_MAPPINGS = {
     AlarmControlPanelState.ARMED_AWAY: "Away",
     AlarmControlPanelState.DISARMED: "Disarmed",
@@ -73,6 +88,9 @@ CONFIG_SCHEMA = vol.Schema(
         DOMAIN: vol.Schema({
             vol.Required(CONF_ALARM_PANEL): cv.entity_id,
             vol.Optional(CONF_SUNRISE_CUTOFF): cv.time,
+            vol.Optional(CONF_TRANSITIONS, default=DEFAULT_TRANSITIONS): {
+                vol.All(vol.Upper, vol.In(AlarmControlPanelState.__members__)): cv.CONDITION_SCHEMA
+            },
             vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
             vol.Optional(CONF_ARM_AWAY_DELAY, default=180): cv.positive_int,
             vol.Optional(CONF_OCCUPIED_DAY_DEFAULT, default=AlarmControlPanelState.ARMED_HOME.value): vol.All(
@@ -92,3 +110,41 @@ CONFIG_SCHEMA = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
+
+
+@dataclass
+class ConditionVariables:
+    occupied: bool | None = None
+    night: bool | None = None
+    state: str | None = None
+    calendar_event: CalendarEvent | None = None
+    occupied_daytime_state: str | None = None
+
+    def as_dict(self) -> ConfigType:
+        return {
+            "daytime": not self.night,
+            "occupied": self.occupied,
+            "vacation": self.state == AlarmControlPanelState.ARMED_VACATION,
+            "night": self.night,
+            "bypass": self.state == AlarmControlPanelState.ARMED_CUSTOM_BYPASS,
+            "manual": self.state in (AlarmControlPanelState.ARMED_VACATION, AlarmControlPanelState.ARMED_CUSTOM_BYPASS),
+            "calendar_event": self.calendar_event,
+            "state": str(self.state),
+            "occupied_daytime_state": self.occupied_daytime_state,
+            "disarmed": self.state == AlarmControlPanelState.DISARMED,
+            "computed": not self.calendar_event
+            and self.state not in (AlarmControlPanelState.ARMED_VACATION, AlarmControlPanelState.ARMED_CUSTOM_BYPASS),
+        }
+
+
+class ChangeSource(StrEnum):
+    CALENDAR = auto()
+    MOBILE = auto()
+    OCCUPANCY = auto()
+    INTERNAL = auto()
+    ALARM_PANEL = auto()
+    BUTTON = auto()
+    SUNRISE = auto()
+    SUNSET = auto()
+    ZOMBIFICATION = auto()
+    STARTUP = auto()
