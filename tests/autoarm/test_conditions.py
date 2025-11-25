@@ -1,4 +1,3 @@
-
 import pytest
 from homeassistant.helpers import config_validation as cv
 

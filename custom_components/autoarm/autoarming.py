@@ -223,6 +223,7 @@ class AlarmArmer:
         self.pre_pending_state: AlarmControlPanelState | None = None
         self.button_device: dict[str, str] = {}
         self.arming_in_progress: asyncio.Event = asyncio.Event()
+        self.arming_state: AlarmControlPanelState | None = None
         self.rate_limiter: Limiter = Limiter(window=throttle_seconds, max_calls=throttle_calls)
         self.hass_api: HomeAssistantAPI = HomeAssistantAPI(hass)
         self.transitions: dict[AlarmControlPanelState, ConditionCheckerType] = {}
@@ -231,6 +232,7 @@ class AlarmArmer:
         }
         self.initialization_errors: dict[str, int] = {}
         self.interventions: list[Intervention] = []
+        self.intervention_ttl: int = 60
 
     async def initialize(self) -> None:
         """Async initialization"""
@@ -324,7 +326,9 @@ class AlarmArmer:
     async def housekeeping(self, triggered_at: datetime.datetime) -> None:
         _LOGGER.debug("AUTOARM Housekeeping starting, triggered at %s", triggered_at)
         now = dt_util.now()
-        self.interventions = [i for i in self.interventions if now > i.created_at + datetime.timedelta(hours=1)]
+        self.interventions = [
+            i for i in self.interventions if now < i.created_at + datetime.timedelta(minutes=self.intervention_ttl)
+        ]
         for cal in self.calendars:
             await cal.prune_events()
         _LOGGER.debug("AUTOARM Housekeeping finished")
@@ -422,7 +426,7 @@ class AlarmArmer:
         _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", event.id, triggered_at)
         if event.arming_state != self.armed_state():
             _LOGGER.info("AUTOARM Calendar event %s changing arming to %s at %s", event.id, event.arming_state, triggered_at)
-            self.arm(arming_state=event.arming_state, source=ChangeSource.CALENDAR)
+            await self.arm(arming_state=event.arming_state, source=ChangeSource.CALENDAR)
         self.hass.states.async_set(
             f"{DOMAIN}.last_calendar_event",
             new_state=event.event.summary or str(event.id),
@@ -444,16 +448,16 @@ class AlarmArmer:
         if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
             _LOGGER.info("AUTOARM Calendar event %s ended, and arming state", event.id)
             # avoid having state locked in vacation by state calculator
-            self.pending_state(source=ChangeSource.CALENDAR)
+            await self.pending_state(source=ChangeSource.CALENDAR)
             await self.reset_armed_state(source=ChangeSource.CALENDAR)
         elif self.calendar_no_event_mode in AlarmControlPanelState:
             _LOGGER.info(
                 "AUTOARM Calendar event %s ended, and returning to fixed state %s", event.id, self.calendar_no_event_mode
             )
-            self.arm(alarm_state_as_enum(self.calendar_no_event_mode), source=ChangeSource.CALENDAR)
+            await self.arm(alarm_state_as_enum(self.calendar_no_event_mode), source=ChangeSource.CALENDAR)
         else:
             _LOGGER.debug("AUTOARM Reinstate previous state on calendar event end in manual mode")
-            self.arm(event.previous_state, source=ChangeSource.CALENDAR)
+            await self.arm(event.previous_state, source=ChangeSource.CALENDAR)
 
     def is_occupied(self) -> bool:
         return any(safe_state(self.hass.states.get(p)) == STATE_HOME for p in self.occupants)
@@ -472,7 +476,8 @@ class AlarmArmer:
     async def on_panel_change(self, event: Event[EventStateChangedData]) -> None:
         """Alarm Control Panel has been changed outside of AutoArm"""
         entity_id, old, new = self._extract_event(event)
-        if self.arming_in_progress.is_set():
+        new_state = alarm_state_as_enum(new)
+        if self.arming_in_progress.is_set() and new_state == self.arming_state:
             _LOGGER.debug(
                 "AUTOARM Panel Change Ignored: %s,%s: %s-->%s",
                 entity_id,
@@ -493,7 +498,7 @@ class AlarmArmer:
             _LOGGER.warning("AUTOARM Dezombifying %s ...", new)
             await self.reset_armed_state(source=ChangeSource.ZOMBIFICATION)
         elif new != old:
-            self.record_intervention(ChangeSource.ALARM_PANEL, alarm_state_as_enum(new))
+            self.record_intervention(ChangeSource.ALARM_PANEL, new_state)
             message = f"Home Assistant alarm level now set from {old} to {new}"
             await self.notify(message, title=f"Alarm now {new}", profile="quiet")
         else:
@@ -526,9 +531,9 @@ class AlarmArmer:
         _LOGGER.info("AUTOARM Resetting armed state %s on occupancy change", existing_state)
         await self.reset_armed_state(source=ChangeSource.OCCUPANCY)
 
-    def pending_state(self, source: ChangeSource | None) -> None:
+    async def pending_state(self, source: ChangeSource | None) -> None:
         self.pre_pending_state = self.armed_state()
-        self.arm(AlarmControlPanelState.PENDING, source=source)
+        await self.arm(AlarmControlPanelState.PENDING, source=source)
 
     async def reset_armed_state(
         self, intervention: Intervention | None = None, source: ChangeSource | None = None
@@ -552,7 +557,7 @@ class AlarmArmer:
                 return existing_state
             if self.calendar_no_event_mode in AlarmControlPanelState:
                 # TODO: may be dupe logic with on_cal event
-                return self.arm(alarm_state_as_enum(self.calendar_no_event_mode), ChangeSource.CALENDAR)
+                return await self.arm(alarm_state_as_enum(self.calendar_no_event_mode), ChangeSource.CALENDAR)
             if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
                 _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
             else:
@@ -574,7 +579,7 @@ class AlarmArmer:
                 return existing_state
         state: AlarmControlPanelState | None = self.determine_state()
         if state is not None and state != AlarmControlPanelState.PENDING:
-            return self.arm(state, source=source)
+            return await self.arm(state, source=source)
         return None
 
     def determine_state(self) -> AlarmControlPanelState | None:
@@ -625,7 +630,7 @@ class AlarmArmer:
             )
             return
 
-        self.arm(arming_state=arming_state, source=source)
+        await self.arm(arming_state=arming_state, source=source)
 
     async def delayed_reset(
         self,
@@ -645,7 +650,7 @@ class AlarmArmer:
 
         await self.reset_armed_state(intervention=intervention, source=source)
 
-    def arm(
+    async def arm(
         self, arming_state: AlarmControlPanelState | None = None, source: ChangeSource | None = None
     ) -> AlarmControlPanelState | None:
         """Change alarm panel state
@@ -664,6 +669,7 @@ class AlarmArmer:
             _LOGGER.debug("AUTOARM Rate limit triggered by %s, skipping arm", source)
             return None
         try:
+            self.arming_state = arming_state
             self.arming_in_progress.set()
             existing_state: AlarmControlPanelState | None = self.armed_state()
             if arming_state != existing_state:
@@ -676,6 +682,7 @@ class AlarmArmer:
             _LOGGER.debug("AUTOARM Failed to arm: %s", e)
         finally:
             self.arming_in_progress.clear()
+            self.arming_state = None
         return None
 
     async def notify(self, message: str, profile: str = "normal", title: str | None = None) -> None:
@@ -721,12 +728,12 @@ class AlarmArmer:
         match event.data.get("action"):
             case "ALARM_PANEL_DISARM":
                 self.record_intervention(source=source, state=AlarmControlPanelState.DISARMED)
-                self.arm(AlarmControlPanelState.DISARMED, source=source)
+                await self.arm(AlarmControlPanelState.DISARMED, source=source)
             case "ALARM_PANEL_RESET":
                 await self.reset_armed_state(intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None))
             case "ALARM_PANEL_AWAY":
                 self.record_intervention(source=source, state=AlarmControlPanelState.ARMED_AWAY)
-                self.arm(AlarmControlPanelState.ARMED_AWAY, source=source)
+                await self.arm(AlarmControlPanelState.ARMED_AWAY, source=source)
             case _:
                 _LOGGER.debug("AUTOARM Ignoring mobile action: %s", event.data)
 
@@ -734,13 +741,13 @@ class AlarmArmer:
     async def on_disarm_button(self, event: Event) -> None:
         _LOGGER.info("AUTOARM Disarm Button: %s", event)
         self.record_intervention(source=ChangeSource.BUTTON, state=AlarmControlPanelState.DISARMED)
-        self.arm(AlarmControlPanelState.DISARMED, source=ChangeSource.BUTTON)
+        await self.arm(AlarmControlPanelState.DISARMED, source=ChangeSource.BUTTON)
 
     @callback
     async def on_vacation_button(self, event: Event) -> None:
         _LOGGER.info("AUTOARM Vacation Button: %s", event)
         self.record_intervention(source=ChangeSource.BUTTON, state=AlarmControlPanelState.ARMED_VACATION)
-        self.arm(AlarmControlPanelState.ARMED_VACATION, source=ChangeSource.BUTTON)
+        await self.arm(AlarmControlPanelState.ARMED_VACATION, source=ChangeSource.BUTTON)
 
     def record_intervention(self, source: ChangeSource, state: AlarmControlPanelState | None) -> Intervention:
         intervention = Intervention(dt_util.now(), source, state)
@@ -769,10 +776,10 @@ class AlarmArmer:
                 title="Arm for away process starting",
             )
         else:
-            self.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.BUTTON)
+            await self.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.BUTTON)
 
     @callback
-    async def on_sunrise(self) -> None:
+    async def on_sunrise(self, *args: Any) -> None:  # noqa: ARG002
         _LOGGER.debug("AUTOARM Sunrise")
         now = datetime.datetime.now(tz=self.local_tz)
         if not self.sunrise_cutoff or now.time() >= self.sunrise_cutoff:
@@ -793,7 +800,7 @@ class AlarmArmer:
             )
 
     @callback
-    async def on_sunset(self) -> None:
+    async def on_sunset(self, *args: Any) -> None:  # noqa: ARG002
         _LOGGER.debug("AUTOARM Sunset")
         await self.reset_armed_state(source=ChangeSource.SUNSET)
 

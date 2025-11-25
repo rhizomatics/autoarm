@@ -1,8 +1,11 @@
+import asyncio
+import datetime as dt
 from collections.abc import AsyncGenerator
 
 import homeassistant.util.dt as dt_util
 import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
+from homeassistant.components.calendar import CalendarEntity
 from homeassistant.core import HomeAssistant
 
 from custom_components.autoarm.autoarming import AlarmArmer, Intervention
@@ -39,13 +42,13 @@ def unoccupied(hass: HomeAssistant) -> None:
     hass.states.async_set("person.tester_bob", "away")
 
 
-def test_vacation_day_occupied(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
-    autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
+async def test_vacation_day_occupied(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
+    await autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
     assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_VACATION
 
 
-def test_vacation_day_unoccupied(autoarmer: AlarmArmer, day: None, unoccupied: None) -> None:  # noqa: ARG001
-    autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
+async def test_vacation_day_unoccupied(autoarmer: AlarmArmer, day: None, unoccupied: None) -> None:  # noqa: ARG001
+    await autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
     assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_VACATION
 
 
@@ -84,6 +87,48 @@ async def test_day(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     hass.states.async_set("sun.sun", "above_horizon")
     await hass.async_block_till_done()
     assert autoarmer.is_night() is False
+
+
+async def test_on_sunset(autoarmer: AlarmArmer) -> None:
+    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    await autoarmer.on_sunset()
+    assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
+
+
+async def test_on_sunrise(autoarmer: AlarmArmer) -> None:
+    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    assert autoarmer.armed_state() == AlarmControlPanelState.PENDING
+    await autoarmer.on_sunrise()
+    assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
+
+
+async def test_on_sunrise_with_cutoff_active_no_interventions(
+    autoarmer: AlarmArmer,
+    hass: HomeAssistant,
+) -> None:
+    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    await hass.async_block_till_done()
+    autoarmer.sunrise_cutoff = (dt_util.now() + dt.timedelta(seconds=2)).time()
+    autoarmer.interventions = []
+    await autoarmer.on_sunrise()
+    await hass.async_block_till_done()
+    # wait for delayed_reset
+    await asyncio.sleep(2)
+    assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
+
+
+async def test_on_sunrise_with_intervention_before_cutoff(
+    autoarmer: AlarmArmer,
+    hass: HomeAssistant,
+) -> None:
+    await autoarmer.arm(AlarmControlPanelState.ARMED_AWAY)
+    autoarmer.sunrise_cutoff = (dt_util.now() + dt.timedelta(seconds=2)).time()
+    await autoarmer.on_sunrise()
+    hass.states.async_set(TEST_PANEL, "pending")
+    await hass.async_block_till_done()
+    # wait for delayed_reset
+    await asyncio.sleep(2)
+    assert autoarmer.armed_state() == AlarmControlPanelState.PENDING
 
 
 async def test_manual_disarmed_ignores_occupied_night(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
@@ -146,3 +191,36 @@ async def test_reset_armed_state_uses_daytime_default(hass: HomeAssistant) -> No
     hass.states.async_set(TEST_PANEL, "unknown")
     await hass.async_block_till_done()
     assert await autoarmer.reset_armed_state() == "disarmed"
+
+
+async def test_housekeeping(hass: HomeAssistant, local_calendar: CalendarEntity) -> None:
+    await local_calendar.async_create_event(
+        dtstart=dt_util.now() - dt.timedelta(minutes=5),
+        dtend=dt_util.now() + dt.timedelta(seconds=2),
+        summary="Testing Day",
+    )
+
+    autoarmer = AlarmArmer(
+        hass,
+        TEST_PANEL,
+        occupied_daytime_default="disarmed",
+        calendars=[{"entity_id": "calendar.testing_calendar", "state_patterns": {"disarmed": ".*"}}],
+        occupants=["person.tester_bob"],
+    )
+    await autoarmer.initialize()
+    cal_event = autoarmer.active_calendar_event()
+    assert cal_event is not None
+    assert cal_event.summary == "Testing Day"
+    await hass.async_block_till_done()
+    hass.states.async_set(TEST_PANEL, "disarmed")
+    await hass.async_block_till_done()
+    assert len(autoarmer.interventions) > 0
+
+    await asyncio.sleep(2)
+    await autoarmer.housekeeping(dt_util.now())
+    assert autoarmer.active_calendar_event() is None
+    assert len(autoarmer.interventions) > 0
+
+    autoarmer.intervention_ttl = 0
+    await autoarmer.housekeeping(dt_util.now())
+    assert len(autoarmer.interventions) == 0
