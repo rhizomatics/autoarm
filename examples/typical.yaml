@@ -13,11 +13,11 @@ autoarm:
     - person.tenant
   transitions:
     armed_home:
-      conditions: "{{ occupied and not night }}"
+      conditions: "{{ autoarm.occupied and not autoarm.night }}"
     armed_away:
-      conditions: "{{ not occupied }}"
+      conditions: "{{ not autoarm.occupied }}"
     armed_night:
-      conditions: "{{ occupied and night }}"
+      conditions: "{{ autoarm.occupied and autoarm.night }}"
   calendar_control:
     no_event_mode: auto
     calendars:

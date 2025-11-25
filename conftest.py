@@ -17,6 +17,7 @@ from homeassistant.util import slugify
 from pytest_homeassistant_custom_component.common import AsyncMock, MockConfigEntry
 
 from custom_components.autoarm.autoarming import AlarmArmer
+from custom_components.autoarm.hass_api import HomeAssistantAPI
 
 
 @pytest.fixture(autouse=True)
@@ -38,6 +39,12 @@ def skip_notifications_fixture() -> Generator[None, Any, None]:
         patch("homeassistant.components.persistent_notification.async_dismiss"),
     ):
         yield
+
+
+@pytest.fixture
+def hass_api(hass: HomeAssistant) -> HomeAssistantAPI:
+    hass_api = HomeAssistantAPI(hass)
+    return hass_api  # noqa: RET504
 
 
 @pytest.fixture

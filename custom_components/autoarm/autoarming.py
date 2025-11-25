@@ -15,7 +15,7 @@ from homeassistant.components.calendar import CalendarEvent
 from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP, SERVICE_RELOAD, STATE_HOME
-from homeassistant.core import Event, EventStateChangedData, HomeAssistant, ServiceCall, State, callback
+from homeassistant.core import Event, EventStateChangedData, HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import condition as condition
 from homeassistant.helpers import config_validation as cv
@@ -61,6 +61,7 @@ from .const import (
     ChangeSource,
     ConditionVariables,
 )
+from .helpers import alarm_state_as_enum, safe_state
 
 if TYPE_CHECKING:
     from homeassistant.helpers.condition import ConditionCheckerType
@@ -198,12 +199,12 @@ class AlarmArmer:
         throttle_seconds: int = 60,
         calendar_no_event_mode: str | None = None,
         calendars: list[ConfigType] | None = None,
-        transitions: dict[str, ConfigType] | None = None,
+        transitions: dict[str, list[ConfigType]] | None = None,
     ) -> None:
         self.hass: HomeAssistant = hass
         self.local_tz = dt_util.get_time_zone(self.hass.config.time_zone)
         self.calendar_configs: list[ConfigType] = calendars or []
-        self.calendar_no_event_mode = calendar_no_event_mode
+        self.calendar_no_event_mode: str = calendar_no_event_mode or NO_CAL_EVENT_MODE_AUTO
         self.calendars: list[TrackedCalendar] = []
         self.alarm_panel: str = alarm_panel
         self.sunrise_cutoff: datetime.time | None = sunrise_cutoff
@@ -225,7 +226,9 @@ class AlarmArmer:
         self.rate_limiter: Limiter = Limiter(window=throttle_seconds, max_calls=throttle_calls)
         self.hass_api: HomeAssistantAPI = HomeAssistantAPI(hass)
         self.transitions: dict[AlarmControlPanelState, ConditionCheckerType] = {}
-        self.transition_config: dict[str, ConfigType] | None = transitions
+        self.transition_config: dict[str, list[ConfigType]] = transitions or {
+            k: cv.CONDITIONS_SCHEMA(v) for k, v in DEFAULT_TRANSITIONS.items()
+        }
         self.initialization_errors: dict[str, int] = {}
         self.interventions: list[Intervention] = []
 
@@ -264,20 +267,18 @@ class AlarmArmer:
 
     async def initialize_logic(self) -> None:
         stage: str = "logic"
-        if self.transition_config is None:
-            self.transition_config = {k: cv.CONDITION_SCHEMA(v) for k, v in DEFAULT_TRANSITIONS.items()}
 
         for state_str, condition_config in self.transition_config.items():
             error: str = ""
             try:
                 state = AlarmControlPanelState(state_str)
                 cond: ConditionCheckerType | None = await self.hass_api.build_condition(
-                    condition_config, strict=True, validate=True
+                    condition_config, strict=True, validate=True, name=state_str
                 )
 
                 if cond:
                     # re-run without strict wrapper
-                    cond = await self.hass_api.build_condition(condition_config)
+                    cond = await self.hass_api.build_condition(condition_config, name=state_str)
                 if cond:
                     _LOGGER.info(f"AUTOARM Validated transition logic for {state_str}")
                     self.transitions[state] = cond
@@ -293,7 +294,7 @@ class AlarmArmer:
                 error = f"Schema error {vi}"
             except Exception as e:
                 self.record_error(stage)
-                _LOGGER.error("AUTOARM Disabling transition %s with error validating %s: %s", state_str, condition_config, e)
+                _LOGGER.exception("AUTOARM Disabling transition %s with error validating %s", state_str, condition_config)
                 error = f"Unknown error {e}"
             if error is not None:
                 self.hass_api.raise_issue(
@@ -367,15 +368,15 @@ class AlarmArmer:
     def initialize_buttons(self) -> None:
         """Initialize (optional) physical alarm state control buttons"""
 
-        def setup_button(state: str, button_entity: str, cb: Callable) -> None:
-            self.button_device[state] = button_entity
-            if self.button_device[state]:
+        def setup_button(state_name: str, button_entity: str, cb: Callable) -> None:
+            self.button_device[state_name] = button_entity
+            if self.button_device[state_name]:
                 self.unsubscribes.append(async_track_state_change_event(self.hass, [button_entity], cb))
 
                 _LOGGER.debug(
                     "AUTOARM Configured %s button for %s",
-                    state,
-                    self.button_device[state],
+                    state_name,
+                    self.button_device[state_name],
                 )
 
         if self.reset_button:
@@ -449,39 +450,23 @@ class AlarmArmer:
             _LOGGER.info(
                 "AUTOARM Calendar event %s ended, and returning to fixed state %s", event.id, self.calendar_no_event_mode
             )
-            self.arm(self.calendar_no_event_mode, source=ChangeSource.CALENDAR)
+            self.arm(alarm_state_as_enum(self.calendar_no_event_mode), source=ChangeSource.CALENDAR)
         else:
             _LOGGER.debug("AUTOARM Reinstate previous state on calendar event end in manual mode")
             self.arm(event.previous_state, source=ChangeSource.CALENDAR)
 
-    def safe_state(self, state: State | None) -> str | None:
-        try:
-            return state.state if state is not None else None
-        except Exception as e:
-            _LOGGER.debug("AUTOARM Failed to load state %s: %s", state, e)
-            return None
-
     def is_occupied(self) -> bool:
-        return any(self.safe_state(self.hass.states.get(p)) == STATE_HOME for p in self.occupants)
+        return any(safe_state(self.hass.states.get(p)) == STATE_HOME for p in self.occupants)
 
     def is_unoccupied(self) -> bool:
-        return all(self.safe_state(self.hass.states.get(p)) != STATE_HOME for p in self.occupants)
+        return all(safe_state(self.hass.states.get(p)) != STATE_HOME for p in self.occupants)
 
     def is_night(self) -> bool:
-        return self.safe_state(self.hass.states.get("sun.sun")) == STATE_BELOW_HORIZON
-
-    def alarm_state_as_enum(self, state_str: str | None) -> AlarmControlPanelState | None:
-        if state_str is None:
-            return None
-        try:
-            return AlarmControlPanelState(state_str)
-        except ValueError as e:
-            _LOGGER.warning("AUTOARM Invalid alarm state: %s", e)
-            return None
+        return safe_state(self.hass.states.get("sun.sun")) == STATE_BELOW_HORIZON
 
     def armed_state(self) -> AlarmControlPanelState | None:
-        raw_state: str | None = self.safe_state(self.hass.states.get(self.alarm_panel))
-        return self.alarm_state_as_enum(raw_state)
+        raw_state: str | None = safe_state(self.hass.states.get(self.alarm_panel))
+        return alarm_state_as_enum(raw_state)
 
     @callback
     async def on_panel_change(self, event: Event[EventStateChangedData]) -> None:
@@ -508,7 +493,7 @@ class AlarmArmer:
             _LOGGER.warning("AUTOARM Dezombifying %s ...", new)
             await self.reset_armed_state(source=ChangeSource.ZOMBIFICATION)
         elif new != old:
-            self.record_intervention(ChangeSource.ALARM_PANEL, self.alarm_state_as_enum(new))
+            self.record_intervention(ChangeSource.ALARM_PANEL, alarm_state_as_enum(new))
             message = f"Home Assistant alarm level now set from {old} to {new}"
             await self.notify(message, title=f"Alarm now {new}", profile="quiet")
         else:
@@ -566,12 +551,14 @@ class AlarmArmer:
                 _LOGGER.debug("AUTOARM Ignoring reset while calendar configured, no active event, and default mode is manual")
                 return existing_state
             if self.calendar_no_event_mode in AlarmControlPanelState:
-                return self.arm(self.calendar_no_event_mode, ChangeSource.CALENDAR)
+                # TODO: may be dupe logic with on_cal event
+                return self.arm(alarm_state_as_enum(self.calendar_no_event_mode), ChangeSource.CALENDAR)
             if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
                 _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
             else:
                 _LOGGER.warning("AUTOARM Unexpected state for calendar no event mode: %s", self.calendar_no_event_mode)
 
+        # TODO: expose as config ( for manual disarm override ) and condition logic
         must_change_state: bool = existing_state is None or existing_state == AlarmControlPanelState.PENDING
         if intervention or source in (ChangeSource.CALENDAR, ChangeSource.OCCUPANCY) or must_change_state:
             _LOGGER.debug("AUTOARM Ignoring previous interventions")
@@ -622,7 +609,7 @@ class AlarmArmer:
 
     async def delayed_arm(
         self,
-        arming_state: str,
+        arming_state: AlarmControlPanelState,
         requested_at: datetime.datetime,
         triggered_at: datetime.datetime,
         source: ChangeSource | None = None,
@@ -658,7 +645,9 @@ class AlarmArmer:
 
         await self.reset_armed_state(intervention=intervention, source=source)
 
-    def arm(self, arming_state: str | None = None, source: ChangeSource | None = None) -> str | None:
+    def arm(
+        self, arming_state: AlarmControlPanelState | None = None, source: ChangeSource | None = None
+    ) -> AlarmControlPanelState | None:
         """Change alarm panel state
 
         Args:

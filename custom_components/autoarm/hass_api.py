@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import logging
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConditionError, ConditionErrorContainer
+from homeassistant.helpers import condition as condition
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import ConfigType
@@ -12,12 +14,8 @@ from homeassistant.helpers.typing import ConfigType
 from .const import DOMAIN, ConditionVariables
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
 
-    from homeassistant.helpers.condition import ConditionCheckerType
-
-from homeassistant.helpers import condition as condition
-
-if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.typing import ConfigType
 
@@ -52,47 +50,80 @@ class HomeAssistantAPI:
         )
 
     async def build_condition(
-        self,
-        condition_config: ConfigType,
-        strict: bool = False,
-        validate: bool = False,
-    ) -> ConditionCheckerType | None:
+        self, condition_config: list[ConfigType], strict: bool = False, validate: bool = False, name: str = DOMAIN
+    ) -> Callable | None:
         if self._hass is None:
             raise ValueError("HomeAssistant not available")
-        condition_variables = ConditionVariables()
+        capturing_logger: ConditionErrorLoggingAdaptor = ConditionErrorLoggingAdaptor(_LOGGER)
+        condition_variables: ConditionVariables = ConditionVariables()
+        cond_list: list[ConfigType]
         try:
             if validate:
-                condition_config = await condition.async_validate_condition_config(self._hass, condition_config)
+                cond_list = cast(
+                    "list[ConfigType]", await condition.async_validate_conditions_config(self._hass, condition_config)
+                )
+            else:
+                cond_list = condition_config
+        except Exception as e:
+            _LOGGER.exception("AUTOARM Condition validation failed: %s", e)
+            raise
+        try:
             if strict:
-                force_strict_template_mode(condition_config, undo=False)
+                force_strict_template_mode(cond_list, undo=False)
 
-            test = await condition.async_from_config(self._hass, condition_config)
+            test: Callable = await condition.async_conditions_from_config(
+                self._hass, cond_list, cast("logging.Logger", capturing_logger), name
+            )
             if test is None:
                 raise ValueError(f"Invalid condition {condition_config}")
-            test(self._hass, condition_variables.as_dict())
+            test({DOMAIN: condition_variables.as_dict()})
+            if strict:
+                for exception in capturing_logger.condition_errors:
+                    _LOGGER.warning("AUTOARM Invalid condition %s:%s", condition_config, exception)
+                    raise exception
             return test
         except Exception as e:
-            _LOGGER.exception("SUPERNOTIFY Condition eval failed: %s", e)
+            _LOGGER.exception("AUTOARM Condition eval failed: %s", e)
             raise
         finally:
             if strict:
-                force_strict_template_mode(condition_config, undo=False)
+                force_strict_template_mode(condition_config, undo=True)
 
     def evaluate_condition(
         self,
-        condition: ConditionCheckerType,
+        condition: Callable,
         condition_variables: ConditionVariables | None = None,
     ) -> bool | None:
         if self._hass is None:
             raise ValueError("HomeAssistant not available")
         try:
-            return condition(self._hass, condition_variables.as_dict() if condition_variables else None)
+            return condition({DOMAIN: condition_variables.as_dict()} if condition_variables else None)
         except Exception as e:
-            _LOGGER.error("SUPERNOTIFY Condition eval failed: %s", e)
+            _LOGGER.error("AUTOARM Condition eval failed: %s", e)
             raise
 
 
-def force_strict_template_mode(condition: ConfigType, undo: bool = False) -> None:
+class ConditionErrorLoggingAdaptor(logging.LoggerAdapter):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.condition_errors: list[ConditionError] = []
+
+    def capture(self, args: Any) -> None:
+        if args and isinstance(args, (list, tuple)):
+            for arg in args:
+                if isinstance(arg, ConditionErrorContainer):
+                    self.condition_errors.extend(arg.errors)
+
+    def error(self, msg: Any, *args: object, **kwargs: Any) -> None:
+        self.capture(args)
+        self.logger.error(msg, args, kwargs)
+
+    def warning(self, msg: Any, *args: Any, **kwargs: Any) -> None:
+        self.capture(args)
+        self.logger.warning(msg, args, kwargs)
+
+
+def force_strict_template_mode(conditions: list[ConfigType], undo: bool = False) -> None:
     class TemplateWrapper:
         def __init__(self, obj: Template) -> None:
             self._obj = obj
@@ -105,7 +136,7 @@ def force_strict_template_mode(condition: ConfigType, undo: bool = False) -> Non
         def __setattr__(self, name: str, value: Any) -> None:
             super().__setattr__(name, value)
 
-    def wrap_template(cond: ConfigType, undo: bool) -> None:
+    def wrap_template(cond: ConfigType, undo: bool) -> ConfigType:
         for key, val in cond.items():
             if not undo and isinstance(val, Template) and hasattr(val, "_env"):
                 cond[key] = TemplateWrapper(val)
@@ -113,6 +144,7 @@ def force_strict_template_mode(condition: ConfigType, undo: bool = False) -> Non
                 cond[key] = val._obj
             elif isinstance(val, dict):
                 wrap_template(val, undo)
+        return cond
 
-    if condition is not None:
-        wrap_template(condition, undo)
+    if conditions is not None:
+        conditions = [wrap_template(condition, undo) for condition in conditions]

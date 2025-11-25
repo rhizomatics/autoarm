@@ -3,6 +3,7 @@
 import logging
 from dataclasses import dataclass
 from enum import StrEnum, auto
+from typing import Any
 
 import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
@@ -55,12 +56,18 @@ NOTIFY_SCHEMA = vol.Schema({
     vol.Optional(NOTIFY_NORMAL): NOTIFY_DEF_SCHEMA,
 })
 
-DEFAULT_TRANSITIONS = {
-    "armed_home": "{{ occupied and not night and computed and occupied_daytime_state == 'armed_home'}}",
-    "armed_away": "{{ not occupied and computed}}",
-    "disarmed": "{{ occupied and not night and computed and occupied_daytime_state == 'disarmed'}}",
-    "armed_night": "{{ occupied and night and computed}}",
-    "armed_vacation": "{{ vacation }}",
+DEFAULT_TRANSITIONS: dict[str, Any] = {
+    "armed_home": [
+        "{{ autoarm.occupied and not autoarm.night }}",
+        "{{ autoarm.computed and autoarm.occupied_daytime_state == 'armed_home'}}",
+    ],
+    "armed_away": "{{ not autoarm.occupied and autoarm.computed}}",
+    "disarmed": [
+        "{{ autoarm.occupied and not autoarm.night }}",
+        "{{ autoarm.computed and autoarm.occupied_daytime_state == 'disarmed'}}",
+    ],
+    "armed_night": "{{ autoarm.occupied and autoarm.night and autoarm.computed}}",
+    "armed_vacation": "{{ autoarm.vacation }}",
 }
 
 DEFAULT_CALENDAR_MAPPINGS = {
@@ -88,8 +95,8 @@ CONFIG_SCHEMA = vol.Schema(
         DOMAIN: vol.Schema({
             vol.Required(CONF_ALARM_PANEL): cv.entity_id,
             vol.Optional(CONF_SUNRISE_CUTOFF): cv.time,
-            vol.Optional(CONF_TRANSITIONS, default=DEFAULT_TRANSITIONS): {
-                vol.All(vol.Upper, vol.In(AlarmControlPanelState.__members__)): cv.CONDITION_SCHEMA
+            vol.Optional(CONF_TRANSITIONS): {
+                vol.All(vol.Upper, vol.In(AlarmControlPanelState.__members__)): cv.CONDITIONS_SCHEMA
             },
             vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
             vol.Optional(CONF_ARM_AWAY_DELAY, default=180): cv.positive_int,
@@ -116,7 +123,7 @@ CONFIG_SCHEMA = vol.Schema(
 class ConditionVariables:
     occupied: bool | None = None
     night: bool | None = None
-    state: str | None = None
+    state: AlarmControlPanelState | None = None
     calendar_event: CalendarEvent | None = None
     occupied_daytime_state: str | None = None
 
