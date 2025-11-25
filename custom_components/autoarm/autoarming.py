@@ -300,10 +300,10 @@ class AlarmArmer:
                 error = f"Unknown error {e}"
             if error is not None:
                 self.hass_api.raise_issue(
-                    f"transition_{state_str}",
+                    f"transition_condition_{state_str}",
                     is_fixable=False,
-                    issue_key="transition",
-                    issue_map={"transition": state_str, "error": error},
+                    issue_key="transition_condition",
+                    issue_map={"state": state_str, "error": error},
                     severity=ir.IssueSeverity.ERROR,
                     learn_more_url="https://supernotify.rhizomatics.org.uk/scenarios/",
                 )

@@ -1,0 +1,15 @@
+{
+    "title":"Supernotify",
+    "services": {
+        "reload": {
+            "name": "[%key:common::action::reload%]",
+            "description": "Reloads autoarm configuration."
+        }
+    },
+    "issues":{
+        "transition_condition":{
+            "title":"Invalid Transition Condition",
+            "description":"Transition condition for {state} failed to validate with an error ({error})"
+        }     
+    }
+}
