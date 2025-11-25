@@ -2,8 +2,9 @@
     "domain": "autoarm",
     "name": "Auto Arm",
     "after_dependencies": [
-        "supernotify",
-        "mobile_app"
+        "mobile_app",
+        "calendar",
+        "local_calendar"
     ],
     "codeowners": [
         "@jeyrb"
