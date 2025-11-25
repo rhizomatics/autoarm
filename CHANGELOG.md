@@ -5,6 +5,7 @@
 - Internal logic for automatic state calc replaced by regular Home Assistant conditions
 ### Internal
 - All manual actions now recorded as interventions
+- Regular housekeeping for interventions and calendar tracking
 - Further typing with ChangeSource and AlarmControlPanelState
 ## 0.5.2
 - Clean up dead code for mobile actions
