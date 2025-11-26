@@ -117,8 +117,10 @@ CONFIG_SCHEMA = vol.Schema({
         vol.Optional(CONF_OCCUPANCY, default={}): OCCUPANCY_SCHEMA,
         vol.Optional(CONF_NOTIFY, default={}): NOTIFY_SCHEMA,
         vol.Optional(CONF_RATE_LIMIT, default={}): RATE_LIMIT_SCHEMA,
-    })
-})
+        })
+    },
+    extra=vol.ALLOW_EXTRA,  # validation fails without this by trying to include all of HASS config
+)
 
 DEFAULT_TRANSITIONS: dict[str, Any] = {
     "armed_home": [
