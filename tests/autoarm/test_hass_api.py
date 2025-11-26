@@ -1,4 +1,5 @@
 import pytest
+from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.exceptions import ConditionError, HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 
@@ -13,7 +14,7 @@ async def test_evaluate_with_bad_condition(hass_api: HomeAssistantAPI) -> None:
 
 
 async def test_evaluates_good_true_condition(hass_api: HomeAssistantAPI) -> None:
-    cvars = ConditionVariables(occupied=True, night=False)
+    cvars = ConditionVariables(True, False, AlarmControlPanelState.DISARMED, {})
     condition = cv.CONDITIONS_SCHEMA({
         "condition": "template",
         "value_template": """
@@ -26,7 +27,7 @@ async def test_evaluates_good_true_condition(hass_api: HomeAssistantAPI) -> None
 
 async def test_evaluates_good_false_condition(hass_api: HomeAssistantAPI) -> None:
 
-    cvars = ConditionVariables(occupied=True, night=False)
+    cvars = ConditionVariables(True, False, AlarmControlPanelState.DISARMED, {})
     condition = cv.CONDITIONS_SCHEMA({
         "condition": "template",
         "value_template": """

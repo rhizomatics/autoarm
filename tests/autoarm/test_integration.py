@@ -1,34 +1,37 @@
 import asyncio
 
 from homeassistant.components.notify.const import ATTR_TITLE
-from homeassistant.const import ATTR_ICON, CONF_CONDITIONS
+from homeassistant.const import ATTR_ICON, CONF_CONDITIONS, CONF_DELAY_TIME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
 
+from custom_components.autoarm.autoarming import AlarmControlPanelState
+from custom_components.autoarm.calendar import CONF_ENTITY_ID
 from custom_components.autoarm.const import (
     ATTR_ACTION,
+    ATTR_RESET,
     CONF_ALARM_PANEL,
-    CONF_ARM_AWAY_DELAY,
-    CONF_BUTTON_ENTITY_AWAY,
-    CONF_BUTTON_ENTITY_DISARM,
-    CONF_BUTTON_ENTITY_RESET,
+    CONF_BUTTONS,
+    CONF_DIURNAL,
+    CONF_EARLIEST,
     CONF_NOTIFY,
-    CONF_OCCUPANTS,
-    CONF_SUNRISE_CUTOFF,
+    CONF_OCCUPANCY,
+    CONF_SUNRISE,
     CONF_TRANSITIONS,
     DOMAIN,
 )
 
 CONFIG = {
     DOMAIN: {
-        CONF_ALARM_PANEL: "alarm_panel.testing",
-        CONF_ARM_AWAY_DELAY: 1,
-        CONF_SUNRISE_CUTOFF: "06:30:00",
-        CONF_BUTTON_ENTITY_RESET: "binary_sensor.button_left",
-        CONF_BUTTON_ENTITY_AWAY: "binary_sensor.button_right",
-        CONF_BUTTON_ENTITY_DISARM: "binary_sensor.button_middle",
-        CONF_OCCUPANTS: ["person.house_owner", "person.tenant"],
+        CONF_ALARM_PANEL: {CONF_ENTITY_ID: "alarm_panel.testing"},
+        CONF_DIURNAL: {CONF_SUNRISE: {CONF_EARLIEST: "06:30:00"}},
+        CONF_BUTTONS: {
+            ATTR_RESET: {CONF_ENTITY_ID: "binary_sensor.button_left"},
+            AlarmControlPanelState.ARMED_AWAY: {CONF_DELAY_TIME: 1, CONF_ENTITY_ID: "binary_sensor.button_right"},
+            AlarmControlPanelState.DISARMED: {CONF_ENTITY_ID: "binary_sensor.button_middle"},
+        },
+        CONF_OCCUPANCY: {CONF_ENTITY_ID: ["person.house_owner", "person.tenant"]},
         CONF_NOTIFY: {
             "common": {
                 "service": "notify.supernotifier",
@@ -67,7 +70,7 @@ async def test_configure(hass: HomeAssistant) -> None:
 async def test_broken_condition_raises_issue(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
     config = {
         DOMAIN: {
-            CONF_ALARM_PANEL: "alarm_panel.testing",
+            CONF_ALARM_PANEL: {CONF_ENTITY_ID: "alarm_panel.testing"},
             CONF_TRANSITIONS: {"armed_home": {CONF_CONDITIONS: "{{ autoarm.morning_coffee and not autoarm.occupied }}"}},
         }
     }

@@ -20,12 +20,13 @@
 
 
 Automate the arming and disarming of the built-in Home Assistant [Alarm
-Control Panel](https://www.home-assistant.io/integrations/alarm_control_panel/), with additional support for calendar integration, manual override via remote control buttons, and mobile push actionable notifications.
+Control Panel Integrations], with additional support for calendar integration, manual override via remote control buttons, and mobile push actionable notifications.
 
 !!! question inline end "Why use alarm control panels?"
     A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful,
-    even if there is no real alarm system, as a single central place to hold the **overall state of
-    the home**, and then use that to drive automations, notifications etc
+    even if there is no real alarm system, as a **single central state of
+    the home**, and then use that to drive automations, notifications etc rather than
+    littering notifications with checks for presence, time of day, vacations or similar.
 
     For example, it is likely that many things will change if `ARMED_VACATION` applies, and
     you may want to have all PIR alerts silenced if alarm state is `DISARMED`. This builds
@@ -38,85 +39,25 @@ Control Panel](https://www.home-assistant.io/integrations/alarm_control_panel/),
 
 ## Setup
 
-Register this GitHub repo as a custom repo in your [HACS]( https://hacs.xyz) configuration.
+Register this GitHub repo as a custom repo in your [HACS][] configuration.
 
 Notifications will work with any HomeAssistant notification implementation, and works best with [Supernotifier](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
 
+## Alarm Panel Configuration
+
+Autoarm will work with any Home Assistant of the [Alarm Control Panel Integrations][]. If you don't have one, try
+[Create an Alarm Panel](configuration/create_panel.md)
+
 ## Automated Arming
 
-Arming has 4 complementary modes of operation:
-
-### Button Integration
-
-Handy if you have a Zigbee, 433Mhz or similar button panel by the door - choose a button
-for `DISARMED`,`ARMED_AWAY` etc, or a *Reset* button to set the panel by the default algorithm.
-
-### Mobile Action
-
-This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](mobile_actions.md)
-for more information.
-
-### Calendar Integration
-
-Use a Home Assistant [calendar integration](https://www.home-assistant.io/integrations/?cat=calendar) to
-define when and how to arm the control panel. If you don't have one, follow these [instructions](configuration/create_calendar.md).
-
-This can be an entry for that purpose, for example a recurring entry on a [Local Calendar](https://www.home-assistant.io/integrations/local_calendar/) dedicated to AutoArm, or looking up an existing calendar to find vacations by pattern.
-
-Using a [Remote Calendar](https://www.home-assistant.io/integrations/remote_calendar/), [Google Calendar](https://www.home-assistant.io/integrations/google/) or similar also means that alarm scheduling
-can be done remotely, even if you have no remote access to Home Assistant.
-
-Multiple calendars, of different types, can be configured, and specific alarm states / match patterns per calendar. See the [example configuration](configuration/examples/typical.md)
-
-If there's no calendar event live, then arming state can fall back to the Sun and Occupancy Automation,
-or fixed at a default state, or left to manual control.
-
-### Default Algorithm - Sun and Occupancy
-
-Arming can happen strictly by sunset and sunrise, and by occupancy.
-
-| Diurnal State | Occupancy State | Alarm State    |
-| ------------- | --------------- | -------------- |
-| day           | occupied        | ARMED_HOME(*)  |
-| day           | empty           | ARMED_AWAY     |
-| night         | occupied        | ARMED_NIGHT    |
-| night         | occupied        | ARMED_AWAY     |
-
-(*) This can be overridden using `occupied_daytime_state` in the configuration, for example
-if you prefer to have the alarm set to `disarmed` when people are home and its daylight.
-
-Two other states, `ARMED_VACATION` and `DISARMED` can be set manually, by buttons, or calendar.
-
-If you need more predictability, especially for high latitudes where sunrise varies wildly through the year,
-set up a calendar and define exactly when you want disarming or arming to happen.
-
-Similarly, there's a `sunrise_cutoff` option to prevent alarm being armed at
-4am if you live far North, like Norway or Scotland.
+See [Automated Arming](automated_arming.md) for the various mechanisms, options and how to configure.
 
 ## Throttling
 
 To guard against loops, or other reasons why arming might be triggered too often,
 rate limiting is applied around the arm call, limited to a set number of calls within
-the past so many seconds.
+the past so many seconds. Configured by `rate_limit` section in config.
 
-
-## Alarm Panel Configuration
-
-Autoarm will work with any Home Assistant [Alarm Control Panel](https://www.home-assistant.io/integrations/alarm_control_panel/) based integration.
-
-If you don't already have an alarm panel, set up a default manual as below, which creates the
-state machine for armed/disarmed status. This is all you need in the way of alarm support for AutoArm to function. You can also choose whether a PIN code is needed or not to arm or disarm.
-
-```yml
-alarm_control_panel:
-  - platform: manual
-    name: Home Alarm Control
-    code_arm_required: false
-    arming_time: 0
-    delay_time: 0
-    disarm_after_trigger: false
-    trigger_time: 0
-```
 
 ## Notifications
 
@@ -135,17 +76,35 @@ notify:
     quiet:
       data:
         priority: low
+        apply-scenarions: nerdy
     normal:
       data:
         priority: medium
 ```
 
-For more notification flexibility, try [Supernotify](https://supernotify.rhizomatics.org.uk)
+ If you want to send to e-mail and mobile then this will fail with a notify group unless you
+ use very basic messages, since additional fields, like the `actions` in the `data` field for
+ Actionable Notifications aren't supported by other notification platforms. The
+ best way to resolve that is with [Supernotify](https://supernotify.rhizomatics.org.uk) which will
+ tune each message for the underlying transport ( mobile apps, and also e-mail, text, chime etc.)
+ along with lots of other tuning options.
 
-## Home Assistant features
+## Home Assistant Features Supported
 
-- The component is reloadable from the *Developer Tools* page
-- Autoarm exposes *entities* for its configuration and last calendar event.
+- [Alarm Control Panel Integrations][]
+- [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/)
+- [Calendar Integration](https://www.home-assistant.io/integrations/calendar/)
+- [Sun Integration](https://www.home-assistant.io/integrations/sun/)
+- [Person Integration][]
+- [Button Integration][]
+- [Device Tracker Integration](https://www.home-assistant.io/integrations/device_tracker/)
+- [Conditions][]
+- [Notifications](https://www.home-assistant.io/integrations/notify/)
+- [Repairs](https://www.home-assistant.io/integrations/repairs/)
+    - Raises repairs for invalid transition configurations
+- [Developer Tools](https://www.home-assistant.io/docs/tools/dev-tools/)
+    - Reloadable from the *YAML* tab
+    - Exposes *entities* for its configuration and last calendar event.
 
 ## References
 
@@ -154,3 +113,10 @@ For more notification flexibility, try [Supernotify](https://supernotify.rhizoma
 * Handy [Dashboard Alarm Panel](https://www.home-assistant.io/dashboards/alarm-panel/) widget to add to your Home Assistant dashboard.
 
 [![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?style=for-the-badge&logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)
+
+[CalendarEvent]: https://github.com/home-assistant/core/blob/56a71e6798ada65e9c99f92f64bd4168e98b935b/homeassistant/components/calendar/__init__.py#L364
+[Alarm Control Panel Integrations]: https://www.home-assistant.io/integrations/alarm_control_panel/
+[Conditions]: https://www.home-assistant.io/docs/scripts/conditions/
+[HACS]: https://hacs.xyz
+[Button Integration]: https://www.home-assistant.io/integrations/button/
+[Person Integration]: https://www.home-assistant.io/integrations/person/

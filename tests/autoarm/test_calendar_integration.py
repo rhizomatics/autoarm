@@ -14,7 +14,7 @@ from custom_components.autoarm.const import (
     CONF_CALENDAR_NO_EVENT,
     CONF_CALENDAR_POLL_INTERVAL,
     CONF_CALENDARS,
-    CONF_OCCUPANTS,
+    CONF_OCCUPANCY,
     DOMAIN,
 )
 
@@ -26,8 +26,8 @@ from homeassistant.core import HomeAssistant, State
 
 CONFIG = {
     DOMAIN: {
-        CONF_ALARM_PANEL: "alarm_panel.testing",
-        CONF_OCCUPANTS: ["person.house_owner", "person.tenant"],
+        CONF_ALARM_PANEL: {CONF_ENTITY_ID: "alarm_panel.testing"},
+        CONF_OCCUPANCY: {CONF_ENTITY_ID: ["person.house_owner", "person.tenant"]},
         CONF_CALENDAR_CONTROL: {
             CONF_CALENDAR_NO_EVENT: "auto",
             CONF_CALENDARS: [

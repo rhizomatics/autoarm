@@ -16,7 +16,7 @@ TEST_PANEL = "alarm_control_panel.test_panel"
 
 @pytest.fixture
 async def autoarmer(hass: HomeAssistant) -> AsyncGenerator[AlarmArmer]:
-    uut = AlarmArmer(hass, TEST_PANEL, occupants=["person.tester_bob"])
+    uut = AlarmArmer(hass, TEST_PANEL, occupancy={"entity_id": ["person.tester_bob"]})
     await uut.initialize()
     yield uut
     uut.shutdown()
@@ -57,7 +57,7 @@ def test_occupied_day_armed_default(autoarmer: AlarmArmer, day: None, occupied: 
 
 
 def test_occupied_day_disarmed_default(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
-    autoarmer.occupied_daytime_default = AlarmControlPanelState.DISARMED
+    autoarmer.occupied_defaults["day"] = AlarmControlPanelState.DISARMED
     assert autoarmer.determine_state() == AlarmControlPanelState.DISARMED
 
 
@@ -184,7 +184,9 @@ async def test_reset_sets_disarmed_from_unknown(hass: HomeAssistant, autoarmer: 
 
 
 async def test_reset_armed_state_uses_daytime_default(hass: HomeAssistant) -> None:
-    autoarmer = AlarmArmer(hass, TEST_PANEL, occupied_daytime_default="disarmed", occupants=["person.tester_bob"])
+    autoarmer = AlarmArmer(
+        hass, TEST_PANEL, occupancy={"default_state": {"day": "disarmed"}, "entity_id": ["person.tester_bob"]}
+    )
     await autoarmer.initialize()
     hass.states.async_set("sun.sun", "above_horizon")
     hass.states.async_set("person.tester_bob", "home")
@@ -203,9 +205,8 @@ async def test_housekeeping_prunes_calendar_events(hass: HomeAssistant, local_ca
     autoarmer = AlarmArmer(
         hass,
         TEST_PANEL,
-        occupied_daytime_default="disarmed",
+        occupancy={"default_state": {"day": "disarmed"}, "entity_id": ["person.tester_bob"]},
         calendars=[{"entity_id": "calendar.testing_calendar", "state_patterns": {"disarmed": ".*"}}],
-        occupants=["person.tester_bob"],
     )
     await autoarmer.initialize()
     cal_event = autoarmer.active_calendar_event()

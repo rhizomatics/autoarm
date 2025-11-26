@@ -1,2 +1,3 @@
 autoarm:
-  alarm_panel: alarm_panel.minimal
+  alarm_panel:
+    entity_id: alarm_panel.minimal

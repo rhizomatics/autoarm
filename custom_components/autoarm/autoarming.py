@@ -1,12 +1,11 @@
 import asyncio
 import contextlib
-import datetime
+import datetime as dt
 import logging
-import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 import homeassistant.util.dt as dt_util
 import voluptuous as vol
@@ -36,23 +35,26 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.util.hass_dict import HassKey
 
 from custom_components.autoarm.hass_api import HomeAssistantAPI
+from tests.autoarm.test_integration import CONF_DELAY_TIME, CONF_ENTITY_ID
 
 from .calendar import TrackedCalendar, TrackedCalendarEvent
 from .const import (
+    ATTR_RESET,
     CONF_ALARM_PANEL,
-    CONF_ARM_AWAY_DELAY,
-    CONF_BUTTON_ENTITY_AWAY,
-    CONF_BUTTON_ENTITY_DISARM,
-    CONF_BUTTON_ENTITY_RESET,
+    CONF_BUTTONS,
     CONF_CALENDAR_CONTROL,
     CONF_CALENDAR_NO_EVENT,
     CONF_CALENDARS,
+    CONF_DAY,
+    CONF_DIURNAL,
+    CONF_EARLIEST,
     CONF_NOTIFY,
-    CONF_OCCUPANTS,
-    CONF_OCCUPIED_DAY_DEFAULT,
-    CONF_SUNRISE_CUTOFF,
-    CONF_THROTTLE_CALLS,
-    CONF_THROTTLE_SECONDS,
+    CONF_OCCUPANCY,
+    CONF_OCCUPANCY_DEFAULT,
+    CONF_RATE_LIMIT,
+    CONF_RATE_LIMIT_CALLS,
+    CONF_RATE_LIMIT_PERIOD,
+    CONF_SUNRISE,
     CONF_TRANSITIONS,
     CONFIG_SCHEMA,
     DEFAULT_TRANSITIONS,
@@ -62,7 +64,7 @@ from .const import (
     ChangeSource,
     ConditionVariables,
 )
-from .helpers import alarm_state_as_enum, safe_state
+from .helpers import Limiter, alarm_state_as_enum, safe_state
 
 if TYPE_CHECKING:
     from homeassistant.helpers.condition import ConditionCheckerType
@@ -131,18 +133,13 @@ def expose_config_entity(hass: HomeAssistant, config: ConfigType) -> None:
         f"{DOMAIN}.configured",
         "True",
         {
-            CONF_ALARM_PANEL: config.get(CONF_ALARM_PANEL),
-            CONF_SUNRISE_CUTOFF: config.get(CONF_SUNRISE_CUTOFF),
-            CONF_OCCUPIED_DAY_DEFAULT: config.get(CONF_OCCUPIED_DAY_DEFAULT),
+            CONF_ALARM_PANEL: config.get(CONF_ALARM_PANEL, {}).get(CONF_ENTITY_ID),
+            CONF_DIURNAL: config.get(CONF_DIURNAL),
             CONF_CALENDAR_CONTROL: config.get(CONF_CALENDAR_CONTROL),
-            CONF_ARM_AWAY_DELAY: config.get(CONF_ARM_AWAY_DELAY, ()),
-            CONF_BUTTON_ENTITY_RESET: config.get(CONF_BUTTON_ENTITY_RESET),
-            CONF_BUTTON_ENTITY_AWAY: config.get(CONF_BUTTON_ENTITY_AWAY),
-            CONF_BUTTON_ENTITY_DISARM: config.get(CONF_BUTTON_ENTITY_DISARM),
-            CONF_OCCUPANTS: config.get(CONF_OCCUPANTS, []),
+            CONF_BUTTONS: config.get(CONF_BUTTONS, {}),
+            CONF_OCCUPANCY: config.get(CONF_OCCUPANCY, {}),
             CONF_NOTIFY: config.get(CONF_NOTIFY, {}),
-            CONF_THROTTLE_SECONDS: config.get(CONF_THROTTLE_SECONDS, 60),
-            CONF_THROTTLE_CALLS: config.get(CONF_THROTTLE_CALLS, 6),
+            CONF_RATE_LIMIT: config.get(CONF_RATE_LIMIT, {}),
         },
     )
 
@@ -151,17 +148,12 @@ def _async_process_config(hass: HomeAssistant, config: ConfigType) -> "AlarmArme
     calendar_config: ConfigType = config.get(CONF_CALENDAR_CONTROL, {})
     return AlarmArmer(
         hass,
-        alarm_panel=config[CONF_ALARM_PANEL],
-        sunrise_cutoff=cast("datetime.time", config.get(CONF_SUNRISE_CUTOFF)),
-        arm_away_delay=config[CONF_ARM_AWAY_DELAY],
-        reset_button=config.get(CONF_BUTTON_ENTITY_RESET),
-        away_button=config.get(CONF_BUTTON_ENTITY_AWAY),
-        disarm_button=config.get(CONF_BUTTON_ENTITY_DISARM),
-        occupants=config[CONF_OCCUPANTS],
+        alarm_panel=config[CONF_ALARM_PANEL].get(CONF_ENTITY_ID),
+        diurnal=config.get(CONF_DIURNAL, {}),
+        buttons=config.get(CONF_BUTTONS, {}),
+        occupancy=config[CONF_OCCUPANCY],
         notify=config[CONF_NOTIFY],
-        occupied_daytime_default=config[CONF_OCCUPIED_DAY_DEFAULT],
-        throttle_calls=config.get(CONF_THROTTLE_CALLS, 6),
-        throttle_seconds=config.get(CONF_THROTTLE_SECONDS, 60),
+        rate_limit=config.get(CONF_RATE_LIMIT, {}),
         calendars=calendar_config.get(CONF_CALENDARS, []),
         transitions=config.get(CONF_TRANSITIONS),
         calendar_no_event_mode=calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO),
@@ -178,7 +170,9 @@ def unlisten(listener: Callable[[], None] | None) -> None:
 
 @dataclass
 class Intervention:
-    created_at: datetime.datetime
+    """Record of a manual intervention, such as a button push, mobile action or alarm panel change"""
+
+    created_at: dt.datetime
     source: ChangeSource
     state: AlarmControlPanelState | None
 
@@ -188,37 +182,33 @@ class AlarmArmer:
         self,
         hass: HomeAssistant,
         alarm_panel: str,
-        sunrise_cutoff: datetime.time | None = None,
-        arm_away_delay: int | None = None,
-        reset_button: str | None = None,
-        away_button: str | None = None,
-        disarm_button: str | None = None,
-        occupied_daytime_default: str | None = None,
-        occupants: list | None = None,
+        buttons: dict[str, ConfigType] | None = None,
+        occupancy: ConfigType | None = None,
         actions: list | None = None,
-        notify: dict | None = None,
-        throttle_calls: int = 6,
-        throttle_seconds: int = 60,
+        notify: ConfigType | None = None,
+        diurnal: ConfigType | None = None,
+        rate_limit: ConfigType | None = None,
         calendar_no_event_mode: str | None = None,
         calendars: list[ConfigType] | None = None,
         transitions: dict[str, dict[str, list[ConfigType]]] | None = None,
     ) -> None:
+        occupancy = occupancy or {}
+        rate_limit = rate_limit or {}
+        diurnal = diurnal or {}
+
         self.hass: HomeAssistant = hass
         self.local_tz = dt_util.get_time_zone(self.hass.config.time_zone)
         self.calendar_configs: list[ConfigType] = calendars or []
         self.calendar_no_event_mode: str = calendar_no_event_mode or NO_CAL_EVENT_MODE_AUTO
         self.calendars: list[TrackedCalendar] = []
         self.alarm_panel: str = alarm_panel
-        self.sunrise_cutoff: datetime.time | None = sunrise_cutoff
-        occupied_daytime_default = (
-            occupied_daytime_default.lower() if occupied_daytime_default else AlarmControlPanelState.ARMED_HOME.value
+        self.sunrise_cutoff: dt.time | None = diurnal.get(CONF_SUNRISE, {}).get(CONF_EARLIEST)
+        self.occupants: list[str] = occupancy.get(CONF_ENTITY_ID, [])
+        self.occupied_defaults: dict[str, AlarmControlPanelState] = occupancy.get(
+            CONF_OCCUPANCY_DEFAULT, {CONF_DAY: AlarmControlPanelState.ARMED_HOME}
         )
-        self.occupied_daytime_default: AlarmControlPanelState = AlarmControlPanelState(occupied_daytime_default)
-        self.arm_away_delay: int | None = arm_away_delay
-        self.reset_button: str | None = reset_button
-        self.away_button: str | None = away_button
-        self.disarm_button: str | None = disarm_button
-        self.occupants: list[str] = occupants or []
+        self.buttons: ConfigType = buttons or {}
+
         self.actions: list[str] = actions or []
         self.notify_profiles: dict[str, dict] = notify or {}
         self.unsubscribes: list = []
@@ -226,25 +216,24 @@ class AlarmArmer:
         self.button_device: dict[str, str] = {}
         self.arming_in_progress: asyncio.Event = asyncio.Event()
         self.requested_state: AlarmControlPanelState | None = None
-        self.requested_state_time: datetime.datetime | None = None
-        self.rate_limiter: Limiter = Limiter(window=throttle_seconds, max_calls=throttle_calls)
+        self.requested_state_time: dt.datetime | None = None
+
+        self.rate_limiter: Limiter = Limiter(
+            window=rate_limit.get(CONF_RATE_LIMIT_PERIOD, dt.timedelta(seconds=60)),
+            max_calls=rate_limit.get(CONF_RATE_LIMIT_CALLS, 5),
+        )
+
         self.hass_api: HomeAssistantAPI = HomeAssistantAPI(hass)
         self.transitions: dict[AlarmControlPanelState, ConditionCheckerType] = {}
-        self.transition_config: dict[str, dict[str, list[ConfigType]]] = transitions or {
-            k: {CONF_CONDITIONS: cv.CONDITIONS_SCHEMA(v)} for k, v in DEFAULT_TRANSITIONS.items()
-        }
+        self.transition_config: dict[str, dict[str, list[ConfigType]]] = transitions or {}
+
         self.initialization_errors: dict[str, int] = {}
         self.interventions: list[Intervention] = []
         self.intervention_ttl: int = 60
 
     async def initialize(self) -> None:
         """Async initialization"""
-        _LOGGER.info(
-            "AUTOARM arm_delay=%s, occupied=%s, state=%s",
-            self.arm_away_delay,
-            self.is_occupied(),
-            self.armed_state(),
-        )
+        _LOGGER.info("AUTOARM occupied=%s, state=%s, calendars=%s", self.is_occupied(), self.armed_state(), len(self.calendars))
 
         self.initialize_alarm_panel()
         await self.initialize_calendar()
@@ -272,6 +261,10 @@ class AlarmArmer:
 
     async def initialize_logic(self) -> None:
         stage: str = "logic"
+        for state_str, raw_condition in DEFAULT_TRANSITIONS.items():
+            if state_str not in self.transition_config:
+                _LOGGER.info("AUTOARM No transition condition defined for %s, defaulting", state_str)
+                self.transition_config[state_str] = {CONF_CONDITIONS: cv.CONDITIONS_SCHEMA(raw_condition)}
 
         for state_str, transition_config in self.transition_config.items():
             error: str = ""
@@ -290,7 +283,7 @@ class AlarmArmer:
                         # re-run without strict wrapper
                         cond = await self.hass_api.build_condition(condition_config, name=state_str)
                     if cond:
-                        _LOGGER.info(f"AUTOARM Validated transition logic for {state_str}")
+                        _LOGGER.debug(f"AUTOARM Validated transition logic for {state_str}")
                         self.transitions[state] = cond
                     else:
                         _LOGGER.warning(f"AUTOARM Failed to validate transition logic for {state_str}")
@@ -323,7 +316,6 @@ class AlarmArmer:
                     issue_key="transition_condition",
                     issue_map={"state": state_str, "error": error},
                     severity=ir.IssueSeverity.ERROR,
-                    learn_more_url="https://autoarm.rhizomatics.org.uk/scenarios/",
                 )
 
     async def async_shutdown(self, _event: Event) -> None:
@@ -341,12 +333,10 @@ class AlarmArmer:
         self.stop_listener = None
         _LOGGER.info("AUTOARM shut down")
 
-    async def housekeeping(self, triggered_at: datetime.datetime) -> None:
+    async def housekeeping(self, triggered_at: dt.datetime) -> None:
         _LOGGER.debug("AUTOARM Housekeeping starting, triggered at %s", triggered_at)
         now = dt_util.now()
-        self.interventions = [
-            i for i in self.interventions if now < i.created_at + datetime.timedelta(minutes=self.intervention_ttl)
-        ]
+        self.interventions = [i for i in self.interventions if now < i.created_at + dt.timedelta(minutes=self.intervention_ttl)]
         for cal in self.calendars:
             await cal.prune_events()
         _LOGGER.debug("AUTOARM Housekeeping finished")
@@ -401,12 +391,15 @@ class AlarmArmer:
                     self.button_device[state_name],
                 )
 
-        if self.reset_button:
-            setup_button("reset", self.reset_button, self.on_reset_button)
-        if self.away_button:
-            setup_button("away", self.away_button, self.on_away_button)
-        if self.disarm_button:
-            setup_button("disarm", self.disarm_button, self.on_disarm_button)
+        for button_use, button_config in self.buttons.items():
+            delay = button_config.get(CONF_DELAY_TIME, 0)
+            for entity_id in button_config[CONF_ENTITY_ID]:
+                if button_use == ATTR_RESET:
+                    setup_button(ATTR_RESET, entity_id, partial(self.on_reset_button, delay))
+                else:
+                    setup_button(
+                        button_use, entity_id, partial(self.on_alarm_state_button, AlarmControlPanelState(button_use), delay)
+                    )
 
     async def initialize_calendar(self) -> None:
         """Configure calendar polling (optional)"""
@@ -440,7 +433,7 @@ class AlarmArmer:
             return events[0]
         return None
 
-    async def on_calendar_event_start(self, event: TrackedCalendarEvent, triggered_at: datetime.datetime) -> None:
+    async def on_calendar_event_start(self, event: TrackedCalendarEvent, triggered_at: dt.datetime) -> None:
         _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", event.id, triggered_at)
         if event.arming_state != self.armed_state():
             _LOGGER.info("AUTOARM Calendar event %s changing arming to %s at %s", event.id, event.arming_state, triggered_at)
@@ -458,7 +451,7 @@ class AlarmArmer:
             },
         )
 
-    async def on_calendar_event_end(self, event: TrackedCalendarEvent, ended_at: datetime.datetime) -> None:
+    async def on_calendar_event_end(self, event: TrackedCalendarEvent, ended_at: dt.datetime) -> None:
         _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", event.id, ended_at)
         if any(cal.has_active_event() for cal in self.calendars):
             _LOGGER.debug("AUTOARM No action on event end since other cal event active")
@@ -480,15 +473,25 @@ class AlarmArmer:
     def is_occupied(self) -> bool:
         return any(safe_state(self.hass.states.get(p)) == STATE_HOME for p in self.occupants)
 
+    def at_home(self) -> list[str]:
+        return [p for p in self.occupants if safe_state(self.hass.states.get(p)) == STATE_HOME]
+
+    def not_home(self) -> list[str]:
+        return [p for p in self.occupants if safe_state(self.hass.states.get(p)) != STATE_HOME]
+
     def is_unoccupied(self) -> bool:
         return all(safe_state(self.hass.states.get(p)) != STATE_HOME for p in self.occupants)
 
     def is_night(self) -> bool:
         return safe_state(self.hass.states.get("sun.sun")) == STATE_BELOW_HORIZON
 
-    def armed_state(self) -> AlarmControlPanelState | None:
+    def armed_state(self) -> AlarmControlPanelState:
         raw_state: str | None = safe_state(self.hass.states.get(self.alarm_panel))
-        return alarm_state_as_enum(raw_state)
+        alarm_state = alarm_state_as_enum(raw_state)
+        if alarm_state is None:
+            _LOGGER.warning("AUTOARM No alarm state available - treating as PENDING")
+            return AlarmControlPanelState.PENDING
+        return alarm_state
 
     @callback
     async def on_panel_change(self, event: Event[EventStateChangedData]) -> None:
@@ -500,7 +503,7 @@ class AlarmArmer:
         if self.arming_in_progress.is_set() or (
             self.requested_state == new_state
             and self.requested_state_time is not None
-            and self.requested_state_time > dt_util.now() - datetime.timedelta(minutes=1)
+            and self.requested_state_time > dt_util.now() - dt.timedelta(minutes=1)
         ):
             _LOGGER.debug(
                 "AUTOARM Panel Change Ignored: %s,%s: %s-->%s",
@@ -551,8 +554,14 @@ class AlarmArmer:
         """
         entity_id, old, new = self._extract_event(event)
         existing_state: AlarmControlPanelState | None = self.armed_state()
-        _LOGGER.debug("AUTOARM Occupancy Change: %s, %s, %s, %s", entity_id, old, new, event)
-        _LOGGER.info("AUTOARM Resetting armed state %s on occupancy change", existing_state)
+        _LOGGER.debug(
+            "AUTOARM Occupancy Change: %s, old:%s, new:%s, event:%s, alarm state: %s",
+            entity_id,
+            old,
+            new,
+            event,
+            existing_state,
+        )
         await self.reset_armed_state(source=ChangeSource.OCCUPANCY)
 
     async def pending_state(self, source: ChangeSource | None) -> None:
@@ -613,7 +622,9 @@ class AlarmArmer:
             self.is_night(),
             state=self.armed_state(),
             calendar_event=self.active_calendar_event(),
-            occupied_daytime_state=self.occupied_daytime_default,
+            occupied_defaults=self.occupied_defaults,
+            at_home=self.at_home(),
+            not_home=self.not_home(),
         )
         for state, checker in self.transitions.items():
             if self.hass_api.evaluate_condition(checker, condition_vars):
@@ -624,7 +635,7 @@ class AlarmArmer:
             return None
         return AlarmControlPanelState(evaluated_state)
 
-    def has_intervention_since(self, cutoff: datetime.datetime) -> bool:
+    def has_intervention_since(self, cutoff: dt.datetime) -> bool:
         """Has there been a manual intervention since the cutoff time"""
         if not self.interventions:
             return False
@@ -639,8 +650,8 @@ class AlarmArmer:
     async def delayed_arm(
         self,
         arming_state: AlarmControlPanelState,
-        requested_at: datetime.datetime,
-        triggered_at: datetime.datetime,
+        requested_at: dt.datetime,
+        triggered_at: dt.datetime,
         source: ChangeSource | None = None,
     ) -> None:
         _LOGGER.debug(
@@ -658,8 +669,8 @@ class AlarmArmer:
 
     async def delayed_reset(
         self,
-        requested_at: datetime.datetime,
-        triggered_at: datetime.datetime,
+        requested_at: dt.datetime,
+        triggered_at: dt.datetime,
         intervention: Intervention | None = None,
         source: ChangeSource | None = None,
     ) -> None:
@@ -740,9 +751,34 @@ class AlarmArmer:
             _LOGGER.exception("AUTOARM notify.%s failed", notify_service)
 
     @callback
-    async def on_reset_button(self, event: Event) -> None:
+    async def on_reset_button(self, event: Event, delay: int) -> None:
         _LOGGER.debug("AUTOARM Reset Button: %s", event)
-        await self.reset_armed_state(intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None))
+        self.record_intervention(source=ChangeSource.BUTTON, state=None)
+        if delay:
+            self.schedule(
+                partial(self.delayed_reset, dt_util.now(), source=ChangeSource.BUTTON), dt_util.now() + dt.timedelta(delay)
+            )
+            await self.notify(
+                f"Alarm will be reset in {delay} seconds",
+                title="Alarm reset wait initiated",
+            )
+        else:
+            await self.reset_armed_state(intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None))
+
+    @callback
+    async def on_alarm_state_button(self, state: AlarmControlPanelState, delay: int, event: Event) -> None:
+        _LOGGER.debug("AUTOARM Alarm %s Button: %s", state, event)
+        self.record_intervention(source=ChangeSource.BUTTON, state=state)
+        if delay:
+            self.schedule(
+                partial(self.delayed_arm, state, dt_util.now(), source=ChangeSource.BUTTON), dt_util.now() + dt.timedelta(delay)
+            )
+            await self.notify(
+                f"Alarm will be set to {state} in {delay} seconds",
+                title=f"Arm set to {state} process starting",
+            )
+        else:
+            await self.arm(state, source=ChangeSource.BUTTON)
 
     @callback
     async def on_mobile_action(self, event: Event) -> None:
@@ -761,51 +797,24 @@ class AlarmArmer:
             case _:
                 _LOGGER.debug("AUTOARM Ignoring mobile action: %s", event.data)
 
-    @callback
-    async def on_disarm_button(self, event: Event) -> None:
-        _LOGGER.info("AUTOARM Disarm Button: %s", event)
-        self.record_intervention(source=ChangeSource.BUTTON, state=AlarmControlPanelState.DISARMED)
-        await self.arm(AlarmControlPanelState.DISARMED, source=ChangeSource.BUTTON)
-
-    @callback
-    async def on_vacation_button(self, event: Event) -> None:
-        _LOGGER.info("AUTOARM Vacation Button: %s", event)
-        self.record_intervention(source=ChangeSource.BUTTON, state=AlarmControlPanelState.ARMED_VACATION)
-        await self.arm(AlarmControlPanelState.ARMED_VACATION, source=ChangeSource.BUTTON)
-
     def record_intervention(self, source: ChangeSource, state: AlarmControlPanelState | None) -> Intervention:
         intervention = Intervention(dt_util.now(), source, state)
         self.interventions.append(intervention)
         return intervention
 
-    @callback
-    async def on_away_button(self, event: Event) -> None:
-        _LOGGER.info("AUTOARM Away Button: %s", event)
-        self.record_intervention(source=ChangeSource.BUTTON, state=AlarmControlPanelState.ARMED_AWAY)
-        if self.arm_away_delay:
-            self.unsubscribes.append(
-                async_track_point_in_time(
-                    self.hass,
-                    partial(
-                        self.delayed_arm,
-                        AlarmControlPanelState.ARMED_AWAY,
-                        dt_util.utc_from_timestamp(time.time()),
-                        source=ChangeSource.BUTTON,
-                    ),
-                    dt_util.utc_from_timestamp(time.time() + self.arm_away_delay),
-                )
+    def schedule(self, func: Callable, trigger_time: dt.datetime) -> None:
+        self.unsubscribes.append(
+            async_track_point_in_time(
+                self.hass,
+                func,
+                trigger_time,
             )
-            await self.notify(
-                f"Alarm will be armed for away in {self.arm_away_delay} seconds",
-                title="Arm for away process starting",
-            )
-        else:
-            await self.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.BUTTON)
+        )
 
     @callback
     async def on_sunrise(self, *args: Any) -> None:  # noqa: ARG002
         _LOGGER.debug("AUTOARM Sunrise")
-        now = datetime.datetime.now(tz=self.local_tz)
+        now = dt_util.now()  # uses Home Assistant's time zone setting
         if not self.sunrise_cutoff or now.time() >= self.sunrise_cutoff:
             # sun is up, and not earlier than cutoff
             await self.reset_armed_state(source=ChangeSource.SUNRISE)
@@ -814,44 +823,12 @@ class AlarmArmer:
                 "AUTOARM Rescheduling delayed sunrise action to %s",
                 self.sunrise_cutoff,
             )
-            trigger = datetime.datetime.combine(now.date(), self.sunrise_cutoff, tzinfo=self.local_tz)
-            self.unsubscribes.append(
-                async_track_point_in_time(
-                    self.hass,
-                    partial(self.delayed_reset, now, source=ChangeSource.SUNRISE),
-                    trigger,
-                )
+            self.schedule(
+                partial(self.delayed_reset, now, source=ChangeSource.SUNRISE),
+                dt.datetime.combine(now.date(), self.sunrise_cutoff, tzinfo=dt_util.DEFAULT_TIME_ZONE),
             )
 
     @callback
     async def on_sunset(self, *args: Any) -> None:  # noqa: ARG002
         _LOGGER.debug("AUTOARM Sunset")
         await self.reset_armed_state(source=ChangeSource.SUNSET)
-
-
-class Limiter:
-    """Rate limiting tracker"""
-
-    def __init__(self, window: int = 60, max_calls: int = 4) -> None:
-        self.calls: list[float] = []
-        self.window: int = window
-        self.max_calls: int = max_calls
-        _LOGGER.debug(
-            "AUTOARM Rate limiter initialized with window %s and max_calls %s",
-            window,
-            max_calls,
-        )
-
-    def triggered(self) -> bool:
-        """Register a call and check if window based rate limit triggered"""
-        cut_off = time.time() - self.window
-        self.calls.append(time.time())
-        in_scope = 0
-
-        for call in self.calls[:]:
-            if call >= cut_off:
-                in_scope += 1
-            else:
-                self.calls.remove(call)
-
-        return in_scope > self.max_calls

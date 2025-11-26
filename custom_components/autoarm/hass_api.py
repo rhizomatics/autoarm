@@ -4,6 +4,7 @@ import logging
 from functools import partial
 from typing import TYPE_CHECKING, Any, cast
 
+from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConditionError, ConditionErrorContainer
 from homeassistant.helpers import condition as condition
@@ -55,7 +56,7 @@ class HomeAssistantAPI:
         if self._hass is None:
             raise ValueError("HomeAssistant not available")
         capturing_logger: ConditionErrorLoggingAdaptor = ConditionErrorLoggingAdaptor(_LOGGER)
-        condition_variables: ConditionVariables = ConditionVariables()
+        condition_variables: ConditionVariables = ConditionVariables(False, False, AlarmControlPanelState.PENDING, {})
         cond_list: list[ConfigType]
         try:
             if validate:

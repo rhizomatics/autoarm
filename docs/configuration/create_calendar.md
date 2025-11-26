@@ -1,9 +1,15 @@
 # Create a Calendar
 
 This *How To* will show you how to create a new calendar dedicated for controlling alarm control panel state.
-This is one way of using AutoArm, you can choose to use other types of calendars, reuse events from existing calendars, or mix-n-match.
+This is one way of using AutoArm, you can choose to use [other types of calendars](https://www.home-assistant.io/integrations/?cat=calendar), reuse events from existing calendars, or mix-n-match.
 
-## Add the Calendar Integration
+## Add a Local Calendar
+
+Use the button, or follow the manual steps:
+
+<a href="https://my.home-assistant.io/redirect/config_flow_start?domain=local_calendar" target="_blank" rel="noopener noreferrer">
+  <img src="https://my.home-assistant.io/badges/config_flow_start.svg" alt="Add Integration to My Home Assistant">
+</a>
 
 1. From the *Settings* | *Integration* screen, choose **Add Integration**.
 2. From this dialogue, choose **Local Calendar**

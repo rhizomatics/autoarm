@@ -3,10 +3,12 @@
 ## 0.6.0
 ### Features
 - Internal logic for automatic state calc replaced by regular Home Assistant conditions
+- Configuration cleaned up into logical, extensible sections
 ### Internal
 - All manual actions now recorded as interventions
 - Regular housekeeping for interventions and calendar tracking
 - Further typing with ChangeSource and AlarmControlPanelState
+- Primary class documentation page
 ## 0.5.2
 - Clean up dead code for mobile actions
 

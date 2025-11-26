@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import logging
 import re
 from collections.abc import Callable
@@ -38,6 +38,8 @@ def unlisten(listener: Callable[[], None] | None) -> None:
 
 
 class TrackedCalendar:
+    """Listener for a Home Assistant Calendar"""
+
     def __init__(self, calendar_config: ConfigType, armer: "AlarmArmer") -> None:  # type: ignore # noqa: F821
         self.enabled = False
         self.armer = armer
@@ -79,21 +81,25 @@ class TrackedCalendar:
         self.enabled = False
         self.tracked_events.clear()
 
-    async def on_timed_poll(self, _called_time: datetime.datetime) -> None:
+    async def on_timed_poll(self, _called_time: dt.datetime) -> None:
+        """Check for new and dead events, entry point for the timed calendar tracker listener"""
         _LOGGER.debug("AUTOARM Calendar Poll")
         await self.match_events()
         await self.prune_events()
 
     def has_active_event(self) -> bool:
+        """Is there any event matching a state pattern that is currently open"""
         return any(tevent.is_current() for tevent in self.tracked_events.values())
 
     def active_events(self) -> list[CalendarEvent]:
+        """List all the events matching a state pattern that are currently open"""
         return [v.event for v in self.tracked_events.values() if v.is_current()]
 
     async def match_events(self) -> None:
+        """Query the calendar for events that match state patterns"""
         now_local = dt_util.now()
-        start_dt = now_local - datetime.timedelta(minutes=15)
-        end_dt = now_local + datetime.timedelta(minutes=self.poll_interval + 5)
+        start_dt = now_local - dt.timedelta(minutes=15)
+        end_dt = now_local + dt.timedelta(minutes=self.poll_interval + 5)
 
         events: list[CalendarEvent] = await self.calendar_entity.async_get_events(self.armer.hass, start_dt, end_dt)
 
@@ -132,6 +138,7 @@ class TrackedCalendar:
                             await self.tracked_events[event_id].initialize()
 
     async def prune_events(self) -> None:
+        """Remove past events"""
         to_remove: list[str] = []
         for event_id, tevent in self.tracked_events.items():
             if not tevent.is_current() and not tevent.is_future():
@@ -143,6 +150,8 @@ class TrackedCalendar:
 
 
 class TrackedCalendarEvent:
+    """Generate alarm state changes for a Home Assistant Calendar event"""
+
     def __init__(
         self,
         calendar_id: str,
@@ -182,9 +191,10 @@ class TrackedCalendarEvent:
                 self.end,
                 self.event.end_datetime_local,
             )
-        _LOGGER.info("AUTOARM Now tracking %s event %s, %s", self.calendar_id, self.event.uid, self.event.summary)
+        _LOGGER.debug("AUTOARM Now tracking %s event %s, %s", self.calendar_id, self.event.uid, self.event.summary)
 
-    async def end(self, event_time: datetime.datetime) -> None:
+    async def end(self, event_time: dt.datetime) -> None:
+        """Handle an event that has reached its finish date and time"""
         _LOGGER.debug("AUTOARM Calendar event %s ended, event_time: %s", self.id, event_time)
         self.track_status = "ended"
         await self.armer.on_calendar_event_end(self, dt_util.now())
@@ -192,19 +202,20 @@ class TrackedCalendarEvent:
 
     @classmethod
     def event_id(cls, calendar_id: str, event: CalendarEvent) -> str:
+        """Generate an ID for the calendar even if it doesn't natively support `uid`"""
         uid = event.uid or str(hash((event.summary, event.description, event.start.isoformat(), event.end.isoformat())))
         return f"{calendar_id}:{uid}"
 
     def is_current(self) -> bool:
         if self.track_status == "ended":
             return False
-        now_local: datetime.datetime = dt_util.now()
+        now_local: dt.datetime = dt_util.now()
         return now_local >= self.event.start_datetime_local and now_local <= self.event.end_datetime_local
 
     def is_future(self) -> bool:
         if self.track_status == "ended":
             return False
-        now_local: datetime.datetime = dt_util.now()
+        now_local: dt.datetime = dt_util.now()
         return self.event.start_datetime_local > now_local
 
     def shutdown(self) -> None:

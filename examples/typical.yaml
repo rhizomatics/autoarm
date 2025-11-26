@@ -1,23 +1,33 @@
 autoarm:
-  alarm_panel: alarm_panel.testing
-  arm_away_delay: 180
-  sunrise_cutoff: "06:30:00"
-  reset_button: binary_sensor.button_left
-  away_button: binary_sensor.button_right
-  disarm_button: binary_sensor.button_middle
-  occupied_daytime_state: disarmed
-  throttle_seconds: 30
-  throttle_calls: 6
-  occupants:
-    - person.house_owner
-    - person.tenant
+  alarm_panel:
+    alias: Virtual control panel using Manual Alarm Control Panel integration
+    entity_id: alarm_panel.testing
+  occupancy:
+    entity_id:
+      - person.house_owner
+      - person.tenant
+    default_state:
+      day: disarmed
+      night: armed_night
+  diurnal:
+    sunrise:
+      earliest: "06:30:00"
   transitions:
     armed_home:
-      conditions: "{{ autoarm.occupied and not autoarm.night }}"
+      alias: Home with alarm active, such as home alone
+      conditions:
+        - "{{ autoarm.occupied and not autoarm.night }}"
+        - "{{ autoarm.computed and autoarm.occupied_daytime_state == 'armed_home'}}"
     armed_away:
-      conditions: "{{ not autoarm.occupied }}"
+      conditions: "{{ not autoarm.occupied and autoarm.computed}}"
+    disarmed:
+      conditions:
+       - "{{ autoarm.occupied and not autoarm.night }}"
+       - "{{ autoarm.computed and autoarm.occupied_daytime_state == 'disarmed'}}"
     armed_night:
-      conditions: "{{ autoarm.occupied and autoarm.night }}"
+      conditions: "{{ autoarm.occupied and autoarm.night and autoarm.computed }}"
+    pending:
+      conditions:
   calendar_control:
     no_event_mode: auto
     calendars:
@@ -35,6 +45,21 @@ autoarm:
             - Camping Trip.*
           armed_away:
             - Working at Office
+
+  buttons:
+    reset:
+      entity_id: binary_sensor.button_right
+    armed_away:
+      delay_time: 180
+      entity_id:
+        - binary_sensor.button_right
+        - binary_sensor.back_door_away
+    disarmed:
+      entity_id: binary_sensor.button_middle
+
+  rate_limit:
+    max_calls: 5
+    period: 60
 
   notify:
     common:

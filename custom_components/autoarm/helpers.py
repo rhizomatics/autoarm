@@ -1,5 +1,7 @@
+import datetime as dt
 import logging
 
+import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.core import State
 
@@ -22,3 +24,31 @@ def safe_state(state: State | None) -> str | None:
     except Exception as e:
         _LOGGER.debug("AUTOARM Failed to load state %s: %s", state, e)
         return None
+
+
+class Limiter:
+    """Rate limiting tracker"""
+
+    def __init__(self, window: dt.timedelta, max_calls: int = 4) -> None:
+        self.calls: list[dt.datetime] = []
+        self.window: dt.timedelta = window
+        self.max_calls: int = max_calls
+        _LOGGER.debug(
+            "AUTOARM Rate limiter initialized with window %s and max_calls %s",
+            window,
+            max_calls,
+        )
+
+    def triggered(self) -> bool:
+        """Register a call and check if window based rate limit triggered"""
+        cut_off: dt.datetime = dt_util.now() - self.window
+        self.calls.append(dt_util.now())
+        in_scope = 0
+
+        for call in self.calls[:]:
+            if call >= cut_off:
+                in_scope += 1
+            else:
+                self.calls.remove(call)
+
+        return in_scope > self.max_calls

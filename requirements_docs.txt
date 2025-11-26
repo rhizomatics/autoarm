@@ -7,3 +7,5 @@ mkdocs-pagetree-plugin
 mkdocs
 voluptuous-openapi>=0.2.0
 pngquant
+mkdocstrings
+mkdocstrings-python

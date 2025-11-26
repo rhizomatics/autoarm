@@ -8,32 +8,19 @@ from typing import Any
 import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEvent
-from homeassistant.const import CONF_ALIAS, CONF_CONDITIONS, CONF_ENTITY_ID, CONF_SERVICE
+from homeassistant.const import CONF_ALIAS, CONF_CONDITIONS, CONF_DELAY_TIME, CONF_ENTITY_ID, CONF_SERVICE
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
+
+_LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "autoarm"
 
 ATTR_ACTION = "action"
+ATTR_RESET = "reset"
 CONF_DATA = "data"
 CONF_NOTIFY = "notify"
 CONF_ALARM_PANEL = "alarm_panel"
-CONF_CALENDAR_CONTROL = "calendar_control"
-CONF_CALENDARS = "calendars"
-CONF_CALENDAR_POLL_INTERVAL = "poll_interval"
-CONF_CALENDAR_EVENT_STATES = "state_patterns"
-CONF_CALENDAR_NO_EVENT = "no_event_mode"
-CONF_OCCUPIED_DAY_DEFAULT = "occupied_daytime_state"
-CONF_CALENDAR_OCCUPANCY_OVERRIDE = "occupancy_override"
-CONF_SUNRISE_CUTOFF = "sunrise_cutoff"
-CONF_ARM_AWAY_DELAY = "arm_away_delay"
-CONF_BUTTON_ENTITY_RESET = "reset_button"
-CONF_BUTTON_ENTITY_AWAY = "away_button"
-CONF_BUTTON_ENTITY_DISARM = "disarm_button"
-CONF_OCCUPANTS = "occupants"
-CONF_THROTTLE_SECONDS = "throttle_seconds"
-CONF_THROTTLE_CALLS = "throttle_calls"
-CONF_TRANSITIONS = "transitions"
 CONF_ALARM_STATES = "alarm_states"
 
 ALARM_STATES = [k.lower() for k in AlarmControlPanelState.__members__]
@@ -46,8 +33,6 @@ NOTIFY_COMMON = "common"
 NOTIFY_QUIET = "quiet"
 NOTIFY_NORMAL = "normal"
 NOTIFY_CATEGORIES = [NOTIFY_COMMON, NOTIFY_QUIET, NOTIFY_NORMAL]
-
-_LOGGER = logging.getLogger(__name__)
 
 NOTIFY_DEF_SCHEMA = vol.Schema({vol.Optional(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict})
 
@@ -64,6 +49,12 @@ DEFAULT_CALENDAR_MAPPINGS = {
     AlarmControlPanelState.ARMED_VACATION: "Vacation",
     AlarmControlPanelState.ARMED_VACATION: "Night",
 }
+
+CONF_CALENDAR_CONTROL = "calendar_control"
+CONF_CALENDARS = "calendars"
+CONF_CALENDAR_POLL_INTERVAL = "poll_interval"
+CONF_CALENDAR_EVENT_STATES = "state_patterns"
+CONF_CALENDAR_NO_EVENT = "no_event_mode"
 CALENDAR_SCHEMA = vol.Schema({
     vol.Required(CONF_ENTITY_ID): cv.entity_id,
     vol.Optional(CONF_ALIAS): cv.string,
@@ -76,7 +67,58 @@ CALENDAR_CONTROL_SCHEMA = vol.Schema({
     vol.Optional(CONF_CALENDAR_NO_EVENT, default=NO_CAL_EVENT_MODE_AUTO): vol.All(vol.Lower, vol.In(NO_CAL_EVENT_OPTIONS)),
     vol.Optional(CONF_CALENDARS, default=[]): vol.All(cv.ensure_list, [CALENDAR_SCHEMA]),
 })
+
+CONF_TRANSITIONS = "transitions"
 TRANSITION_SCHEMA = vol.Schema({vol.Optional(CONF_ALIAS): cv.string, vol.Required(CONF_CONDITIONS): cv.CONDITIONS_SCHEMA})
+
+CONF_BUTTONS = "buttons"
+BUTTON_OPTIONS = [ATTR_RESET, *ALARM_STATES]
+BUTTON_SCHEMA = vol.Schema({
+    vol.Optional(CONF_ALIAS): cv.string,
+    vol.Optional(CONF_DELAY_TIME): vol.All(cv.time_period, cv.positive_timedelta),
+    vol.Required(CONF_ENTITY_ID): vol.All(cv.ensure_list, [cv.entity_id]),
+})
+
+CONF_RATE_LIMIT = "rate_limit"
+CONF_RATE_LIMIT_CALLS = "max_calls"
+CONF_RATE_LIMIT_PERIOD = "period"
+RATE_LIMIT_SCHEMA = vol.Schema({
+    vol.Optional(CONF_RATE_LIMIT_PERIOD, default=60): vol.All(cv.time_period, cv.positive_timedelta),
+    vol.Optional(CONF_RATE_LIMIT_CALLS, default=6): cv.positive_int,
+})
+
+CONF_OCCUPANCY = "occupancy"
+CONF_DAY = "day"
+CONF_NIGHT = "night"
+CONF_OCCUPANCY_DEFAULT = "default_state"
+OCCUPANCY_SCHEMA = vol.Schema({
+    vol.Required(CONF_ENTITY_ID, default=[]): vol.All(cv.ensure_list, [cv.entity_id]),
+    vol.Optional(CONF_OCCUPANCY_DEFAULT, default={CONF_DAY: AlarmControlPanelState.ARMED_HOME}): {
+        vol.In([CONF_DAY, CONF_NIGHT]): vol.In(ALARM_STATES)
+    },
+})
+
+CONF_DIURNAL = "diurnal"
+CONF_SUNRISE = "sunrise"
+CONF_EARLIEST = "earliest"
+
+CONFIG_SCHEMA = vol.Schema({
+    DOMAIN: vol.Schema({
+        vol.Required(CONF_ALARM_PANEL): vol.Schema({
+            vol.Optional(CONF_ALIAS): cv.string,
+            vol.Required(CONF_ENTITY_ID): cv.entity_id,
+        }),
+        vol.Optional(CONF_DIURNAL): vol.Schema({
+            vol.Optional(CONF_SUNRISE): vol.Schema({vol.Optional(CONF_EARLIEST): cv.time})
+        }),
+        vol.Optional(CONF_TRANSITIONS): {vol.In(ALARM_STATES): TRANSITION_SCHEMA},
+        vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
+        vol.Optional(CONF_BUTTONS): {vol.In(BUTTON_OPTIONS): BUTTON_SCHEMA},
+        vol.Optional(CONF_OCCUPANCY, default={}): OCCUPANCY_SCHEMA,
+        vol.Optional(CONF_NOTIFY, default={}): NOTIFY_SCHEMA,
+        vol.Optional(CONF_RATE_LIMIT, default={}): RATE_LIMIT_SCHEMA,
+    })
+})
 
 DEFAULT_TRANSITIONS: dict[str, Any] = {
     "armed_home": [
@@ -93,47 +135,32 @@ DEFAULT_TRANSITIONS: dict[str, Any] = {
 }
 
 
-CONFIG_SCHEMA = vol.Schema({
-    DOMAIN: vol.Schema({
-        vol.Required(CONF_ALARM_PANEL): cv.entity_id,
-        vol.Optional(CONF_SUNRISE_CUTOFF): cv.time,
-        vol.Optional(CONF_OCCUPIED_DAY_DEFAULT, default=AlarmControlPanelState.ARMED_HOME.value): vol.All(vol.In(ALARM_STATES)),
-        vol.Optional(CONF_TRANSITIONS): {vol.In(ALARM_STATES): TRANSITION_SCHEMA},
-        vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
-        vol.Optional(CONF_ARM_AWAY_DELAY, default=180): cv.positive_int,
-        vol.Optional(CONF_BUTTON_ENTITY_RESET): cv.entity_id,
-        vol.Optional(CONF_BUTTON_ENTITY_AWAY): cv.entity_id,
-        vol.Optional(CONF_BUTTON_ENTITY_DISARM): cv.entity_id,
-        vol.Optional(CONF_OCCUPANTS, default=[]): vol.All(cv.ensure_list, [cv.entity_id]),
-        # type: ignore
-        vol.Optional(CONF_NOTIFY, default={}): NOTIFY_SCHEMA,
-        # type: ignore
-        vol.Optional(CONF_THROTTLE_SECONDS, default=60): cv.positive_int,
-        # type: ignore
-        vol.Optional(CONF_THROTTLE_CALLS, default=6): cv.positive_int,
-    })
-})
-
-
 @dataclass
 class ConditionVariables:
-    occupied: bool | None = None
-    night: bool | None = None
-    state: AlarmControlPanelState | None = None
+    """Field with sub-fields added to the template context of Transition Conditions"""
+
+    occupied: bool
+    night: bool
+    state: AlarmControlPanelState
+    occupied_defaults: dict[str, AlarmControlPanelState]
     calendar_event: CalendarEvent | None = None
-    occupied_daytime_state: str | None = None
+    at_home: list[str] | None = None
+    not_home: list[str] | None = None
 
     def as_dict(self) -> ConfigType:
+        """Generate the field to be exposed in the context, stringifying alarm states"""
         return {
             "daytime": not self.night,
             "occupied": self.occupied,
+            "at_home": self.at_home or [],
+            "not_home": self.at_home or [],
             "vacation": self.state == AlarmControlPanelState.ARMED_VACATION,
             "night": self.night,
             "bypass": self.state == AlarmControlPanelState.ARMED_CUSTOM_BYPASS,
             "manual": self.state in (AlarmControlPanelState.ARMED_VACATION, AlarmControlPanelState.ARMED_CUSTOM_BYPASS),
             "calendar_event": self.calendar_event,
             "state": str(self.state),
-            "occupied_daytime_state": self.occupied_daytime_state,
+            "occupied_daytime_state": self.occupied_defaults.get(CONF_DAY, AlarmControlPanelState.ARMED_HOME),
             "disarmed": self.state == AlarmControlPanelState.DISARMED,
             "computed": not self.calendar_event
             and self.state not in (AlarmControlPanelState.ARMED_VACATION, AlarmControlPanelState.ARMED_CUSTOM_BYPASS),
@@ -141,6 +168,8 @@ class ConditionVariables:
 
 
 class ChangeSource(StrEnum):
+    """Enumeration of all the known ways to trigger a state change"""
+
     CALENDAR = auto()
     MOBILE = auto()
     OCCUPANCY = auto()
