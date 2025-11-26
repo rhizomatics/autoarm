@@ -9,7 +9,9 @@ from homeassistant.components.local_calendar.const import DOMAIN as LOCAL_CALEND
 from homeassistant.components.local_calendar.store import LocalCalendarStore
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from homeassistant.core import (
+    HomeAssistant,
+)
 from homeassistant.exceptions import DependencyError
 from homeassistant.helpers import entity_platform
 from homeassistant.setup import async_setup_component

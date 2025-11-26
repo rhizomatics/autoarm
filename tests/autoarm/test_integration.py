@@ -1,8 +1,9 @@
 import asyncio
 
 from homeassistant.components.notify.const import ATTR_TITLE
-from homeassistant.const import ATTR_ICON
+from homeassistant.const import ATTR_ICON, CONF_CONDITIONS
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
 
 from custom_components.autoarm.const import (
@@ -15,6 +16,7 @@ from custom_components.autoarm.const import (
     CONF_NOTIFY,
     CONF_OCCUPANTS,
     CONF_SUNRISE_CUTOFF,
+    CONF_TRANSITIONS,
     DOMAIN,
 )
 
@@ -60,6 +62,28 @@ async def test_configure(hass: HomeAssistant) -> None:
 
     hass.states.async_set("alarm_panel.testing", "disarmed")
     await hass.async_block_till_done()
+
+
+async def test_broken_condition_raises_issue(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
+    config = {
+        DOMAIN: {
+            CONF_ALARM_PANEL: "alarm_panel.testing",
+            CONF_TRANSITIONS: {"armed_home": {CONF_CONDITIONS: "{{ autoarm.morning_coffee and not autoarm.occupied }}"}},
+        }
+    }
+
+    assert await async_setup_component(hass, "autoarm", config)
+    await hass.async_block_till_done()
+
+    assert ("autoarm", "transition_condition_armed_home") in issue_registry.issues
+    issue = issue_registry.issues["autoarm", "transition_condition_armed_home"]
+    assert issue.translation_key == "transition_condition"
+    assert issue.translation_placeholders == {
+        "state": "armed_home",
+        "error": "UndefinedError: 'dict object' has no attribute 'morning_coffee'",
+    }
+
+    assert issue.severity == ir.IssueSeverity.ERROR
 
 
 async def test_arm_on_away(hass: HomeAssistant) -> None:

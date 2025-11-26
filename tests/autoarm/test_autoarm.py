@@ -193,7 +193,7 @@ async def test_reset_armed_state_uses_daytime_default(hass: HomeAssistant) -> No
     assert await autoarmer.reset_armed_state() == "disarmed"
 
 
-async def test_housekeeping(hass: HomeAssistant, local_calendar: CalendarEntity) -> None:
+async def test_housekeeping_prunes_calendar_events(hass: HomeAssistant, local_calendar: CalendarEntity) -> None:
     await local_calendar.async_create_event(
         dtstart=dt_util.now() - dt.timedelta(minutes=5),
         dtend=dt_util.now() + dt.timedelta(seconds=2),
@@ -211,16 +211,30 @@ async def test_housekeeping(hass: HomeAssistant, local_calendar: CalendarEntity)
     cal_event = autoarmer.active_calendar_event()
     assert cal_event is not None
     assert cal_event.summary == "Testing Day"
-    await hass.async_block_till_done()
-    hass.states.async_set(TEST_PANEL, "disarmed")
-    await hass.async_block_till_done()
-    assert len(autoarmer.interventions) > 0
 
     await asyncio.sleep(2)
     await autoarmer.housekeeping(dt_util.now())
     assert autoarmer.active_calendar_event() is None
+
+
+async def test_housekeeping_leaves_new_interventions(hass: HomeAssistant) -> None:
+    autoarmer = AlarmArmer(hass, TEST_PANEL)
+    await autoarmer.initialize()
+    hass.states.async_set(TEST_PANEL, "disarmed")
+    await hass.async_block_till_done()
     assert len(autoarmer.interventions) > 0
 
+    await autoarmer.housekeeping(dt_util.now())
+    assert len(autoarmer.interventions) > 0
+
+
+async def test_housekeeping_prunes_old_interventions(hass: HomeAssistant) -> None:
+    autoarmer = AlarmArmer(hass, TEST_PANEL)
+    await autoarmer.initialize()
+    hass.states.async_set(TEST_PANEL, "disarmed")
+    await hass.async_block_till_done()
+    assert len(autoarmer.interventions) > 0
     autoarmer.intervention_ttl = 0
+
     await autoarmer.housekeeping(dt_util.now())
     assert len(autoarmer.interventions) == 0

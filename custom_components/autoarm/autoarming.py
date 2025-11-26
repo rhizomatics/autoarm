@@ -14,9 +14,9 @@ from homeassistant.components.alarm_control_panel.const import AlarmControlPanel
 from homeassistant.components.calendar import CalendarEvent
 from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP, SERVICE_RELOAD, STATE_HOME
+from homeassistant.const import CONF_CONDITIONS, EVENT_HOMEASSISTANT_STOP, SERVICE_RELOAD, STATE_HOME
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, ServiceCall, callback
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import ConditionError, HomeAssistantError
 from homeassistant.helpers import condition as condition
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
@@ -53,6 +53,7 @@ from .const import (
     CONF_SUNRISE_CUTOFF,
     CONF_THROTTLE_CALLS,
     CONF_THROTTLE_SECONDS,
+    CONF_TRANSITIONS,
     CONFIG_SCHEMA,
     DEFAULT_TRANSITIONS,
     DOMAIN,
@@ -162,6 +163,7 @@ def _async_process_config(hass: HomeAssistant, config: ConfigType) -> "AlarmArme
         throttle_calls=config.get(CONF_THROTTLE_CALLS, 6),
         throttle_seconds=config.get(CONF_THROTTLE_SECONDS, 60),
         calendars=calendar_config.get(CONF_CALENDARS, []),
+        transitions=config.get(CONF_TRANSITIONS),
         calendar_no_event_mode=calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO),
     )
 
@@ -199,7 +201,7 @@ class AlarmArmer:
         throttle_seconds: int = 60,
         calendar_no_event_mode: str | None = None,
         calendars: list[ConfigType] | None = None,
-        transitions: dict[str, list[ConfigType]] | None = None,
+        transitions: dict[str, dict[str, list[ConfigType]]] | None = None,
     ) -> None:
         self.hass: HomeAssistant = hass
         self.local_tz = dt_util.get_time_zone(self.hass.config.time_zone)
@@ -223,12 +225,13 @@ class AlarmArmer:
         self.pre_pending_state: AlarmControlPanelState | None = None
         self.button_device: dict[str, str] = {}
         self.arming_in_progress: asyncio.Event = asyncio.Event()
-        self.arming_state: AlarmControlPanelState | None = None
+        self.requested_state: AlarmControlPanelState | None = None
+        self.requested_state_time: datetime.datetime | None = None
         self.rate_limiter: Limiter = Limiter(window=throttle_seconds, max_calls=throttle_calls)
         self.hass_api: HomeAssistantAPI = HomeAssistantAPI(hass)
         self.transitions: dict[AlarmControlPanelState, ConditionCheckerType] = {}
-        self.transition_config: dict[str, list[ConfigType]] = transitions or {
-            k: cv.CONDITIONS_SCHEMA(v) for k, v in DEFAULT_TRANSITIONS.items()
+        self.transition_config: dict[str, dict[str, list[ConfigType]]] = transitions or {
+            k: {CONF_CONDITIONS: cv.CONDITIONS_SCHEMA(v)} for k, v in DEFAULT_TRANSITIONS.items()
         }
         self.initialization_errors: dict[str, int] = {}
         self.interventions: list[Intervention] = []
@@ -270,35 +273,48 @@ class AlarmArmer:
     async def initialize_logic(self) -> None:
         stage: str = "logic"
 
-        for state_str, condition_config in self.transition_config.items():
+        for state_str, transition_config in self.transition_config.items():
             error: str = ""
-            try:
-                state = AlarmControlPanelState(state_str)
-                cond: ConditionCheckerType | None = await self.hass_api.build_condition(
-                    condition_config, strict=True, validate=True, name=state_str
-                )
+            condition_config = transition_config.get(CONF_CONDITIONS)
+            if condition_config is None:
+                error = "Empty conditions"
+                _LOGGER.warning(f"AUTOARM Found no conditions for {state_str} transition")
+            else:
+                try:
+                    state = AlarmControlPanelState(state_str)
+                    cond: ConditionCheckerType | None = await self.hass_api.build_condition(
+                        condition_config, strict=True, validate=True, name=state_str
+                    )
 
-                if cond:
-                    # re-run without strict wrapper
-                    cond = await self.hass_api.build_condition(condition_config, name=state_str)
-                if cond:
-                    _LOGGER.info(f"AUTOARM Validated transition logic for {state_str}")
-                    self.transitions[state] = cond
-                else:
-                    _LOGGER.warning(f"AUTOARM Failed to validate transition logic for {state_str}")
-                    error = "Condition validation failed"
-            except ValueError as ve:
-                self.record_error(stage)
-                error = f"Invalid state {ve}"
-                _LOGGER.error(f"AUTOARM Invalid state in {state_str} transition - {ve}")
-            except vol.Invalid as vi:
-                self.record_error(stage)
-                _LOGGER.error(f"AUTOARM Condition definition for transition {state_str} fails Home Assistant schema check {vi}")
-                error = f"Schema error {vi}"
-            except Exception as e:
-                self.record_error(stage)
-                _LOGGER.exception("AUTOARM Disabling transition %s with error validating %s", state_str, condition_config)
-                error = f"Unknown error {e}"
+                    if cond:
+                        # re-run without strict wrapper
+                        cond = await self.hass_api.build_condition(condition_config, name=state_str)
+                    if cond:
+                        _LOGGER.info(f"AUTOARM Validated transition logic for {state_str}")
+                        self.transitions[state] = cond
+                    else:
+                        _LOGGER.warning(f"AUTOARM Failed to validate transition logic for {state_str}")
+                        error = "Condition validation failed"
+                except ValueError as ve:
+                    self.record_error(stage)
+                    error = f"Invalid state {ve}"
+                    _LOGGER.error(f"AUTOARM Invalid state in {state_str} transition - {ve}")
+                except vol.Invalid as vi:
+                    self.record_error(stage)
+                    _LOGGER.error(f"AUTOARM Transition {state_str} conditions fails Home Assistant schema check {vi}")
+                    error = f"Schema error {vi}"
+                except ConditionError as ce:
+                    _LOGGER.error(f"AUTOARM Transition {state_str} conditions fails Home Assistant condition check {ce}")
+                    if hasattr(ce, "message"):
+                        error = ce.message
+                    elif hasattr(ce, "error") and hasattr(ce.error, "message"):
+                        error = ce.error.message
+                    else:
+                        error = str(ce)
+                except Exception as e:
+                    self.record_error(stage)
+                    _LOGGER.exception("AUTOARM Disabling transition %s with error validating %s", state_str, condition_config)
+                    error = f"Unknown exception {e}"
             if error:
                 _LOGGER.warning(f"AUTOARM raising report issue for {error} on {state_str}")
                 self.hass_api.raise_issue(
@@ -307,7 +323,7 @@ class AlarmArmer:
                     issue_key="transition_condition",
                     issue_map={"state": state_str, "error": error},
                     severity=ir.IssueSeverity.ERROR,
-                    learn_more_url="https://supernotify.rhizomatics.org.uk/scenarios/",
+                    learn_more_url="https://autoarm.rhizomatics.org.uk/scenarios/",
                 )
 
     async def async_shutdown(self, _event: Event) -> None:
@@ -479,7 +495,13 @@ class AlarmArmer:
         """Alarm Control Panel has been changed outside of AutoArm"""
         entity_id, old, new = self._extract_event(event)
         new_state = alarm_state_as_enum(new)
-        if self.arming_in_progress.is_set() and new_state == self.arming_state:
+        # ignore changes in progress or in last minute from AutoArm itself
+        # all other changes are assumed external, e.g. from panel UI in HASS app or another automatio
+        if self.arming_in_progress.is_set() or (
+            self.requested_state == new_state
+            and self.requested_state_time is not None
+            and self.requested_state_time > dt_util.now() - datetime.timedelta(minutes=1)
+        ):
             _LOGGER.debug(
                 "AUTOARM Panel Change Ignored: %s,%s: %s-->%s",
                 entity_id,
@@ -671,7 +693,8 @@ class AlarmArmer:
             _LOGGER.debug("AUTOARM Rate limit triggered by %s, skipping arm", source)
             return None
         try:
-            self.arming_state = arming_state
+            self.requested_state = arming_state
+            self.requested_state_time = dt_util.now()
             self.arming_in_progress.set()
             existing_state: AlarmControlPanelState | None = self.armed_state()
             if arming_state != existing_state:
@@ -684,7 +707,6 @@ class AlarmArmer:
             _LOGGER.debug("AUTOARM Failed to arm: %s", e)
         finally:
             self.arming_in_progress.clear()
-            self.arming_state = None
         return None
 
     async def notify(self, message: str, profile: str = "normal", title: str | None = None) -> None:

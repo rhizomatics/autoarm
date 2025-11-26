@@ -33,7 +33,7 @@ class HomeAssistantAPI:
         issue_key: str,
         issue_map: dict[str, str],
         severity: ir.IssueSeverity = ir.IssueSeverity.WARNING,
-        learn_more_url: str = "https://supernotify.rhizomatics.org.uk",
+        learn_more_url: str = "https://autoarm.rhizomatics.org.uk",
         is_fixable: bool = False,
     ) -> None:
         if not self._hass:
@@ -77,10 +77,10 @@ class HomeAssistantAPI:
             if test is None:
                 raise ValueError(f"Invalid condition {condition_config}")
             test({DOMAIN: condition_variables.as_dict()})
-            if strict:
+            if strict and capturing_logger.condition_errors:
                 for exception in capturing_logger.condition_errors:
                     _LOGGER.warning("AUTOARM Invalid condition %s:%s", condition_config, exception)
-                    raise exception
+                raise capturing_logger.condition_errors[0]
             return test
         except Exception as e:
             _LOGGER.exception("AUTOARM Condition eval failed: %s", e)
@@ -113,6 +113,8 @@ class ConditionErrorLoggingAdaptor(logging.LoggerAdapter):
             for arg in args:
                 if isinstance(arg, ConditionErrorContainer):
                     self.condition_errors.extend(arg.errors)
+                elif isinstance(arg, ConditionError):
+                    self.condition_errors.append(arg)
 
     def error(self, msg: Any, *args: object, **kwargs: Any) -> None:
         self.capture(args)
