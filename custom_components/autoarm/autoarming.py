@@ -267,7 +267,7 @@ class AlarmArmer:
         stage: str = "logic"
         for state_str, raw_condition in DEFAULT_TRANSITIONS.items():
             if state_str not in self.transition_config:
-                _LOGGER.info("AUTOARM Defaulting transition condition for %s, defaulting", state_str)
+                _LOGGER.info("AUTOARM Defaulting transition condition for %s", state_str)
                 self.transition_config[state_str] = {CONF_CONDITIONS: cv.CONDITIONS_SCHEMA(raw_condition)}
 
         for state_str, transition_config in self.transition_config.items():
