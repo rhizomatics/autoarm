@@ -76,10 +76,7 @@ CALENDAR_CONTROL_SCHEMA = vol.Schema({
     vol.Optional(CONF_CALENDAR_NO_EVENT, default=NO_CAL_EVENT_MODE_AUTO): vol.All(vol.Lower, vol.In(NO_CAL_EVENT_OPTIONS)),
     vol.Optional(CONF_CALENDARS, default=[]): vol.All(cv.ensure_list, [CALENDAR_SCHEMA]),
 })
-TRANSITION_SCHEMA = vol.Schema({
-    vol.Optional(CONF_ALIAS): cv.string,
-    vol.Required(CONF_CONDITIONS): cv.CONDITIONS_SCHEMA
-})
+TRANSITION_SCHEMA = vol.Schema({vol.Optional(CONF_ALIAS): cv.string, vol.Required(CONF_CONDITIONS): cv.CONDITIONS_SCHEMA})
 
 DEFAULT_TRANSITIONS: dict[str, Any] = {
     "armed_home": [
@@ -96,30 +93,26 @@ DEFAULT_TRANSITIONS: dict[str, Any] = {
 }
 
 
-CONFIG_SCHEMA = vol.Schema(
-    {
-        DOMAIN: vol.Schema({
-            vol.Required(CONF_ALARM_PANEL): cv.entity_id,
-            vol.Optional(CONF_SUNRISE_CUTOFF): cv.time,
-            vol.Optional(CONF_OCCUPIED_DAY_DEFAULT, default=AlarmControlPanelState.ARMED_HOME.value): vol.All(
-                vol.In(ALARM_STATES)
-            ),
-            vol.Optional(CONF_TRANSITIONS): {vol.In(ALARM_STATES): TRANSITION_SCHEMA},
-            vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
-            vol.Optional(CONF_ARM_AWAY_DELAY, default=180): cv.positive_int,
-            vol.Optional(CONF_BUTTON_ENTITY_RESET): cv.entity_id,
-            vol.Optional(CONF_BUTTON_ENTITY_AWAY): cv.entity_id,
-            vol.Optional(CONF_BUTTON_ENTITY_DISARM): cv.entity_id,
-            vol.Optional(CONF_OCCUPANTS, default=[]): vol.All(cv.ensure_list, [cv.entity_id]),
-            # type: ignore
-            vol.Optional(CONF_NOTIFY, default={}): NOTIFY_SCHEMA,
-            # type: ignore
-            vol.Optional(CONF_THROTTLE_SECONDS, default=60): cv.positive_int,
-            # type: ignore
-            vol.Optional(CONF_THROTTLE_CALLS, default=6): cv.positive_int,
-        })
-    }
-)
+CONFIG_SCHEMA = vol.Schema({
+    DOMAIN: vol.Schema({
+        vol.Required(CONF_ALARM_PANEL): cv.entity_id,
+        vol.Optional(CONF_SUNRISE_CUTOFF): cv.time,
+        vol.Optional(CONF_OCCUPIED_DAY_DEFAULT, default=AlarmControlPanelState.ARMED_HOME.value): vol.All(vol.In(ALARM_STATES)),
+        vol.Optional(CONF_TRANSITIONS): {vol.In(ALARM_STATES): TRANSITION_SCHEMA},
+        vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
+        vol.Optional(CONF_ARM_AWAY_DELAY, default=180): cv.positive_int,
+        vol.Optional(CONF_BUTTON_ENTITY_RESET): cv.entity_id,
+        vol.Optional(CONF_BUTTON_ENTITY_AWAY): cv.entity_id,
+        vol.Optional(CONF_BUTTON_ENTITY_DISARM): cv.entity_id,
+        vol.Optional(CONF_OCCUPANTS, default=[]): vol.All(cv.ensure_list, [cv.entity_id]),
+        # type: ignore
+        vol.Optional(CONF_NOTIFY, default={}): NOTIFY_SCHEMA,
+        # type: ignore
+        vol.Optional(CONF_THROTTLE_SECONDS, default=60): cv.positive_int,
+        # type: ignore
+        vol.Optional(CONF_THROTTLE_CALLS, default=6): cv.positive_int,
+    })
+})
 
 
 @dataclass
