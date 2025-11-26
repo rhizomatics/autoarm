@@ -76,7 +76,11 @@ CALENDAR_CONTROL_SCHEMA = vol.Schema({
     vol.Optional(CONF_CALENDAR_NO_EVENT, default=NO_CAL_EVENT_MODE_AUTO): vol.All(vol.Lower, vol.In(NO_CAL_EVENT_OPTIONS)),
     vol.Optional(CONF_CALENDARS, default=[]): vol.All(cv.ensure_list, [CALENDAR_SCHEMA]),
 })
-TRANSITION_SCHEMA = vol.Schema({vol.Required(CONF_CONDITIONS): cv.CONDITIONS_SCHEMA})
+TRANSITION_SCHEMA = vol.Schema({
+    vol.Optional(CONF_ALIAS): cv.string,
+    vol.Required(CONF_CONDITIONS): cv.CONDITIONS_SCHEMA
+})
+
 DEFAULT_TRANSITIONS: dict[str, Any] = {
     "armed_home": [
         "{{ autoarm.occupied and not autoarm.night }}",
@@ -114,8 +118,7 @@ CONFIG_SCHEMA = vol.Schema(
             # type: ignore
             vol.Optional(CONF_THROTTLE_CALLS, default=6): cv.positive_int,
         })
-    },
-    extra=vol.ALLOW_EXTRA,
+    }
 )
 
 
