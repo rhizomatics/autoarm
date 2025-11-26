@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.1
+### Fixes
+- Incorrect import from test
 ## 0.6.0
 ### Features
 - Internal logic for automatic state calc replaced by regular Home Assistant conditions

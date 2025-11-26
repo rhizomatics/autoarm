@@ -8,7 +8,7 @@ dependencies = ["homeassistant>=2025.11.1"]
 
 [tool.poetry]
 package-mode = false
-version = "0.6.0"
+version = "0.6.1"
 packages = [{ include = "custom_components.autoarm" }]
 
 [tool.setuptools.packages.find]

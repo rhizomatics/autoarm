@@ -13,7 +13,7 @@ from homeassistant.components.alarm_control_panel.const import AlarmControlPanel
 from homeassistant.components.calendar import CalendarEvent
 from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
-from homeassistant.const import CONF_CONDITIONS, EVENT_HOMEASSISTANT_STOP, SERVICE_RELOAD, STATE_HOME
+from homeassistant.const import CONF_CONDITIONS, CONF_ENTITY_ID, EVENT_HOMEASSISTANT_STOP, SERVICE_RELOAD, STATE_HOME
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import ConditionError, HomeAssistantError
 from homeassistant.helpers import condition as condition
@@ -35,7 +35,6 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.util.hass_dict import HassKey
 
 from custom_components.autoarm.hass_api import HomeAssistantAPI
-from tests.autoarm.test_integration import CONF_DELAY_TIME, CONF_ENTITY_ID
 
 from .calendar import TrackedCalendar, TrackedCalendarEvent
 from .const import (
@@ -46,6 +45,7 @@ from .const import (
     CONF_CALENDAR_NO_EVENT,
     CONF_CALENDARS,
     CONF_DAY,
+    CONF_DELAY_TIME,
     CONF_DIURNAL,
     CONF_EARLIEST,
     CONF_NOTIFY,
