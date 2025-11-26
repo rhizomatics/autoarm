@@ -1,9 +1,9 @@
 # Create an Alarm Panel
 
 If you don't already have an alarm panel, set up a default manual as below, which creates the
-state machine for armed/disarmed status. This is all you need in the way of alarm support for AutoArm to function. 
+state machine for armed/disarmed status. This is all you need in the way of alarm support for AutoArm to function.
 
-You can also choose whether a PIN code is needed or not to arm or disarm. AutoArm has its own delay time 
+You can also choose whether a PIN code is needed or not to arm or disarm. AutoArm has its own delay time
 handling for buttons, so recommended to keep the times at zero if not needed for any other purposes.
 
 ```yaml

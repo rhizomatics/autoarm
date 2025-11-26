@@ -102,21 +102,22 @@ CONF_DIURNAL = "diurnal"
 CONF_SUNRISE = "sunrise"
 CONF_EARLIEST = "earliest"
 
-CONFIG_SCHEMA = vol.Schema({
-    DOMAIN: vol.Schema({
-        vol.Required(CONF_ALARM_PANEL): vol.Schema({
-            vol.Optional(CONF_ALIAS): cv.string,
-            vol.Required(CONF_ENTITY_ID): cv.entity_id,
-        }),
-        vol.Optional(CONF_DIURNAL): vol.Schema({
-            vol.Optional(CONF_SUNRISE): vol.Schema({vol.Optional(CONF_EARLIEST): cv.time})
-        }),
-        vol.Optional(CONF_TRANSITIONS): {vol.In(ALARM_STATES): TRANSITION_SCHEMA},
-        vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
-        vol.Optional(CONF_BUTTONS): {vol.In(BUTTON_OPTIONS): BUTTON_SCHEMA},
-        vol.Optional(CONF_OCCUPANCY, default={}): OCCUPANCY_SCHEMA,
-        vol.Optional(CONF_NOTIFY, default={}): NOTIFY_SCHEMA,
-        vol.Optional(CONF_RATE_LIMIT, default={}): RATE_LIMIT_SCHEMA,
+CONFIG_SCHEMA = vol.Schema(
+    {
+        DOMAIN: vol.Schema({
+            vol.Required(CONF_ALARM_PANEL): vol.Schema({
+                vol.Optional(CONF_ALIAS): cv.string,
+                vol.Required(CONF_ENTITY_ID): cv.entity_id,
+            }),
+            vol.Optional(CONF_DIURNAL): vol.Schema({
+                vol.Optional(CONF_SUNRISE): vol.Schema({vol.Optional(CONF_EARLIEST): cv.time})
+            }),
+            vol.Optional(CONF_TRANSITIONS): {vol.In(ALARM_STATES): TRANSITION_SCHEMA},
+            vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
+            vol.Optional(CONF_BUTTONS): {vol.In(BUTTON_OPTIONS): BUTTON_SCHEMA},
+            vol.Optional(CONF_OCCUPANCY, default={}): OCCUPANCY_SCHEMA,
+            vol.Optional(CONF_NOTIFY, default={}): NOTIFY_SCHEMA,
+            vol.Optional(CONF_RATE_LIMIT, default={}): RATE_LIMIT_SCHEMA,
         })
     },
     extra=vol.ALLOW_EXTRA,  # validation fails without this by trying to include all of HASS config

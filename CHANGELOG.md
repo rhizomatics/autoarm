@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.6.2
+## 0.6.3
 ### Fixes
 - Incorrect import from test
 - Reinstate config allow extra
+- Prevent exposed config entity including datetime objs, and ensure with new test
 ## 0.6.0
 ### Features
 - Internal logic for automatic state calc replaced by regular Home Assistant conditions

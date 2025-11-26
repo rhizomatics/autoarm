@@ -1,4 +1,5 @@
 import asyncio
+import json
 
 from homeassistant.components.notify.const import ATTR_TITLE
 from homeassistant.const import ATTR_ICON, CONF_CONDITIONS, CONF_DELAY_TIME
@@ -65,6 +66,20 @@ async def test_configure(hass: HomeAssistant) -> None:
 
     hass.states.async_set("alarm_panel.testing", "disarmed")
     await hass.async_block_till_done()
+
+
+async def test_exposed_entities(hass: HomeAssistant) -> None:
+    assert await async_setup_component(hass, "autoarm", CONFIG)
+
+    await hass.async_block_till_done()
+    configuration = hass.states.get("autoarm.configured")
+    assert configuration is not None
+    assert configuration.state == "valid"
+    # check for unserializable classes that will upset HomeAssistant
+    assert json.dumps(configuration.attributes)
+    assert "error" not in configuration.attributes
+    assert configuration.attributes["alarm_panel"] == "alarm_panel.testing"
+    assert hass.states.get("autoarm.last_calendar_event") is not None
 
 
 async def test_broken_condition_raises_issue(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:

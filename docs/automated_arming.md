@@ -2,7 +2,7 @@
 
 Arming has several complementary modes of operation, that can be selected and mixed as you need.
 
-Mobile Actions, Buttons and Alarm Panel changes are classed as **Manual Interventions**, and won't be overridden 
+Mobile Actions, Buttons and Alarm Panel changes are classed as **Manual Interventions**, and won't be overridden
 back by AutoArm unless there's an occupancy change or other manual intervention.
 
 ## Alarm Panel Control
@@ -16,7 +16,7 @@ controls for further state changes.
 The Home Assistant **Alarm Control Panel** can also be exposed to a Voice Assistant, so disarm or arm by talking to Alexa or
 similar. Use the *Settings*->*Voice Assistants* page in Home Assistant to do this.
 
-Alexa has additional controls to prevent unauthorized disarming ( otherwise burgulars could shout 
+Alexa has additional controls to prevent unauthorized disarming ( otherwise burgulars could shout
 through the letterbox! ), see [Connect Your Home Security System to Echo Hub](https://www.amazon.co.uk/gp/help/customer/display.html?nodeId=T3hgRgU3Wx5DZxfZCB) on the Amazon documentation.
 
 ## Physical Button Control
@@ -68,7 +68,7 @@ The people who live at the property can be defined as [Person Integration][] ent
 [Person Entities]() in the `occupancy` configuration, and used to derive an `occupied`
 value for [Automated Transitions]. This works best with the Companion App on a mobile
 phone, although other [Device Tracker Integrations](https://www.home-assistant.io/integrations/?cat=device-tracker)
-can work, such as a home network `device_tracker`, 
+can work, such as a home network `device_tracker`,
 
 See the [Presence Detection](https://www.home-assistant.io/getting-started/presence-detection/)
 guidance from Home Assistant on how to set this up, and the options for using it.

@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
 import datetime as dt
+import json
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -27,6 +28,7 @@ from homeassistant.helpers.event import (
     async_track_sunset,
     async_track_time_change,
 )
+from homeassistant.helpers.json import ExtendedJSONEncoder
 from homeassistant.helpers.reload import (
     async_integration_yaml_config,
 )
@@ -129,19 +131,21 @@ async def async_setup(
 
 
 def expose_config_entity(hass: HomeAssistant, config: ConfigType) -> None:
-    hass.states.async_set(
-        f"{DOMAIN}.configured",
-        "True",
-        {
-            CONF_ALARM_PANEL: config.get(CONF_ALARM_PANEL, {}).get(CONF_ENTITY_ID),
-            CONF_DIURNAL: config.get(CONF_DIURNAL),
-            CONF_CALENDAR_CONTROL: config.get(CONF_CALENDAR_CONTROL),
-            CONF_BUTTONS: config.get(CONF_BUTTONS, {}),
-            CONF_OCCUPANCY: config.get(CONF_OCCUPANCY, {}),
-            CONF_NOTIFY: config.get(CONF_NOTIFY, {}),
-            CONF_RATE_LIMIT: config.get(CONF_RATE_LIMIT, {}),
-        },
-    )
+    data: dict[str, Any] = {
+        CONF_ALARM_PANEL: config.get(CONF_ALARM_PANEL, {}).get(CONF_ENTITY_ID),
+        CONF_DIURNAL: config.get(CONF_DIURNAL),
+        CONF_CALENDAR_CONTROL: config.get(CONF_CALENDAR_CONTROL),
+        CONF_BUTTONS: config.get(CONF_BUTTONS, {}),
+        CONF_OCCUPANCY: config.get(CONF_OCCUPANCY, {}),
+        CONF_NOTIFY: config.get(CONF_NOTIFY, {}),
+        CONF_RATE_LIMIT: config.get(CONF_RATE_LIMIT, {}),
+    }
+    try:
+        jsonized: str = json.dumps(obj=data, cls=ExtendedJSONEncoder)
+        hass.states.async_set(f"{DOMAIN}.configured", "valid", json.loads(jsonized))
+    except Exception as e:
+        _LOGGER.error("AUTOARM Failed to expose config data as entity: %s, %s", data, e)
+        hass.states.async_set(entity_id=f"{DOMAIN}.configured", new_state="partially-valid", attributes={"error": str(e)})
 
 
 def _async_process_config(hass: HomeAssistant, config: ConfigType) -> "AlarmArmer":
@@ -263,7 +267,7 @@ class AlarmArmer:
         stage: str = "logic"
         for state_str, raw_condition in DEFAULT_TRANSITIONS.items():
             if state_str not in self.transition_config:
-                _LOGGER.info("AUTOARM No transition condition defined for %s, defaulting", state_str)
+                _LOGGER.info("AUTOARM Defaulting transition condition for %s, defaulting", state_str)
                 self.transition_config[state_str] = {CONF_CONDITIONS: cv.CONDITIONS_SCHEMA(raw_condition)}
 
         for state_str, transition_config in self.transition_config.items():
