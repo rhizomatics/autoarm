@@ -20,7 +20,7 @@
 
 
 Automate the arming and disarming of the built-in Home Assistant [Alarm
-Control Panel Integrations], with additional support for calendar integration, manual override via remote control buttons, and mobile push actionable notifications.
+Control Panel Integrations][], with additional support for calendar integration, manual override via remote control buttons, and mobile push actionable notifications.
 
 !!! question inline end "Why use alarm control panels?"
     A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful,
