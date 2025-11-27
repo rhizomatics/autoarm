@@ -38,7 +38,7 @@ async def test_examples(
     assert autoarm_state is not None
     assert autoarm_state.state
     assert autoarm_state.attributes["alarm_panel"] == "alarm_panel.testing"
-    autoarm_init = hass.states.get("autoarm.initialization")
+    autoarm_init = hass.states.get("autoarm.initialized")
     assert autoarm_init is not None
     assert autoarm_init.state == "valid"
     hass.bus.async_fire("mobile_app_notification_action", {"action": "ALARM_PANEL_DISARM"})
@@ -60,6 +60,6 @@ async def test_examples(
         autoarm_state = hass.states.get("autoarm.configured")
         assert autoarm_state is not None
         assert autoarm_state.attributes["alarm_panel"] == "alarm_panel.minimal"
-        autoarm_init = hass.states.get("autoarm.initialization")
+        autoarm_init = hass.states.get("autoarm.initialized")
         assert autoarm_init is not None
         assert autoarm_init.state == "valid"
