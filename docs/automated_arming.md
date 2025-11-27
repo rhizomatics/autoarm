@@ -25,8 +25,10 @@ Handy if you have a Zigbee, 433Mhz or similar button panel by the door - choose 
 [Button Integrations](https://www.home-assistant.io/integrations/?cat=button) entities
 for `DISARMED`,`ARMED_AWAY` etc, or a *Reset* button to set the panel by the default algorithm.
 
-A delay can be set, so if for example you have an *away* button next to the front door, you can give yourself
-a couple of minutes to exit the property before the alarm is set.
+A delay can be set, so if for example you have an *away* button next to the front door, you can give yourself a couple of minutes to exit the property before the alarm is set.
+
+See also the [Manual MQTT Alarm Control Panel](https://www.home-assistant.io/integrations/manual_mqtt/)
+for another way to integrate physical buttons to control state.
 
 ## Mobile Action Control
 
@@ -144,7 +146,7 @@ with other Jinja2 features and Home Assistant extras, including AND/OR/NOT logic
 | occupied_daytime_state     | str             | Default state for occupied in day time                   |
 
 [CalendarEvent]: https://github.com/home-assistant/core/blob/56a71e6798ada65e9c99f92f64bd4168e98b935b/homeassistant/components/calendar/__init__.py#L364
-[Alarm Control Panel Integrations]: https://www.home-assistant.io/integrations/alarm_control_panel/
+[Alarm Control Panel Integrations]: https://www.home-assistant.io/integrations/?search=alarm+control+panel
 [Conditions]: https://www.home-assistant.io/docs/scripts/conditions/
 [HACS]: https://hacs.xyz
 [Button Integration]: https://www.home-assistant.io/integrations/button/

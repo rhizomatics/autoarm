@@ -115,7 +115,7 @@ notify:
 [![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?style=for-the-badge&logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)
 
 [CalendarEvent]: https://github.com/home-assistant/core/blob/56a71e6798ada65e9c99f92f64bd4168e98b935b/homeassistant/components/calendar/__init__.py#L364
-[Alarm Control Panel Integrations]: https://www.home-assistant.io/integrations/alarm_control_panel/
+[Alarm Control Panel Integrations]: https://www.home-assistant.io/integrations/?search=alarm+control+panel
 [Conditions]: https://www.home-assistant.io/docs/scripts/conditions/
 [HACS]: https://hacs.xyz
 [Button Integration]: https://www.home-assistant.io/integrations/button/

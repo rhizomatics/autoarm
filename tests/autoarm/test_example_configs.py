@@ -1,7 +1,6 @@
 import pathlib
 from pathlib import Path
 from typing import Any
-from unittest.mock import patch
 
 import pytest
 from homeassistant import config as hass_config
@@ -17,15 +16,19 @@ from custom_components.autoarm.const import DOMAIN
 
 EXAMPLES_ROOT = Path("examples")
 
-examples: list[Path] = list(EXAMPLES_ROOT.iterdir())
+examples: list[Path] = [p for p in EXAMPLES_ROOT.iterdir() if p.is_file() and p.name.endswith(".yaml")]
 
 
 @pytest.mark.parametrize("config_name", examples, ids=lambda v: v.stem)
 @pytest.mark.parametrize(argnames="reload", argvalues=[True, False], ids=["reload", "no-reload"])
-async def test_examples(hass: HomeAssistant, config_name: str, reload: bool, local_calendar: CalendarEntity) -> None:  # noqa: ARG001
+async def test_examples(hass: HomeAssistant, config_name: str, reload: bool,
+                        local_calendar: CalendarEntity,  # noqa: ARG001
+                        monkeypatch: pytest.MonkeyPatch) -> None:
     config: dict[Any, Any] = await hass.async_add_executor_job(load_yaml_config_file, str(config_name))
 
-    assert await async_setup_component(hass, DOMAIN, config)
+    for domain in config:
+        assert await async_setup_component(hass, domain, config)
+
     await hass.async_block_till_done()
     autoarm_state: State | None = hass.states.get("autoarm.configured")
     assert autoarm_state is not None
@@ -34,11 +37,15 @@ async def test_examples(hass: HomeAssistant, config_name: str, reload: bool, loc
     autoarm_init = hass.states.get("autoarm.initialization")
     assert autoarm_init is not None
     assert autoarm_init.state == "valid"
+    hass.bus.async_fire("mobile_app_notification_action", {"action": "ALARM_PANEL_DISARM"})
+    await hass.async_block_till_done()
+    assert hass.states.get("alarm_control_panel.testing").state == "disarmed"
 
     if reload:
         config_path = pathlib.Path(__file__).parent.joinpath("fixtures", "empty_config.yaml").absolute()
 
-        with patch.object(hass_config, "YAML_CONFIG_FILE", config_path):
+        with monkeypatch.context() as m:
+            m.setattr(hass_config, "YAML_CONFIG_FILE", str(config_path))
             await hass.services.async_call(
                 DOMAIN,
                 SERVICE_RELOAD,

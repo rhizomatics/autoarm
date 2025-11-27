@@ -1,3 +1,7 @@
+alarm_control_panel:
+  - platform: manual
+    name: Testing
+    code_arm_required: false
 autoarm:
   alarm_panel:
     alias: Virtual control panel using Manual Alarm Control Panel integration

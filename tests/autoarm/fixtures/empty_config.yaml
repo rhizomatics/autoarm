@@ -1,3 +1,7 @@
+alarm_control_panel:
+  - platform: manual
+    name: Minimal
+    code_arm_required: false
 autoarm:
   alarm_panel:
     entity_id: alarm_panel.minimal

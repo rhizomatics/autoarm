@@ -1,0 +1,9 @@
+
+alarm_control_panel:
+  - platform: manual_mqtt
+    name: testing
+    state_topic: home/alarm
+    command_topic: home/alarm/set
+autoarm:
+  alarm_panel:
+    entity_id: alarm_panel.testing

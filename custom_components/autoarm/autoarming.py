@@ -263,6 +263,91 @@ class AlarmArmer:
         self.initialization_errors.setdefault(stage, 0)
         self.initialization_errors[stage] += 1
 
+    def initialize_integration(self) -> None:
+        self.unsubscribes.append(self.hass.bus.async_listen("mobile_app_notification_action", self.on_mobile_action))
+
+    def initialize_alarm_panel(self) -> None:
+        """Set up automation for Home Assistant alarm panel
+
+        See https://www.home-assistant.io/integrations/alarm_control_panel/
+
+        Succeeds even if control panel has not yet started, listener will pick up events when it does
+        """
+        self.unsubscribes.append(async_track_state_change_event(self.hass, [self.alarm_panel], self.on_panel_change))
+        _LOGGER.debug("AUTOARM Auto-arming %s", self.alarm_panel)
+
+    def initialize_housekeeping(self) -> None:
+        self.unsubscribes.append(
+            async_track_time_change(
+                self.hass,
+                action=self.housekeeping,
+                minute=0,
+            )
+        )
+
+    def initialize_diurnal(self) -> None:
+        # events API expects a function, however underlying HassJob is fine with coroutines
+        self.unsubscribes.append(async_track_sunrise(self.hass, self.on_sunrise, None))  # type: ignore
+        self.unsubscribes.append(async_track_sunset(self.hass, self.on_sunset, None))  # type: ignore
+
+    def initialize_occupancy(self) -> None:
+        """Configure occupants, and listen for changes in their state"""
+        _LOGGER.info("AUTOARM Occupancy determined by %s", ",".join(self.occupants))
+        self.unsubscribes.append(async_track_state_change_event(self.hass, self.occupants, self.on_occupancy_change))
+        _LOGGER.debug(
+            "AUTOARM Occupied: %s, Unoccupied: %s, Night: %s",
+            self.is_occupied(),
+            self.is_unoccupied(),
+            self.is_night(),
+        )
+
+    def initialize_buttons(self) -> None:
+        """Initialize (optional) physical alarm state control buttons"""
+
+        def setup_button(state_name: str, button_entity: str, cb: Callable) -> None:
+            self.button_device[state_name] = button_entity
+            if self.button_device[state_name]:
+                self.unsubscribes.append(async_track_state_change_event(self.hass, [button_entity], cb))
+
+                _LOGGER.debug(
+                    "AUTOARM Configured %s button for %s",
+                    state_name,
+                    self.button_device[state_name],
+                )
+
+        for button_use, button_config in self.buttons.items():
+            delay = button_config.get(CONF_DELAY_TIME, 0)
+            for entity_id in button_config[CONF_ENTITY_ID]:
+                if button_use == ATTR_RESET:
+                    setup_button(ATTR_RESET, entity_id, partial(self.on_reset_button, delay))
+                else:
+                    setup_button(
+                        button_use, entity_id, partial(self.on_alarm_state_button, AlarmControlPanelState(button_use), delay)
+                    )
+
+    async def initialize_calendar(self) -> None:
+        """Configure calendar polling (optional)"""
+        stage: str = "calendar"
+        self.hass.states.async_set(f"{DOMAIN}.last_calendar_event", "unavailable", attributes={})
+        if not self.calendar_configs:
+            return
+        try:
+            platforms: list[entity_platform.EntityPlatform] = entity_platform.async_get_platforms(self.hass, CALENDAR_DOMAIN)
+            if platforms:
+                platform: entity_platform.EntityPlatform = platforms[0]
+            else:
+                self.record_error(stage)
+                _LOGGER.error("AUTOARM Calendar platform not available from Home Assistant")
+                return
+        except Exception as _e:
+            self.record_error(stage)
+            _LOGGER.exception("AUTOARM Unable to access calendar platform")
+            return
+        for calendar_config in self.calendar_configs:
+            tracked_calendar = TrackedCalendar(calendar_config, self)
+            await tracked_calendar.initialize(platform)
+            self.calendars.append(tracked_calendar)
+
     async def initialize_logic(self) -> None:
         stage: str = "logic"
         for state_str, raw_condition in DEFAULT_TRANSITIONS.items():
@@ -344,89 +429,6 @@ class AlarmArmer:
         for cal in self.calendars:
             await cal.prune_events()
         _LOGGER.debug("AUTOARM Housekeeping finished")
-
-    def initialize_integration(self) -> None:
-        self.unsubscribes.append(self.hass.bus.async_listen("mobile_app_notification_action", self.on_mobile_action))
-
-    def initialize_alarm_panel(self) -> None:
-        """Set up automation for Home Assistant alarm panel
-
-        See https://www.home-assistant.io/integrations/alarm_control_panel/
-        """
-        self.unsubscribes.append(async_track_state_change_event(self.hass, [self.alarm_panel], self.on_panel_change))
-        _LOGGER.debug("AUTOARM Auto-arming %s", self.alarm_panel)
-
-    def initialize_housekeeping(self) -> None:
-        self.unsubscribes.append(
-            async_track_time_change(
-                self.hass,
-                action=self.housekeeping,
-                minute=0,
-            )
-        )
-
-    def initialize_diurnal(self) -> None:
-        # events API expects a function, however underlying HassJob is fine with coroutines
-        self.unsubscribes.append(async_track_sunrise(self.hass, self.on_sunrise, None))  # type: ignore
-        self.unsubscribes.append(async_track_sunset(self.hass, self.on_sunset, None))  # type: ignore
-
-    def initialize_occupancy(self) -> None:
-        """Configure occupants, and listen for changes in their state"""
-        _LOGGER.info("AUTOARM Occupancy determined by %s", ",".join(self.occupants))
-        self.unsubscribes.append(async_track_state_change_event(self.hass, self.occupants, self.on_occupancy_change))
-        _LOGGER.debug(
-            "AUTOARM Occupied: %s, Unoccupied: %s, Night: %s",
-            self.is_occupied(),
-            self.is_unoccupied(),
-            self.is_night(),
-        )
-
-    def initialize_buttons(self) -> None:
-        """Initialize (optional) physical alarm state control buttons"""
-
-        def setup_button(state_name: str, button_entity: str, cb: Callable) -> None:
-            self.button_device[state_name] = button_entity
-            if self.button_device[state_name]:
-                self.unsubscribes.append(async_track_state_change_event(self.hass, [button_entity], cb))
-
-                _LOGGER.debug(
-                    "AUTOARM Configured %s button for %s",
-                    state_name,
-                    self.button_device[state_name],
-                )
-
-        for button_use, button_config in self.buttons.items():
-            delay = button_config.get(CONF_DELAY_TIME, 0)
-            for entity_id in button_config[CONF_ENTITY_ID]:
-                if button_use == ATTR_RESET:
-                    setup_button(ATTR_RESET, entity_id, partial(self.on_reset_button, delay))
-                else:
-                    setup_button(
-                        button_use, entity_id, partial(self.on_alarm_state_button, AlarmControlPanelState(button_use), delay)
-                    )
-
-    async def initialize_calendar(self) -> None:
-        """Configure calendar polling (optional)"""
-        stage: str = "calendar"
-        self.hass.states.async_set(f"{DOMAIN}.last_calendar_event", "unavailable", attributes={})
-        if not self.calendar_configs:
-            return
-        try:
-            platforms: list[entity_platform.EntityPlatform] = entity_platform.async_get_platforms(self.hass, CALENDAR_DOMAIN)
-            if platforms:
-                platform: entity_platform.EntityPlatform = platforms[0]
-            else:
-                self.record_error(stage)
-                _LOGGER.error("AUTOARM Calendar platform not available from Home Assistant")
-                return
-        except Exception as _e:
-            self.record_error(stage)
-            _LOGGER.exception("AUTOARM Unable to access calendar platform")
-            return
-        for calendar_config in self.calendar_configs:
-            tracked_calendar = TrackedCalendar(calendar_config, self)
-            await tracked_calendar.initialize(platform)
-            self.calendars.append(tracked_calendar)
 
     def active_calendar_event(self) -> CalendarEvent | None:
         events: list[CalendarEvent] = []
