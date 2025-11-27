@@ -1,7 +1,13 @@
 # Changelog
 
+## 0.6.5
+### Features
+- Now exposes a `last_intervention` entity for button, mobile action or direct panel change
+- Panel state now given a `changed_by` attribute value, and this now used to prevent events from changes induced by autoarm being treated as interventions
+- More attributes on `last_calculation`
+- Logging noise reduction
 ## 0.6.4
-## Features
+### Features
 - Now exposes a `last_calculation` entity with the key facts used
 ### Internal
 - Integration tests now set up alarm panels
