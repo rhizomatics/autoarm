@@ -302,12 +302,6 @@ class AlarmArmer:
         """Configure occupants, and listen for changes in their state"""
         _LOGGER.info("AUTOARM Occupancy determined by %s", ",".join(self.occupants))
         self.unsubscribes.append(async_track_state_change_event(self.hass, self.occupants, self.on_occupancy_change))
-        _LOGGER.debug(
-            "AUTOARM Occupied: %s, Unoccupied: %s, Night: %s",
-            self.is_occupied(),
-            self.is_unoccupied(),
-            self.is_night(),
-        )
 
     def initialize_buttons(self) -> None:
         """Initialize (optional) physical alarm state control buttons"""
