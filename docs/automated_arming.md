@@ -70,13 +70,19 @@ The people who live at the property can be defined as [Person Integration][] ent
 [Person Entities]() in the `occupancy` configuration, and used to derive an `occupied`
 value for [Automated Transitions]. This works best with the Companion App on a mobile
 phone, although other [Device Tracker Integrations](https://www.home-assistant.io/integrations/?cat=device-tracker)
-can work, such as a home network `device_tracker`,
+can work, such as a home network `device_tracker`.
+
+!!! tip
+    Since the occupied check looks for entities that have a state `home`, it doesn't
+    have to be `person` entities, and you can add a list of `device tracker` entities.
+    The advantage of Person is that you can define multiple trackers for a single individual,
+    and they are `home` if any of the trackers are `home`, even if some of them haven't kept up.
 
 See the [Presence Detection](https://www.home-assistant.io/getting-started/presence-detection/)
 guidance from Home Assistant on how to set this up, and the options for using it.
 
 If the house is occupied, and its daytime, some people like that to be `disarmed` and
-others prefer `armed_home`. You can control this via [Calendar Control] or use the
+others prefer `armed_home`. You can control this via [Calendar Control][] or use the
 `state_default` settings for day and/or night in the `occupancy` configuration.
 
 ## Automated Transitions
@@ -102,7 +108,7 @@ set up a calendar and define exactly when you want disarming or arming to happen
 
 ### Algorithm Conditions
 
-These defaults will be used if there is no transition defined ( you can override just one of them if
+The defaults below will be used if there is no transition defined ( you can override just one of them if
 you prefer, and the others will remain as default, leave `conditions` empty if you really want to disable
 the transition).
 

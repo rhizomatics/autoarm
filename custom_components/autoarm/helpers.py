@@ -59,7 +59,7 @@ def deobjectify(obj: object) -> dict | str | int | float | bool | None:
         return obj
     if isinstance(obj, (dt.datetime, dt.time, dt.date)):
         return obj.isoformat()
-    as_dict = getattr(obj, 'as_dict', None)
+    as_dict = getattr(obj, "as_dict", None)
     if as_dict is None:
         return str(obj)
     return as_dict()
