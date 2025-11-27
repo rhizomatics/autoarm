@@ -180,6 +180,13 @@ class Intervention:
     source: ChangeSource
     state: AlarmControlPanelState | None
 
+    def as_dict(self) -> dict[str, str | None]:
+        return {
+            "created_at": self.created_at.isoformat(),
+            "source": str(self.source),
+            "state": str(self.state) if self.state is not None else None,
+        }
+
 
 class AlarmArmer:
     def __init__(
@@ -256,6 +263,7 @@ class AlarmArmer:
             "valid" if not self.initialization_errors else "invalid",
             attributes=self.initialization_errors,
         )
+        self.hass.states.async_set(f"{DOMAIN}.last_calculation", "unavailable", attributes={})
 
         _LOGGER.info("AUTOARM Initialized, state: %s", self.armed_state())
 
@@ -560,12 +568,11 @@ class AlarmArmer:
         """
         entity_id, old, new = self._extract_event(event)
         existing_state: AlarmControlPanelState | None = self.armed_state()
-        _LOGGER.debug(
-            "AUTOARM Occupancy Change: %s, old:%s, new:%s, event:%s, alarm state: %s",
+        _LOGGER.info(
+            "AUTOARM Occupancy Change: %s, state:%s->%s, current alarm state: %s",
             entity_id,
             old,
             new,
-            event,
             existing_state,
         )
         await self.reset_armed_state(source=ChangeSource.OCCUPANCY)
@@ -578,6 +585,11 @@ class AlarmArmer:
         self, intervention: Intervention | None = None, source: ChangeSource | None = None
     ) -> str | None:
         """Logic to automatically work out appropriate current armed state"""
+        state: AlarmControlPanelState | None = None
+        existing_state: AlarmControlPanelState | None = None
+        must_change_state: bool = False
+        last_state_intervention: Intervention | None = None
+
         if source is None and intervention is not None:
             source = intervention.source
         _LOGGER.debug(
@@ -585,41 +597,60 @@ class AlarmArmer:
             intervention,
             source,
         )
+        try:
+            existing_state = self.armed_state()
+            if self.calendars:
+                if self.active_calendar_event():
+                    _LOGGER.debug("AUTOARM Ignoring reset while calendar event active")
+                    return existing_state
+                if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_MANUAL:
+                    _LOGGER.debug(
+                        "AUTOARM Ignoring reset while calendar configured, no active event, and default mode is manual"
+                    )
+                    return existing_state
+                if self.calendar_no_event_mode in AlarmControlPanelState:
+                    # TODO: may be dupe logic with on_cal event
+                    return await self.arm(alarm_state_as_enum(self.calendar_no_event_mode), ChangeSource.CALENDAR)
+                if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
+                    _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
+                else:
+                    _LOGGER.warning("AUTOARM Unexpected state for calendar no event mode: %s", self.calendar_no_event_mode)
 
-        existing_state: AlarmControlPanelState | None = self.armed_state()
-        if self.calendars:
-            if self.active_calendar_event():
-                _LOGGER.debug("AUTOARM Ignoring reset while calendar event active")
-                return existing_state
-            if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_MANUAL:
-                _LOGGER.debug("AUTOARM Ignoring reset while calendar configured, no active event, and default mode is manual")
-                return existing_state
-            if self.calendar_no_event_mode in AlarmControlPanelState:
-                # TODO: may be dupe logic with on_cal event
-                return await self.arm(alarm_state_as_enum(self.calendar_no_event_mode), ChangeSource.CALENDAR)
-            if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
-                _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
+            # TODO: expose as config ( for manual disarm override ) and condition logic
+            must_change_state = existing_state is None or existing_state == AlarmControlPanelState.PENDING
+            if intervention or source in (ChangeSource.CALENDAR, ChangeSource.OCCUPANCY) or must_change_state:
+                _LOGGER.debug("AUTOARM Ignoring previous interventions")
             else:
-                _LOGGER.warning("AUTOARM Unexpected state for calendar no event mode: %s", self.calendar_no_event_mode)
+                last_state_intervention = self.last_state_intervention()
+                if last_state_intervention:
+                    _LOGGER.debug(
+                        "AUTOARM Ignoring automated reset for %s set by %s at %s",
+                        last_state_intervention.state,
+                        last_state_intervention.source,
+                        last_state_intervention.created_at,
+                    )
+                    return existing_state
+            state = self.determine_state()
+            if state is not None and state != AlarmControlPanelState.PENDING and state != existing_state:
+                state = await self.arm(state, source=source)
+        finally:
+            self.hass.states.async_set(
+                f"{DOMAIN}.last_calculation",
+                str(state is not None and state != existing_state),
+                attributes={
+                    "new_state": str(state),
+                    "old_state": str(existing_state),
+                    "source": source,
+                    "occupied": self.is_occupied(),
+                    "night": self.is_night(),
+                    "must_change_state": str(must_change_state),
+                    "last_state_intervention": last_state_intervention.as_dict() if last_state_intervention else None,
+                    "intervention": intervention.as_dict() if intervention else None,
+                    "time": dt_util.now().isoformat(),
+                },
+            )
 
-        # TODO: expose as config ( for manual disarm override ) and condition logic
-        must_change_state: bool = existing_state is None or existing_state == AlarmControlPanelState.PENDING
-        if intervention or source in (ChangeSource.CALENDAR, ChangeSource.OCCUPANCY) or must_change_state:
-            _LOGGER.debug("AUTOARM Ignoring previous interventions")
-        else:
-            last_state_intervention: Intervention | None = self.last_state_intervention()
-            if last_state_intervention:
-                _LOGGER.debug(
-                    "AUTOARM Ignoring automated reset for %s set by %s at %s",
-                    last_state_intervention.state,
-                    last_state_intervention.source,
-                    last_state_intervention.created_at,
-                )
-                return existing_state
-        state: AlarmControlPanelState | None = self.determine_state()
-        if state is not None and state != AlarmControlPanelState.PENDING:
-            return await self.arm(state, source=source)
-        return None
+        return state
 
     def determine_state(self) -> AlarmControlPanelState | None:
         evaluated_state: AlarmControlPanelState | None = None

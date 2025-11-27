@@ -1,6 +1,8 @@
 # Changelog
 
 ## 0.6.4
+## Features
+- Now exposes a `last_calculation` entity with the key facts used
 ### Internal
 - Integration tests now set up alarm panels
 ## 0.6.3
