@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.4
+### Internal
+- Integration tests now set up alarm panels
 ## 0.6.3
 ### Fixes
 - Incorrect import from test

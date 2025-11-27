@@ -33,6 +33,3 @@ tags:
 ::: custom_components.autoarm.calendar.TrackedCalendarEvent
     handler: python
     heading_level: 4
-
-
-

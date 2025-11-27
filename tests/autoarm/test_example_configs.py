@@ -21,9 +21,13 @@ examples: list[Path] = [p for p in EXAMPLES_ROOT.iterdir() if p.is_file() and p.
 
 @pytest.mark.parametrize("config_name", examples, ids=lambda v: v.stem)
 @pytest.mark.parametrize(argnames="reload", argvalues=[True, False], ids=["reload", "no-reload"])
-async def test_examples(hass: HomeAssistant, config_name: str, reload: bool,
-                        local_calendar: CalendarEntity,  # noqa: ARG001
-                        monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_examples(
+    hass: HomeAssistant,
+    config_name: str,
+    reload: bool,
+    local_calendar: CalendarEntity,  # noqa: ARG001
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     config: dict[Any, Any] = await hass.async_add_executor_job(load_yaml_config_file, str(config_name))
 
     for domain in config:
