@@ -13,6 +13,8 @@ autoarm:
     default_state:
       day: disarmed
       night: armed_night
+    delay_time:
+      not_home: 180
   diurnal:
     sunrise:
       earliest: "06:30:00"

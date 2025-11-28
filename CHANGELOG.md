@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.6
+### Features
+- New `reset_service` action available
+- Delay time now available for occupancy checks, separately selectable for ->`home` and ->`not_home`
+### Internal
+- Simplified logic for delayed actions
 ## 0.6.5
 ### Features
 - Now exposes a `last_intervention` entity for button, mobile action or direct panel change

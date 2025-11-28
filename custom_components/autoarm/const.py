@@ -8,7 +8,15 @@ from typing import Any
 import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEvent
-from homeassistant.const import CONF_ALIAS, CONF_CONDITIONS, CONF_DELAY_TIME, CONF_ENTITY_ID, CONF_SERVICE
+from homeassistant.const import (
+    CONF_ALIAS,
+    CONF_CONDITIONS,
+    CONF_DELAY_TIME,
+    CONF_ENTITY_ID,
+    CONF_SERVICE,
+    STATE_HOME,
+    STATE_NOT_HOME,
+)
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
@@ -96,6 +104,7 @@ OCCUPANCY_SCHEMA = vol.Schema({
     vol.Optional(CONF_OCCUPANCY_DEFAULT, default={CONF_DAY: AlarmControlPanelState.ARMED_HOME}): {
         vol.In([CONF_DAY, CONF_NIGHT]): vol.In(ALARM_STATES)
     },
+    vol.Optional(CONF_DELAY_TIME): {vol.In([STATE_HOME, STATE_NOT_HOME]): vol.All(cv.time_period, cv.positive_timedelta)},
 })
 
 CONF_DIURNAL = "diurnal"
@@ -179,6 +188,8 @@ class ChangeSource(StrEnum):
     INTERNAL = auto()
     ALARM_PANEL = auto()
     BUTTON = auto()
+    ACTION = auto()
+    NOTIFY = auto()
     SUNRISE = auto()
     SUNSET = auto()
     ZOMBIFICATION = auto()

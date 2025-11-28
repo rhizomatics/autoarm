@@ -2,16 +2,13 @@ import asyncio
 import json
 
 from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, AlarmControlPanelState
-from homeassistant.components.notify.const import ATTR_TITLE
-from homeassistant.const import ATTR_ICON, CONF_CONDITIONS, CONF_DELAY_TIME
+from homeassistant.const import CONF_CONDITIONS, CONF_DELAY_TIME
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
 
-from custom_components.autoarm.autoarming import AlarmControlPanelState
 from custom_components.autoarm.calendar import CONF_ENTITY_ID
 from custom_components.autoarm.const import (
-    ATTR_ACTION,
     ATTR_RESET,
     CONF_ALARM_PANEL,
     CONF_BUTTONS,
@@ -30,28 +27,14 @@ CONFIG = {
         CONF_DIURNAL: {CONF_SUNRISE: {CONF_EARLIEST: "06:30:00"}},
         CONF_BUTTONS: {
             ATTR_RESET: {CONF_ENTITY_ID: "binary_sensor.button_left"},
-            AlarmControlPanelState.ARMED_AWAY: {CONF_DELAY_TIME: 1, CONF_ENTITY_ID: "binary_sensor.button_right"},
+            AlarmControlPanelState.ARMED_AWAY: {CONF_DELAY_TIME: 2, CONF_ENTITY_ID: "binary_sensor.button_right"},
             AlarmControlPanelState.DISARMED: {CONF_ENTITY_ID: "binary_sensor.button_middle"},
         },
         CONF_OCCUPANCY: {CONF_ENTITY_ID: ["person.house_owner", "person.tenant"]},
         CONF_NOTIFY: {
             "common": {
-                "service": "notify.supernotifier",
-                "data": {
-                    "actions": [
-                        {
-                            ATTR_ACTION: "ALARM_PANEL_DISARM",
-                            ATTR_TITLE: "Disarm Alarm Panel",
-                            ATTR_ICON: "sfsymbols:bell.slash",
-                        },
-                        {ATTR_ACTION: "ALARM_PANEL_RESET", ATTR_TITLE: "Reset Alarm Panel", ATTR_ICON: "sfsymbols:bell"},
-                        {
-                            ATTR_ACTION: "ALARM_PANEL_AWAY",
-                            ATTR_TITLE: "Arm Alarm Panel for Going Awa",
-                            ATTR_ICON: "sfsymbols:airplane",
-                        },
-                    ],
-                },
+                "service": "notify.send_message",
+                "data": {"message": "alarm changed"},
             },
             "quiet": {"data": {"priority": "low"}},
             "normal": {"data": {"priority": "medium"}},
@@ -81,6 +64,16 @@ async def test_exposed_entities(hass: HomeAssistant) -> None:
     assert "error" not in configuration.attributes
     assert configuration.attributes["alarm_panel"] == "alarm_panel.testing"
     assert hass.states.get("autoarm.last_calendar_event") is not None
+
+
+async def test_reset_service(hass: HomeAssistant) -> None:
+    assert await async_setup_component(hass, "autoarm", CONFIG)
+
+    await hass.async_block_till_done()
+    response = await hass.services.async_call("autoarm", "reset_state", None, blocking=True, return_response=True)
+    assert response is not None
+    assert response["change"] == "armed_away"
+    assert hass.states.get("autoarm.last_intervention").state == "action"  # type: ignore
 
 
 async def test_broken_condition_raises_issue(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
@@ -158,11 +151,13 @@ async def test_disarm_on_mobile_action(hass: HomeAssistant) -> None:
 
 
 async def test_delayed_arm_on_button(hass: HomeAssistant) -> None:
-    hass.states.async_set("alarm_panel.testing", "disarmed")
+
     assert await async_setup_component(hass, "autoarm", CONFIG)
     await hass.async_block_till_done()
+    hass.states.async_set("alarm_panel.testing", "disarmed")
 
     hass.states.async_set("binary_sensor.button_right", "on")
+    assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
     await hass.async_block_till_done()
-    await asyncio.sleep(2)
+    await asyncio.sleep(3)
     assert hass.states.get("alarm_panel.testing").state == "armed_away"  # type: ignore

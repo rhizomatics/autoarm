@@ -37,6 +37,11 @@ This works similar to the buttons, except its driven by [Actionable Notification
 These can be added to any notification, so for example noisy PIR alerts can be quickly squelched by
 disarming the alarm.
 
+## Home Assistant Action
+
+An action (aka "service") called `autoarm.reset_state` can be used to trigger a state reset. It will work
+the same way as other resets, such as at sunrise or sunset.
+
 ## Calendar Control
 
 ### Integrating a Calendar
@@ -84,6 +89,27 @@ guidance from Home Assistant on how to set this up, and the options for using it
 If the house is occupied, and its daytime, some people like that to be `disarmed` and
 others prefer `armed_home`. You can control this via [Calendar Control][] or use the
 `state_default` settings for day and/or night in the `occupancy` configuration.
+
+One problem with device trackers is that they can be noisy, for example if someone tracked
+by phone walks out of wifi range, or reboots their device. This tends to be a problem when
+building occupied, since its much less likely for a device tracker to intermittenly think
+the device is at home. A delay timer can be set, separately for `home` and `not_home`, to
+smooth this out, so alarm won't reset unless someone still out a few minutes later.
+
+In this configuration, there will be a three minute wait to make sure the device tracker
+stable for `home`->`not_home`, and zero delay when arriving home.
+
+```yaml
+  occupancy:
+    entity_id:
+      - person.house_owner
+      - person.tenant
+    default_state:
+      day: disarmed
+      night: armed_night
+    delay_time:
+      not_home: 180
+```
 
 ## Automated Transitions
 
