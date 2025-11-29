@@ -30,6 +30,11 @@ A delay can be set, so if for example you have an *away* button next to the fron
 See also the [Manual MQTT Alarm Control Panel](https://www.home-assistant.io/integrations/manual_mqtt/)
 for another way to integrate physical buttons to control state.
 
+![Example Buttons](assets/images/alarm_buttons.png){width=240,align=left}
+/// caption
+Example Cheap 433Mhz Buttons Using RFLink
+///
+
 ## Mobile Action Control
 
 This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](mobile_actions.md) for more information.
