@@ -8,8 +8,8 @@
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/rhizomatics/autoarm)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/rhizomatics/autoarm/main.svg)](https://results.pre-commit.ci/latest/github/rhizomatics/autoarm/main)
-![Coverage](https://raw.githubusercontent.com/rhizomatics/autoarm/56db7352359d70e71e9d7215568943ea07916dc0/badges/coverage.svg)
-![Tests](https://raw.githubusercontent.com/rhizomatics/autoarm/56db7352359d70e71e9d7215568943ea07916dc0/badges/tests.svg)
+![Coverage](https://raw.githubusercontent.com/rhizomatics/autoarm/refs/heads/badges/badges/coverage.svg)
+![Tests](https://raw.githubusercontent.com/rhizomatics/autoarm/refs/heads/badges/badges/tests.svg)
 [![Github Deploy](https://github.com/rhizomatics/autoarm/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/rhizomatics/autoarm/actions/workflows/deploy.yml)
 [![CodeQL](https://github.com/rhizomatics/autoarm/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/rhizomatics/autoarm/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/rhizomatics/autoarm/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/rhizomatics/autoarm/actions/workflows/dependabot/dependabot-updates)
