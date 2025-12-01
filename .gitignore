@@ -10,6 +10,7 @@ cov.xml
 node_modules/
 package-lock.json
 .devcontainer/.venv
+junit/
 
 
 # C extensions
