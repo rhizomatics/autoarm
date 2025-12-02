@@ -37,7 +37,8 @@ Example Cheap 433Mhz Buttons Using RFLink
 
 ## Mobile Action Control
 
-This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](mobile_actions.md) for more information.
+This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](mobile_actions.md) for more information, and the [Contextual Mobile Actions Recipe](https://supernotify.rhizomatics.org.uk/recipes/contextual_mobile_actions/) for a nice way to do this in [Supernotify](https://supernotify.rhizomatics.org.uk
+where only the appropriate actions are shown).
 
 These can be added to any notification, so for example noisy PIR alerts can be quickly squelched by
 disarming the alarm.
