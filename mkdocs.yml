@@ -4,13 +4,18 @@ site_description: Automated alarm control panel arming and disarming for Home As
 
 repo_name: rhizomatics/autoarm
 repo_url: https://github.com/rhizomatics/autoarm
+edit_uri: edit/main/docs/
 
 theme:
   name: material
   highlightjs: true
   language: en
   logo: assets/images/autoarm-dark-256x256.png
+  icon:
+    repo: fontawesome/brands/github
   features:
+    - content.action.edit
+    - content.action.view
     - content.code.copy
     - content.code.select
     - content.code.annotate
@@ -22,6 +27,9 @@ theme:
     - navigation.path
     - navigation.indexes
     - navigation.top
+    - search.suggest
+    - search
+    - search.share
     - toc.follow
     - toc.integrate
 plugins:
@@ -32,6 +40,8 @@ plugins:
   - tags
   - minify:
       minify_html: true
+  - git-revision-date-localized:
+      enable_creation_date: true
   - coverage:
       page_path: developer/coverage
       html_report_dir: htmlcov

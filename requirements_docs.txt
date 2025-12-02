@@ -9,3 +9,4 @@ voluptuous-openapi>=0.2.0
 pngquant
 mkdocstrings
 mkdocstrings-python
+mkdocs-git-revision-date-localized-plugin
