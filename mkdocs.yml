@@ -37,6 +37,7 @@ plugins:
   - autorefs
   - pagetree
   - optimize
+  - meta-descriptions
   - tags
   - minify:
       minify_html: true

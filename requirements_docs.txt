@@ -10,3 +10,4 @@ pngquant
 mkdocstrings
 mkdocstrings-python
 mkdocs-git-revision-date-localized-plugin
+mkdocs-meta-descriptions-plugin
