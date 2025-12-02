@@ -4,7 +4,7 @@
 
 # Alarm Auto Arming
 
-[![Rhizomatics Open Source](https://img.shields.io/badge/rhizomatics%20open%20source-lightseagreen)](https://github.com/rhizomatics)
+[![Rhizomatics Open Source](https://img.shields.io/badge/rhizomatics%20open%20source-lightseagreen)](https://github.com/rhizomatics) [![hacs][hacsbadge]][hacs]
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/rhizomatics/autoarm)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/rhizomatics/autoarm/main.svg)](https://results.pre-commit.ci/latest/github/rhizomatics/autoarm/main)
@@ -34,7 +34,7 @@ Control Panel Integrations][], with additional support for calendar integration,
 
 ## Setup
 
-Register this GitHub repo as a custom repo in your [HACS][] configuration.
+AutoArm is one of the default repositories on [HACS][], so there's no need to register  a custom repo.
 
 Notifications will work with any HomeAssistant notification implementation, and works best with [Supernotify](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
 
@@ -115,3 +115,7 @@ notify:
 [HACS]: https://hacs.xyz
 [Button Integration]: https://www.home-assistant.io/integrations/button/
 [Person Integration]: https://www.home-assistant.io/integrations/person/
+
+
+[hacs]: https://hacs.xyz
+[hacsbadge]: https://img.shields.io/badge/HACS-Default-blue.svg
