@@ -23,14 +23,9 @@ Automate the arming and disarming of the built-in Home Assistant [Alarm
 Control Panel Integrations][], with additional support for calendar integration, manual override via remote control buttons, and mobile push actionable notifications.
 
 !!! question inline end "Why use alarm control panels?"
-    A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful,
-    even if there is no real alarm system, as a **single central state of
-    the home**, and then use that to drive automations, notifications etc rather than
-    littering notifications with checks for presence, time of day, vacations or similar.
+    A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful, even if there is no real alarm system, as a **single central state of the home**, and then use that to drive automations, notifications etc rather than littering notifications with checks for presence, time of day, vacations or similar.
 
-    For example, it is likely that many things will change if `ARMED_VACATION` applies, and
-    you may want to have all PIR alerts silenced if alarm state is `DISARMED`. This builds
-    on how real alarm systems have worked for decades.
+    For example, it is likely that many things will change if `ARMED_VACATION` applies, and you may want to have all PIR alerts silenced if alarm state is `DISARMED`. This builds on how real alarm systems have worked for decades.
 
     One big obstacle to using Alarm Control Panel is having to remember to change the
     alarm panel state when people are in or out of the house, at night or when away on holiday.
@@ -41,7 +36,7 @@ Control Panel Integrations][], with additional support for calendar integration,
 
 Register this GitHub repo as a custom repo in your [HACS][] configuration.
 
-Notifications will work with any HomeAssistant notification implementation, and works best with [Supernotifier](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
+Notifications will work with any HomeAssistant notification implementation, and works best with [Supernotify](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
 
 ## Alarm Panel Configuration
 
