@@ -61,7 +61,7 @@ jobs:
           echo "No changes to badges"
         fi
     - name: HACS Action
-      uses: "hacs/action@06827d281b9c558c46d8ed6f4aae6c517fdc19ed"
+      uses: "hacs/action@6f81caf1dd4cc0f615444dba4d4a3ceaa22db99c"
       with:
         category: "integration"
         ignore: brands
