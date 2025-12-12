@@ -1,6 +1,6 @@
-pytest==8.4.2
+pytest==9.0.0
 pytest-cov
-pytest-homeassistant-custom-component>=0.13.295
+pytest-homeassistant-custom-component
 pytest-unordered
 pytest-mock
 pytest-xdist
