@@ -182,8 +182,13 @@ def _async_process_config(hass: HomeAssistant, config: ConfigType) -> "AlarmArme
 
 
 def migrate(hass: HomeAssistant) -> None:
-    for entity_id in ("autoarm.configured", "autoarm.last_calendar_event", "autoarm.last_intervention", "autoarm.initialized",
-                  "autoarm.last_calculation"):
+    for entity_id in (
+        "autoarm.configured",
+        "autoarm.last_calendar_event",
+        "autoarm.last_intervention",
+        "autoarm.initialized",
+        "autoarm.last_calculation",
+    ):
         try:
             if hass.states.get(entity_id):
                 _LOGGER.info("AUTOARM Migration removing legacy entity_id: %s", entity_id)
