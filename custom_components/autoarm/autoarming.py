@@ -165,6 +165,7 @@ async def async_setup(
 
 def _async_process_config(hass: HomeAssistant, config: ConfigType) -> "AlarmArmer":
     calendar_config: ConfigType = config.get(CONF_CALENDAR_CONTROL, {})
+    migrate(hass)
     service: AlarmArmer = AlarmArmer(
         hass,
         alarm_panel=config[CONF_ALARM_PANEL].get(CONF_ENTITY_ID),
@@ -178,6 +179,17 @@ def _async_process_config(hass: HomeAssistant, config: ConfigType) -> "AlarmArme
         calendar_no_event_mode=calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO),
     )
     return service
+
+
+def migrate(hass: HomeAssistant) -> None:
+    for entity_id in ("autoarm.configured", "autoarm.last_calendar_event", "autoarm.last_intervention", "autoarm.initialized",
+                  "autoarm.last_calculation"):
+        try:
+            if hass.states.get(entity_id):
+                _LOGGER.info("AUTOARM Migration removing legacy entity_id: %s", entity_id)
+                hass.states.async_remove(entity_id)
+        except Exception as e:
+            _LOGGER.warning("AUTOARM Migration fail for %s:%s", entity_id, e)
 
 
 def unlisten(listener: Callable[[], None] | None) -> None:
