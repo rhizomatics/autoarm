@@ -1,5 +1,6 @@
 import asyncio
 import json
+from typing import Any
 
 from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, AlarmControlPanelState
 from homeassistant.const import CONF_CONDITIONS, CONF_DELAY_TIME
@@ -56,14 +57,23 @@ async def test_exposed_entities(hass: HomeAssistant) -> None:
     assert await async_setup_component(hass, "autoarm", CONFIG)
 
     await hass.async_block_till_done()
-    configuration = hass.states.get("autoarm.configured")
+    configuration = hass.states.get("binary_sensor.autoarm_initialized")
     assert configuration is not None
     assert configuration.state == "valid"
+
+    assert hass.states.get("sensor.autoarm_last_calendar_event") is not None
+
+
+async def test_actions(hass: HomeAssistant) -> None:
+    assert await async_setup_component(hass, "autoarm", CONFIG)
+
+    await hass.async_block_till_done()
+    config: Any = await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True)
+    assert config is not None
+    assert "error" not in config
+    assert config["alarm_panel"] == "alarm_panel.testing"
     # check for unserializable classes that will upset HomeAssistant
-    assert json.dumps(configuration.attributes)
-    assert "error" not in configuration.attributes
-    assert configuration.attributes["alarm_panel"] == "alarm_panel.testing"
-    assert hass.states.get("autoarm.last_calendar_event") is not None
+    assert json.dumps(config)
 
 
 async def test_reset_service(hass: HomeAssistant) -> None:
@@ -73,7 +83,7 @@ async def test_reset_service(hass: HomeAssistant) -> None:
     response = await hass.services.async_call("autoarm", "reset_state", None, blocking=True, return_response=True)
     assert response is not None
     assert response["change"] == "armed_away"
-    assert hass.states.get("autoarm.last_intervention").state == "action"  # type: ignore
+    assert hass.states.get("sensor.autoarm_last_intervention").state == "action"  # type: ignore
 
 
 async def test_broken_condition_raises_issue(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
@@ -105,7 +115,7 @@ async def test_on_panel_change_ignores_autoarm_generated_event(hass: HomeAssista
 
     hass.states.async_set("binary_sensor.button_middle", "on")
     await hass.async_block_till_done()
-    assert hass.states.get("autoarm.last_intervention").state == "button"  # type: ignore
+    assert hass.states.get("sensor.autoarm_last_intervention").state == "button"  # type: ignore
     panel_entity = hass.states.get("alarm_panel.testing")
     assert panel_entity is not None
     assert panel_entity.attributes[ATTR_CHANGED_BY] == "autoarm.button"
@@ -113,7 +123,7 @@ async def test_on_panel_change_ignores_autoarm_generated_event(hass: HomeAssista
     # when alarm panel is changed directly, this is recorded as an intervention
     hass.states.async_set("alarm_panel.testing", "armed_vacation")
     await hass.async_block_till_done()
-    assert hass.states.get("autoarm.last_intervention").state == "alarm_panel"  # type: ignore
+    assert hass.states.get("sensor.autoarm_last_intervention").state == "alarm_panel"  # type: ignore
 
 
 async def test_arm_on_away(hass: HomeAssistant) -> None:

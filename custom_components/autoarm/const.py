@@ -3,7 +3,6 @@
 import logging
 from dataclasses import dataclass
 from enum import StrEnum, auto
-from typing import Any
 
 import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
@@ -67,9 +66,9 @@ CALENDAR_SCHEMA = vol.Schema({
     vol.Required(CONF_ENTITY_ID): cv.entity_id,
     vol.Optional(CONF_ALIAS): cv.string,
     vol.Optional(CONF_CALENDAR_POLL_INTERVAL, default=30): cv.positive_int,
-    vol.Optional(CONF_CALENDAR_EVENT_STATES, default=DEFAULT_CALENDAR_MAPPINGS): dict[  # type: ignore
-        vol.In(ALARM_STATES), vol.All(cv.ensure_list, [cv.string])
-    ],
+    vol.Optional(CONF_CALENDAR_EVENT_STATES, default=DEFAULT_CALENDAR_MAPPINGS): {
+        vol.In(ALARM_STATES): vol.All(cv.ensure_list, [cv.string])
+    },
 })
 CALENDAR_CONTROL_SCHEMA = vol.Schema({
     vol.Optional(CONF_CALENDAR_NO_EVENT, default=NO_CAL_EVENT_MODE_AUTO): vol.All(vol.Lower, vol.In(NO_CAL_EVENT_OPTIONS)),
@@ -132,7 +131,7 @@ CONFIG_SCHEMA = vol.Schema(
     extra=vol.ALLOW_EXTRA,  # validation fails without this by trying to include all of HASS config
 )
 
-DEFAULT_TRANSITIONS: dict[str, Any] = {
+DEFAULT_TRANSITIONS: dict[str, str | list[str]] = {
     "armed_home": [
         "{{ autoarm.occupied and not autoarm.night }}",
         "{{ autoarm.computed and autoarm.occupied_daytime_state == 'armed_home'}}",

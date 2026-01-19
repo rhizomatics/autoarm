@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0
+### Fixes
+- Alarm Control Panel attributes no longer overwritten
+- Entity naming corrected for Home Assistant consistency, now `sensor.autoarm_XXXX` or `binary_sensor.autoarm_XXXX`
+- Configuration exposure moved from entity to `enquire_configuration` action, to avoid huge output to Developer states panel
+- Exposed `reset_state` action
+- Exposed `sensor.autoarm_failures` entity
+- Home Assistant Quality Scale audited and improvements started
 ## 0.6.6
 ### Features
 - New `reset_service` action available

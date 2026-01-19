@@ -42,6 +42,12 @@ def unoccupied(hass: HomeAssistant) -> None:
     hass.states.async_set("person.tester_bob", "away")
 
 
+async def test_arm_preserves_panel_attributes(autoarmer: AlarmArmer, hass: HomeAssistant) -> None:
+    hass.states.async_set(entity_id=TEST_PANEL, new_state="disarmed", attributes={"icon": "mdi:alarm-panel"})
+    await autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
+    assert hass.states.get(TEST_PANEL).attributes.get("icon") == "mdi:alarm-panel"  # type:ignore[attr-defined]
+
+
 async def test_vacation_day_occupied(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
     await autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
     assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_VACATION

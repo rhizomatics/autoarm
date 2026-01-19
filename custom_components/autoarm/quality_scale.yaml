@@ -1,0 +1,335 @@
+rules:
+  # ============================================================================
+  # Bronze Tier
+  # ============================================================================
+
+  action-setup:
+    status: done
+    comment: |
+      Services (reload, enquire_configuration, reset_state) are registered in
+      async_setup in autoarming.py:132-161 and autoarming.py:302-307.
+
+  appropriate-polling:
+    status: exempt
+    comment: |
+      This integration is primarily event-driven (state changes, sunrise/sunset,
+      button presses, mobile actions). Calendar polling is configurable per-calendar
+      with sensible defaults (30 seconds).
+
+  brands:
+    status: todo
+    comment: |
+      Brand assets (logo, icon) exist in docs/assets but are not yet submitted
+      to the Home Assistant brands repository.
+
+  common-modules:
+    status: done
+    comment: |
+      Common patterns are placed in dedicated modules: const.py (constants/schemas),
+      helpers.py (utilities), hass_api.py (HA API wrapper), calendar.py (calendar logic).
+
+  config-flow:
+    status: exempt
+    comment: |
+      This integration uses YAML-only configuration as indicated by
+      "config_flow": false in manifest.json. YAML configuration is appropriate
+      for this integration as it requires complex nested configuration for
+      transitions, calendars, buttons, and notification profiles that would be
+      cumbersome in a UI flow.
+
+  config-flow-test-coverage:
+    status: exempt
+    comment: |
+      No config flow exists; this is a YAML-only integration.
+
+  dependency-transparency:
+    status: done
+    comment: |
+      All dependencies are standard Home Assistant components (sun, alarm_control_panel,
+      mobile_app, calendar, local_calendar, notify) declared in manifest.json.
+      No external Python packages are required.
+
+  docs-actions:
+    status: done
+    comment: |
+      Services are documented in services.yaml and README.md describes the reload,
+      enquire_configuration, and reset_state actions.
+
+  docs-high-level-description:
+    status: done
+    comment: |
+      README.md provides a clear overview of AutoArm's purpose: automating alarm
+      control panel state based on occupancy, time, calendar events, and manual
+      interventions.
+
+  docs-installation-instructions:
+    status: done
+    comment: |
+      README.md includes HACS installation instructions and links to detailed
+      configuration guides.
+
+  docs-removal-instructions:
+    status: todo
+    comment: |
+      Documentation does not explicitly describe how to remove the integration.
+
+  entity-event-setup:
+    status: done
+    comment: |
+      Entity event subscriptions are set up in dedicated initialize_* methods
+      called from initialize() in autoarming.py:261-274, using proper HA event
+      tracking functions (async_track_state_change_event, async_track_sunrise, etc.).
+
+  entity-unique-id:
+    status: exempt
+    comment: |
+      Entities are created using hass.states.async_set() with fixed entity IDs
+      (e.g., sensor.autoarm_failures, binary_sensor.autoarm_initialized). These
+      are integration-scoped singletons, not device-based entities requiring
+      unique IDs.
+
+  has-entity-name:
+    status: exempt
+    comment: |
+      Entities are created directly via hass.states.async_set() rather than
+      entity classes, so has_entity_name is not applicable. Entity IDs follow
+      the pattern sensor.autoarm_* which is consistent and discoverable.
+
+  runtime-data:
+    status: done
+    comment: |
+      Runtime data is stored using HassKey[AutoArmData] in autoarming.py:96
+      and accessed via hass.data[HASS_DATA_KEY].
+
+  test-before-configure:
+    status: exempt
+    comment: |
+      No config flow exists; this is a YAML-only integration. Configuration
+      validation is performed via voluptuous schemas in const.py.
+
+  test-before-setup:
+    status: done
+    comment: |
+      Setup validates configuration via CONFIG_SCHEMA (voluptuous) and checks
+      for required config in async_setup (autoarming.py:111-113). Transition
+      conditions are validated during initialize_logic() with issues raised
+      via the repair system for invalid configs.
+
+  unique-config-entry:
+    status: exempt
+    comment: |
+      YAML-only integration with a single domain-wide configuration. Multiple
+      instances are not supported or needed.
+
+  # ============================================================================
+  # Silver Tier
+  # ============================================================================
+
+  action-exceptions:
+    status: todo
+    comment: |
+      Service actions currently log errors but don't raise HomeAssistantError
+      exceptions in all failure cases. Should be improved.
+
+  config-entry-unloading:
+    status: done
+    comment: |
+      Integration supports unloading via shutdown() method (autoarming.py:458-466)
+      which properly cleans up all listeners. Reload service also calls shutdown
+      before reinitializing (autoarming.py:128-130).
+
+  docs-configuration-parameters:
+    status: done
+    comment: |
+      Configuration parameters are documented in docs/automated_arming.md and
+      example configurations in docs/configuration/examples/.
+
+  docs-installation-parameters:
+    status: exempt
+    comment: |
+      No installation parameters required; YAML-only configuration.
+
+  entity-unavailable:
+    status: done
+    comment: |
+      Entities are set to "unavailable" state when appropriate, e.g.,
+      sensor.autoarm_last_calculation and sensor.autoarm_last_calendar_event
+      are initialized to "unavailable" (autoarming.py:300, 374).
+
+  integration-owner:
+    status: done
+    comment: |
+      Code owner @jeyrb is declared in manifest.json and actively maintains
+      the integration.
+
+  log-when-unavailable:
+    status: done
+    comment: |
+      Logging uses consistent "AUTOARM" prefix throughout. State transitions
+      are logged at appropriate levels (debug for routine, info for changes,
+      warning/error for issues).
+
+  parallel-updates:
+    status: exempt
+    comment: |
+      This integration doesn't poll external devices in parallel. Calendar
+      polling is handled per-calendar with independent timers.
+
+  reauthentication-flow:
+    status: exempt
+    comment: |
+      No authentication required; this integration orchestrates local HA
+      entities only.
+
+  test-coverage:
+    status: todo
+    comment: |
+      Test suite exists with good coverage but no minimum threshold is enforced
+      (--cov-fail-under=0 in pyproject.toml). Should be increased to 95%.
+
+  # ============================================================================
+  # Gold Tier
+  # ============================================================================
+
+  devices:
+    status: exempt
+    comment: |
+      This integration doesn't represent physical devices. It orchestrates
+      existing alarm_control_panel, person, calendar, and button entities.
+
+  diagnostics:
+    status: todo
+    comment: |
+      No diagnostics.py implemented. Could expose configuration and state
+      information for debugging.
+
+  discovery:
+    status: exempt
+    comment: |
+      This integration orchestrates user-configured entities; there is nothing
+      to discover automatically.
+
+  discovery-update-info:
+    status: exempt
+    comment: |
+      No discovery; not applicable.
+
+  docs-data-update:
+    status: done
+    comment: |
+      README.md and automated_arming.md describe how data is updated via
+      event listeners, calendar polling, and manual triggers.
+
+  docs-examples:
+    status: done
+    comment: |
+      Example configurations are provided in docs/configuration/examples/
+      including minimal.md and typical.md. Mobile action examples in
+      docs/mobile_actions.md.
+
+  docs-known-limitations:
+    status: todo
+    comment: |
+      Known limitations are not explicitly documented in a dedicated section.
+
+  docs-supported-devices:
+    status: exempt
+    comment: |
+      This integration works with any alarm_control_panel, person, calendar,
+      and button entities. No specific device compatibility to document.
+
+  docs-supported-functions:
+    status: done
+    comment: |
+      Supported functionality (occupancy tracking, calendar integration,
+      button control, mobile actions, notifications) is documented in
+      README.md and automated_arming.md.
+
+  docs-troubleshooting:
+    status: todo
+    comment: |
+      No dedicated troubleshooting section in documentation.
+
+  docs-use-cases:
+    status: done
+    comment: |
+      Use cases are illustrated in README.md ("Why use alarm control panels?"
+      section) and throughout the documentation.
+
+  dynamic-devices:
+    status: exempt
+    comment: |
+      No device registry usage; not applicable.
+
+  entity-category:
+    status: todo
+    comment: |
+      Entities created via async_set don't use EntityCategory. Could be
+      improved if refactored to use entity classes.
+
+  entity-device-class:
+    status: todo
+    comment: |
+      Entities don't specify device classes. binary_sensor.autoarm_initialized
+      could use a diagnostic device class.
+
+  entity-disabled-by-default:
+    status: exempt
+    comment: |
+      All exposed entities are essential for operation and debugging. None
+      are noisy or rarely used.
+
+  entity-translations:
+    status: todo
+    comment: |
+      Entity names are hardcoded in English. Translations would require
+      refactoring to use entity classes with translation keys.
+
+  exception-translations:
+    status: done
+    comment: |
+      Issue messages use translation keys in strings.json with placeholders
+      (e.g., transition_condition issue).
+
+  icon-translations:
+    status: todo
+    comment: |
+      No icon translations implemented; entities don't have custom icons.
+
+  reconfiguration-flow:
+    status: exempt
+    comment: |
+      YAML-only integration; reconfiguration is done by editing YAML and
+      calling the reload service.
+
+  repair-issues:
+    status: done
+    comment: |
+      Repair issues are raised for invalid transition conditions via
+      hass_api.raise_issue() (autoarming.py:445-451). Uses proper translation
+      keys and severity levels.
+
+  stale-devices:
+    status: exempt
+    comment: |
+      No device registry usage; not applicable.
+
+  # ============================================================================
+  # Platinum Tier
+  # ============================================================================
+
+  async-dependency:
+    status: done
+    comment: |
+      No external dependencies; all code uses Home Assistant's async APIs.
+
+  inject-websession:
+    status: exempt
+    comment: |
+      No external HTTP calls requiring websession injection.
+
+  strict-typing:
+    status: in progress
+    comment: |
+      Type hints are used throughout but not strictly enforced. Some `Any`
+      types remain and py.typed marker is not present.

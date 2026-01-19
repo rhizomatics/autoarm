@@ -9,7 +9,7 @@ from homeassistant.config import (
     load_yaml_config_file,
 )
 from homeassistant.const import SERVICE_RELOAD
-from homeassistant.core import HomeAssistant, State
+from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 
 from custom_components.autoarm.const import DOMAIN
@@ -34,16 +34,14 @@ async def test_examples(
         assert await async_setup_component(hass, domain, config)
 
     await hass.async_block_till_done()
-    autoarm_state: State | None = hass.states.get("autoarm.configured")
-    assert autoarm_state is not None
-    assert autoarm_state.state
-    assert autoarm_state.attributes["alarm_panel"] == "alarm_panel.testing"
-    autoarm_init = hass.states.get("autoarm.initialized")
+
+    autoarm_init = hass.states.get("binary_sensor.autoarm_initialized")
     assert autoarm_init is not None
     assert autoarm_init.state == "valid"
     hass.bus.async_fire("mobile_app_notification_action", {"action": "ALARM_PANEL_DISARM"})
     await hass.async_block_till_done()
-    assert hass.states.get("alarm_control_panel.testing").state == "disarmed"
+    assert hass.states.get("alarm_control_panel.testing").state == "disarmed"  # type: ignore
+    assert hass.states.get("sensor.autoarm_failures").state == "0"  # type: ignore
 
     if reload:
         config_path = pathlib.Path(__file__).parent.joinpath("fixtures", "empty_config.yaml").absolute()
@@ -57,9 +55,8 @@ async def test_examples(
                 blocking=True,
             )
             await hass.async_block_till_done()
-        autoarm_state = hass.states.get("autoarm.configured")
-        assert autoarm_state is not None
-        assert autoarm_state.attributes["alarm_panel"] == "alarm_panel.minimal"
-        autoarm_init = hass.states.get("autoarm.initialized")
+
+        autoarm_init = hass.states.get("binary_sensor.autoarm_initialized")
         assert autoarm_init is not None
         assert autoarm_init.state == "valid"
+        assert hass.states.get("sensor.autoarm_failures").state == "0"  # type: ignore
