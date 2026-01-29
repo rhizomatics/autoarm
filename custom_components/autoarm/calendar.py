@@ -149,7 +149,7 @@ class TrackedCalendar:
                         )
                         await existing_event.update(event)
             if not matched and event_id in self.tracked_events:
-                existing_event: TrackedCalendarEvent = self.tracked_events[event_id]
+                existing_event = self.tracked_events[event_id]
                 if existing_event.event != event:
                     _LOGGER.info(
                         "AUTOARM Calendar %s found updated event %s no longer matching",
