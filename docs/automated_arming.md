@@ -37,11 +37,9 @@ Example Cheap 433Mhz Buttons Using RFLink
 
 ## Mobile Action Control
 
-This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](mobile_actions.md) for more information, and the [Contextual Mobile Actions Recipe](https://supernotify.rhizomatics.org.uk/recipes/contextual_mobile_actions/) for a nice way to do this in [Supernotify](https://supernotify.rhizomatics.org.uk
-where only the appropriate actions are shown).
+This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](mobile_actions.md) for more information, and the [Contextual Mobile Actions Recipe](https://supernotify.rhizomatics.org.uk/recipes/contextual_mobile_actions/) for a nice way to do this in [Supernotify](https://supernotify.rhizomatics.org.uk) where only the appropriate actions are shown.
 
-These can be added to any notification, so for example noisy PIR alerts can be quickly squelched by
-disarming the alarm.
+These can be added to any notification, so for example noisy PIR alerts can be quickly squelched by disarming the alarm.
 
 ## Home Assistant Action
 
@@ -86,8 +84,7 @@ can work, such as a home network `device_tracker`.
 !!! tip
     Since the occupied check looks for entities that have a state `home`, it doesn't
     have to be `person` entities, and you can add a list of `device tracker` entities.
-    The advantage of Person is that you can define multiple trackers for a single individual,
-    and they are `home` if any of the trackers are `home`, even if some of them haven't kept up.
+    The advantage of Person is that you can define multiple trackers for a single individual, and they are `home` if any of the trackers are `home`, even if some of them haven't kept up.
 
 See the [Presence Detection](https://www.home-assistant.io/getting-started/presence-detection/)
 guidance from Home Assistant on how to set this up, and the options for using it.

@@ -47,6 +47,7 @@ class TrackedCalendar:
         self.entity_id: str = cast("str", calendar_config.get(CONF_ENTITY_ID))
         self.poll_interval: int = calendar_config.get(CONF_CALENDAR_POLL_INTERVAL, 30)
         self.state_mappings: dict[str, list[str]] = cast("dict", calendar_config.get(CONF_CALENDAR_EVENT_STATES))
+        # self.notify_on_change: str = calendar_config.get(CONF_CALENDAR_ENTRY_NOTIFICATIONS, ENTRY_NOTIFICATION_MATCHED)
         self.tracked_events: dict[str, TrackedCalendarEvent] = {}
         self.poller_listener: CALLBACK_TYPE | None = None
 
@@ -107,6 +108,7 @@ class TrackedCalendar:
             # presume the events are sorted by start time
             event_id = TrackedCalendarEvent.event_id(self.calendar_entity.entity_id, event)
             _LOGGER.debug("AUTOARM Calendar Event: %s", event_id)
+            matched: bool = False
             for state_str, patterns in self.state_mappings.items():
                 if any(
                     re.match(
@@ -115,6 +117,7 @@ class TrackedCalendar:
                     )
                     for patt in patterns
                 ):
+                    matched = True
                     if event_id not in self.tracked_events:
                         state: AlarmControlPanelState | None = alarm_state_as_enum(state_str)
                         if state is None:
@@ -136,15 +139,50 @@ class TrackedCalendar:
                                 self.calendar_entity.entity_id, event, state, self.armer
                             )
                             await self.tracked_events[event_id].initialize()
+                    else:
+                        existing_event: TrackedCalendarEvent = self.tracked_events[event_id]
+                        _LOGGER.info(
+                            "AUTOARM Calendar %s found updated event %s for state %s",
+                            self.calendar_entity.entity_id,
+                            event.summary,
+                            state_str,
+                        )
+                        await existing_event.update(event)
+            if not matched and event_id in self.tracked_events:
+                existing_event: TrackedCalendarEvent = self.tracked_events[event_id]
+                if existing_event.event != event:
+                    _LOGGER.info(
+                        "AUTOARM Calendar %s found updated event %s no longer matching",
+                        self.calendar_entity.entity_id,
+                        event.summary,
+                    )
+                    await existing_event.remove()
 
     async def prune_events(self) -> None:
         """Remove past events"""
         to_remove: list[str] = []
+        min_start: dt.datetime | None = None
+        max_end: dt.datetime | None = None
         for event_id, tevent in self.tracked_events.items():
+            if min_start is None or min_start > tevent.event.start_datetime_local:
+                min_start = tevent.event.start_datetime_local
+            if max_end is None or max_end < tevent.event.end_datetime_local:
+                max_end = tevent.event.end_datetime_local
             if not tevent.is_current() and not tevent.is_future():
                 _LOGGER.debug("AUTOARM Pruning expire calendar event: %s", tevent.event.uid)
                 to_remove.append(event_id)
                 await tevent.end(dt_util.now())
+
+        if min_start and max_end:
+            live_event_ids: list[str] = [
+                e.uid
+                for e in await self.calendar_entity.async_get_events(self.armer.hass, min_start, max_end)
+                if e.uid is not None
+            ]
+            for tevent in self.tracked_events.values():
+                if tevent.event.uid not in live_event_ids:
+                    await tevent.remove()
+                    to_remove.append(tevent.id)
         for event_id in to_remove:
             del self.tracked_events[event_id]
 
@@ -159,19 +197,18 @@ class TrackedCalendarEvent:
         arming_state: AlarmControlPanelState,
         armer: "AlarmArmer",  # type: ignore # noqa: F821
     ) -> None:
-        self.tracked_at = dt_util.now()
-        self.calendar_id = calendar_id
-        self.id = TrackedCalendarEvent.event_id(calendar_id, event)
+        self.tracked_at: dt.datetime = dt_util.now()
+        self.calendar_id: str = calendar_id
+        self.id: str = TrackedCalendarEvent.event_id(calendar_id, event)
         self.event: CalendarEvent = event
         self.arming_state: AlarmControlPanelState = arming_state
         self.start_listener: Callable | None = None
         self.end_listener: Callable | None = None
-        self.armer = armer
+        self.armer: AlarmArmer = armer  # type: ignore # noqa: F821
         self.previous_state: AlarmControlPanelState | None = armer.armed_state()
         self.track_status: str = "pending"
 
     async def initialize(self) -> None:
-
         if self.event.end_datetime_local < self.tracked_at:
             _LOGGER.debug("AUTOARM Ignoring past event")
             self.track_status = "ended"
@@ -199,6 +236,20 @@ class TrackedCalendarEvent:
         self.track_status = "ended"
         await self.armer.on_calendar_event_end(self, dt_util.now())
         self.shutdown()
+
+    async def update(self, new_event: CalendarEvent) -> None:
+        _LOGGER.debug("AUTOARM Calendar event updated for %s: %s", self.id, self.event.summary)
+        was_current = self.is_current()
+        self.event = new_event
+        if not self.is_current() and was_current:
+            await self.end(dt_util.now())
+
+    async def remove(self) -> None:
+        _LOGGER.debug("AUTOARM Calendar event deletion for %s: %s", self.id, self.event.summary)
+        if self.track_status == "started":
+            await self.end(dt_util.now())
+        else:
+            self.track_status = "ended"
 
     @classmethod
     def event_id(cls, calendar_id: str, event: CalendarEvent) -> str:

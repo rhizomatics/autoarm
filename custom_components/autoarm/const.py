@@ -36,6 +36,7 @@ NO_CAL_EVENT_MODE_AUTO = "auto"
 NO_CAL_EVENT_MODE_MANUAL = "manual"
 NO_CAL_EVENT_OPTIONS: list[str] = [NO_CAL_EVENT_MODE_AUTO, NO_CAL_EVENT_MODE_MANUAL, *ALARM_STATES]
 
+
 NOTIFY_COMMON = "common"
 NOTIFY_QUIET = "quiet"
 NOTIFY_NORMAL = "normal"
@@ -57,15 +58,26 @@ DEFAULT_CALENDAR_MAPPINGS = {
     AlarmControlPanelState.ARMED_VACATION: "Night",
 }
 
+# ENTRY_NOTIFICATION_ALL = "ALL"
+# ENTRY_NOTIFICATION_NONE = "NONE"
+# ENTRY_NOTIFICATION_MATCHED = "MATCHED"
+# ENTRY_NOTIFICATION_CHOICES = (ENTRY_NOTIFICATION_ALL, ENTRY_NOTIFICATION_MATCHED, ENTRY_NOTIFICATION_NONE)
+
 CONF_CALENDAR_CONTROL = "calendar_control"
 CONF_CALENDARS = "calendars"
 CONF_CALENDAR_POLL_INTERVAL = "poll_interval"
 CONF_CALENDAR_EVENT_STATES = "state_patterns"
 CONF_CALENDAR_NO_EVENT = "no_event_mode"
+CONF_CALENDAR_ENTRY_NOTIFICATIONS = "entry_notifications"
+CONF_CALENDAR_REMINDER_NOTIFICATIONS = "reminders"
+
 CALENDAR_SCHEMA = vol.Schema({
     vol.Required(CONF_ENTITY_ID): cv.entity_id,
     vol.Optional(CONF_ALIAS): cv.string,
     vol.Optional(CONF_CALENDAR_POLL_INTERVAL, default=30): cv.positive_int,
+    # vol.Optional(CONF_CALENDAR_ENTRY_NOTIFICATIONS): vol.In(ENTRY_NOTIFICATION_CHOICES),
+    # vol.Optional(CONF_CALENDAR_REMINDER_NOTIFICATIONS, default={}): {
+    #     vol.In(ALARM_STATES): vol.All(cv.ensure_list, [cv.time_period])},
     vol.Optional(CONF_CALENDAR_EVENT_STATES, default=DEFAULT_CALENDAR_MAPPINGS): {
         vol.In(ALARM_STATES): vol.All(cv.ensure_list, [cv.string])
     },

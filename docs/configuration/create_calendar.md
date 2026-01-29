@@ -70,3 +70,16 @@ autoarm:
             armed_away:
               - Work Trip.*
 ```
+
+## What to do when no event
+
+While a calendar could have events covering every minute of every
+day, its much less work to only define what is needed, such as what's
+the right time to arm at night, or when vacations start and end.
+
+`no_event_mode` allows control over what happens when there's no
+calendar event, and nothing else to determine alarm state. It can be:
+
+`auto` - Will make best guess, including checking what the alarm panel was before the event
+`manual` - No state changes made when calendar event ends
+`disarmed`,`armed_away` etc - Use any of the standard Alarm Control Panel states as a fixed default

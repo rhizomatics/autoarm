@@ -4,7 +4,48 @@ readme = "README.md"
 description = "Automated setting of Home Assistant Alarm Control Panel based on occupancy rules."
 dynamic = ["version"]
 requires-python = ">=3.13.2"
-dependencies = ["homeassistant>=2025.11.1"]
+
+dependencies = [
+    "homeassistant>=2026.1.1",
+    "ical"
+]
+
+[dependency-groups]
+dev=[
+    "homeassistant-stubs == 2026.1.1",
+    "pytest==9.0.0",
+    "pytest-cov==7.0.0",
+    "pytest-homeassistant-custom-component>=0.13.306",
+    "pytest-unordered",
+    "pytest-mock",
+    "pytest-xdist",
+    "pytest-icdiff",
+    "pre-commit",
+    "ruff",
+    "mypy",
+    "genbadge[all]",
+]
+docs=[
+    "mkdocs-minify-plugin",
+    "pymdown-extensions",
+    "mkdocs-material>=9.7.1",
+    "pillow>=12.0", # mkdocs-material[imaging] has elderly pillow demand
+    "cairosvg~=2.6", # mkdocs-material[imaging]
+    "mkdocs-autorefs",
+    "mkdocs-coverage",
+    "mkdocs-pagetree-plugin",
+    "mkdocs",
+    "pngquant",
+    "mkdocstrings",
+    "mkdocstrings-python",
+    "mkdocs-git-revision-date-localized-plugin",
+    "mkdocs-meta-descriptions-plugin",
+    "mkdocs-minify-html-plugin",
+    "mkdocs-htmlproofer-plugin",
+    "mkdocs-minify-plugin",
+    "mkdocs-material-extensions"
+]
+
 
 [tool.poetry]
 package-mode = false

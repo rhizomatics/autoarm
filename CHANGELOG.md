@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.1
+### Calendar Integration
+- Better handling of changes or removal of calendar entries currently driving live alarm state
+### Internal
+- All dependencies now managed by uv and `pyproject.toml`
 ## 0.7.0
 ### Fixes
 - Alarm Control Panel attributes no longer overwritten

@@ -39,6 +39,9 @@ plugins:
   - optimize
   - meta-descriptions
   - tags
+  - htmlproofer:
+      skip_downloads: True
+  - meta-descriptions
   - minify:
       minify_html: true
   - git-revision-date-localized:
