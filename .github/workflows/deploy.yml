@@ -38,13 +38,13 @@ jobs:
       uses:  astral-sh/ruff-action@57714a7c8a2e59f32539362ba31877a1957dded1
     - name: Test with pytest
       run: |
-        pytest . --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=custom_components.autoarm --cov-report=xml --cov-report=html
+        uv run pytest . --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=custom_components.autoarm --cov-report=xml --cov-report=html
     - name: Generate badges
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        genbadge coverage -i coverage.xml -o badges/coverage.svg
-        genbadge tests -i junit/test-results-${{ matrix.python-version }}.xml -o badges/tests.svg
+        uv run genbadge coverage -i coverage.xml -o badges/coverage.svg
+        uv run genbadge tests -i junit/test-results-${{ matrix.python-version }}.xml -o badges/tests.svg
 
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
