@@ -23,6 +23,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6.0.2
+    - name: HACS Action
+      uses: "hacs/action@6f81caf1dd4cc0f615444dba4d4a3ceaa22db99c"
+      with:
+        category: "integration"
+    - name: HACS Hassfest
+      uses: "home-assistant/actions/hassfest@87c064c607f3c5cc673a24258d0c98d23033bfc3"
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
       with:
@@ -59,13 +65,7 @@ jobs:
         else
           echo "No changes to badges"
         fi
-    - name: HACS Action
-      uses: "hacs/action@6f81caf1dd4cc0f615444dba4d4a3ceaa22db99c"
-      with:
-        category: "integration"
-        ignore: brands
-    - name: HACS Hassfest
-      uses: "home-assistant/actions/hassfest@87c064c607f3c5cc673a24258d0c98d23033bfc3"
+
     - name: Upload pytest test results
       uses: actions/upload-artifact@v5
       with:
