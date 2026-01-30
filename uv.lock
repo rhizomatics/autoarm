@@ -399,7 +399,7 @@ dev = [
     { name = "pre-commit" },
     { name = "pytest", specifier = "==9.0.0" },
     { name = "pytest-cov", specifier = "==7.0.0" },
-    { name = "pytest-homeassistant-custom-component", specifier = ">=0.13.300" },
+    { name = "pytest-homeassistant-custom-component", specifier = ">=0.13.306" },
     { name = "pytest-icdiff" },
     { name = "pytest-mock" },
     { name = "pytest-unordered" },

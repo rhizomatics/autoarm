@@ -1,6 +1,5 @@
 import asyncio
 import datetime as dt
-from unittest.mock import ANY
 
 import homeassistant.util.dt as dt_util
 import pytest
@@ -13,6 +12,9 @@ from custom_components.autoarm.calendar import TrackedCalendar, TrackedCalendarE
 from custom_components.autoarm.const import (
     CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_POLL_INTERVAL,
+    NO_CAL_EVENT_MODE_AUTO,
+    AlarmControlPanelState,
+    ChangeSource,
 )
 
 
@@ -21,12 +23,14 @@ async def simple_tracked_calendar(
     local_calendar: CalendarEntity, calendar_platform: EntityPlatform, mock_armer_real_hass: AlarmArmer
 ) -> TrackedCalendar:
     uut = TrackedCalendar(
+        mock_armer_real_hass.hass,
         {
             CONF_ENTITY_ID: local_calendar.entity_id,
             CONF_CALENDAR_POLL_INTERVAL: 10,
             CONF_CALENDAR_EVENT_STATES: {"armed_away": ["Away"], "armed_vacation": ["Holiday.*"]},
         },
         mock_armer_real_hass,
+        no_event_mode=NO_CAL_EVENT_MODE_AUTO,
     )
     await uut.initialize(calendar_platform)
     return uut
@@ -43,6 +47,20 @@ async def calendar_with_holiday_event(
     )
     await simple_tracked_calendar.on_timed_poll(dt_util.now())
     return simple_tracked_calendar
+
+
+async def test_calendar_finds_alarm_states(simple_tracked_calendar: TrackedCalendar, local_calendar: CalendarEntity) -> None:
+    await local_calendar.async_create_event(
+        dtstart=dt_util.now() - dt.timedelta(minutes=2),
+        dtend=dt_util.now() + dt.timedelta(minutes=2),
+        description="Something is happening and ARMED_AWAY should be set",
+    )
+    await simple_tracked_calendar.on_timed_poll(dt_util.now())
+    assert simple_tracked_calendar.has_active_event()
+    simple_tracked_calendar.armer.arm.assert_called_once_with(
+        arming_state=AlarmControlPanelState.ARMED_AWAY,  # type: ignore
+        source=ChangeSource.CALENDAR,
+    )  # type: ignore
 
 
 async def test_calendar_bare_lifecycle(simple_tracked_calendar: TrackedCalendar) -> None:
@@ -67,7 +85,10 @@ async def test_calendar_tracks_event(
     await calendar_with_holiday_event.prune_events()
     assert calendar_with_holiday_event.has_active_event()
     await calendar_with_holiday_event.match_events()
-    mock_armer_real_hass.on_calendar_event_start.assert_called_once_with(tracked_event, ANY)  # type: ignore
+    mock_armer_real_hass.arm.assert_called_once_with(  # type: ignore
+        arming_state=AlarmControlPanelState.ARMED_VACATION,
+        source=ChangeSource.CALENDAR,
+    )  # type: ignore
     calendar_with_holiday_event.shutdown()
     assert not calendar_with_holiday_event.has_active_event()
 

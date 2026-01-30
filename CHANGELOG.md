@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.2
+### Notifications
+- Support for Supernotify scenarios
+- Any profiles can be used now, with `normal` and `quiet` retained as defaults
+  - Profiles are defined by the `source`, with `quiet` defaulting to `button` and `panel` for backward compatibility
+- Notification data can have `source` and `profile` populated by adding key with null value to config
+### Calendar Integration
+- Calendar event matching will look anywhere in description or summary not only the start of summary
+- Calendar event matching looks for alarm states constants anywhere in summary or description, for example `ARMED_HOME`
+
+
 ## 0.7.1
 ### Calendar Integration
 - Better handling of changes or removal of calendar entries currently driving live alarm state

@@ -43,6 +43,10 @@ async def test_examples(
     assert hass.states.get("alarm_control_panel.testing").state == "disarmed"  # type: ignore
     assert hass.states.get("sensor.autoarm_failures").state == "0"  # type: ignore
 
+    config = await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True)
+    assert config["notify"]["common"]["service"] == "notify.send_message"
+    assert config["notify"]["quiet"]["source"] == ["alarm_panel", "button", "calendar", "sunrise", "sunset"]
+
     if reload:
         config_path = pathlib.Path(__file__).parent.joinpath("fixtures", "empty_config.yaml").absolute()
 

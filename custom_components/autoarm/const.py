@@ -3,6 +3,7 @@
 import logging
 from dataclasses import dataclass
 from enum import StrEnum, auto
+from typing import Any
 
 import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
@@ -36,26 +37,53 @@ NO_CAL_EVENT_MODE_AUTO = "auto"
 NO_CAL_EVENT_MODE_MANUAL = "manual"
 NO_CAL_EVENT_OPTIONS: list[str] = [NO_CAL_EVENT_MODE_AUTO, NO_CAL_EVENT_MODE_MANUAL, *ALARM_STATES]
 
-
+CONF_SUPERNOTIFY = "supernotify"
+CONF_SCENARIO = "scenario"
+CONF_SOURCE = "source"
 NOTIFY_COMMON = "common"
 NOTIFY_QUIET = "quiet"
 NOTIFY_NORMAL = "normal"
 NOTIFY_CATEGORIES = [NOTIFY_COMMON, NOTIFY_QUIET, NOTIFY_NORMAL]
 
-NOTIFY_DEF_SCHEMA = vol.Schema({vol.Optional(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict})
-
-NOTIFY_SCHEMA = vol.Schema({
-    vol.Optional(NOTIFY_COMMON): {vol.Required(CONF_SERVICE): cv.service, vol.Optional(CONF_DATA): dict},
-    vol.Optional(NOTIFY_QUIET): NOTIFY_DEF_SCHEMA,
-    vol.Optional(NOTIFY_NORMAL): NOTIFY_DEF_SCHEMA,
+NOTIFY_DEF_SCHEMA = vol.Schema({
+    vol.Optional(CONF_SERVICE): cv.service,
+    vol.Optional(CONF_SUPERNOTIFY, default=False): cv.boolean,
+    vol.Optional(CONF_SOURCE, default=[]): vol.All(cv.ensure_list, [str]),
+    vol.Optional(CONF_SCENARIO, default=[]): vol.All(cv.ensure_list, [str]),
+    vol.Optional(CONF_DATA): dict,
 })
+
+
+def _apply_notify_defaults(config: dict[str, Any]) -> dict:
+    """Apply defaults for known notify profiles."""
+    if not config:
+        config = config or {}
+        # backward compatible with old fixed pair profiles
+        config.setdefault(NOTIFY_QUIET, {})
+        config.setdefault(NOTIFY_NORMAL, {})
+    if NOTIFY_QUIET in config:
+        if not config[NOTIFY_QUIET].get(CONF_SOURCE):
+            config[NOTIFY_QUIET][CONF_SOURCE] = [
+                ChangeSource.ALARM_PANEL,
+                ChangeSource.BUTTON,
+                ChangeSource.CALENDAR,
+                ChangeSource.SUNRISE,
+                ChangeSource.SUNSET,
+            ]
+
+    config.setdefault(NOTIFY_COMMON, {})
+    config[NOTIFY_COMMON].setdefault(CONF_SERVICE, "notify.send_message")
+    return config
+
+
+NOTIFY_SCHEMA = vol.All(vol.Schema({cv.string: NOTIFY_DEF_SCHEMA}), _apply_notify_defaults)
 
 DEFAULT_CALENDAR_MAPPINGS = {
     AlarmControlPanelState.ARMED_AWAY: "Away",
     AlarmControlPanelState.DISARMED: "Disarmed",
     AlarmControlPanelState.ARMED_HOME: "Home",
-    AlarmControlPanelState.ARMED_VACATION: "Vacation",
-    AlarmControlPanelState.ARMED_VACATION: "Night",
+    AlarmControlPanelState.ARMED_VACATION: ["Vacation", "Holiday"],
+    AlarmControlPanelState.ARMED_NIGHT: "Night",
 }
 
 # ENTRY_NOTIFICATION_ALL = "ALL"
@@ -79,7 +107,7 @@ CALENDAR_SCHEMA = vol.Schema({
     # vol.Optional(CONF_CALENDAR_REMINDER_NOTIFICATIONS, default={}): {
     #     vol.In(ALARM_STATES): vol.All(cv.ensure_list, [cv.time_period])},
     vol.Optional(CONF_CALENDAR_EVENT_STATES, default=DEFAULT_CALENDAR_MAPPINGS): {
-        vol.In(ALARM_STATES): vol.All(cv.ensure_list, [cv.string])
+        vol.In(ALARM_STATES): vol.All(cv.ensure_list, [cv.is_regex])
     },
 })
 CALENDAR_CONTROL_SCHEMA = vol.Schema({

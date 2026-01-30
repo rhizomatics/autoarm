@@ -1,5 +1,6 @@
 import datetime as dt
 import logging
+from typing import Any
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
@@ -54,7 +55,7 @@ class Limiter:
         return in_scope > self.max_calls
 
 
-def deobjectify(obj: object) -> dict | str | int | float | bool | None:
+def deobjectify(obj: object) -> dict[Any, Any] | str | int | float | bool | None:
     if obj is None or isinstance(obj, (str, int, float, bool)):
         return obj
     if isinstance(obj, (dt.datetime, dt.time, dt.date)):

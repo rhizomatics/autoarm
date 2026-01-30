@@ -14,7 +14,14 @@ from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, 
 from homeassistant.components.calendar import CalendarEvent
 from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
-from homeassistant.const import CONF_CONDITIONS, CONF_ENTITY_ID, EVENT_HOMEASSISTANT_STOP, SERVICE_RELOAD, STATE_HOME
+from homeassistant.const import (
+    CONF_CONDITIONS,
+    CONF_ENTITY_ID,
+    CONF_SERVICE,
+    EVENT_HOMEASSISTANT_STOP,
+    SERVICE_RELOAD,
+    STATE_HOME,
+)
 from homeassistant.core import (
     Event,
     EventStateChangedData,
@@ -47,7 +54,7 @@ from homeassistant.util.hass_dict import HassKey
 
 from custom_components.autoarm.hass_api import HomeAssistantAPI
 
-from .calendar import TrackedCalendar, TrackedCalendarEvent
+from .calendar import TrackedCalendar
 from .const import (
     ATTR_RESET,
     CONF_ALARM_PANEL,
@@ -65,13 +72,17 @@ from .const import (
     CONF_RATE_LIMIT,
     CONF_RATE_LIMIT_CALLS,
     CONF_RATE_LIMIT_PERIOD,
+    CONF_SCENARIO,
+    CONF_SOURCE,
     CONF_SUNRISE,
+    CONF_SUPERNOTIFY,
     CONF_TRANSITIONS,
     CONFIG_SCHEMA,
     DEFAULT_TRANSITIONS,
     DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
     NO_CAL_EVENT_MODE_MANUAL,
+    NOTIFY_COMMON,
     ChangeSource,
     ConditionVariables,
 )
@@ -228,7 +239,7 @@ class AlarmArmer:
         alarm_panel: str,
         buttons: dict[str, ConfigType] | None = None,
         occupancy: ConfigType | None = None,
-        actions: list | None = None,
+        actions: list[str] | None = None,
         notify: ConfigType | None = None,
         diurnal: ConfigType | None = None,
         rate_limit: ConfigType | None = None,
@@ -255,8 +266,8 @@ class AlarmArmer:
         self.buttons: ConfigType = buttons or {}
 
         self.actions: list[str] = actions or []
-        self.notify_profiles: dict[str, dict] = notify or {}
-        self.unsubscribes: list = []
+        self.notify_profiles: dict[str, dict[str, Any]] = notify or {}
+        self.unsubscribes: list[Callable[[], None]] = []
         self.pre_pending_state: AlarmControlPanelState | None = None
         self.button_device: dict[str, str] = {}
         self.arming_in_progress: asyncio.Event = asyncio.Event()
@@ -404,7 +415,7 @@ class AlarmArmer:
             _LOGGER.exception("AUTOARM Unable to access calendar platform")
             return
         for calendar_config in self.calendar_configs:
-            tracked_calendar = TrackedCalendar(calendar_config, self)
+            tracked_calendar = TrackedCalendar(self.hass, calendar_config, self, self.calendar_no_event_mode)
             await tracked_calendar.initialize(platform)
             self.calendars.append(tracked_calendar)
 
@@ -490,6 +501,9 @@ class AlarmArmer:
             # TODO: consider sorting events to LIFO
             return events[0]
         return None
+
+    def has_active_calendar_event(self) -> bool:
+        return any(cal.has_active_event() for cal in self.calendars)
 
     def is_occupied(self) -> bool:
         return any(safe_state(self.hass.states.get(p)) == STATE_HOME for p in self.occupants)
@@ -638,7 +652,7 @@ class AlarmArmer:
         )
         for state, checker in self.transitions.items():
             if self.hass_api.evaluate_condition(checker, condition_vars):
-                _LOGGER.debug("AUTOARM Computed state as % from condition", state)
+                _LOGGER.debug("AUTOARM Computed state as %s from condition", state)
                 evaluated_state = state
                 break
         if evaluated_state is None:
@@ -646,7 +660,7 @@ class AlarmArmer:
         return AlarmControlPanelState(evaluated_state)
 
     @callback
-    async def delayed_arm(self, triggered_at: dt.datetime, requested_at: dt.datetime | None, **kwargs) -> None:
+    async def delayed_arm(self, triggered_at: dt.datetime, requested_at: dt.datetime | None, **kwargs: Any) -> None:
         _LOGGER.debug("AUTOARM delayed_arm at %s, requested_at: %s", triggered_at, requested_at)
         if self.is_intervention_since_request(requested_at):
             return
@@ -667,6 +681,8 @@ class AlarmArmer:
             str: New arming state
 
         """
+        if self.armed_state() == arming_state:
+            return None
         if self.rate_limiter.triggered():
             _LOGGER.debug("AUTOARM Rate limit triggered by %s, skipping arm", source)
             return None
@@ -691,12 +707,21 @@ class AlarmArmer:
             self.arming_in_progress.clear()
         return None
 
-    async def notify(self, message: str, profile: str = "normal", title: str | None = None) -> None:
-        notify_service = None
+    async def notify(self, source: ChangeSource, message: str, title: str | None = None) -> None:
+        notify_service: str | None = None
         try:
+            selected_profile: dict[str, Any] | None = None
+            selected_profile_name: str | None = None
+            for profile_name, profile in self.notify_profiles.items():
+                if source in profile.get(CONF_SOURCE, []):
+                    selected_profile = profile
+                    selected_profile_name = profile_name
+                    break
+            if not selected_profile:
+                _LOGGER.debug("No profile selected for %s notification: %s", source, message)
+
             # separately merge base dict and data sub-dict as cheap and nasty semi-deep-merge
-            selected_profile = self.notify_profiles.get(profile)
-            base_profile = self.notify_profiles.get("common", {})
+            base_profile = self.notify_profiles.get(NOTIFY_COMMON, {})
             base_profile_data = base_profile.get("data", {})
             merged_profile = dict(base_profile)
             merged_profile_data = dict(base_profile_data)
@@ -705,11 +730,18 @@ class AlarmArmer:
                 merged_profile.update(selected_profile)
                 merged_profile_data.update(selected_profile_data)
             merged_profile["data"] = merged_profile_data
-            notify_service = merged_profile.get("service", "").replace("notify.", "")
+
+            data = merged_profile.get("data", {})
+            if "source" in data and data["source"] is None:
+                data["source"] = source
+            if "profile" in data and data["profile"] is None:
+                data["profile"] = selected_profile_name
+            if merged_profile.get(CONF_SUPERNOTIFY) and merged_profile.get(CONF_SCENARIO):
+                data["apply_scenarios"] = merged_profile.get(CONF_SCENARIO)
+            notify_service = merged_profile.get(CONF_SERVICE, "").replace("notify.", "")
 
             title = title or "Alarm Auto Arming"
             if notify_service and merged_profile:
-                data = merged_profile.get("data", {})
                 await self.hass.services.async_call(
                     "notify",
                     notify_service,
@@ -815,6 +847,7 @@ class AlarmArmer:
         if delay:
             self.schedule_state(dt_util.now() + delay, state, intervention, source=ChangeSource.BUTTON)
             await self.notify(
+                ChangeSource.BUTTON,
                 f"Alarm will be set to {state} in {delay}",
                 title=f"Arm set to {state} process starting",
             )
@@ -829,6 +862,7 @@ class AlarmArmer:
             self.schedule_state(dt_util.now() + delay, None, intervention, ChangeSource.BUTTON)
 
             await self.notify(
+                ChangeSource.BUTTON,
                 f"Alarm will be reset in {delay}",
                 title="Alarm reset wait initiated",
             )
@@ -880,7 +914,7 @@ class AlarmArmer:
                     new,
                 )
                 return
-        new_state = alarm_state_as_enum(new)
+        new_state: AlarmControlPanelState | None = alarm_state_as_enum(new)
 
         _LOGGER.info(
             "AUTOARM Panel Change: %s,%s: %s-->%s",
@@ -895,46 +929,9 @@ class AlarmArmer:
             await self.reset_armed_state(source=ChangeSource.ZOMBIFICATION)
         elif new != old:
             message = f"Home Assistant alarm level now set from {old} to {new}"
-            await self.notify(message, title=f"Alarm now {new}", profile="quiet")
+            await self.notify(ChangeSource.ALARM_PANEL, message, title=f"Alarm now {new}")
         else:
             _LOGGER.debug("AUTOARM panel change leaves state unchanged at %s", new)
-
-    async def on_calendar_event_start(self, event: TrackedCalendarEvent, triggered_at: dt.datetime) -> None:
-        _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", event.id, triggered_at)
-        if event.arming_state != self.armed_state():
-            _LOGGER.info("AUTOARM Calendar event %s changing arming to %s at %s", event.id, event.arming_state, triggered_at)
-            await self.arm(arming_state=event.arming_state, source=ChangeSource.CALENDAR)
-        self.hass.states.async_set(
-            f"sensor.{DOMAIN}_last_calendar_event",
-            new_state=event.event.summary or str(event.id),
-            attributes={
-                "calendar": event.calendar_id,
-                "start": event.event.start_datetime_local,
-                "end": event.event.end_datetime_local,
-                "summary": event.event.summary,
-                "description": event.event.description,
-                "uid": event.event.uid,
-            },
-        )
-
-    async def on_calendar_event_end(self, event: TrackedCalendarEvent, ended_at: dt.datetime) -> None:
-        _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", event.id, ended_at)
-        if any(cal.has_active_event() for cal in self.calendars):
-            _LOGGER.debug("AUTOARM No action on event end since other cal event active")
-            return
-        if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
-            _LOGGER.info("AUTOARM Calendar event %s ended, and arming state", event.id)
-            # avoid having state locked in vacation by state calculator
-            await self.pending_state(source=ChangeSource.CALENDAR)
-            await self.reset_armed_state(source=ChangeSource.CALENDAR)
-        elif self.calendar_no_event_mode in AlarmControlPanelState:
-            _LOGGER.info(
-                "AUTOARM Calendar event %s ended, and returning to fixed state %s", event.id, self.calendar_no_event_mode
-            )
-            await self.arm(alarm_state_as_enum(self.calendar_no_event_mode), source=ChangeSource.CALENDAR)
-        else:
-            _LOGGER.debug("AUTOARM Reinstate previous state on calendar event end in manual mode")
-            await self.arm(event.previous_state, source=ChangeSource.CALENDAR)
 
     @callback
     async def housekeeping(self, triggered_at: dt.datetime) -> None:
