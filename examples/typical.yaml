@@ -69,7 +69,8 @@ autoarm:
 
   notify:
     common:
-      service: notify.send_message
+      service: notify.supernotify
+      supernotify: true
       data:
         actions:
           - action: ALARM_PANEL_DISARM
@@ -82,8 +83,15 @@ autoarm:
             title: Arm Alarm Panel for Going Away
             icon: sfsymbols:airplane
     quiet:
+      scenario: alarm_panel_quiet
       data:
         priority: low
     normal:
+      scenario: alarm_panel
+      source:
+        - calendar
+      state:
+        - armed_away
+        - armed_vacation
       data:
         priority: medium

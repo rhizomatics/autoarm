@@ -17,7 +17,6 @@ from homeassistant.components.sun.const import STATE_BELOW_HORIZON
 from homeassistant.const import (
     CONF_CONDITIONS,
     CONF_ENTITY_ID,
-    CONF_SERVICE,
     EVENT_HOMEASSISTANT_STOP,
     SERVICE_RELOAD,
     STATE_HOME,
@@ -53,6 +52,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.util.hass_dict import HassKey
 
 from custom_components.autoarm.hass_api import HomeAssistantAPI
+from custom_components.autoarm.notifier import Notifier
 
 from .calendar import TrackedCalendar
 from .const import (
@@ -72,21 +72,17 @@ from .const import (
     CONF_RATE_LIMIT,
     CONF_RATE_LIMIT_CALLS,
     CONF_RATE_LIMIT_PERIOD,
-    CONF_SCENARIO,
-    CONF_SOURCE,
     CONF_SUNRISE,
-    CONF_SUPERNOTIFY,
     CONF_TRANSITIONS,
     CONFIG_SCHEMA,
     DEFAULT_TRANSITIONS,
     DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
     NO_CAL_EVENT_MODE_MANUAL,
-    NOTIFY_COMMON,
     ChangeSource,
     ConditionVariables,
 )
-from .helpers import Limiter, alarm_state_as_enum, deobjectify, safe_state
+from .helpers import AppHealthTracker, Limiter, alarm_state_as_enum, deobjectify, safe_state
 
 if TYPE_CHECKING:
     from homeassistant.helpers.condition import ConditionCheckerType
@@ -185,9 +181,8 @@ def _async_process_config(hass: HomeAssistant, config: ConfigType) -> "AlarmArme
         occupancy=config[CONF_OCCUPANCY],
         notify=config[CONF_NOTIFY],
         rate_limit=config.get(CONF_RATE_LIMIT, {}),
-        calendars=calendar_config.get(CONF_CALENDARS, []),
+        calendar_config=calendar_config,
         transitions=config.get(CONF_TRANSITIONS),
-        calendar_no_event_mode=calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO),
     )
     return service
 
@@ -243,8 +238,7 @@ class AlarmArmer:
         notify: ConfigType | None = None,
         diurnal: ConfigType | None = None,
         rate_limit: ConfigType | None = None,
-        calendar_no_event_mode: str | None = None,
-        calendars: list[ConfigType] | None = None,
+        calendar_config: ConfigType | None = None,
         transitions: dict[str, dict[str, list[ConfigType]]] | None = None,
     ) -> None:
         occupancy = occupancy or {}
@@ -252,10 +246,13 @@ class AlarmArmer:
         diurnal = diurnal or {}
 
         self.hass: HomeAssistant = hass
+        self.app_health_tracker: AppHealthTracker = AppHealthTracker(hass)
+        self.notifier: Notifier = Notifier(notify, hass, self.app_health_tracker)
         self.local_tz = dt_util.get_time_zone(self.hass.config.time_zone)
-        self.calendar_configs: list[ConfigType] = calendars or []
-        self.calendar_no_event_mode: str = calendar_no_event_mode or NO_CAL_EVENT_MODE_AUTO
+        calendar_config = calendar_config or {}
+        self.calendar_configs: list[ConfigType] = calendar_config.get(CONF_CALENDARS, []) or []
         self.calendars: list[TrackedCalendar] = []
+        self.calendar_no_event_mode: str | None = calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO)
         self.alarm_panel: str = alarm_panel
         self.sunrise_cutoff: dt.time | None = diurnal.get(CONF_SUNRISE, {}).get(CONF_EARLIEST)
         self.occupants: list[str] = occupancy.get(CONF_ENTITY_ID, [])
@@ -266,7 +263,6 @@ class AlarmArmer:
         self.buttons: ConfigType = buttons or {}
 
         self.actions: list[str] = actions or []
-        self.notify_profiles: dict[str, dict[str, Any]] = notify or {}
         self.unsubscribes: list[Callable[[], None]] = []
         self.pre_pending_state: AlarmControlPanelState | None = None
         self.button_device: dict[str, str] = {}
@@ -281,10 +277,8 @@ class AlarmArmer:
         self.transitions: dict[AlarmControlPanelState, ConditionCheckerType] = {}
         self.transition_config: dict[str, dict[str, list[ConfigType]]] = transitions or {}
 
-        self.initialization_errors: dict[str, int] = {}
         self.interventions: list[Intervention] = []
         self.intervention_ttl: int = 60
-        self.failures = 0
 
     async def initialize(self) -> None:
         """Async initialization"""
@@ -303,28 +297,11 @@ class AlarmArmer:
 
         _LOGGER.info("AUTOARM Initialized, state: %s", self.armed_state())
 
-    def record_initialization_error(self, stage: str) -> None:
-        self.initialization_errors.setdefault(stage, 0)
-        self.initialization_errors[stage] += 1
-        self.failures += 1
-        self.hass.states.async_set(
-            f"sensor.{DOMAIN}_failures", str(self.failures), attributes={"initialization_errors": self.initialization_errors}
-        )
-
-    def record_runtime_error(self) -> None:
-        self.failures += 1
-        self.hass.states.async_set(f"sensor.{DOMAIN}_failures", str(self.failures))
-
     def initialize_home_assistant(self) -> None:
         self.stop_listener: Callable[[], None] | None = self.hass.bus.async_listen_once(
             EVENT_HOMEASSISTANT_STOP, self.async_shutdown
         )
-        self.hass.states.async_set(
-            f"binary_sensor.{DOMAIN}_initialized",
-            "valid" if not self.initialization_errors else "invalid",
-            attributes=self.initialization_errors,
-        )
-        self.hass.states.async_set(f"sensor.{DOMAIN}_failures", str(self.failures))
+        self.app_health_tracker.app_initialized()
         self.hass.states.async_set(f"sensor.{DOMAIN}_last_calculation", "unavailable", attributes={})
 
         self.hass.services.async_register(
@@ -407,15 +384,17 @@ class AlarmArmer:
             if platforms:
                 platform: entity_platform.EntityPlatform = platforms[0]
             else:
-                self.record_initialization_error(stage)
+                self.app_health_tracker.record_initialization_error(stage)
                 _LOGGER.error("AUTOARM Calendar platform not available from Home Assistant")
                 return
         except Exception as _e:
-            self.record_initialization_error(stage)
+            self.app_health_tracker.record_initialization_error(stage)
             _LOGGER.exception("AUTOARM Unable to access calendar platform")
             return
         for calendar_config in self.calendar_configs:
-            tracked_calendar = TrackedCalendar(self.hass, calendar_config, self, self.calendar_no_event_mode)
+            tracked_calendar = TrackedCalendar(
+                self.hass, calendar_config, self.calendar_no_event_mode, self, self.app_health_tracker
+            )
             await tracked_calendar.initialize(platform)
             self.calendars.append(tracked_calendar)
 
@@ -449,11 +428,11 @@ class AlarmArmer:
                         _LOGGER.warning(f"AUTOARM Failed to validate transition logic for {state_str}")
                         error = "Condition validation failed"
                 except ValueError as ve:
-                    self.record_initialization_error(stage)
+                    self.app_health_tracker.record_initialization_error(stage)
                     error = f"Invalid state {ve}"
                     _LOGGER.error(f"AUTOARM Invalid state in {state_str} transition - {ve}")
                 except vol.Invalid as vi:
-                    self.record_initialization_error(stage)
+                    self.app_health_tracker.record_initialization_error(stage)
                     _LOGGER.error(f"AUTOARM Transition {state_str} conditions fails Home Assistant schema check {vi}")
                     error = f"Schema error {vi}"
                 except ConditionError as ce:
@@ -465,7 +444,7 @@ class AlarmArmer:
                     else:
                         error = str(ce)
                 except Exception as e:
-                    self.record_initialization_error(stage)
+                    self.app_health_tracker.record_initialization_error(stage)
                     _LOGGER.exception("AUTOARM Disabling transition %s with error validating %s", state_str, condition_config)
                     error = f"Unknown exception {e}"
             if error:
@@ -667,7 +646,7 @@ class AlarmArmer:
         await self.arm(**kwargs)
 
     async def arm(
-        self, arming_state: AlarmControlPanelState | None = None, source: ChangeSource | None = None
+        self, arming_state: AlarmControlPanelState | None, source: ChangeSource | None = None
     ) -> AlarmControlPanelState | None:
         """Change alarm panel state
 
@@ -681,6 +660,8 @@ class AlarmArmer:
             str: New arming state
 
         """
+        if arming_state is None:
+            return None
         if self.armed_state() == arming_state:
             return None
         if self.rate_limiter.triggered():
@@ -697,62 +678,17 @@ class AlarmArmer:
                 attrs[ATTR_CHANGED_BY] = f"{DOMAIN}.{source}"
                 self.hass.states.async_set(entity_id=self.alarm_panel, new_state=str(arming_state), attributes=attrs)
                 _LOGGER.info("AUTOARM Setting %s from %s to %s for %s", self.alarm_panel, existing_state, arming_state, source)
+                if source and arming_state:
+                    await self.notifier.notify(source=source, from_state=existing_state, to_state=arming_state)
                 return arming_state
             _LOGGER.debug("Skipping arm for %s, as %s already %s", source, self.alarm_panel, arming_state)
             return existing_state
         except Exception as e:
             _LOGGER.error("AUTOARM Failed to arm: %s", e)
-            self.record_runtime_error()
+            self.app_health_tracker.record_runtime_error()
         finally:
             self.arming_in_progress.clear()
         return None
-
-    async def notify(self, source: ChangeSource, message: str, title: str | None = None) -> None:
-        notify_service: str | None = None
-        try:
-            selected_profile: dict[str, Any] | None = None
-            selected_profile_name: str | None = None
-            for profile_name, profile in self.notify_profiles.items():
-                if source in profile.get(CONF_SOURCE, []):
-                    selected_profile = profile
-                    selected_profile_name = profile_name
-                    break
-            if not selected_profile:
-                _LOGGER.debug("No profile selected for %s notification: %s", source, message)
-
-            # separately merge base dict and data sub-dict as cheap and nasty semi-deep-merge
-            base_profile = self.notify_profiles.get(NOTIFY_COMMON, {})
-            base_profile_data = base_profile.get("data", {})
-            merged_profile = dict(base_profile)
-            merged_profile_data = dict(base_profile_data)
-            if selected_profile:
-                selected_profile_data: dict = selected_profile.get("data", {})
-                merged_profile.update(selected_profile)
-                merged_profile_data.update(selected_profile_data)
-            merged_profile["data"] = merged_profile_data
-
-            data = merged_profile.get("data", {})
-            if "source" in data and data["source"] is None:
-                data["source"] = source
-            if "profile" in data and data["profile"] is None:
-                data["profile"] = selected_profile_name
-            if merged_profile.get(CONF_SUPERNOTIFY) and merged_profile.get(CONF_SCENARIO):
-                data["apply_scenarios"] = merged_profile.get(CONF_SCENARIO)
-            notify_service = merged_profile.get(CONF_SERVICE, "").replace("notify.", "")
-
-            title = title or "Alarm Auto Arming"
-            if notify_service and merged_profile:
-                await self.hass.services.async_call(
-                    "notify",
-                    notify_service,
-                    service_data={"message": message, "title": title, "data": data},
-                )
-            else:
-                _LOGGER.debug("AUTOARM Skipped notification, service: %s, data: %s", notify_service, merged_profile)
-
-        except Exception:
-            self.record_runtime_error()
-            _LOGGER.exception("AUTOARM notify.%s failed", notify_service)
 
     def schedule_state(
         self,
@@ -846,9 +782,11 @@ class AlarmArmer:
         intervention = self.record_intervention(source=ChangeSource.BUTTON, state=state)
         if delay:
             self.schedule_state(dt_util.now() + delay, state, intervention, source=ChangeSource.BUTTON)
-            await self.notify(
+            await self.notifier.notify(
                 ChangeSource.BUTTON,
-                f"Alarm will be set to {state} in {delay}",
+                from_state=self.armed_state(),
+                to_state=state,
+                message=f"Alarm will be set to {state} in {delay}",
                 title=f"Arm set to {state} process starting",
             )
         else:
@@ -861,9 +799,9 @@ class AlarmArmer:
         if delay:
             self.schedule_state(dt_util.now() + delay, None, intervention, ChangeSource.BUTTON)
 
-            await self.notify(
+            await self.notifier.notify(
                 ChangeSource.BUTTON,
-                f"Alarm will be reset in {delay}",
+                message=f"Alarm will be reset in {delay}",
                 title="Alarm reset wait initiated",
             )
         else:
@@ -915,6 +853,7 @@ class AlarmArmer:
                 )
                 return
         new_state: AlarmControlPanelState | None = alarm_state_as_enum(new)
+        old_state: AlarmControlPanelState | None = alarm_state_as_enum(old)
 
         _LOGGER.info(
             "AUTOARM Panel Change: %s,%s: %s-->%s",
@@ -928,8 +867,7 @@ class AlarmArmer:
             _LOGGER.warning("AUTOARM Dezombifying %s ...", new)
             await self.reset_armed_state(source=ChangeSource.ZOMBIFICATION)
         elif new != old:
-            message = f"Home Assistant alarm level now set from {old} to {new}"
-            await self.notify(ChangeSource.ALARM_PANEL, message, title=f"Alarm now {new}")
+            await self.notifier.notify(ChangeSource.ALARM_PANEL, old_state, new_state)
         else:
             _LOGGER.debug("AUTOARM panel change leaves state unchanged at %s", new)
 

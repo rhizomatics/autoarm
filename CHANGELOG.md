@@ -1,15 +1,19 @@
 # Changelog
 
-## 0.7.2
+## 0.8.0
 ### Notifications
+- All arm changes can be notified if configured
 - Support for Supernotify scenarios
 - Any profiles can be used now, with `normal` and `quiet` retained as defaults
   - Profiles are defined by the `source`, with `quiet` defaulting to `button` and `panel` for backward compatibility
+  - Profiles can be further refined by listing under `state` only changes only to or from the list of states
 - Notification data can have `source` and `profile` populated by adding key with null value to config
 ### Calendar Integration
 - Calendar event matching will look anywhere in description or summary not only the start of summary
 - Calendar event matching looks for alarm states constants anywhere in summary or description, for example `ARMED_HOME`
-
+## Internal
+- `Notifier` and `AppHealthTracker` refactored out of main class
+- Test coverage massively improved for notifications
 
 ## 0.7.1
 ### Calendar Integration

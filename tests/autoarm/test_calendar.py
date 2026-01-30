@@ -29,8 +29,9 @@ async def simple_tracked_calendar(
             CONF_CALENDAR_POLL_INTERVAL: 10,
             CONF_CALENDAR_EVENT_STATES: {"armed_away": ["Away"], "armed_vacation": ["Holiday.*"]},
         },
-        mock_armer_real_hass,
         no_event_mode=NO_CAL_EVENT_MODE_AUTO,
+        armer=mock_armer_real_hass,
+        app_health_tracker=mock_armer_real_hass.app_health_tracker,
     )
     await uut.initialize(calendar_platform)
     return uut

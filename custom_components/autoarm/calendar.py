@@ -16,7 +16,7 @@ from homeassistant.helpers.event import (
 )
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.autoarm.helpers import alarm_state_as_enum
+from custom_components.autoarm.helpers import AppHealthTracker, alarm_state_as_enum
 
 from .const import (
     ALARM_STATES,
@@ -48,11 +48,13 @@ class TrackedCalendar:
         self,
         hass: HomeAssistant,
         calendar_config: ConfigType,
-        armer: "AlarmArmer",  # type: ignore # noqa: F821
         no_event_mode: str | None,
+        armer: "AlarmArmer",  # type: ignore # noqa: F821
+        app_health_tracker: AppHealthTracker,
     ) -> None:
         self.enabled = False
         self.armer = armer
+        self.app_health_tracker: AppHealthTracker = app_health_tracker
         self.hass: HomeAssistant = hass
         self.no_event_mode: str | None = no_event_mode
         self.alias: str = cast("str", calendar_config.get(CONF_ALIAS, ""))
@@ -69,6 +71,7 @@ class TrackedCalendar:
                 "CalendarEntity|None", calendar_platform.domain_entities.get(self.entity_id)
             )
             if calendar_entity is None:
+                self.app_health_tracker.record_initialization_error("calendar_setup")
                 _LOGGER.warning("AUTOARM Unable to access calendar %s", self.entity_id)
             else:
                 self.calendar_entity = calendar_entity
@@ -86,6 +89,7 @@ class TrackedCalendar:
                 await self.match_events()
 
         except Exception as _e:
+            self.app_health_tracker.record_runtime_error()
             _LOGGER.exception("AUTOARM Failed to initialize calendar entity %s", self.entity_id)
 
     def shutdown(self) -> None:

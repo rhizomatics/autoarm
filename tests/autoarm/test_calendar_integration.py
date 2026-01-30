@@ -1,6 +1,6 @@
 import asyncio
 import datetime as dt
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
@@ -150,7 +150,7 @@ async def test_calendar_event_ending_shortly(local_calendar: CalendarEntity, has
     assert panel_state(hass) in (AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
 
 
-async def test_calendar_event_ending_fixed_mode(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
+async def test_calendar_event_ending_fixed_mode(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
     hass.states.async_set("person.tenant", "home", {"friendly_name": "Jill"})
 
     start = dt_util.start_of_local_day()

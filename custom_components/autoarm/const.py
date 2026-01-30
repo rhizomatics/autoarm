@@ -40,6 +40,7 @@ NO_CAL_EVENT_OPTIONS: list[str] = [NO_CAL_EVENT_MODE_AUTO, NO_CAL_EVENT_MODE_MAN
 CONF_SUPERNOTIFY = "supernotify"
 CONF_SCENARIO = "scenario"
 CONF_SOURCE = "source"
+CONF_STATE = "state"
 NOTIFY_COMMON = "common"
 NOTIFY_QUIET = "quiet"
 NOTIFY_NORMAL = "normal"
@@ -47,8 +48,9 @@ NOTIFY_CATEGORIES = [NOTIFY_COMMON, NOTIFY_QUIET, NOTIFY_NORMAL]
 
 NOTIFY_DEF_SCHEMA = vol.Schema({
     vol.Optional(CONF_SERVICE): cv.service,
-    vol.Optional(CONF_SUPERNOTIFY, default=False): cv.boolean,
-    vol.Optional(CONF_SOURCE, default=[]): vol.All(cv.ensure_list, [str]),
+    vol.Optional(CONF_SUPERNOTIFY): cv.boolean,
+    vol.Optional(CONF_SOURCE): vol.All(cv.ensure_list, [str]),
+    vol.Optional(CONF_STATE): vol.All(cv.ensure_list, [vol.In(ALARM_STATES)]),
     vol.Optional(CONF_SCENARIO, default=[]): vol.All(cv.ensure_list, [str]),
     vol.Optional(CONF_DATA): dict,
 })
@@ -61,18 +63,28 @@ def _apply_notify_defaults(config: dict[str, Any]) -> dict:
         # backward compatible with old fixed pair profiles
         config.setdefault(NOTIFY_QUIET, {})
         config.setdefault(NOTIFY_NORMAL, {})
+    sources: list[str] = [s for profile in config.values() for s in profile.get(CONF_SOURCE, [])]
+
     if NOTIFY_QUIET in config:
         if not config[NOTIFY_QUIET].get(CONF_SOURCE):
             config[NOTIFY_QUIET][CONF_SOURCE] = [
-                ChangeSource.ALARM_PANEL,
-                ChangeSource.BUTTON,
-                ChangeSource.CALENDAR,
-                ChangeSource.SUNRISE,
-                ChangeSource.SUNSET,
+                v
+                for v in [
+                    ChangeSource.ALARM_PANEL,
+                    ChangeSource.BUTTON,
+                    ChangeSource.CALENDAR,
+                    ChangeSource.SUNRISE,
+                    ChangeSource.SUNSET,
+                ]
+                if v not in sources
             ]
 
     config.setdefault(NOTIFY_COMMON, {})
     config[NOTIFY_COMMON].setdefault(CONF_SERVICE, "notify.send_message")
+    if config[NOTIFY_COMMON].get(CONF_SUPERNOTIFY) is None:
+        config[NOTIFY_COMMON][CONF_SUPERNOTIFY] = any(
+            config[NOTIFY_COMMON][CONF_SERVICE].endswith(v) for v in ("supernotify", "supernotifier")
+        )
     return config
 
 
@@ -224,11 +236,9 @@ class ChangeSource(StrEnum):
     CALENDAR = auto()
     MOBILE = auto()
     OCCUPANCY = auto()
-    INTERNAL = auto()
     ALARM_PANEL = auto()
     BUTTON = auto()
     ACTION = auto()
-    NOTIFY = auto()
     SUNRISE = auto()
     SUNSET = auto()
     ZOMBIFICATION = auto()

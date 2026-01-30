@@ -61,21 +61,44 @@ Two notifications are sent:
 - Alarm status has changed, by any means
 - A button has been pressed, and the arm status will be actioned with a few seconds delay
 
-The alarm status message uses the `quiet` profile, and the other one `normal` profile. This
-lets you change the priority, or any of the other message content.
+The alarm status message by default uses a `quiet` profile, and another one called `normal`, which
+can be overridden with as many profiles named as you like. Each profile is defined by the source of
+alarm change, optionally restricted by which alarm states are involved, and lets you change the priority, or any 
+of the other message content (the ubiquitous Home Assistant `data` section).
 
 ```yaml
 notify:
     common:
       service: notify.supernotify
     quiet:
+      scenario: nerdy
       data:
         priority: low
-        apply-scenarions: nerdy
     normal:
+      source:
+        - calendar
+      state:
+        - armed_vacation
+        - armed_away
       data:
         priority: medium
 ```
+
+Possible sources for alarm changes are:
+
+| Source        | Description                                                               |
+|---------------|---------------------------------------------------------------------------|
+| calendar      | Calendar events                                                           |
+| mobile        | Mobile action                                                             |
+| occupancy     | Occupancy calculation, e.g. automatically switching off `ARMED_AWAY`      |
+| alarm_panel   | Changes made to Alarm Control Panel outside of AutoArm                    |
+| button        | A physical button push                                                    |
+| action        | A Home Assistant Action call (previously known as 'Service')              |
+| sunrise       | HomeAssistant `sun` integration event                                     |
+| sunset        | HomeAssistant `sun` integration event                                     |
+| startup       | Alarm changes made as part of AutoArm startup                             |
+| zombification | Home Assistant alarm panel got itself into a 'zombie' state and was reset |
+
 
  If you want to send to e-mail and mobile then this will fail with a notify group unless you
  use very basic messages, since additional fields, like the `actions` in the `data` field for
