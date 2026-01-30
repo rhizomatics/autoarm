@@ -159,7 +159,7 @@ class TrackedCalendar:
         for event in events:
             # presume the events are sorted by start time
             event_id = TrackedCalendarEvent.event_id(self.calendar_entity.entity_id, event)
-            _LOGGER.debug("AUTOARM Calendar Event: %s", event_id)
+            _LOGGER.debug("AUTOARM Calendar Event: %s [%s]", event.summary, event_id)
 
             state_str: str | None = self.match_event(event.summary, event.description)
             if state_str is None:
@@ -171,6 +171,8 @@ class TrackedCalendar:
                         event.summary,
                     )
                     await existing_event.remove()
+                else:
+                    _LOGGER.debug("AUTOARM Ignoring untracked unmatched event")
             else:
                 if event_id not in self.tracked_events:
                     state: AlarmControlPanelState | None = alarm_state_as_enum(state_str)
@@ -208,6 +210,8 @@ class TrackedCalendar:
                             state_str,
                         )
                         await existing_event.update(event)
+                    else:
+                        _LOGGER.debug("AUTOARM No change to previously tracked event")
 
     async def prune_events(self) -> None:
         """Remove past events"""
