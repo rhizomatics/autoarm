@@ -11,6 +11,7 @@
 ### Calendar Integration
 - Calendar event matching will look anywhere in description or summary not only the start of summary
 - Calendar event matching looks for alarm states constants anywhere in summary or description, for example `ARMED_HOME`
+    - This is in addition to any regular expression matches set up, for example `Trip.*` mapped to `ARMED_VACATION`
 ## Internal
 - `Notifier` and `AppHealthTracker` refactored out of main class
 - Test coverage massively improved for notifications
