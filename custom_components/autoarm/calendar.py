@@ -164,7 +164,7 @@ class TrackedCalendar:
             state_str: str | None = self.match_event(event.summary, event.description)
             if state_str is None:
                 if event_id in self.tracked_events:
-                    existing_event = self.tracked_events[event_id]
+                    existing_event: TrackedCalendarEvent = self.tracked_events[event_id]
                     _LOGGER.info(
                         "AUTOARM Calendar %s found updated event %s no longer matching",
                         self.calendar_entity.entity_id,
@@ -201,7 +201,7 @@ class TrackedCalendar:
                         )
                         await self.tracked_events[event_id].initialize()
                 else:
-                    existing_event: TrackedCalendarEvent = self.tracked_events[event_id]
+                    existing_event = self.tracked_events[event_id]
                     if existing_event.event != event:
                         _LOGGER.info(
                             "AUTOARM Calendar %s found updated event %s for state %s",
@@ -234,6 +234,7 @@ class TrackedCalendar:
             ]
             for tevent in self.tracked_events.values():
                 if tevent.event.uid not in live_event_ids:
+                    _LOGGER.debug("AUTOARM Pruning dead calendar event: %s", tevent.event.uid)
                     await tevent.remove()
                     to_remove.append(tevent.id)
         for event_id in to_remove:

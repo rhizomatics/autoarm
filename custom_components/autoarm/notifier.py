@@ -90,6 +90,6 @@ class Notifier:
             else:
                 _LOGGER.debug("AUTOARM Skipped notification, service: %s, data: %s", notify_service, merged_profile)
 
-        except Exception:
+        except Exception as e:
             self.app_health_tracker.record_runtime_error()
-            _LOGGER.exception("AUTOARM notify.%s failed", notify_service)
+            _LOGGER.error("AUTOARM notify.%s failed: %s", notify_service, e)
