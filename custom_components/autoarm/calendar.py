@@ -75,7 +75,12 @@ class TrackedCalendar:
                 _LOGGER.warning("AUTOARM Unable to access calendar %s", self.entity_id)
             else:
                 self.calendar_entity = calendar_entity
-                _LOGGER.info("AUTOARM Configured calendar %s from %s", self.entity_id, calendar_platform.platform_name)
+                _LOGGER.info(
+                    "AUTOARM Configured calendar %s from %s, polling every %s minutes",
+                    self.entity_id,
+                    calendar_platform.platform_name,
+                    self.poll_interval,
+                )
                 self.poller_listener = async_track_utc_time_change(
                     self.hass,
                     self.on_timed_poll,
@@ -161,10 +166,10 @@ class TrackedCalendar:
                 if event_id in self.tracked_events:
                     existing_event = self.tracked_events[event_id]
                     _LOGGER.info(
-                            "AUTOARM Calendar %s found updated event %s no longer matching",
-                            self.calendar_entity.entity_id,
-                            event.summary,
-                        )
+                        "AUTOARM Calendar %s found updated event %s no longer matching",
+                        self.calendar_entity.entity_id,
+                        event.summary,
+                    )
                     await existing_event.remove()
             else:
                 if event_id not in self.tracked_events:
