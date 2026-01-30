@@ -114,7 +114,7 @@ CONF_CALENDAR_REMINDER_NOTIFICATIONS = "reminders"
 CALENDAR_SCHEMA = vol.Schema({
     vol.Required(CONF_ENTITY_ID): cv.entity_id,
     vol.Optional(CONF_ALIAS): cv.string,
-    vol.Optional(CONF_CALENDAR_POLL_INTERVAL, default=30): cv.positive_int,
+    vol.Optional(CONF_CALENDAR_POLL_INTERVAL, default=15): cv.positive_int,
     # vol.Optional(CONF_CALENDAR_ENTRY_NOTIFICATIONS): vol.In(ENTRY_NOTIFICATION_CHOICES),
     # vol.Optional(CONF_CALENDAR_REMINDER_NOTIFICATIONS, default={}): {
     #     vol.In(ALARM_STATES): vol.All(cv.ensure_list, [cv.time_period])},
