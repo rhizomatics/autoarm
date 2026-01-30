@@ -659,30 +659,30 @@ wheels = [
 
 [[package]]
 name = "boto3"
-version = "1.42.37"
+version = "1.42.38"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore" },
     { name = "jmespath" },
     { name = "s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a9/ef/0d6ceb88ae2b3638b956190a431e4a8a3697d5769d4bbbede8efcccacaea/boto3-1.42.37.tar.gz", hash = "sha256:d8b6c52c86f3bf04f71a5a53e7fb4d1527592afebffa5170cf3ef7d70966e610", size = 112830, upload-time = "2026-01-28T20:38:43.339Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e8/38/1e5eb348e41d97ca2b6164df28501409c2fe9bd34455c256dd87644b7c0e/boto3-1.42.38.tar.gz", hash = "sha256:af2e5c08972d35fa4b4bc457031794343a6ddb1df5692db43302d5b5feaac23e", size = 112852, upload-time = "2026-01-29T20:39:37.786Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fb/a4/cd334f74498acc6ad42a69c48e8c495f6f721d8abe13f8ef0d4b862fb1c0/boto3-1.42.37-py3-none-any.whl", hash = "sha256:e1e38fd178ffc66cfbe9cb6838b8c460000c3eb741e5f40f57eb730780ef0ed4", size = 140604, upload-time = "2026-01-28T20:38:42.135Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/98/22e5f4f5ced6cf1aface4b438307a157e9cb7a4bcbd19f4b9dec89b0fe33/boto3-1.42.38-py3-none-any.whl", hash = "sha256:b5a748b3fdddba8aa2988af0e462996ef72dc2760b0eab30329b9d201d4b38f2", size = 140606, upload-time = "2026-01-29T20:39:36.641Z" },
 ]
 
 [[package]]
 name = "botocore"
-version = "1.42.37"
+version = "1.42.38"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d5/4d/94292e7686e64d2ede8dae7102bbb11a1474e407c830de4192f2518e6cff/botocore-1.42.37.tar.gz", hash = "sha256:3ec58eb98b0857f67a2ae6aa3ded51597e7335f7640be654e0e86da4f173b5b2", size = 14914621, upload-time = "2026-01-28T20:38:34.586Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b1/b7/a02a9db7f5267547da79a28e0832059f87b7e8f275423b4384891d53bf3b/botocore-1.42.38.tar.gz", hash = "sha256:eb36d09b5c61b3ede6129f7b54630049f3eeeccf1327a32cf8944563027a4002", size = 14918119, upload-time = "2026-01-29T20:39:28.055Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/72/30/54042dd3ad8161964f8f47aa418785079bd8d2f17053c40d65bafb9f6eed/botocore-1.42.37-py3-none-any.whl", hash = "sha256:f13bb8b560a10714d96fb7b0c7f17828dfa6e6606a1ead8c01c6ebb8765acbd8", size = 14589390, upload-time = "2026-01-28T20:38:31.306Z" },
+    { url = "https://files.pythonhosted.org/packages/04/c1/5db0d5f9a57d5e72dd3b18c7279b0005adaf5ffe5915803ae6216fe86cec/botocore-1.42.38-py3-none-any.whl", hash = "sha256:b67e0c4989a6bdd459cb49274df05003179165567b7789d8d920cdbdc6c2661f", size = 14590772, upload-time = "2026-01-29T20:39:25.165Z" },
 ]
 
 [[package]]
@@ -1653,7 +1653,7 @@ wheels = [
 
 [[package]]
 name = "huggingface-hub"
-version = "1.3.4"
+version = "1.3.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
@@ -1667,9 +1667,9 @@ dependencies = [
     { name = "typer-slim" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/af/25/74af9d16cd59ae15b12467a79a84aa0fe24be4aba68fc4da0c1864d49c17/huggingface_hub-1.3.4.tar.gz", hash = "sha256:c20d5484a611b7b7891d272e8fc9f77d5de025b0480bdacfa858efb3780b455f", size = 627683, upload-time = "2026-01-26T14:05:10.656Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/67/e9/2658cb9bc4c72a67b7f87650e827266139befaf499095883d30dabc4d49f/huggingface_hub-1.3.5.tar.gz", hash = "sha256:8045aca8ddab35d937138f3c386c6d43a275f53437c5c64cdc9aa8408653b4ed", size = 627456, upload-time = "2026-01-29T10:34:19.687Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/55/07/3d0c34c345043c6a398a5882e196b2220dc5861adfa18322448b90908f26/huggingface_hub-1.3.4-py3-none-any.whl", hash = "sha256:a0c526e76eb316e96a91e8a1a7a93cf66b0dd210be1a17bd5fc5ae53cba76bfd", size = 536611, upload-time = "2026-01-26T14:05:08.549Z" },
+    { url = "https://files.pythonhosted.org/packages/f9/84/a579b95c46fe8e319f89dc700c087596f665141575f4dcf136aaa97d856f/huggingface_hub-1.3.5-py3-none-any.whl", hash = "sha256:fe332d7f86a8af874768452295c22cd3f37730fb2463cf6cc3295e26036f8ef9", size = 536675, upload-time = "2026-01-29T10:34:17.713Z" },
 ]
 
 [[package]]
