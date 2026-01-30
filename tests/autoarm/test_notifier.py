@@ -1,4 +1,3 @@
-
 from homeassistant.core import HomeAssistant
 
 from custom_components.autoarm.autoarming import AlarmArmer
@@ -384,3 +383,136 @@ async def test_notify_selects_profile_with_both_source_and_state(hass: HomeAssis
     assert len(calls) == 1
     assert calls[0]["service"] == "special_service"
     assert calls[0]["data"]["data"]["special"] is True
+
+
+async def test_notify_profile_ordering_by_state_specificity(hass: HomeAssistant) -> None:
+    """Test that more specific profiles (fewer states) are checked first."""
+    from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
+
+    notify_config = {
+        "common": {"service": "notify.default_service"},
+        "backstop": {},
+        # Broad profile - matches many states
+        "broad": {
+            "service": "notify.broad_service",
+            "state": [
+                AlarmControlPanelState.ARMED_AWAY,
+                AlarmControlPanelState.ARMED_HOME,
+                AlarmControlPanelState.ARMED_NIGHT,
+            ],
+            "data": {"profile": "broad"},
+        },
+        # Specific profile - matches only one state
+        "specific": {
+            "service": "notify.specific_service",
+            "state": [AlarmControlPanelState.ARMED_AWAY],
+            "data": {"profile": "specific"},
+        },
+    }
+    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    calls: list[dict] = []
+
+    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029
+        calls.append({"service": call.service, "data": dict(call.data)})
+
+    hass.services.async_register("notify", "broad_service", mock_handler)
+    hass.services.async_register("notify", "specific_service", mock_handler)
+
+    # Both profiles match ARMED_AWAY, but specific should win due to fewer states
+    await armer.notifier.notify(
+        ChangeSource.BUTTON,
+        from_state=AlarmControlPanelState.DISARMED,
+        to_state=AlarmControlPanelState.ARMED_AWAY,
+    )
+
+    assert len(calls) == 1
+    assert calls[0]["service"] == "specific_service"
+    assert calls[0]["data"]["data"]["profile"] == "specific"
+
+
+async def test_notify_profile_with_state_filter_preferred_over_no_filter(hass: HomeAssistant) -> None:
+    """Test that profiles with state filters are preferred over those without."""
+    from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
+
+    notify_config = {
+        "common": {"service": "notify.default_service"},
+        "backstop": {},
+        # No state filter - matches all states
+        "catch_all": {
+            "service": "notify.catch_all_service",
+            "source": [ChangeSource.BUTTON],
+            "data": {"profile": "catch_all"},
+        },
+        # Has state filter
+        "filtered": {
+            "service": "notify.filtered_service",
+            "source": [ChangeSource.BUTTON],
+            "state": [AlarmControlPanelState.ARMED_AWAY, AlarmControlPanelState.ARMED_HOME],
+            "data": {"profile": "filtered"},
+        },
+    }
+    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    calls: list[dict] = []
+
+    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029
+        calls.append({"service": call.service, "data": dict(call.data)})
+
+    hass.services.async_register("notify", "catch_all_service", mock_handler)
+    hass.services.async_register("notify", "filtered_service", mock_handler)
+
+    # Both profiles match source, but filtered should win (has state filter)
+    await armer.notifier.notify(
+        ChangeSource.BUTTON,
+        from_state=AlarmControlPanelState.DISARMED,
+        to_state=AlarmControlPanelState.ARMED_AWAY,
+    )
+
+    assert len(calls) == 1
+    assert calls[0]["service"] == "filtered_service"
+    assert calls[0]["data"]["data"]["profile"] == "filtered"
+
+
+async def test_notify_fallback_to_broader_profile_when_specific_not_matched(hass: HomeAssistant) -> None:
+    """Test that broader profile is used when specific profile doesn't match state."""
+    from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
+
+    notify_config = {
+        "common": {"service": "notify.default_service"},
+        "backstop": {},
+        # Specific profile - only matches ARMED_VACATION
+        "vacation_only": {
+            "service": "notify.vacation_service",
+            "state": [AlarmControlPanelState.ARMED_VACATION],
+            "data": {"profile": "vacation_only"},
+        },
+        # Broader profile - matches multiple states including ARMED_AWAY
+        "general": {
+            "service": "notify.general_service",
+            "state": [
+                AlarmControlPanelState.ARMED_AWAY,
+                AlarmControlPanelState.ARMED_HOME,
+                AlarmControlPanelState.ARMED_NIGHT,
+            ],
+            "data": {"profile": "general"},
+        },
+    }
+    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    calls: list[dict] = []
+
+    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029
+        calls.append({"service": call.service, "data": dict(call.data)})
+
+    hass.services.async_register("notify", "vacation_service", mock_handler)
+    hass.services.async_register("notify", "general_service", mock_handler)
+
+    # vacation_only is checked first (more specific) but doesn't match ARMED_AWAY
+    # general should be used instead
+    await armer.notifier.notify(
+        ChangeSource.BUTTON,
+        from_state=AlarmControlPanelState.DISARMED,
+        to_state=AlarmControlPanelState.ARMED_AWAY,
+    )
+
+    assert len(calls) == 1
+    assert calls[0]["service"] == "general_service"
+    assert calls[0]["data"]["data"]["profile"] == "general"

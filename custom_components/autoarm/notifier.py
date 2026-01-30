@@ -5,7 +5,7 @@ from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import CONF_SERVICE, CONF_SOURCE, CONF_STATE
 
-from custom_components.autoarm.const import CONF_SCENARIO, CONF_SUPERNOTIFY, NOTIFY_COMMON, ChangeSource
+from custom_components.autoarm.const import ALARM_STATES, CONF_SCENARIO, CONF_SUPERNOTIFY, NOTIFY_COMMON, ChangeSource
 from custom_components.autoarm.helpers import AppHealthTracker
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,9 +31,13 @@ class Notifier:
         try:
             selected_profile: dict[str, Any] | None = None
             selected_profile_name: str | None = None
-            for profile_name, profile in self.notify_profiles.items():
+            config_by_state_pickiness = sorted(
+                self.notify_profiles, key=lambda v: len(self.notify_profiles[v].get(CONF_STATE, ALARM_STATES))
+            )
+            for profile_name in config_by_state_pickiness:
                 if profile_name == NOTIFY_COMMON:
                     continue
+                profile: dict[str, Any] = self.notify_profiles[profile_name]
                 if profile.get(CONF_SOURCE) and source not in profile.get(CONF_SOURCE, []):
                     _LOGGER.debug("Notification not selected for %s profile for source match on %s", profile_name, source)
                     continue

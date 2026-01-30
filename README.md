@@ -63,7 +63,7 @@ Two notifications are sent:
 
 The alarm status message by default uses a `quiet` profile, and another one called `normal`, which
 can be overridden with as many profiles named as you like. Each profile is defined by the source of
-alarm change, optionally restricted by which alarm states are involved, and lets you change the priority, or any 
+alarm change, optionally restricted by which alarm states are involved, and lets you change the priority, or any
 of the other message content (the ubiquitous Home Assistant `data` section).
 
 ```yaml

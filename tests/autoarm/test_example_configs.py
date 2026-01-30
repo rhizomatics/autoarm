@@ -46,7 +46,7 @@ async def test_examples(
 
     config = await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True)
     if config_name.name == "typical.yaml":
-        assert config["notify"]["quiet"]["source"] == ["alarm_panel", "button", "sunrise", "sunset"]
+        assert config["notify"]["quiet"]["source"] == ["alarm_panel", "button", "calendar", "sunrise", "sunset"]
         assert config["notify"]["normal"]["source"] == ["calendar"]
         assert config["notify"]["common"]["service"] == "notify.supernotify"
         assert config["notify"]["common"]["supernotify"]
