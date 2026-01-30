@@ -5,7 +5,8 @@
         "mobile_app",
         "calendar",
         "local_calendar",
-        "notify"
+        "notify",
+        "supernotify"
     ],
     "codeowners": [
         "@jeyrb"
