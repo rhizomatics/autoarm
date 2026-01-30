@@ -155,10 +155,18 @@ class TrackedCalendar:
             # presume the events are sorted by start time
             event_id = TrackedCalendarEvent.event_id(self.calendar_entity.entity_id, event)
             _LOGGER.debug("AUTOARM Calendar Event: %s", event_id)
-            matched: bool = False
+
             state_str: str | None = self.match_event(event.summary, event.description)
-            if state_str is not None:
-                matched = True
+            if state_str is None:
+                if event_id in self.tracked_events:
+                    existing_event = self.tracked_events[event_id]
+                    _LOGGER.info(
+                            "AUTOARM Calendar %s found updated event %s no longer matching",
+                            self.calendar_entity.entity_id,
+                            event.summary,
+                        )
+                    await existing_event.remove()
+            else:
                 if event_id not in self.tracked_events:
                     state: AlarmControlPanelState | None = alarm_state_as_enum(state_str)
                     if state is None:
@@ -187,22 +195,14 @@ class TrackedCalendar:
                         await self.tracked_events[event_id].initialize()
                 else:
                     existing_event: TrackedCalendarEvent = self.tracked_events[event_id]
-                    _LOGGER.info(
-                        "AUTOARM Calendar %s found updated event %s for state %s",
-                        self.calendar_entity.entity_id,
-                        event.summary,
-                        state_str,
-                    )
-                    await existing_event.update(event)
-            if not matched and event_id in self.tracked_events:
-                existing_event = self.tracked_events[event_id]
-                if existing_event.event != event:
-                    _LOGGER.info(
-                        "AUTOARM Calendar %s found updated event %s no longer matching",
-                        self.calendar_entity.entity_id,
-                        event.summary,
-                    )
-                    await existing_event.remove()
+                    if existing_event.event != event:
+                        _LOGGER.info(
+                            "AUTOARM Calendar %s found updated event %s for state %s",
+                            self.calendar_entity.entity_id,
+                            event.summary,
+                            state_str,
+                        )
+                        await existing_event.update(event)
 
     async def prune_events(self) -> None:
         """Remove past events"""
