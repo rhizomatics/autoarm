@@ -184,7 +184,7 @@ class TrackedCalendar:
                             state_str,
                         )
                     else:
-                        _LOGGER.info(
+                        _LOGGER.debug(
                             "AUTOARM Calendar %s matched event %s for state %s",
                             self.calendar_entity.entity_id,
                             event.summary,
