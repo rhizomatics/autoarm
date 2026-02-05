@@ -238,8 +238,8 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
     alarm_panel: str = entry.data[CONF_ALARM_PANEL]
     person_entities: list[str] = entry.options.get(CONF_PERSON_ENTITIES, [])
     calendar_entities: list[str] = entry.options.get(CONF_CALENDAR_ENTITIES, [])
-    occupancy_default_day: str = entry.options.get(CONF_OCCUPANCY_DEFAULT_DAY, "armed_home")
-    occupancy_default_night: str | None = entry.options.get(CONF_OCCUPANCY_DEFAULT_NIGHT)
+    occupancy_default_day: str = entry.options.get(CONF_OCCUPANCY_DEFAULT_DAY, "disarmed")
+    occupancy_default_night: str | None = entry.options.get(CONF_OCCUPANCY_DEFAULT_NIGHT,"armed_night")
     no_event_mode: str = entry.options.get(CONF_NO_EVENT_MODE, NO_CAL_EVENT_MODE_AUTO)
 
     # Build occupancy config
