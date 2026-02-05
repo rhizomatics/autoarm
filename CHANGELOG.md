@@ -5,7 +5,7 @@
 - The basic setup, along with calendars, occupancy and some tuning is now UI based using Home Assistant ConfigFlow and ConfigEntry, with automated migration of existing YAML config
 ### Fixes
 - Notifications now better respect which alarm states are in scope per profile
- 
+
 ## 0.8.0
 ### Notifications
 - All arm changes can be notified if configured

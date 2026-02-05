@@ -68,9 +68,10 @@ rules:
       configuration guides.
 
   docs-removal-instructions:
-    status: todo
+    status: done
     comment: |
-      Documentation does not explicitly describe how to remove the integration.
+      Removal instructions documented in docs/removal.md covering HACS
+      removal, manual removal, and cleanup steps.
 
   entity-event-setup:
     status: done
@@ -126,10 +127,11 @@ rules:
   # ============================================================================
 
   action-exceptions:
-    status: todo
+    status: done
     comment: |
-      Service actions currently log errors but don't raise HomeAssistantError
-      exceptions in all failure cases. Should be improved.
+      Service handlers raise HomeAssistantError on failure: reload raises on
+      YAML parse errors, enquire_configuration raises when no entry exists or
+      serialization fails.
 
   config-entry-unloading:
     status: done
@@ -182,10 +184,10 @@ rules:
       entities only.
 
   test-coverage:
-    status: todo
+    status: done
     comment: |
-      Test suite exists with good coverage but no minimum threshold is enforced
-      (--cov-fail-under=0 in pyproject.toml). Should be increased to 95%.
+      Test suite maintains >90% coverage with --cov-fail-under=90 enforced
+      in pyproject.toml.
 
   # ============================================================================
   # Gold Tier
@@ -198,10 +200,11 @@ rules:
       existing alarm_control_panel, person, calendar, and button entities.
 
   diagnostics:
-    status: todo
+    status: done
     comment: |
-      No diagnostics.py implemented. Could expose configuration and state
-      information for debugging.
+      diagnostics.py exposes config entry data, options, YAML keys, and
+      armer runtime state (alarm panel, calendar count, person entities,
+      health tracker status).
 
   discovery:
     status: exempt
@@ -228,9 +231,11 @@ rules:
       docs/mobile_actions.md.
 
   docs-known-limitations:
-    status: todo
+    status: done
     comment: |
-      Known limitations are not explicitly documented in a dedicated section.
+      Known limitations documented in docs/known_limitations.md covering
+      single panel, YAML-only advanced features, calendar polling, manual
+      intervention lock, and panel compatibility.
 
   docs-supported-devices:
     status: exempt
@@ -246,9 +251,11 @@ rules:
       README.md and automated_arming.md.
 
   docs-troubleshooting:
-    status: todo
+    status: done
     comment: |
-      No dedicated troubleshooting section in documentation.
+      Troubleshooting guide in docs/troubleshooting.md covering common issues
+      with state changes, calendar detection, notifications, repair issues,
+      and debug logging.
 
   docs-use-cases:
     status: done
@@ -332,5 +339,5 @@ rules:
   strict-typing:
     status: in progress
     comment: |
-      Type hints are used throughout but not strictly enforced. Some `Any`
-      types remain and py.typed marker is not present.
+      Type hints are used throughout. py.typed marker is present. Some `Any`
+      types remain due to HA ConfigType and service data patterns.

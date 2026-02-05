@@ -120,7 +120,7 @@ class AutoArmData:
     other_data: dict[str, str | dict[str, str] | list[str] | int | float | bool | None]
 
 
-async def async_setup(  # noqa: RUF029
+async def async_setup(
     hass: HomeAssistant,
     config: ConfigType,
 ) -> bool:
@@ -217,7 +217,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001, RUF029
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001
     """Unload Auto Arm config entry."""
     if HASS_DATA_KEY in hass.data:
         hass.data[HASS_DATA_KEY].armer.shutdown()
