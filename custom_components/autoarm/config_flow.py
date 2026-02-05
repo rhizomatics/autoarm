@@ -1,6 +1,5 @@
 """Config flow for Auto Arm integration."""
 
-import logging
 from typing import Any
 
 import voluptuous as vol
@@ -27,9 +26,11 @@ from .const import (
     NO_CAL_EVENT_OPTIONS,
 )
 
-_LOGGER = logging.getLogger(__name__)
-
 CONF_CALENDAR_ENTITIES = "calendar_entities"
+CONF_PERSON_ENTITIES = "person_entities"
+CONF_OCCUPANCY_DEFAULT_DAY = "occupancy_default_day"
+CONF_OCCUPANCY_DEFAULT_NIGHT = "occupancy_default_night"
+CONF_NO_EVENT_MODE = "no_event_mode"
 CONF_PERSON_ENTITIES = "person_entities"
 CONF_OCCUPANCY_DEFAULT_DAY = "occupancy_default_day"
 CONF_OCCUPANCY_DEFAULT_NIGHT = "occupancy_default_night"
