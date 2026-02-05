@@ -30,7 +30,7 @@ The Bronze tier represents the baseline standard for all integrations.
 
 | Rule | Status | Notes |
 |------|--------|-------|
-| `action-setup` | Done | Services registered in `async_setup` ([autoarming.py](../../custom_components/autoarm/autoarming.py)) |
+| `action-setup` | Done | Services registered in `async_setup` (autoarming.py) |
 | `brands` | Done | Brand assets submitted and approved in the HA brands repository |
 | `common-modules` | Done | Logic separated into `const.py`, `helpers.py`, `hass_api.py`, `calendar.py` |
 | `config-flow` | Done | UI config flow for alarm panel, calendars, persons, and occupancy defaults |
