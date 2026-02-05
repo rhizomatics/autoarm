@@ -1,14 +1,15 @@
 from collections.abc import Generator
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from unittest.mock import Mock, patch
 
 import pytest
+from homeassistant.components.alarm_control_panel.const import DOMAIN as ALARM_PANEL_DOMAIN
 from homeassistant.components.calendar import CalendarEntity
 from homeassistant.components.local_calendar import CONF_CALENDAR_NAME, LocalCalendarStore  # type: ignore
 from homeassistant.components.local_calendar.const import DOMAIN as LOCAL_CALENDAR_DOMAIN  # type: ignore
 from homeassistant.components.notify.legacy import BaseNotificationService
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import Platform
+from homeassistant.const import CONF_NAME, Platform
 from homeassistant.core import HomeAssistant, SupportsResponse, callback
 from homeassistant.exceptions import DependencyError
 from homeassistant.helpers import entity_platform
@@ -28,6 +29,9 @@ from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_
 from custom_components.autoarm.hass_api import HomeAssistantAPI
 from custom_components.autoarm.helpers import AppHealthTracker
 from custom_components.autoarm.notifier import Notifier
+
+if TYPE_CHECKING:
+    from homeassistant.helpers.typing import ConfigType
 
 
 @pytest.fixture(autouse=True)
@@ -74,6 +78,13 @@ async def local_calendar(
 
     calendar: CalendarEntity = calendar_platform.domain_entities[f"calendar.{slugify(name)}"]  # type: ignore
     return calendar
+
+
+@pytest.fixture
+async def alarm_panel(hass: HomeAssistant) -> str:
+    alarm_config: ConfigType = {ALARM_PANEL_DOMAIN: {"platform": "manual", CONF_NAME: "Testing", "code_arm_required": False}}
+    assert await async_setup_component(hass, ALARM_PANEL_DOMAIN, alarm_config)
+    return alarm_config[ALARM_PANEL_DOMAIN][CONF_NAME]
 
 
 @pytest.fixture

@@ -1,7 +1,17 @@
 autoarm:
+  # UI: alarm_panel entity is selected during config flow setup
+  alarm_panel:
+    alias: Virtual control panel using Manual Alarm Control Panel integration
+    entity_id: alarm_control_panel.testing
   # UI: person entities and default_state are configurable via Options
   # YAML: delay_time remains YAML-only
   occupancy:
+    entity_id:
+      - person.house_owner
+      - person.tenant
+    default_state:
+      day: disarmed
+      night: armed_night
     delay_time:
       not_home: 180
   # YAML-only: sunrise/sunset configuration
