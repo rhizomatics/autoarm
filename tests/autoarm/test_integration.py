@@ -214,7 +214,8 @@ async def test_yaml_import_migration(hass: HomeAssistant, mock_notify: Any) -> N
 
 
 async def test_setup_entry_raises_not_ready_on_failure(
-    hass: HomeAssistant, mock_notify: Any  # noqa: ARG001
+    hass: HomeAssistant,
+    mock_notify: Any,  # noqa: ARG001
 ) -> None:
     """Test that async_setup_entry raises ConfigEntryNotReady when initialization fails."""
     from unittest.mock import patch
