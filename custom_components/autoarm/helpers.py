@@ -1,11 +1,13 @@
 import datetime as dt
 import logging
-from typing import Any
+import re
+from typing import Any, cast
 
 import homeassistant.util.dt as dt_util
 from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.core import State
+from homeassistant.helpers.json import ExtendedJSONEncoder
 
 from .const import DOMAIN
 
@@ -94,3 +96,15 @@ class AppHealthTracker:
     def record_runtime_error(self) -> None:
         self.failures += 1
         self.hass.states.async_set(f"sensor.{DOMAIN}_failures", str(self.failures))
+
+
+class ExtendedExtendedJSONEncoder(ExtendedJSONEncoder):
+    def default(self, o: Any) -> Any:
+        if isinstance(o, dt.time):
+            return cast("dt.time", o).isoformat()
+        if isinstance(o, dt.timedelta):
+            td: dt.timedelta = cast("dt.timedelta", o)
+            return f"{td.seconds} seconds"
+        if isinstance(o, re.Pattern):
+            return {cast("re.Pattern", o).pattern}
+        return super().default(o)

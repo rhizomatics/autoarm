@@ -60,6 +60,7 @@ async def test_examples_import(
         assert enquire_config["notify"]["common"]["service"] == "notify.supernotify"
         assert enquire_config["notify"]["common"]["supernotify"]
         assert entries[0].options[CONF_PERSON_ENTITIES] == ["person.house_owner", "person.tenant"]
+        assert enquire_config["rate_limit"]["period"]=="60 seconds"
     elif config_name.name == "minimal.yaml":
         assert enquire_config["notify"]["quiet"]["source"] == ["alarm_panel", "button", "calendar", "sunrise", "sunset"]
         assert enquire_config["notify"]["common"]["service"] == "notify.send_message"

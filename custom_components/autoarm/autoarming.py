@@ -44,7 +44,6 @@ from homeassistant.helpers.event import (
     async_track_sunset,
     async_track_time_change,
 )
-from homeassistant.helpers.json import ExtendedJSONEncoder
 from homeassistant.helpers.reload import (
     async_integration_yaml_config,
 )
@@ -94,7 +93,7 @@ from .const import (
     ChangeSource,
     ConditionVariables,
 )
-from .helpers import AppHealthTracker, Limiter, alarm_state_as_enum, deobjectify, safe_state
+from .helpers import AppHealthTracker, ExtendedExtendedJSONEncoder, Limiter, alarm_state_as_enum, deobjectify, safe_state
 
 if TYPE_CHECKING:
     from homeassistant.helpers.condition import ConditionCheckerType
@@ -121,7 +120,7 @@ class AutoArmData:
     other_data: dict[str, str | dict[str, str] | list[str] | int | float | bool | None]
 
 
-async def async_setup(
+async def async_setup(  # noqa: RUF029
     hass: HomeAssistant,
     config: ConfigType,
 ) -> bool:
@@ -190,7 +189,7 @@ async def async_setup(
             CONF_RATE_LIMIT: stashed_yaml.get(CONF_RATE_LIMIT, {}),
         }
         try:
-            jsonized: str = json.dumps(obj=data, cls=ExtendedJSONEncoder)
+            jsonized: str = json.dumps(obj=data, cls=ExtendedExtendedJSONEncoder)
             return json.loads(jsonized)
         except Exception as err:
             raise HomeAssistantError(f"Failed to serialize configuration: {err}") from err
@@ -218,7 +217,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001, RUF029
     """Unload Auto Arm config entry."""
     if HASS_DATA_KEY in hass.data:
         hass.data[HASS_DATA_KEY].armer.shutdown()
@@ -238,8 +237,8 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
     alarm_panel: str = entry.data[CONF_ALARM_PANEL]
     person_entities: list[str] = entry.options.get(CONF_PERSON_ENTITIES, [])
     calendar_entities: list[str] = entry.options.get(CONF_CALENDAR_ENTITIES, [])
-    occupancy_default_day: str = entry.options.get(CONF_OCCUPANCY_DEFAULT_DAY, "armed_home")
-    occupancy_default_night: str | None = entry.options.get(CONF_OCCUPANCY_DEFAULT_NIGHT)
+    occupancy_default_day: str = entry.options.get(CONF_OCCUPANCY_DEFAULT_DAY, "disarmed")
+    occupancy_default_night: str | None = entry.options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")
     no_event_mode: str = entry.options.get(CONF_NO_EVENT_MODE, NO_CAL_EVENT_MODE_AUTO)
 
     # Build occupancy config
