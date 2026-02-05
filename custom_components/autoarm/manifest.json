@@ -20,7 +20,7 @@
     "integration_type": "hub",
     "iot_class": "calculated",
     "issue_tracker": "https://github.com/rhizomatics/autoarm/issues",
+    "quality_scale": "silver",
     "requirements": [],
-    "version": "1.0.0",
-    "quality_scale": "silver"
+    "version": "1.0.0"
 }

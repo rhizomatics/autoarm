@@ -5,19 +5,19 @@
             "user": {
                 "title": "Select Alarm Panel",
                 "data": {
-                    "alarm_panel": "Alarm control panel"
+                    "alarm_panel": "Alarm Control Panel to manage"
                 }
             },
             "calendars": {
                 "title": "Select Calendars",
                 "data": {
-                    "calendar_entities": "Calendar entities"
+                    "calendar_entities": "Calendars to use for arming schedules"
                 }
             },
             "persons": {
                 "title": "Select Persons",
                 "data": {
-                    "person_entities": "Person entities"
+                    "person_entities": "People for occupancy based arming"
                 }
             }
         },
@@ -30,11 +30,11 @@
             "init": {
                 "title": "Auto Arm Options",
                 "data": {
-                    "calendar_entities": "Calendar entities",
-                    "person_entities": "Person entities",
-                    "occupancy_default_day": "Occupied daytime state",
-                    "occupancy_default_night": "Occupied nighttime state",
-                    "no_event_mode": "No calendar event mode"
+                    "calendar_entities": "Calendars to use for arming schedules",
+                    "person_entities": "People for occupancy based arming",
+                    "occupancy_default_day": "Default arming state when occupied during day",
+                    "occupancy_default_night": "Default arming state when occupied at night",
+                    "no_event_mode": "Arming state when a calendar event ends"
                 }
             }
         }
