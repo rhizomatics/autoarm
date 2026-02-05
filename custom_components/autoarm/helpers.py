@@ -106,5 +106,5 @@ class ExtendedExtendedJSONEncoder(ExtendedJSONEncoder):
             td: dt.timedelta = cast("dt.timedelta", o)
             return f"{td.seconds} seconds"
         if isinstance(o, re.Pattern):
-            return f"r{cast("re.Pattern", o).pattern}"
+            return {cast("re.Pattern", o).pattern}
         return super().default(o)
