@@ -17,7 +17,7 @@ While core settings (alarm panel, calendars, persons, occupancy defaults) are ma
 
 ## Calendar Polling
 
-Calendar events are detected by polling, not real-time events. The default poll interval is 15 seconds per calendar. Very short calendar events (shorter than the poll interval) may be missed. This is a Home Assistant limitation, necessitated by 
+Calendar events are detected by polling, not real-time events. The default poll interval is 15 seconds per calendar. Very short calendar events (shorter than the poll interval) may be missed. This is a Home Assistant limitation, necessitated by
 the different styles of calendar supported, for example, Google Calendars.
 
 ## Manual Intervention Lock

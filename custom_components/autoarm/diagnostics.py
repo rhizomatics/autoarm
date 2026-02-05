@@ -9,7 +9,7 @@ from .autoarming import HASS_DATA_KEY
 from .const import YAML_DATA_KEY
 
 
-async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, Any]:  # noqa: RUF029
+async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     yaml_config = hass.data.get(YAML_DATA_KEY, {})
     data: dict[str, Any] = {
