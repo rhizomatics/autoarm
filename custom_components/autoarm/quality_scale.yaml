@@ -17,10 +17,9 @@ rules:
       with sensible defaults (30 seconds).
 
   brands:
-    status: todo
+    status: done
     comment: |
-      Brand assets (logo, icon) exist in docs/assets but are not yet submitted
-      to the Home Assistant brands repository.
+      Brand assets submitted and approved in the Home Assistant brands repository.
 
   common-modules:
     status: done
@@ -111,9 +110,10 @@ rules:
     status: done
     comment: |
       Setup validates configuration via CONFIG_SCHEMA (voluptuous) and checks
-      for required config in async_setup (autoarming.py:111-113). Transition
-      conditions are validated during initialize_logic() with issues raised
-      via the repair system for invalid configs.
+      for required config in async_setup. async_setup_entry raises
+      ConfigEntryNotReady on initialization failure so HA retries.
+      Transition conditions are validated during initialize_logic() with
+      issues raised via the repair system for invalid configs.
 
   unique-config-entry:
     status: done

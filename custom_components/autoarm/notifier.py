@@ -50,15 +50,16 @@ class Notifier:
                 selected_profile = profile
                 selected_profile_name = profile_name
                 break
-            if not selected_profile:
+            if selected_profile is None:
                 _LOGGER.debug("No profile selected for %s notification: %s", source, message)
+                return
 
             # separately merge base dict and data sub-dict as cheap and nasty semi-deep-merge
             base_profile = self.notify_profiles.get(NOTIFY_COMMON, {})
             base_profile_data = base_profile.get("data", {})
             merged_profile = dict(base_profile)
             merged_profile_data = dict(base_profile_data)
-            if selected_profile:
+            if selected_profile is not None:
                 selected_profile_data: dict = selected_profile.get("data", {})
                 merged_profile.update(selected_profile)
                 merged_profile_data.update(selected_profile_data)
