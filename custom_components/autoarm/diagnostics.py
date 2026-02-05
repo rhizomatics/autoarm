@@ -23,9 +23,9 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigE
         data["armer"] = {
             "alarm_panel": armer.alarm_panel,
             "calendar_count": len(armer.calendars),
-            "person_entities": armer.person_entities,
+            "occupants": armer.occupants,
             "failures": armer.app_health_tracker.failures,
-            "initialized": armer.app_health_tracker.initialized,
+            "initialization_errors": armer.app_health_tracker.initialization_errors,
         }
 
     return data
