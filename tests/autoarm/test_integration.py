@@ -1,14 +1,23 @@
 import asyncio
+import datetime as dt
 import json
 from typing import Any
 
 from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, AlarmControlPanelState
-from homeassistant.const import CONF_CONDITIONS, CONF_DELAY_TIME
+from homeassistant.const import CONF_CONDITIONS, CONF_DELAY_TIME, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.autoarm.calendar import CONF_ENTITY_ID
+from custom_components.autoarm.config_flow import (
+    CONF_CALENDAR_ENTITIES,
+    CONF_NO_EVENT_MODE,
+    CONF_OCCUPANCY_DEFAULT_DAY,
+    CONF_OCCUPANCY_DEFAULT_NIGHT,
+    CONF_PERSON_ENTITIES,
+)
 from custom_components.autoarm.const import (
     ATTR_RESET,
     CONF_ALARM_PANEL,
@@ -20,43 +29,64 @@ from custom_components.autoarm.const import (
     CONF_SUNRISE,
     CONF_TRANSITIONS,
     DOMAIN,
+    YAML_DATA_KEY,
 )
 
-CONFIG = {
-    DOMAIN: {
-        CONF_ALARM_PANEL: {CONF_ENTITY_ID: "alarm_panel.testing"},
-        CONF_DIURNAL: {CONF_SUNRISE: {CONF_EARLIEST: "06:30:00"}},
-        CONF_BUTTONS: {
-            ATTR_RESET: {CONF_ENTITY_ID: "binary_sensor.button_left"},
-            AlarmControlPanelState.ARMED_AWAY: {CONF_DELAY_TIME: 2, CONF_ENTITY_ID: "binary_sensor.button_right"},
-            AlarmControlPanelState.DISARMED: {CONF_ENTITY_ID: "binary_sensor.button_middle"},
+YAML_CONFIG: dict[str, Any] = {
+    CONF_DIURNAL: {CONF_SUNRISE: {CONF_EARLIEST: "06:30:00"}},
+    CONF_BUTTONS: {
+        ATTR_RESET: {CONF_ENTITY_ID: ["binary_sensor.button_left"]},
+        AlarmControlPanelState.ARMED_AWAY: {
+            CONF_DELAY_TIME: dt.timedelta(seconds=2),
+            CONF_ENTITY_ID: ["binary_sensor.button_right"],
         },
-        CONF_OCCUPANCY: {CONF_ENTITY_ID: ["person.house_owner", "person.tenant"]},
-        CONF_NOTIFY: {
-            "common": {
-                "service": "notify.send_message",
-                "data": {"message": "alarm changed"},
-            },
-            "quiet": {"data": {"priority": "low"}},
-            "normal": {"data": {"priority": "medium"}},
+        AlarmControlPanelState.DISARMED: {CONF_ENTITY_ID: ["binary_sensor.button_middle"]},
+    },
+    CONF_NOTIFY: {
+        "common": {
+            "service": "notify.send_message",
+            "data": {"message": "alarm changed"},
         },
-    }
+        "quiet": {"data": {"priority": "low"}},
+        "normal": {"data": {"priority": "medium"}},
+    },
+}
+
+ENTRY_DATA: dict[str, Any] = {CONF_ALARM_PANEL: "alarm_panel.testing"}
+ENTRY_OPTIONS: dict[str, Any] = {
+    CONF_CALENDAR_ENTITIES: [],
+    CONF_PERSON_ENTITIES: ["person.house_owner", "person.tenant"],
+    CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
+    CONF_OCCUPANCY_DEFAULT_NIGHT: None,
+    CONF_NO_EVENT_MODE: "auto",
 }
 
 
-async def test_configure(hass: HomeAssistant) -> None:
-    assert await async_setup_component(hass, "autoarm", CONFIG)
-
+async def _setup_entry(hass: HomeAssistant, yaml_config: dict[str, Any] | None = None) -> MockConfigEntry:
+    """Set up a config entry with optional YAML config."""
+    hass.data[YAML_DATA_KEY] = yaml_config or YAML_CONFIG
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="Auto Arm",
+        data=ENTRY_DATA,
+        options=ENTRY_OPTIONS,
+    )
+    entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
+    return entry
+
+
+async def test_configure(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    await _setup_entry(hass)
 
     hass.states.async_set("alarm_panel.testing", "disarmed")
     await hass.async_block_till_done()
 
 
-async def test_exposed_entities(hass: HomeAssistant) -> None:
-    assert await async_setup_component(hass, "autoarm", CONFIG)
+async def test_exposed_entities(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    await _setup_entry(hass)
 
-    await hass.async_block_till_done()
     configuration = hass.states.get("binary_sensor.autoarm_initialized")
     assert configuration is not None
     assert configuration.state == "valid"
@@ -64,38 +94,36 @@ async def test_exposed_entities(hass: HomeAssistant) -> None:
     assert hass.states.get("sensor.autoarm_last_calendar_event") is not None
 
 
-async def test_actions(hass: HomeAssistant) -> None:
-    assert await async_setup_component(hass, "autoarm", CONFIG)
+async def test_actions(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    await _setup_entry(hass)
 
-    await hass.async_block_till_done()
     config: Any = await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True)
     assert config is not None
     assert "error" not in config
     assert config["alarm_panel"] == "alarm_panel.testing"
-    # check for unserializable classes that will upset HomeAssistant
     assert json.dumps(config)
 
 
-async def test_reset_service(hass: HomeAssistant) -> None:
-    assert await async_setup_component(hass, "autoarm", CONFIG)
+async def test_reset_service(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    await _setup_entry(hass)
 
-    await hass.async_block_till_done()
     response = await hass.services.async_call("autoarm", "reset_state", None, blocking=True, return_response=True)
     assert response is not None
     assert response["change"] == "armed_away"
     assert hass.states.get("sensor.autoarm_last_intervention").state == "action"  # type: ignore
 
 
-async def test_broken_condition_raises_issue(hass: HomeAssistant, issue_registry: ir.IssueRegistry) -> None:
-    config = {
-        DOMAIN: {
-            CONF_ALARM_PANEL: {CONF_ENTITY_ID: "alarm_panel.testing"},
-            CONF_TRANSITIONS: {"armed_home": {CONF_CONDITIONS: "{{ autoarm.morning_coffee and not autoarm.occupied }}"}},
-        }
+async def test_broken_condition_raises_issue(
+    hass: HomeAssistant,
+    issue_registry: ir.IssueRegistry,
+    mock_notify: Any,  # noqa: ARG001
+) -> None:
+    yaml_config = {
+        CONF_TRANSITIONS: {
+            "armed_home": {CONF_CONDITIONS: cv.CONDITIONS_SCHEMA("{{ autoarm.morning_coffee and not autoarm.occupied }}")}
+        },
     }
-
-    assert await async_setup_component(hass, "autoarm", config)
-    await hass.async_block_till_done()
+    await _setup_entry(hass, yaml_config=yaml_config)
 
     assert ("autoarm", "transition_condition_armed_home") in issue_registry.issues
     issue = issue_registry.issues["autoarm", "transition_condition_armed_home"]
@@ -104,14 +132,11 @@ async def test_broken_condition_raises_issue(hass: HomeAssistant, issue_registry
         "state": "armed_home",
         "error": "UndefinedError: 'dict object' has no attribute 'morning_coffee'",
     }
-
     assert issue.severity == ir.IssueSeverity.ERROR
 
 
-async def test_on_panel_change_ignores_autoarm_generated_event(hass: HomeAssistant) -> None:
-
-    assert await async_setup_component(hass, "autoarm", CONFIG)
-    await hass.async_block_till_done()
+async def test_on_panel_change_ignores_autoarm_generated_event(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    await _setup_entry(hass)
 
     hass.states.async_set("binary_sensor.button_middle", "on")
     await hass.async_block_till_done()
@@ -120,19 +145,17 @@ async def test_on_panel_change_ignores_autoarm_generated_event(hass: HomeAssista
     assert panel_entity is not None
     assert panel_entity.attributes[ATTR_CHANGED_BY] == "autoarm.button"
 
-    # when alarm panel is changed directly, this is recorded as an intervention
     hass.states.async_set("alarm_panel.testing", "armed_vacation")
     await hass.async_block_till_done()
     assert hass.states.get("sensor.autoarm_last_intervention").state == "alarm_panel"  # type: ignore
 
 
-async def test_arm_on_away(hass: HomeAssistant) -> None:
+async def test_arm_on_away(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
     hass.states.async_set("person.house_owner", "not_home", {"friendly_name": "Jack"})
     hass.states.async_set("person.tenant", "home", {"friendly_name": "Jill"})
-
     hass.states.async_set("alarm_panel.testing", "disarmed")
-    assert await async_setup_component(hass, "autoarm", CONFIG)
-    await hass.async_block_till_done()
+
+    await _setup_entry(hass)
 
     hass.states.async_set("person.house_owner", "not_home")
     hass.states.async_set("person.tenant", "not_home")
@@ -140,30 +163,26 @@ async def test_arm_on_away(hass: HomeAssistant) -> None:
     assert hass.states.get("alarm_panel.testing").state == "armed_away"  # type: ignore
 
 
-async def test_disarm_on_button(hass: HomeAssistant) -> None:
+async def test_disarm_on_button(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
     hass.states.async_set("alarm_panel.testing", "armed_away")
-    assert await async_setup_component(hass, "autoarm", CONFIG)
-    await hass.async_block_till_done()
+    await _setup_entry(hass)
 
     hass.states.async_set("binary_sensor.button_middle", "on")
     await hass.async_block_till_done()
     assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
 
 
-async def test_disarm_on_mobile_action(hass: HomeAssistant) -> None:
+async def test_disarm_on_mobile_action(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
     hass.states.async_set("alarm_panel.testing", "armed_away")
-    assert await async_setup_component(hass, "autoarm", CONFIG)
-    await hass.async_block_till_done()
+    await _setup_entry(hass)
 
     hass.bus.async_fire("mobile_app_notification_action", {"action": "ALARM_PANEL_DISARM"})
     await hass.async_block_till_done()
     assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
 
 
-async def test_delayed_arm_on_button(hass: HomeAssistant) -> None:
-
-    assert await async_setup_component(hass, "autoarm", CONFIG)
-    await hass.async_block_till_done()
+async def test_delayed_arm_on_button(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    await _setup_entry(hass)
     hass.states.async_set("alarm_panel.testing", "disarmed")
 
     hass.states.async_set("binary_sensor.button_right", "on")
@@ -171,3 +190,23 @@ async def test_delayed_arm_on_button(hass: HomeAssistant) -> None:
     await hass.async_block_till_done()
     await asyncio.sleep(3)
     assert hass.states.get("alarm_panel.testing").state == "armed_away"  # type: ignore
+
+
+async def test_yaml_import_migration(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    """Test that YAML config with alarm_panel triggers import flow and creates ConfigEntry."""
+    full_yaml_config = {
+        DOMAIN: {
+            CONF_ALARM_PANEL: {CONF_ENTITY_ID: "alarm_panel.testing"},
+            CONF_OCCUPANCY: {CONF_ENTITY_ID: ["person.house_owner", "person.tenant"]},
+            CONF_NOTIFY: {
+                "common": {"service": "notify.send_message"},
+            },
+        }
+    }
+    assert await async_setup_component(hass, DOMAIN, full_yaml_config)
+    await hass.async_block_till_done()
+
+    entries = hass.config_entries.async_entries(DOMAIN)
+    assert len(entries) == 1
+    assert entries[0].data[CONF_ALARM_PANEL] == "alarm_panel.testing"
+    assert entries[0].options[CONF_PERSON_ENTITIES] == ["person.house_owner", "person.tenant"]

@@ -3,6 +3,7 @@ import contextlib
 import datetime as dt
 import json
 import logging
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
@@ -14,6 +15,7 @@ from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, 
 from homeassistant.components.calendar import CalendarEvent
 from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
     CONF_CONDITIONS,
     CONF_ENTITY_ID,
@@ -55,17 +57,27 @@ from custom_components.autoarm.hass_api import HomeAssistantAPI
 from custom_components.autoarm.notifier import Notifier
 
 from .calendar import TrackedCalendar
+from .config_flow import (
+    CONF_CALENDAR_ENTITIES,
+    CONF_NO_EVENT_MODE,
+    CONF_OCCUPANCY_DEFAULT_DAY,
+    CONF_OCCUPANCY_DEFAULT_NIGHT,
+    CONF_PERSON_ENTITIES,
+)
 from .const import (
     ATTR_RESET,
     CONF_ALARM_PANEL,
     CONF_BUTTONS,
     CONF_CALENDAR_CONTROL,
+    CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_NO_EVENT,
+    CONF_CALENDAR_POLL_INTERVAL,
     CONF_CALENDARS,
     CONF_DAY,
     CONF_DELAY_TIME,
     CONF_DIURNAL,
     CONF_EARLIEST,
+    CONF_NIGHT,
     CONF_NOTIFY,
     CONF_OCCUPANCY,
     CONF_OCCUPANCY_DEFAULT,
@@ -79,6 +91,7 @@ from .const import (
     DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
     NO_CAL_EVENT_MODE_MANUAL,
+    YAML_DATA_KEY,
     ChangeSource,
     ConditionVariables,
 )
@@ -109,32 +122,45 @@ class AutoArmData:
     other_data: dict[str, str | dict[str, str] | list[str] | int | float | bool | None]
 
 
-# async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 async def async_setup(
     hass: HomeAssistant,
     config: ConfigType,
 ) -> bool:
     _ = CONFIG_SCHEMA
-    if DOMAIN not in config:
-        _LOGGER.warning("AUTOARM No config found")
-        return True
-    config = config.get(DOMAIN, {})
+    yaml_config: ConfigType = config.get(DOMAIN, {})
+    if yaml_config or YAML_DATA_KEY not in hass.data:
+        hass.data[YAML_DATA_KEY] = yaml_config
 
-    hass.data[HASS_DATA_KEY] = AutoArmData(_async_process_config(hass, config), {})
-    await hass.data[HASS_DATA_KEY].armer.initialize()
+    has_alarm_panel = CONF_ALARM_PANEL in yaml_config
+    existing_entries = hass.config_entries.async_entries(DOMAIN)
+
+    if has_alarm_panel and not existing_entries:
+        _LOGGER.info("AUTOARM Triggering import of YAML configuration to ConfigEntry")
+        hass.async_create_task(hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_IMPORT}, data=yaml_config))
+    elif has_alarm_panel and existing_entries:
+        _LOGGER.warning("AUTOARM YAML core config present but ConfigEntry already exists; ignoring YAML core settings")
+        ir.async_create_issue(
+            hass,
+            DOMAIN,
+            "yaml_core_config_deprecated",
+            is_fixable=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key="yaml_core_config_deprecated",
+        )
 
     async def reload_service_handler(service_call: ServiceCall) -> None:
         """Reload yaml entities."""
-        config = None
         _LOGGER.info("AUTOARM Reloading %s.%s component, data %s", service_call.domain, service_call.service, service_call.data)
+        fresh_config = None
         with contextlib.suppress(HomeAssistantError):
-            config = await async_integration_yaml_config(hass, DOMAIN)
-        if config is None or DOMAIN not in config:
-            _LOGGER.warning("AUTOARM reload rejected for lack of config: %s", config)
-            return
-        hass.data[HASS_DATA_KEY].armer.shutdown()
-        hass.data[HASS_DATA_KEY].armer = _async_process_config(hass, config[DOMAIN])
-        await hass.data[HASS_DATA_KEY].armer.initialize()
+            fresh_config = await async_integration_yaml_config(hass, DOMAIN)
+        if fresh_config is not None and DOMAIN in fresh_config:
+            hass.data[YAML_DATA_KEY] = fresh_config[DOMAIN]
+        else:
+            hass.data[YAML_DATA_KEY] = {}
+        entries = hass.config_entries.async_entries(DOMAIN)
+        for entry in entries:
+            await hass.config_entries.async_reload(entry.entry_id)
 
     async_register_admin_service(
         hass,
@@ -144,14 +170,24 @@ async def async_setup(
     )
 
     def supplemental_action_enquire_configuration(_call: ServiceCall) -> ConfigType:
+        entries = hass.config_entries.async_entries(DOMAIN)
+        if not entries:
+            return {"error": "No config entry found"}
+        entry = entries[0]
+        stashed_yaml = hass.data.get(YAML_DATA_KEY, {})
         data: ConfigType = {
-            CONF_ALARM_PANEL: config.get(CONF_ALARM_PANEL, {}).get(CONF_ENTITY_ID),
-            CONF_DIURNAL: config.get(CONF_DIURNAL),
-            CONF_CALENDAR_CONTROL: config.get(CONF_CALENDAR_CONTROL),
-            CONF_BUTTONS: config.get(CONF_BUTTONS, {}),
-            CONF_OCCUPANCY: config.get(CONF_OCCUPANCY, {}),
-            CONF_NOTIFY: config.get(CONF_NOTIFY, {}),
-            CONF_RATE_LIMIT: config.get(CONF_RATE_LIMIT, {}),
+            CONF_ALARM_PANEL: entry.data.get(CONF_ALARM_PANEL),
+            CONF_DIURNAL: stashed_yaml.get(CONF_DIURNAL),
+            CONF_CALENDAR_CONTROL: stashed_yaml.get(CONF_CALENDAR_CONTROL),
+            CONF_BUTTONS: stashed_yaml.get(CONF_BUTTONS, {}),
+            CONF_OCCUPANCY: {
+                CONF_ENTITY_ID: entry.options.get(CONF_PERSON_ENTITIES, []),
+                CONF_OCCUPANCY_DEFAULT: {
+                    CONF_DAY: entry.options.get(CONF_OCCUPANCY_DEFAULT_DAY, "armed_home"),
+                },
+            },
+            CONF_NOTIFY: stashed_yaml.get(CONF_NOTIFY, {}),
+            CONF_RATE_LIMIT: stashed_yaml.get(CONF_RATE_LIMIT, {}),
         }
         try:
             jsonized: str = json.dumps(obj=data, cls=ExtendedJSONEncoder)
@@ -170,21 +206,105 @@ async def async_setup(
     return True
 
 
-def _async_process_config(hass: HomeAssistant, config: ConfigType) -> "AlarmArmer":
-    calendar_config: ConfigType = config.get(CONF_CALENDAR_CONTROL, {})
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up Auto Arm from a config entry."""
+    yaml_config: ConfigType = hass.data.get(YAML_DATA_KEY, {})
+    armer = _build_armer_from_entry(hass, entry, yaml_config)
+    hass.data[HASS_DATA_KEY] = AutoArmData(armer, {})
+    await armer.initialize()
+    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
+    return True
+
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001
+    """Unload Auto Arm config entry."""
+    if HASS_DATA_KEY in hass.data:
+        hass.data[HASS_DATA_KEY].armer.shutdown()
+        del hass.data[HASS_DATA_KEY]
+    return True
+
+
+async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Handle options update by reloading the entry."""
+    await hass.config_entries.async_reload(entry.entry_id)
+
+
+def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config: ConfigType) -> "AlarmArmer":
+    """Build an AlarmArmer instance from ConfigEntry data/options merged with YAML."""
     migrate(hass)
-    service: AlarmArmer = AlarmArmer(
+
+    alarm_panel: str = entry.data[CONF_ALARM_PANEL]
+    person_entities: list[str] = entry.options.get(CONF_PERSON_ENTITIES, [])
+    calendar_entities: list[str] = entry.options.get(CONF_CALENDAR_ENTITIES, [])
+    occupancy_default_day: str = entry.options.get(CONF_OCCUPANCY_DEFAULT_DAY, "armed_home")
+    occupancy_default_night: str | None = entry.options.get(CONF_OCCUPANCY_DEFAULT_NIGHT)
+    no_event_mode: str = entry.options.get(CONF_NO_EVENT_MODE, NO_CAL_EVENT_MODE_AUTO)
+
+    # Build occupancy config
+    yaml_occupancy = yaml_config.get(CONF_OCCUPANCY, {})
+    occupancy_defaults: dict[str, str] = {CONF_DAY: occupancy_default_day}
+    if occupancy_default_night:
+        occupancy_defaults[CONF_NIGHT] = occupancy_default_night
+    occupancy: ConfigType = {
+        CONF_ENTITY_ID: person_entities,
+        CONF_OCCUPANCY_DEFAULT: occupancy_defaults,
+    }
+    yaml_delay_time = yaml_occupancy.get(CONF_DELAY_TIME) if isinstance(yaml_occupancy, dict) else None
+    if yaml_delay_time:
+        occupancy[CONF_DELAY_TIME] = yaml_delay_time
+
+    # Build calendar config
+    yaml_calendar_control = yaml_config.get(CONF_CALENDAR_CONTROL, {})
+    yaml_calendars: list[ConfigType] = yaml_calendar_control.get(CONF_CALENDARS, []) if yaml_calendar_control else []
+    yaml_cal_by_entity: dict[str, ConfigType] = {cal[CONF_ENTITY_ID]: cal for cal in yaml_calendars if CONF_ENTITY_ID in cal}
+
+    calendar_list: list[ConfigType] = []
+    for cal_entity_id in calendar_entities:
+        yaml_override = yaml_cal_by_entity.get(cal_entity_id, {})
+        cal_config: ConfigType = {
+            CONF_ENTITY_ID: cal_entity_id,
+            CONF_CALENDAR_POLL_INTERVAL: yaml_override.get(CONF_CALENDAR_POLL_INTERVAL, 15),
+            CONF_CALENDAR_EVENT_STATES: yaml_override.get(CONF_CALENDAR_EVENT_STATES, _validated_default_calendar_mappings()),
+        }
+        calendar_list.append(cal_config)
+
+    calendar_config: ConfigType = {}
+    if calendar_list:
+        calendar_config = {
+            CONF_CALENDAR_NO_EVENT: no_event_mode,
+            CONF_CALENDARS: calendar_list,
+        }
+
+    # Build notify config (from YAML, with defaults applied)
+    notify = yaml_config.get(CONF_NOTIFY, {})
+
+    return AlarmArmer(
         hass,
-        alarm_panel=config[CONF_ALARM_PANEL].get(CONF_ENTITY_ID),
-        diurnal=config.get(CONF_DIURNAL, {}),
-        buttons=config.get(CONF_BUTTONS, {}),
-        occupancy=config[CONF_OCCUPANCY],
-        notify=config[CONF_NOTIFY],
-        rate_limit=config.get(CONF_RATE_LIMIT, {}),
+        alarm_panel=alarm_panel,
+        diurnal=yaml_config.get(CONF_DIURNAL, {}),
+        buttons=yaml_config.get(CONF_BUTTONS, {}),
+        occupancy=occupancy,
+        notify=notify,
+        rate_limit=yaml_config.get(CONF_RATE_LIMIT, {}),
         calendar_config=calendar_config,
-        transitions=config.get(CONF_TRANSITIONS),
+        transitions=yaml_config.get(CONF_TRANSITIONS),
     )
-    return service
+
+
+def _validated_default_calendar_mappings() -> dict[str, list[re.Pattern[str]]]:
+    """Build default calendar event state mappings with compiled regex patterns.
+
+    Mirrors the schema validation that CALENDAR_SCHEMA applies (ensure_list + is_regex).
+    """
+    from .const import DEFAULT_CALENDAR_MAPPINGS
+
+    result: dict[str, list[re.Pattern[str]]] = {}
+    for state, patterns in DEFAULT_CALENDAR_MAPPINGS.items():
+        state_str = str(state)
+        if isinstance(patterns, str):
+            patterns = [patterns]
+        result[state_str] = [re.compile(p) if isinstance(p, str) else p for p in patterns]
+    return result
 
 
 def migrate(hass: HomeAssistant) -> None:

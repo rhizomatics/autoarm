@@ -17,6 +17,14 @@ from homeassistant.util import slugify
 from pytest_homeassistant_custom_component.common import AsyncMock, MockConfigEntry
 
 from custom_components.autoarm.autoarming import AlarmArmer
+from custom_components.autoarm.config_flow import (
+    CONF_CALENDAR_ENTITIES,
+    CONF_NO_EVENT_MODE,
+    CONF_OCCUPANCY_DEFAULT_DAY,
+    CONF_OCCUPANCY_DEFAULT_NIGHT,
+    CONF_PERSON_ENTITIES,
+)
+from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY
 from custom_components.autoarm.hass_api import HomeAssistantAPI
 from custom_components.autoarm.helpers import AppHealthTracker
 from custom_components.autoarm.notifier import Notifier
@@ -127,3 +135,28 @@ def mock_notify(hass: HomeAssistant) -> MockAction:
     )  # type: ignore
 
     return mock_action
+
+
+@pytest.fixture
+async def setup_autoarm(
+    hass: HomeAssistant,
+    mock_notify: MockAction,  # noqa: ARG001
+) -> MockConfigEntry:
+    """Set up autoarm via ConfigEntry with default test config."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="Auto Arm",
+        data={CONF_ALARM_PANEL: "alarm_panel.testing"},
+        options={
+            CONF_CALENDAR_ENTITIES: [],
+            CONF_PERSON_ENTITIES: ["person.house_owner", "person.tenant"],
+            CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
+            CONF_OCCUPANCY_DEFAULT_NIGHT: None,
+            CONF_NO_EVENT_MODE: "auto",
+        },
+    )
+    entry.add_to_hass(hass)
+    hass.data[YAML_DATA_KEY] = {}
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    return entry
