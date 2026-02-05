@@ -3,7 +3,6 @@ from typing import Any
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.autoarm.autoarming import HASS_DATA_KEY
 from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ENTITIES,
     CONF_NO_EVENT_MODE,
@@ -48,7 +47,7 @@ async def test_diagnostics(hass: HomeAssistant, mock_notify: Any) -> None:  # no
     assert result["armer"]["calendar_count"] == 0
     assert result["armer"]["occupants"] == ["person.house_owner"]
     assert result["armer"]["failures"] == 0
-    assert result["armer"]["initialization_errors"]=={}
+    assert result["armer"]["initialization_errors"] == {}
 
 
 async def test_diagnostics_without_armer(hass: HomeAssistant) -> None:
