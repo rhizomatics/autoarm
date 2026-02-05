@@ -139,5 +139,5 @@ addopts = [
     "--cov-report=html",
     "--cov-report=term-missing",
     "--cov=custom_components.autoarm",
-    "--cov-fail-under=0"
+    "--cov-fail-under=90"
 ]

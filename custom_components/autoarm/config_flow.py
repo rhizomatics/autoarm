@@ -16,6 +16,7 @@ from homeassistant.helpers.selector import (
 from .const import (
     ALARM_STATES,
     CONF_ALARM_PANEL,
+    CONF_CALENDAR_CONTROL,
     CONF_CALENDAR_NO_EVENT,
     CONF_CALENDARS,
     CONF_DAY,
@@ -27,10 +28,6 @@ from .const import (
 )
 
 CONF_CALENDAR_ENTITIES = "calendar_entities"
-CONF_PERSON_ENTITIES = "person_entities"
-CONF_OCCUPANCY_DEFAULT_DAY = "occupancy_default_day"
-CONF_OCCUPANCY_DEFAULT_NIGHT = "occupancy_default_night"
-CONF_NO_EVENT_MODE = "no_event_mode"
 CONF_PERSON_ENTITIES = "person_entities"
 CONF_OCCUPANCY_DEFAULT_DAY = "occupancy_default_day"
 CONF_OCCUPANCY_DEFAULT_NIGHT = "occupancy_default_night"
@@ -124,7 +121,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         person_entities = occupancy_config.get(CONF_ENTITY_ID, [])
         occupancy_defaults = occupancy_config.get(CONF_OCCUPANCY_DEFAULT, {})
 
-        calendar_config = import_data.get("calendar_control", {})
+        calendar_config = import_data.get(CONF_CALENDAR_CONTROL, {})
         calendar_entities = [cal[CONF_ENTITY_ID] for cal in calendar_config.get(CONF_CALENDARS, []) if CONF_ENTITY_ID in cal]
         no_event_mode = calendar_config.get(CONF_CALENDAR_NO_EVENT, DEFAULT_OPTIONS[CONF_NO_EVENT_MODE])
 

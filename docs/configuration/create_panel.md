@@ -17,8 +17,13 @@ alarm_control_panel:
     trigger_time: 0
 ```
 
-This can then be added to AutoArm like, notice how the `name` is made lower case and spaces replaced
-with underscores to create an `entity_id`.
+## Selecting the Alarm Panel in AutoArm
+
+The alarm panel entity is selected during the AutoArm UI config flow. Go to **Settings** > **Devices & Services** > **Add Integration**, search for **AutoArm**, and select your alarm panel entity in the first step.
+
+### Legacy YAML Reference
+
+Before the UI config flow, the alarm panel was specified in YAML. This is still supported for auto-migration, but new installations should use the UI.
 
 ```yaml
 autoarm:

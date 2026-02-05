@@ -1,5 +1,4 @@
 import asyncio
-import contextlib
 import datetime as dt
 import json
 import logging
@@ -33,7 +32,7 @@ from homeassistant.core import (
     SupportsResponse,
     callback,
 )
-from homeassistant.exceptions import ConditionError, HomeAssistantError
+from homeassistant.exceptions import ConditionError, ConfigEntryNotReady, HomeAssistantError
 from homeassistant.helpers import condition as condition
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
@@ -151,9 +150,10 @@ async def async_setup(
     async def reload_service_handler(service_call: ServiceCall) -> None:
         """Reload yaml entities."""
         _LOGGER.info("AUTOARM Reloading %s.%s component, data %s", service_call.domain, service_call.service, service_call.data)
-        fresh_config = None
-        with contextlib.suppress(HomeAssistantError):
+        try:
             fresh_config = await async_integration_yaml_config(hass, DOMAIN)
+        except HomeAssistantError as err:
+            raise HomeAssistantError(f"Failed to reload YAML configuration: {err}") from err
         if fresh_config is not None and DOMAIN in fresh_config:
             hass.data[YAML_DATA_KEY] = fresh_config[DOMAIN]
         else:
@@ -172,7 +172,7 @@ async def async_setup(
     def supplemental_action_enquire_configuration(_call: ServiceCall) -> ConfigType:
         entries = hass.config_entries.async_entries(DOMAIN)
         if not entries:
-            return {"error": "No config entry found"}
+            raise HomeAssistantError("No config entry found for AutoArm")
         entry = entries[0]
         stashed_yaml = hass.data.get(YAML_DATA_KEY, {})
         data: ConfigType = {
@@ -192,9 +192,8 @@ async def async_setup(
         try:
             jsonized: str = json.dumps(obj=data, cls=ExtendedJSONEncoder)
             return json.loads(jsonized)
-        except Exception as e:
-            _LOGGER.error("AUTOARM Failed to expose config data as entity: %s, %s", data, e)
-            return {"error": str(e)}
+        except Exception as err:
+            raise HomeAssistantError(f"Failed to serialize configuration: {err}") from err
 
     hass.services.async_register(
         DOMAIN,
@@ -209,9 +208,12 @@ async def async_setup(
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Auto Arm from a config entry."""
     yaml_config: ConfigType = hass.data.get(YAML_DATA_KEY, {})
-    armer = _build_armer_from_entry(hass, entry, yaml_config)
-    hass.data[HASS_DATA_KEY] = AutoArmData(armer, {})
-    await armer.initialize()
+    try:
+        armer = _build_armer_from_entry(hass, entry, yaml_config)
+        hass.data[HASS_DATA_KEY] = AutoArmData(armer, {})
+        await armer.initialize()
+    except Exception as err:
+        raise ConfigEntryNotReady(f"Failed to initialize Auto Arm: {err}") from err
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
 

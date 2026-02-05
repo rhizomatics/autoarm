@@ -4,6 +4,7 @@ import json
 from typing import Any
 
 from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, AlarmControlPanelState
+from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_CONDITIONS, CONF_DELAY_TIME, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
@@ -210,3 +211,29 @@ async def test_yaml_import_migration(hass: HomeAssistant, mock_notify: Any) -> N
     assert len(entries) == 1
     assert entries[0].data[CONF_ALARM_PANEL] == "alarm_panel.testing"
     assert entries[0].options[CONF_PERSON_ENTITIES] == ["person.house_owner", "person.tenant"]
+
+
+async def test_setup_entry_raises_not_ready_on_failure(
+    hass: HomeAssistant,
+    mock_notify: Any,  # noqa: ARG001
+) -> None:
+    """Test that async_setup_entry raises ConfigEntryNotReady when initialization fails."""
+    from unittest.mock import patch
+
+    hass.data[YAML_DATA_KEY] = YAML_CONFIG
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="Auto Arm",
+        data=ENTRY_DATA,
+        options=ENTRY_OPTIONS,
+    )
+    entry.add_to_hass(hass)
+
+    with patch(
+        "custom_components.autoarm.autoarming._build_armer_from_entry",
+        side_effect=Exception("boom"),
+    ):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert entry.state is ConfigEntryState.SETUP_RETRY

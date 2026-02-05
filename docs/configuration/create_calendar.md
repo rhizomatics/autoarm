@@ -19,14 +19,20 @@ Use the button, or follow the manual steps:
 
 ## Configure AutoArm
 
-Add the calendar to AutoArm, in this example `Alarm Control` is the name of the calendar:
+!!! note "UI and YAML split"
+    Calendar entities and `no_event_mode` are now configured via the AutoArm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
+
+Select the calendar entity in **Settings** > **Devices & Services** > **AutoArm** > **Configure**.
+
+Then add the per-calendar details in YAML, in this example `Alarm Control` is the name of the calendar:
 
 ```yaml
 autoarm:
     calendar_control:
-      - entity_id: calendar.alarm_control
-        state_patterns:
-            disarmed: Disarmed
+      calendars:
+        - entity_id: calendar.alarm_control
+          state_patterns:
+              disarmed: Disarmed
 ```
 
 This calendar is going to be used very simply to disarm the alarm during set periods, and let AutoArm
@@ -78,7 +84,7 @@ day, its much less work to only define what is needed, such as what's
 the right time to arm at night, or when vacations start and end.
 
 `no_event_mode` allows control over what happens when there's no
-calendar event, and nothing else to determine alarm state. It can be:
+calendar event, and nothing else to determine alarm state. This is configurable via the AutoArm **Options** UI. It can be:
 
 `auto` - Will make best guess, including checking what the alarm panel was before the event
 `manual` - No state changes made when calendar event ends

@@ -48,6 +48,9 @@ the same way as other resets, such as at sunrise or sunset.
 
 ## Calendar Control
 
+!!! note "Configuration split"
+    Calendar entities and `no_event_mode` are configured via the AutoArm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
+
 ### Integrating a Calendar
 
 Use a Home Assistant [calendar integration](https://www.home-assistant.io/integrations/?cat=calendar) to
@@ -73,7 +76,10 @@ being armed at 4am if you live far North, like Norway or Scotland.
 2. Re-evaluate the alarm state at **sunset**
 3. Provide a `day` and `night` value for conditions
 
-## Occupancy Control
+## Occupancy Control
+
+!!! note "Configuration split"
+    Person entities and occupancy `default_state` are configured via the AutoArm **Options** UI. The `delay_time` setting remains in YAML.
 
 The people who live at the property can be defined as [Person Integration][] entities
 [Person Entities]() in the `occupancy` configuration, and used to derive an `occupied`
@@ -115,6 +121,9 @@ stable for `home`->`not_home`, and zero delay when arriving home.
 ```
 
 ## Automated Transitions
+
+!!! note "YAML-only"
+    Transition conditions are configured entirely in YAML.
 
 If nothing else is configured ( occupancy, buttons, calendars ) then arming will still
 happen by the state of the sun. The rules for this, and how occupancy is used,

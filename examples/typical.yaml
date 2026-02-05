@@ -3,9 +3,12 @@ alarm_control_panel:
     name: Testing
     code_arm_required: false
 autoarm:
+  # UI: alarm_panel entity is selected during config flow setup
   alarm_panel:
     alias: Virtual control panel using Manual Alarm Control Panel integration
     entity_id: alarm_panel.testing
+  # UI: person entities and default_state are configurable via Options
+  # YAML: delay_time remains YAML-only
   occupancy:
     entity_id:
       - person.house_owner
@@ -15,9 +18,11 @@ autoarm:
       night: armed_night
     delay_time:
       not_home: 180
+  # YAML-only: sunrise/sunset configuration
   diurnal:
     sunrise:
       earliest: "06:30:00"
+  # YAML-only: transition conditions
   transitions:
     armed_home:
       alias: Home with alarm active, such as home alone
@@ -34,6 +39,8 @@ autoarm:
       conditions: "{{ autoarm.occupied and autoarm.night and autoarm.computed }}"
     pending:
       conditions:
+  # UI: calendar entities and no_event_mode are configurable via Options
+  # YAML: per-calendar state_patterns and poll_interval remain here
   calendar_control:
     no_event_mode: auto
     calendars:
@@ -52,6 +59,7 @@ autoarm:
           armed_away:
             - Working at Office
 
+  # YAML-only: button configuration
   buttons:
     reset:
       entity_id: binary_sensor.button_right
@@ -63,10 +71,12 @@ autoarm:
     disarmed:
       entity_id: binary_sensor.button_middle
 
+  # YAML-only: rate limiting
   rate_limit:
     max_calls: 5
     period: 60
 
+  # YAML-only: notification configuration
   notify:
     common:
       service: notify.supernotify

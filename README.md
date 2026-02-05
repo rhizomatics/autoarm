@@ -20,7 +20,7 @@
 
 
 Automate the arming and disarming of the built-in Home Assistant [Alarm
-Control Panel Integrations][], with additional support for calendar integration, manual override via remote control buttons, and mobile push actionable notifications.
+Control Panel Integrations][], with additional support for calendar integration, occupancy-driven arming and disarming, manual override via remote control buttons, and mobile push actionable notifications.
 
 !!! question inline end "Why use alarm control panels?"
     A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful, even if there is no real alarm system, as a **single central state of the home**, and then use that to drive automations, notifications etc rather than littering notifications with checks for presence, time of day, vacations or similar.
@@ -36,12 +36,25 @@ Control Panel Integrations][], with additional support for calendar integration,
 
 AutoArm is one of the default repositories on [HACS][], so there's no need to register  a custom repo.
 
-Notifications will work with any HomeAssistant notification implementation, and works best with [Supernotify](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
+Notifications will work with any HomeAssistant notification implementation, with additional support for [Supernotify](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
 
-## Alarm Panel Configuration
+## Configuration
 
-Autoarm will work with any Home Assistant of the [Alarm Control Panel Integrations][]. If you don't have one, try
-[Create an Alarm Panel](configuration/create_panel.md)
+AutoArm is set up using the Home Assistant Integrations page, with additional advanced configuration available via YAML.
+
+### UI Setup
+
+1. Go to **Settings** > **Devices & Services** > **Add Integration** and search for **AutoArm**.
+2. Select your **Alarm Control Panel** entity (any [Alarm Control Panel Integration][Alarm Control Panel Integrations] will work). If you don't have one, see [Create an Alarm Panel](configuration/create_panel.md).
+3. Optionally select **Calendar** and **Person** entities.
+4. Adjust defaults in **Options** at any time (calendar entities, person entities, occupancy defaults, no-event mode).
+
+### YAML for Advanced Features
+
+Transitions, buttons, notifications, diurnal settings, rate limiting, and per-calendar overrides (state patterns, poll intervals) are configured in YAML. See [Typical Configuration](configuration/examples/typical.md) for a full example.
+
+!!! note "Migrating from YAML-only"
+    Existing YAML configurations are automatically migrated to a config entry on restart. See [Migration Guide](configuration/migration.md) for details.
 
 ## Automated Arming
 
@@ -61,10 +74,7 @@ Two notifications are sent:
 - Alarm status has changed, by any means
 - A button has been pressed, and the arm status will be actioned with a few seconds delay
 
-The alarm status message by default uses a `quiet` profile, and another one called `normal`, which
-can be overridden with as many profiles named as you like. Each profile is defined by the source of
-alarm change, optionally restricted by which alarm states are involved, and lets you change the priority, or any
-of the other message content (the ubiquitous Home Assistant `data` section).
+The alarm status message by default uses a `quiet` profile, and another one called `normal`, which can be overridden with as many profiles named as you like. Each profile is defined by the source of alarm change, optionally restricted by which alarm states are involved, and lets you change the priority, or any of the other message content (the ubiquitous Home Assistant `data` section).
 
 ```yaml
 notify:
@@ -100,12 +110,8 @@ Possible sources for alarm changes are:
 | zombification | Home Assistant alarm panel got itself into a 'zombie' state and was reset |
 
 
- If you want to send to e-mail and mobile then this will fail with a notify group unless you
- use very basic messages, since additional fields, like the `actions` in the `data` field for
- Actionable Notifications aren't supported by other notification platforms. The
- best way to resolve that is with [Supernotify](https://supernotify.rhizomatics.org.uk) which will
- tune each message for the underlying transport ( mobile apps, and also e-mail, text, chime etc.)
- along with lots of other tuning options.
+ If you want to send to e-mail and mobile then this will fail with a notify group unless you use very basic messages, since additional fields, like the `actions` in the `data` field for Actionable Notifications aren't supported by other notification platforms. The
+ best way to resolve that is with [Supernotify](https://supernotify.rhizomatics.org.uk) which will tune each message for the underlying transport ( mobile apps, and also e-mail, text, chime etc.) along with lots of other tuning options and automatic discovery.
 
 ## Home Assistant Features Supported
 
@@ -121,6 +127,7 @@ Possible sources for alarm changes are:
 - [Repairs](https://www.home-assistant.io/integrations/repairs/)
     - Raises repairs for invalid transition configurations
 - [Developer Tools](https://www.home-assistant.io/docs/tools/dev-tools/)
+    - Configurable integration with UI config flow and options
     - Reloadable from the *YAML* tab
     - Exposes *entities* for its configuration and last calendar event.
 
