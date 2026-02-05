@@ -19,10 +19,12 @@ from homeassistant.const import (
 )
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.util.hass_dict import HassKey
 
 _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "autoarm"
+YAML_DATA_KEY: HassKey[ConfigType] = HassKey(f"{DOMAIN}_yaml")
 
 ATTR_ACTION = "action"
 ATTR_RESET = "reset"
@@ -165,7 +167,7 @@ CONF_EARLIEST = "earliest"
 CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.Schema({
-            vol.Required(CONF_ALARM_PANEL): vol.Schema({
+            vol.Optional(CONF_ALARM_PANEL): vol.Schema({
                 vol.Optional(CONF_ALIAS): cv.string,
                 vol.Required(CONF_ENTITY_ID): cv.entity_id,
             }),

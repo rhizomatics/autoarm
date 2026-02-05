@@ -29,18 +29,18 @@ rules:
       helpers.py (utilities), hass_api.py (HA API wrapper), calendar.py (calendar logic).
 
   config-flow:
-    status: exempt
+    status: done
     comment: |
-      This integration uses YAML-only configuration as indicated by
-      "config_flow": false in manifest.json. YAML configuration is appropriate
-      for this integration as it requires complex nested configuration for
-      transitions, calendars, buttons, and notification profiles that would be
-      cumbersome in a UI flow.
+      Config flow implemented in config_flow.py with user flow (3 steps:
+      alarm panel, calendars, persons), YAML import flow, and options flow.
+      Advanced config (transitions, buttons, notify, diurnal, rate_limit)
+      remains in YAML.
 
   config-flow-test-coverage:
-    status: exempt
+    status: done
     comment: |
-      No config flow exists; this is a YAML-only integration.
+      Config flow tests in tests/autoarm/test_config_flow.py cover user flow,
+      minimal flow, duplicate abort, import flow, import abort, and options flow.
 
   dependency-transparency:
     status: done
@@ -102,10 +102,10 @@ rules:
       and accessed via hass.data[HASS_DATA_KEY].
 
   test-before-configure:
-    status: exempt
+    status: done
     comment: |
-      No config flow exists; this is a YAML-only integration. Configuration
-      validation is performed via voluptuous schemas in const.py.
+      Config flow validates alarm panel entity selection. Import flow validates
+      YAML structure. Schema validation via voluptuous in const.py.
 
   test-before-setup:
     status: done
@@ -116,10 +116,10 @@ rules:
       via the repair system for invalid configs.
 
   unique-config-entry:
-    status: exempt
+    status: done
     comment: |
-      YAML-only integration with a single domain-wide configuration. Multiple
-      instances are not supported or needed.
+      Config flow sets unique_id = DOMAIN and calls _abort_if_unique_id_configured()
+      to prevent duplicate entries. Only one AutoArm instance is supported.
 
   # ============================================================================
   # Silver Tier
@@ -297,10 +297,11 @@ rules:
       No icon translations implemented; entities don't have custom icons.
 
   reconfiguration-flow:
-    status: exempt
+    status: done
     comment: |
-      YAML-only integration; reconfiguration is done by editing YAML and
-      calling the reload service.
+      Options flow in config_flow.py allows changing calendar entities, person
+      entities, occupancy defaults, and no-event mode via the UI. Changes
+      trigger an entry reload.
 
   repair-issues:
     status: done

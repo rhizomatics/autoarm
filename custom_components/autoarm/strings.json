@@ -1,5 +1,44 @@
 {
     "title":"AutoArm",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Select Alarm Panel",
+                "data": {
+                    "alarm_panel": "Alarm control panel"
+                }
+            },
+            "calendars": {
+                "title": "Select Calendars",
+                "data": {
+                    "calendar_entities": "Calendar entities"
+                }
+            },
+            "persons": {
+                "title": "Select Persons",
+                "data": {
+                    "person_entities": "Person entities"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "[%key:common::config_flow::abort::already_configured_service%]"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Auto Arm Options",
+                "data": {
+                    "calendar_entities": "Calendar entities",
+                    "person_entities": "Person entities",
+                    "occupancy_default_day": "Occupied daytime state",
+                    "occupancy_default_night": "Occupied nighttime state",
+                    "no_event_mode": "No calendar event mode"
+                }
+            }
+        }
+    },
     "services": {
         "reload": {
             "name": "[%key:common::action::reload%]",
@@ -10,6 +49,10 @@
         "transition_condition":{
             "title":"Invalid Transition Condition",
             "description":"Transition condition for {state} failed to validate with an error ({error})"
+        },
+        "yaml_core_config_deprecated": {
+            "title": "YAML core configuration is deprecated",
+            "description": "Core AutoArm settings (alarm_panel, occupancy, calendars) have been migrated to the UI config entry. Remove these from your YAML configuration and use the UI to manage them. Advanced settings (transitions, buttons, notify, diurnal, rate_limit) can remain in YAML."
         }
     }
 }
