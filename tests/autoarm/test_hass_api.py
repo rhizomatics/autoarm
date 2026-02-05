@@ -14,7 +14,7 @@ async def test_evaluate_with_bad_condition(hass_api: HomeAssistantAPI) -> None:
 
 
 async def test_evaluates_good_true_condition(hass_api: HomeAssistantAPI) -> None:
-    cvars = ConditionVariables(True, False, AlarmControlPanelState.DISARMED, {})
+    cvars = ConditionVariables(True, False, False, AlarmControlPanelState.DISARMED, {})
     condition = cv.CONDITIONS_SCHEMA({
         "condition": "template",
         "value_template": """
@@ -27,11 +27,23 @@ async def test_evaluates_good_true_condition(hass_api: HomeAssistantAPI) -> None
 
 async def test_evaluates_good_false_condition(hass_api: HomeAssistantAPI) -> None:
 
-    cvars = ConditionVariables(True, False, AlarmControlPanelState.DISARMED, {})
+    cvars = ConditionVariables(True, False, False, AlarmControlPanelState.DISARMED, {})
     condition = cv.CONDITIONS_SCHEMA({
         "condition": "template",
         "value_template": """
                         {{ autoarm.occupied and autoarm.night}}""",
+    })
+    checker = await hass_api.build_condition(condition, strict=True)
+    assert checker is not None
+    assert hass_api.evaluate_condition(checker, cvars) is False
+
+
+async def test_evaluates_with_undefined_occupancy(hass_api: HomeAssistantAPI) -> None:
+    cvars = ConditionVariables(None, None, False, AlarmControlPanelState.DISARMED, {}, None, None, None)
+    condition = cv.CONDITIONS_SCHEMA({
+        "condition": "template",
+        "value_template": """
+                        {{ autoarm.occupied and not autoarm.night}}""",
     })
     checker = await hass_api.build_condition(condition, strict=True)
     assert checker is not None

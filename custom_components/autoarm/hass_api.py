@@ -56,7 +56,7 @@ class HomeAssistantAPI:
         if self._hass is None:
             raise ValueError("HomeAssistant not available")
         capturing_logger: ConditionErrorLoggingAdaptor = ConditionErrorLoggingAdaptor(_LOGGER)
-        condition_variables: ConditionVariables = ConditionVariables(False, False, AlarmControlPanelState.PENDING, {})
+        condition_variables: ConditionVariables = ConditionVariables(None,None,False,  AlarmControlPanelState.PENDING, {})
         cond_list: list[ConfigType]
         try:
             if validate:

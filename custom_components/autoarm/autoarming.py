@@ -120,7 +120,7 @@ class AutoArmData:
     other_data: dict[str, str | dict[str, str] | list[str] | int | float | bool | None]
 
 
-async def async_setup(
+async def async_setup(  # noqa: RUF029
     hass: HomeAssistant,
     config: ConfigType,
 ) -> bool:
@@ -217,7 +217,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001, RUF029
     """Unload Auto Arm config entry."""
     if HASS_DATA_KEY in hass.data:
         hass.data[HASS_DATA_KEY].armer.shutdown()
@@ -467,8 +467,11 @@ class AlarmArmer:
 
     def initialize_occupancy(self) -> None:
         """Configure occupants, and listen for changes in their state"""
-        _LOGGER.info("AUTOARM Occupancy determined by %s", ",".join(self.occupants))
-        self.unsubscribes.append(async_track_state_change_event(self.hass, self.occupants, self.on_occupancy_change))
+        if self.occupants:
+            _LOGGER.info("AUTOARM Occupancy determined by %s", ",".join(self.occupants))
+            self.unsubscribes.append(async_track_state_change_event(self.hass, self.occupants, self.on_occupancy_change))
+        else:
+            _LOGGER.info("AUTOARM Occupancy not configured")
 
     def initialize_buttons(self) -> None:
         """Initialize (optional) physical alarm state control buttons"""
@@ -605,17 +608,27 @@ class AlarmArmer:
     def has_active_calendar_event(self) -> bool:
         return any(cal.has_active_event() for cal in self.calendars)
 
-    def is_occupied(self) -> bool:
-        return any(safe_state(self.hass.states.get(p)) == STATE_HOME for p in self.occupants)
+    def is_occupied(self) -> bool | None:
+        '''Ternary - true at least one person entity has state home, false none of them, null if no occupants defined'''
+        if self.occupants:
+            return any(safe_state(self.hass.states.get(p)) == STATE_HOME for p in self.occupants)
+        return None
 
-    def at_home(self) -> list[str]:
-        return [p for p in self.occupants if safe_state(self.hass.states.get(p)) == STATE_HOME]
+    def at_home(self) -> list[str] | None:
+        if self.occupants:
+            return [p for p in self.occupants if safe_state(self.hass.states.get(p)) == STATE_HOME]
+        return None
 
-    def not_home(self) -> list[str]:
-        return [p for p in self.occupants if safe_state(self.hass.states.get(p)) != STATE_HOME]
+    def not_home(self) -> list[str] | None:
+        if self.occupants:
+            return [p for p in self.occupants if safe_state(self.hass.states.get(p)) != STATE_HOME]
+        return None
 
-    def is_unoccupied(self) -> bool:
-        return all(safe_state(self.hass.states.get(p)) != STATE_HOME for p in self.occupants)
+    def is_unoccupied(self) -> bool | None:
+        '''Ternary - false at least one person entity has state home, true none of them, null if no occupants defined'''
+        if self.occupants:
+            return all(safe_state(self.hass.states.get(p)) != STATE_HOME for p in self.occupants)
+        return None
 
     def is_night(self) -> bool:
         return safe_state(self.hass.states.get("sun.sun")) == STATE_BELOW_HORIZON
@@ -743,6 +756,7 @@ class AlarmArmer:
         evaluated_state: AlarmControlPanelState | None = None
         condition_vars: ConditionVariables = ConditionVariables(
             self.is_occupied(),
+            self.is_unoccupied(),
             self.is_night(),
             state=self.armed_state(),
             calendar_event=self.active_calendar_event(),

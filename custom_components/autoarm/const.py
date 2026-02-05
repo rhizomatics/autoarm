@@ -204,7 +204,8 @@ DEFAULT_TRANSITIONS: dict[str, str | list[str]] = {
 class ConditionVariables:
     """Field with sub-fields added to the template context of Transition Conditions"""
 
-    occupied: bool
+    occupied: bool | None
+    unoccupied: bool | None
     night: bool
     state: AlarmControlPanelState
     occupied_defaults: dict[str, AlarmControlPanelState]

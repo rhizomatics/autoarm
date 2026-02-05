@@ -3,6 +3,8 @@
 ## 1.0.0
 ### Configuration
 - The basic setup, along with calendars, occupancy and some tuning is now UI based using Home Assistant ConfigFlow and ConfigEntry, with automated migration of existing YAML config
+### Occupancy
+- Logic now clearly distinguishes occupancy not configured vs occupied and unoccupied
 ### Fixes
 - Notifications now better respect which alarm states are in scope per profile
 
