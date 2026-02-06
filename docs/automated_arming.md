@@ -74,9 +74,10 @@ This does three things to support [Automated Transitions]:
     - There's a `earliest` and `latest` cutoff option in the UI config to stop alarm being disarmed at 4am if you live far North, like Canada or Scotland.
     - The cutoffs for sunrise can be set to the same time to override the `sun` integration altogeher for sunsrise
 2. Re-evaluate the alarm state at **sunset**
-    - There's a `earliest` and `latest` cutoff option in the UI config, which works
-    identically to that for sunrise
+    - There's a `earliest` and `latest` cutoff option in the UI config, which works identically to that for sunrise
 3. Provide a `day` and `night` value for conditions
+
+![Diurnal Overrides in Configuration](./assets/images/config_flow_options_diurnal.png)
 
 ## Occupancy Control
 

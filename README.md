@@ -22,6 +22,8 @@
 Automate the arming and disarming of the built-in Home Assistant [Alarm
 Control Panel Integrations][], with additional support for calendar integration, occupancy-driven arming and disarming, manual override via remote control buttons, and mobile push actionable notifications.
 
+Calendar, occupancy and diurnal scheduling available with **zero YAML**, everything configured from the Home Assistant settings. Advanced configuration for physical buttons, and fine-tuning for other scheduling, available from optional YAML configuration.
+
 !!! question inline end "Why use alarm control panels?"
     A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful, even if there is no real alarm system, as a **single central state of the home**, and then use that to drive automations, notifications etc rather than littering notifications with checks for presence, time of day, vacations or similar.
 
@@ -49,6 +51,8 @@ AutoArm is set up using the Home Assistant Integrations page, with additional ad
 3. Optionally select **Calendar** and **Person** entities.
 4. Adjust defaults in **Options** at any time (calendar entities, person entities, occupancy defaults, no-event mode).
 
+![Configuration Options](./assets/images/config_flow_options.png)
+
 ### YAML for Advanced Features
 
 Transitions, buttons, notifications, diurnal settings, rate limiting, and per-calendar overrides (state patterns, poll intervals) are configured in YAML. See [Typical Configuration](configuration/examples/typical.md) for a full example.
@@ -60,6 +64,22 @@ Transitions, buttons, notifications, diurnal settings, rate limiting, and per-ca
 
 See [Automated Arming](automated_arming.md) for the various mechanisms, options and how to configure.
 
+The full list of how alarm panel state can be set:
+
+| Source        | Description                                                               |
+|---------------|---------------------------------------------------------------------------|
+| calendar      | Calendar events                                                           |
+| mobile        | Mobile action                                                             |
+| occupancy     | Occupancy calculation, e.g. automatically switching off `ARMED_AWAY`      |
+| alarm_panel   | Changes made to Alarm Control Panel outside of AutoArm                    |
+| button        | A physical button push                                                    |
+| action        | A Home Assistant Action call (previously known as 'Service')              |
+| sunrise       | HomeAssistant `sun` integration event                                     |
+| sunset        | HomeAssistant `sun` integration event                                     |
+| startup       | Alarm changes made as part of AutoArm startup                             |
+| zombification | Home Assistant alarm panel got itself into a 'zombie' state and was reset |
+
+
 ## Throttling
 
 To guard against loops, or other reasons why arming might be triggered too often,
@@ -69,10 +89,18 @@ the past so many seconds. Configured by `rate_limit` section in config.
 
 ## Notifications
 
+Notifications is set up via the integration settings.
+
+![Notification Options](./assets/images/config_flow_options_notifications.png)
+
 Two notifications are sent:
 
 - Alarm status has changed, by any means
 - A button has been pressed, and the arm status will be actioned with a few seconds delay
+
+### Advanced Notifications
+
+More control over notifications is available using YAML configuration,
 
 The alarm status message by default uses a `quiet` profile, and another one called `normal`, which can be overridden with as many profiles named as you like. Each profile is defined by the source of alarm change, optionally restricted by which alarm states are involved, and lets you change the priority, or any of the other message content (the ubiquitous Home Assistant `data` section).
 
@@ -92,24 +120,7 @@ notify:
         priority: medium
 ```
 
-Possible sources for alarm changes are:
-
-| Source        | Description                                                               |
-|---------------|---------------------------------------------------------------------------|
-| calendar      | Calendar events                                                           |
-| mobile        | Mobile action                                                             |
-| occupancy     | Occupancy calculation, e.g. automatically switching off `ARMED_AWAY`      |
-| alarm_panel   | Changes made to Alarm Control Panel outside of AutoArm                    |
-| button        | A physical button push                                                    |
-| action        | A Home Assistant Action call (previously known as 'Service')              |
-| sunrise       | HomeAssistant `sun` integration event                                     |
-| sunset        | HomeAssistant `sun` integration event                                     |
-| startup       | Alarm changes made as part of AutoArm startup                             |
-| zombification | Home Assistant alarm panel got itself into a 'zombie' state and was reset |
-
-
- If you want to send to e-mail and mobile then this will fail with a notify group unless you use very basic messages, since additional fields, like the `actions` in the `data` field for Actionable Notifications aren't supported by other notification platforms. The
- best way to resolve that is with [Supernotify](https://supernotify.rhizomatics.org.uk) which will tune each message for the underlying transport ( mobile apps, and also e-mail, text, chime etc.) along with lots of other tuning options and automatic discovery.
+ If you want to send to e-mail and mobile then this will fail with a notify group unless you use very basic messages, since additional fields, like the `actions` in the `data` field for Actionable Notifications aren't supported by other notification platforms. The best way to resolve that is with [Supernotify](https://supernotify.rhizomatics.org.uk) which will tune each message for the underlying transport ( mobile apps, and also e-mail, text, chime etc.) along with lots of other tuning options and automatic discovery.
 
 ## Home Assistant Features Supported
 
