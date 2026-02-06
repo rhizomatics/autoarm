@@ -5,7 +5,7 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
-from homeassistant.const import CONF_ENTITY_ID, CONF_SERVICE
+from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_SERVICE
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers.selector import (
     BooleanSelector,
@@ -67,6 +67,7 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
     CONF_OCCUPANCY_DEFAULT_NIGHT: None,
     CONF_NO_EVENT_MODE: "auto",
+    CONF_NOTIFY_ENABLED:True,
     CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
     CONF_NOTIFY_TARGETS: [],
     CONF_SUNRISE_EARLIEST: None,
@@ -127,6 +128,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_OCCUPANCY_DEFAULT_NIGHT: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_NIGHT],
                 CONF_NO_EVENT_MODE: DEFAULT_OPTIONS[CONF_NO_EVENT_MODE],
                 CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
+                CONF_NOTIFY_ENABLED: True,
                 CONF_NOTIFY_TARGETS: [],
                 CONF_SUNRISE_EARLIEST: None,
                 CONF_SUNRISE_LATEST: None,
@@ -167,6 +169,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
 
         notify_config = import_data.get(CONF_NOTIFY, {})
         notify_action = notify_config.get(NOTIFY_COMMON, {}).get(CONF_SERVICE, DEFAULT_NOTIFY_ACTION)
+        notify_enabled: bool=notify_config.get(NOTIFY_COMMON, {}).get(CONF_ENABLED, True)
 
         diurnal_config = import_data.get(CONF_DIURNAL, {})
         sunrise_config = diurnal_config.get(CONF_SUNRISE, {}) if diurnal_config else {}
@@ -178,6 +181,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_OCCUPANCY_DEFAULT_DAY: occupancy_defaults.get(CONF_DAY, DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_DAY]),
             CONF_OCCUPANCY_DEFAULT_NIGHT: occupancy_defaults.get(CONF_NIGHT),
             CONF_NO_EVENT_MODE: no_event_mode,
+            CONF_NOTIFY_ENABLED: notify_enabled,
             CONF_NOTIFY_ACTION: notify_action,
             CONF_NOTIFY_TARGETS: [],
             CONF_SUNRISE_EARLIEST: _time_to_str(sunrise_config.get(CONF_EARLIEST)),

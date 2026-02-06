@@ -17,6 +17,7 @@ from homeassistant.components.sun.const import STATE_BELOW_HORIZON
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
     CONF_CONDITIONS,
+    CONF_ENABLED,
     CONF_ENTITY_ID,
     CONF_SERVICE,
     EVENT_HOMEASSISTANT_STOP,
@@ -211,6 +212,7 @@ async def async_setup(
                 or stashed_yaml.get(CONF_NOTIFY, {}).get(NOTIFY_COMMON, {}).get(CONF_SERVICE, DEFAULT_NOTIFY_ACTION),
                 "targets": entry.options.get(CONF_NOTIFY_TARGETS, []),
                 "profiles": stashed_yaml.get(CONF_NOTIFY, {}),
+                "enabled":stashed_yaml.get(CONF_ENABLED,True)
             },
             CONF_RATE_LIMIT: stashed_yaml.get(CONF_RATE_LIMIT, {}),
         }
@@ -399,7 +401,7 @@ class AlarmArmer:
         buttons: dict[str, ConfigType] | None = None,
         occupancy: ConfigType | None = None,
         actions: list[str] | None = None,
-        notify_enabled: bool = False,
+        notify_enabled: bool = True,
         notify_action: str | None = None,
         notify_targets: list[str] | None = None,
         notify_profiles: ConfigType | None = None,
