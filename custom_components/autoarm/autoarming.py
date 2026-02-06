@@ -212,7 +212,7 @@ async def async_setup(
                 or stashed_yaml.get(CONF_NOTIFY, {}).get(NOTIFY_COMMON, {}).get(CONF_SERVICE, DEFAULT_NOTIFY_ACTION),
                 "targets": entry.options.get(CONF_NOTIFY_TARGETS, []),
                 "profiles": stashed_yaml.get(CONF_NOTIFY, {}),
-                "enabled":stashed_yaml.get(CONF_ENABLED,True)
+                "enabled": stashed_yaml.get(CONF_ENABLED, True),
             },
             CONF_RATE_LIMIT: stashed_yaml.get(CONF_RATE_LIMIT, {}),
         }

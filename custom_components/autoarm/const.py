@@ -54,7 +54,7 @@ NOTIFY_CATEGORIES = [NOTIFY_COMMON, NOTIFY_QUIET, NOTIFY_NORMAL]
 NOTIFY_DEF_SCHEMA = vol.Schema({
     vol.Optional(CONF_SERVICE): cv.service,
     vol.Optional(CONF_SUPERNOTIFY): cv.boolean,
-    vol.Required(CONF_SUPERNOTIFY,default=True): cv.boolean,
+    vol.Required(CONF_SUPERNOTIFY, default=True): cv.boolean,
     vol.Optional(CONF_TARGET): vol.All(cv.ensure_list, [str]),
     vol.Optional(CONF_SOURCE): vol.All(cv.ensure_list, [str]),
     vol.Optional(CONF_STATE): vol.All(cv.ensure_list, [vol.In(ALARM_STATES)]),

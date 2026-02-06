@@ -67,7 +67,7 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
     CONF_OCCUPANCY_DEFAULT_NIGHT: None,
     CONF_NO_EVENT_MODE: "auto",
-    CONF_NOTIFY_ENABLED:True,
+    CONF_NOTIFY_ENABLED: True,
     CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
     CONF_NOTIFY_TARGETS: [],
     CONF_SUNRISE_EARLIEST: None,
@@ -169,7 +169,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
 
         notify_config = import_data.get(CONF_NOTIFY, {})
         notify_action = notify_config.get(NOTIFY_COMMON, {}).get(CONF_SERVICE, DEFAULT_NOTIFY_ACTION)
-        notify_enabled: bool=notify_config.get(NOTIFY_COMMON, {}).get(CONF_ENABLED, True)
+        notify_enabled: bool = notify_config.get(NOTIFY_COMMON, {}).get(CONF_ENABLED, True)
 
         diurnal_config = import_data.get(CONF_DIURNAL, {})
         sunrise_config = diurnal_config.get(CONF_SUNRISE, {}) if diurnal_config else {}
@@ -258,7 +258,10 @@ class AutoArmOptionsFlow(OptionsFlow):
                 ),
                 vol.Required("notify_options"): section(
                     vol.Schema({
-                        vol.Required(CONF_NOTIFY_ENABLED, default=False): BooleanSelector(),
+                        vol.Required(
+                            CONF_NOTIFY_ENABLED,
+                            default=options.get(CONF_NOTIFY_ENABLED, True),
+                        ): BooleanSelector(),
                         vol.Optional(
                             CONF_NOTIFY_ACTION,
                             default=options.get(CONF_NOTIFY_ACTION, DEFAULT_NOTIFY_ACTION),
