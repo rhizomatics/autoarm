@@ -35,10 +35,45 @@
                     "occupancy_default_day": "Default arming state when occupied during day",
                     "occupancy_default_night": "Default arming state when occupied at night",
                     "no_event_mode": "Arming state when a calendar event ends",
-                    "sunrise_earliest": "Sunrise no earlier than time",
-                    "sunrise_latest": "Sunrise no later than time",
-                    "sunset_earliest": "Sunset no earlier than time",
-                    "sunset_latest": "Sunset no later than time"
+                    "notify_action": "Notification Action",
+                    "notify_targets": "Notification Targets"
+                },
+                "sections": {
+                    "notify_options": {
+                        "name": "Notifications",
+                        "data": {
+                            "notify_enabled":"Notifications Enabled",
+                            "notify_action": "Notification Action",
+                            "notify_targets": "Notification Targets"
+                        },
+                        "data_description": {
+                            "notify_enabled":"Enable notifications for alarm state changes",
+                            "notify_action":"Home Assistant action (service) to use to notify",
+                            "notify_targets":"List of addresses or notify entities to notify, can be left blank for Supernotify"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "Sunrise Constraints",
+                        "data": {
+                            "sunrise_earliest": "Earliest",
+                            "sunrise_latest": "Latest"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "Sunrise no earlier than time",
+                            "sunrise_latest": "Sunrise no later than time"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "Sunset Constraints",
+                        "data": {
+                            "sunset_earliest": "Earliest",
+                            "sunset_latest": "Latest"
+                        },
+                        "data_description": {
+                             "sunset_earliest": "Sunset no earlier than time",
+                            "sunset_latest": "Sunset no earlier than time"
+                        }
+                    }
                 }
             }
         }

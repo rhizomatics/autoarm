@@ -115,7 +115,7 @@ async def test_on_sunrise_with_cutoff_active_no_interventions(
 ) -> None:
     await autoarmer.arm(AlarmControlPanelState.PENDING)
     await hass.async_block_till_done()
-    autoarmer.sunrise_cutoff = (dt_util.now() + dt.timedelta(seconds=2)).time()
+    autoarmer.sunrise_cutoff = (dt_util.now() + dt.timedelta(seconds=2)).time()  # type: ignore[attr-defined]
     autoarmer.interventions = []
     await autoarmer.on_sunrise()
     await hass.async_block_till_done()
@@ -129,7 +129,7 @@ async def test_on_sunrise_with_intervention_before_cutoff(
     hass: HomeAssistant,
 ) -> None:
     await autoarmer.arm(AlarmControlPanelState.ARMED_AWAY)
-    autoarmer.sunrise_cutoff = (dt_util.now() + dt.timedelta(seconds=2)).time()
+    autoarmer.sunrise_cutoff = (dt_util.now() + dt.timedelta(seconds=2)).time()  # type: ignore[attr-defined]
     await autoarmer.on_sunrise()
     hass.states.async_set(TEST_PANEL, "pending")
     await hass.async_block_till_done()

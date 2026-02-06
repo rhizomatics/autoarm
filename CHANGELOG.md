@@ -7,8 +7,12 @@
 - Logic now clearly distinguishes occupancy not configured vs occupied and unoccupied
 ### Auto Transitions
 - Refreshed logic, including for undefined occupancy
+### Notifications
+- Actionable Notifications set by default when Supernotify used for notification
+- Advanced config in YAML can set targets for notifications, per profile or in `common` profile
 ### Fixes
 - Notifications now better respect which alarm states are in scope per profile
+
 
 ## 0.8.0
 ### Notifications

@@ -18,6 +18,7 @@ from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
     CONF_CONDITIONS,
     CONF_ENTITY_ID,
+    CONF_SERVICE,
     EVENT_HOMEASSISTANT_STOP,
     SERVICE_RELOAD,
     STATE_HOME,
@@ -58,6 +59,9 @@ from .calendar import TrackedCalendar
 from .config_flow import (
     CONF_CALENDAR_ENTITIES,
     CONF_NO_EVENT_MODE,
+    CONF_NOTIFY_ACTION,
+    CONF_NOTIFY_ENABLED,
+    CONF_NOTIFY_TARGETS,
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
@@ -65,6 +69,7 @@ from .config_flow import (
     CONF_SUNRISE_LATEST,
     CONF_SUNSET_EARLIEST,
     CONF_SUNSET_LATEST,
+    DEFAULT_NOTIFY_ACTION,
 )
 from .const import (
     ATTR_RESET,
@@ -95,6 +100,7 @@ from .const import (
     DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
     NO_CAL_EVENT_MODE_MANUAL,
+    NOTIFY_COMMON,
     YAML_DATA_KEY,
     ChangeSource,
     ConditionVariables,
@@ -200,7 +206,12 @@ async def async_setup(
                     CONF_DAY: entry.options.get(CONF_OCCUPANCY_DEFAULT_DAY, "armed_home"),
                 },
             },
-            CONF_NOTIFY: stashed_yaml.get(CONF_NOTIFY, {}),
+            CONF_NOTIFY: {
+                CONF_SERVICE: entry.options.get(CONF_NOTIFY_ACTION)
+                or stashed_yaml.get(CONF_NOTIFY, {}).get(NOTIFY_COMMON, {}).get(CONF_SERVICE, DEFAULT_NOTIFY_ACTION),
+                "targets": entry.options.get(CONF_NOTIFY_TARGETS, []),
+                "profiles": stashed_yaml.get(CONF_NOTIFY, {}),
+            },
             CONF_RATE_LIMIT: stashed_yaml.get(CONF_RATE_LIMIT, {}),
         }
         try:
@@ -291,8 +302,8 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
             CONF_CALENDARS: calendar_list,
         }
 
-    # Build notify config (from YAML, with defaults applied)
-    notify = yaml_config.get(CONF_NOTIFY, {})
+    # Build notify config: service from options overrides YAML when explicitly set
+    notify_profiles = yaml_config.get(CONF_NOTIFY, {})
 
     # Build diurnal cutoffs: options take priority, YAML is fallback
     yaml_diurnal = yaml_config.get(CONF_DIURNAL, {}) or {}
@@ -314,7 +325,10 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         sunset_latest=_parse_time(CONF_SUNSET_LATEST, yaml_sunset.get(CONF_LATEST)),
         buttons=yaml_config.get(CONF_BUTTONS, {}),
         occupancy=occupancy,
-        notify=notify,
+        notify_profiles=notify_profiles,
+        notify_enabled=entry.options.get(CONF_NOTIFY_ENABLED, False),
+        notify_action=entry.options.get(CONF_NOTIFY_ACTION),
+        notify_targets=entry.options.get(CONF_NOTIFY_TARGETS, []),
         rate_limit=yaml_config.get(CONF_RATE_LIMIT, {}),
         calendar_config=calendar_config,
         transitions=yaml_config.get(CONF_TRANSITIONS),
@@ -385,7 +399,10 @@ class AlarmArmer:
         buttons: dict[str, ConfigType] | None = None,
         occupancy: ConfigType | None = None,
         actions: list[str] | None = None,
-        notify: ConfigType | None = None,
+        notify_enabled: bool = False,
+        notify_action: str | None = None,
+        notify_targets: list[str] | None = None,
+        notify_profiles: ConfigType | None = None,
         sunrise_earliest: dt.time | None = None,
         sunrise_latest: dt.time | None = None,
         sunset_earliest: dt.time | None = None,
@@ -399,7 +416,15 @@ class AlarmArmer:
 
         self.hass: HomeAssistant = hass
         self.app_health_tracker: AppHealthTracker = AppHealthTracker(hass)
-        self.notifier: Notifier = Notifier(notify, hass, self.app_health_tracker)
+        if notify_enabled and not notify_profiles and not notify_action:
+            _LOGGER.warning("AUTOARM Notification disabled - no config")
+            notify_enabled = False
+        if notify_enabled:
+            self.notifier: Notifier | None = Notifier(
+                notify_profiles, hass, self.app_health_tracker, notify_action, notify_targets
+            )
+        else:
+            self.notifier = None
         self.local_tz = dt_util.get_time_zone(self.hass.config.time_zone)
         calendar_config = calendar_config or {}
         self.calendar_configs: list[ConfigType] = calendar_config.get(CONF_CALENDARS, []) or []
@@ -867,7 +892,7 @@ class AlarmArmer:
                 attrs[ATTR_CHANGED_BY] = f"{DOMAIN}.{source}"
                 self.hass.states.async_set(entity_id=self.alarm_panel, new_state=str(arming_state), attributes=attrs)
                 _LOGGER.info("AUTOARM Setting %s from %s to %s for %s", self.alarm_panel, existing_state, arming_state, source)
-                if source and arming_state:
+                if self.notifier and source and arming_state:
                     await self.notifier.notify(source=source, from_state=existing_state, to_state=arming_state)
                 return arming_state
             _LOGGER.debug("Skipping arm for %s, as %s already %s", source, self.alarm_panel, arming_state)
@@ -987,13 +1012,14 @@ class AlarmArmer:
         intervention = self.record_intervention(source=ChangeSource.BUTTON, state=state)
         if delay:
             self.schedule_state(dt_util.now() + delay, state, intervention, source=ChangeSource.BUTTON)
-            await self.notifier.notify(
-                ChangeSource.BUTTON,
-                from_state=self.armed_state(),
-                to_state=state,
-                message=f"Alarm will be set to {state} in {delay}",
-                title=f"Arm set to {state} process starting",
-            )
+            if self.notifier:
+                await self.notifier.notify(
+                    ChangeSource.BUTTON,
+                    from_state=self.armed_state(),
+                    to_state=state,
+                    message=f"Alarm will be set to {state} in {delay}",
+                    title=f"Arm set to {state} process starting",
+                )
         else:
             await self.arm(state, source=ChangeSource.BUTTON)
 
@@ -1003,12 +1029,12 @@ class AlarmArmer:
         intervention = self.record_intervention(source=ChangeSource.BUTTON, state=None)
         if delay:
             self.schedule_state(dt_util.now() + delay, None, intervention, ChangeSource.BUTTON)
-
-            await self.notifier.notify(
-                ChangeSource.BUTTON,
-                message=f"Alarm will be reset in {delay}",
-                title="Alarm reset wait initiated",
-            )
+            if self.notifier:
+                await self.notifier.notify(
+                    ChangeSource.BUTTON,
+                    message=f"Alarm will be reset in {delay}",
+                    title="Alarm reset wait initiated",
+                )
         else:
             await self.reset_armed_state(intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None))
 
@@ -1072,7 +1098,8 @@ class AlarmArmer:
             _LOGGER.warning("AUTOARM Dezombifying %s ...", new)
             await self.reset_armed_state(source=ChangeSource.ZOMBIFICATION)
         elif new != old:
-            await self.notifier.notify(ChangeSource.ALARM_PANEL, old_state, new_state)
+            if self.notifier:
+                await self.notifier.notify(ChangeSource.ALARM_PANEL, old_state, new_state)
         else:
             _LOGGER.debug("AUTOARM panel change leaves state unchanged at %s", new)
 

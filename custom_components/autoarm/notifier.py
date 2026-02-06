@@ -3,7 +3,7 @@ from typing import Any
 
 from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
-from homeassistant.const import CONF_SERVICE, CONF_SOURCE, CONF_STATE
+from homeassistant.const import CONF_SERVICE, CONF_SOURCE, CONF_STATE, CONF_TARGET
 
 from custom_components.autoarm.const import ALARM_STATES, CONF_SCENARIO, CONF_SUPERNOTIFY, NOTIFY_COMMON, ChangeSource
 from custom_components.autoarm.helpers import AppHealthTracker
@@ -13,11 +13,18 @@ _LOGGER = logging.getLogger(__name__)
 
 class Notifier:
     def __init__(
-        self, notify_profiles: dict[str, dict[str, Any]] | None, hass: HomeAssistant, app_health_tracker: AppHealthTracker
+        self,
+        notify_profiles: dict[str, dict[str, Any]] | None,
+        hass: HomeAssistant,
+        app_health_tracker: AppHealthTracker,
+        notify_action: str | None,
+        notify_targets: list[str] | None = None,
     ) -> None:
         self.notify_profiles: dict[str, dict[str, Any]] = notify_profiles or {}
-        self.hass = hass
-        self.app_health_tracker = app_health_tracker
+        self.hass: HomeAssistant = hass
+        self.app_health_tracker: AppHealthTracker = app_health_tracker
+        self.notify_action: str | None = notify_action
+        self.notify_targets: list[str] = notify_targets or []
 
     async def notify(
         self,
@@ -27,7 +34,7 @@ class Notifier:
         message: str | None = None,
         title: str | None = None,
     ) -> None:
-        notify_service: str | None = None
+
         try:
             selected_profile: dict[str, Any] | None = None
             selected_profile_name: str | None = None
@@ -72,7 +79,15 @@ class Notifier:
                 data["profile"] = selected_profile_name
             if merged_profile.get(CONF_SUPERNOTIFY) and merged_profile.get(CONF_SCENARIO):
                 data["apply_scenarios"] = merged_profile.get(CONF_SCENARIO)
-            notify_service = merged_profile.get(CONF_SERVICE, "").replace("notify.", "")
+
+            notify_action: str | None = merged_profile.get(CONF_SERVICE, self.notify_action)
+            notify_targets: list[str] | None = merged_profile.get(CONF_TARGET, self.notify_targets)
+            if notify_action is None:
+                _LOGGER.debug("AUTOARM Notifications disabled, no notification action")
+                return
+            if notify_action == "notify.send_message" and not notify_targets:
+                _LOGGER.debug("AUTOARM Notifications disabled, no targets for notify.send_message")
+                return
 
             if title is None:
                 title = f"Alarm now {to_state}" if to_state else "Alarm Panel Change"
@@ -82,15 +97,20 @@ class Notifier:
                 else:
                     message = "Alarm control panel operation complete"
 
-            if notify_service and merged_profile:
+            if notify_action and merged_profile:
+                service_data: dict[str, Any] = {"message": message, "title": title, "data": data}
+                if notify_targets:
+                    service_data["target"] = notify_targets
+                domain, action = notify_action.split(".", 1)
+                _LOGGER.debug("AUTOARM Notifying %s.%s with %s", domain, action, service_data)
                 await self.hass.services.async_call(
-                    "notify",
-                    notify_service,
-                    service_data={"message": message, "title": title, "data": data},
+                    domain,
+                    action,
+                    service_data=service_data,
                 )
             else:
-                _LOGGER.debug("AUTOARM Skipped notification, service: %s, data: %s", notify_service, merged_profile)
+                _LOGGER.debug("AUTOARM Skipped notification, service: %s, data: %s", self.notify_action, merged_profile)
 
         except Exception as e:
             self.app_health_tracker.record_runtime_error()
-            _LOGGER.error("AUTOARM notify.%s failed: %s", notify_service, e)
+            _LOGGER.exception("AUTOARM %s failed: %s", self.notify_action, e)

@@ -9,11 +9,14 @@ import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEvent
 from homeassistant.const import (
+    CONF_ACTION,
+    CONF_ACTIONS,
     CONF_ALIAS,
     CONF_CONDITIONS,
     CONF_DELAY_TIME,
     CONF_ENTITY_ID,
     CONF_SERVICE,
+    CONF_TARGET,
     STATE_HOME,
     STATE_NOT_HOME,
 )
@@ -51,6 +54,7 @@ NOTIFY_CATEGORIES = [NOTIFY_COMMON, NOTIFY_QUIET, NOTIFY_NORMAL]
 NOTIFY_DEF_SCHEMA = vol.Schema({
     vol.Optional(CONF_SERVICE): cv.service,
     vol.Optional(CONF_SUPERNOTIFY): cv.boolean,
+    vol.Optional(CONF_TARGET): vol.All(cv.ensure_list, [str]),
     vol.Optional(CONF_SOURCE): vol.All(cv.ensure_list, [str]),
     vol.Optional(CONF_STATE): vol.All(cv.ensure_list, [vol.In(ALARM_STATES)]),
     vol.Optional(CONF_SCENARIO, default=[]): vol.All(cv.ensure_list, [str]),
@@ -82,11 +86,19 @@ def _apply_notify_defaults(config: dict[str, Any]) -> dict:
             ]
 
     config.setdefault(NOTIFY_COMMON, {})
+    config[NOTIFY_COMMON].setdefault(CONF_DATA, {})
     config[NOTIFY_COMMON].setdefault(CONF_SERVICE, "notify.send_message")
+
     if config[NOTIFY_COMMON].get(CONF_SUPERNOTIFY) is None:
         config[NOTIFY_COMMON][CONF_SUPERNOTIFY] = any(
             config[NOTIFY_COMMON][CONF_SERVICE].endswith(v) for v in ("supernotify", "supernotifier")
         )
+    if config[NOTIFY_COMMON].get(CONF_SUPERNOTIFY) and CONF_ACTIONS not in config[NOTIFY_COMMON][CONF_DATA]:
+        config[NOTIFY_COMMON][CONF_DATA][CONF_ACTIONS] = [
+            {CONF_ACTION: "ALARM_PANEL_DISARM", "title": "Disarm Alarm Panel", "icon": "sfsymbols:bell.slash"},
+            {CONF_ACTION: "ALARM_PANEL_RESET", "title": "Reset Alarm Panel", "icon": "sfsymbols:bell"},
+            {CONF_ACTION: "ALARM_PANEL_AWAY", "title": "Arm Alarm Panel Away", "icon": "sfsymbols:airplane"},
+        ]
     return config
 
 

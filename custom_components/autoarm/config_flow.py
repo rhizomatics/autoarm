@@ -5,13 +5,17 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
-from homeassistant.const import CONF_ENTITY_ID
+from homeassistant.const import CONF_ENTITY_ID, CONF_SERVICE
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers.selector import (
+    BooleanSelector,
     EntitySelector,
     EntitySelectorConfig,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
+    TextSelector,
+    TextSelectorConfig,
     TimeSelector,
 )
 
@@ -26,12 +30,14 @@ from .const import (
     CONF_EARLIEST,
     CONF_LATEST,
     CONF_NIGHT,
+    CONF_NOTIFY,
     CONF_OCCUPANCY,
     CONF_OCCUPANCY_DEFAULT,
     CONF_SUNRISE,
     CONF_SUNSET,
     DOMAIN,
     NO_CAL_EVENT_OPTIONS,
+    NOTIFY_COMMON,
 )
 
 CONF_CALENDAR_ENTITIES = "calendar_entities"
@@ -39,6 +45,9 @@ CONF_PERSON_ENTITIES = "person_entities"
 CONF_OCCUPANCY_DEFAULT_DAY = "occupancy_default_day"
 CONF_OCCUPANCY_DEFAULT_NIGHT = "occupancy_default_night"
 CONF_NO_EVENT_MODE = "no_event_mode"
+CONF_NOTIFY_ACTION = "notify_action"
+CONF_NOTIFY_TARGETS = "notify_targets"
+CONF_NOTIFY_ENABLED = "notify_enabled"
 CONF_SUNRISE_EARLIEST = "sunrise_earliest"
 CONF_SUNRISE_LATEST = "sunrise_latest"
 CONF_SUNSET_EARLIEST = "sunset_earliest"
@@ -50,12 +59,16 @@ def _time_to_str(t: dt.time | None) -> str | None:
     return t.isoformat() if t else None
 
 
+DEFAULT_NOTIFY_ACTION = "notify.send_message"
+
 DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_CALENDAR_ENTITIES: [],
     CONF_PERSON_ENTITIES: [],
     CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
     CONF_OCCUPANCY_DEFAULT_NIGHT: None,
     CONF_NO_EVENT_MODE: "auto",
+    CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
+    CONF_NOTIFY_TARGETS: [],
     CONF_SUNRISE_EARLIEST: None,
     CONF_SUNRISE_LATEST: None,
     CONF_SUNSET_EARLIEST: None,
@@ -113,6 +126,8 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_OCCUPANCY_DEFAULT_DAY: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_DAY],
                 CONF_OCCUPANCY_DEFAULT_NIGHT: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_NIGHT],
                 CONF_NO_EVENT_MODE: DEFAULT_OPTIONS[CONF_NO_EVENT_MODE],
+                CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
+                CONF_NOTIFY_TARGETS: [],
                 CONF_SUNRISE_EARLIEST: None,
                 CONF_SUNRISE_LATEST: None,
                 CONF_SUNSET_EARLIEST: None,
@@ -150,6 +165,9 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         calendar_entities = [cal[CONF_ENTITY_ID] for cal in calendar_config.get(CONF_CALENDARS, []) if CONF_ENTITY_ID in cal]
         no_event_mode = calendar_config.get(CONF_CALENDAR_NO_EVENT, DEFAULT_OPTIONS[CONF_NO_EVENT_MODE])
 
+        notify_config = import_data.get(CONF_NOTIFY, {})
+        notify_action = notify_config.get(NOTIFY_COMMON, {}).get(CONF_SERVICE, DEFAULT_NOTIFY_ACTION)
+
         diurnal_config = import_data.get(CONF_DIURNAL, {})
         sunrise_config = diurnal_config.get(CONF_SUNRISE, {}) if diurnal_config else {}
         sunset_config = diurnal_config.get(CONF_SUNSET, {}) if diurnal_config else {}
@@ -160,6 +178,8 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_OCCUPANCY_DEFAULT_DAY: occupancy_defaults.get(CONF_DAY, DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_DAY]),
             CONF_OCCUPANCY_DEFAULT_NIGHT: occupancy_defaults.get(CONF_NIGHT),
             CONF_NO_EVENT_MODE: no_event_mode,
+            CONF_NOTIFY_ACTION: notify_action,
+            CONF_NOTIFY_TARGETS: [],
             CONF_SUNRISE_EARLIEST: _time_to_str(sunrise_config.get(CONF_EARLIEST)),
             CONF_SUNRISE_LATEST: _time_to_str(sunrise_config.get(CONF_LATEST)),
             CONF_SUNSET_EARLIEST: _time_to_str(sunset_config.get(CONF_EARLIEST)),
@@ -184,9 +204,15 @@ class AutoArmOptionsFlow(OptionsFlow):
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Manage the options."""
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            # Flatten section dicts into top-level options
+            data = {k: v for k, v in user_input.items() if not isinstance(v, dict)}
+            for v in user_input.values():
+                if isinstance(v, dict):
+                    data.update(v)
+            return self.async_create_entry(title="", data=data)
 
         options = self.config_entry.options
+        notify_services = sorted(f"notify.{service}" for service in self.hass.services.async_services().get("notify", {}))
 
         return self.async_show_form(
             step_id="init",
@@ -210,7 +236,7 @@ class AutoArmOptionsFlow(OptionsFlow):
                 ),
                 vol.Optional(
                     CONF_OCCUPANCY_DEFAULT_NIGHT,
-                    description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT)},
+                    description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")},
                 ): SelectSelector(
                     SelectSelectorConfig(
                         options=ALARM_STATES,
@@ -226,21 +252,51 @@ class AutoArmOptionsFlow(OptionsFlow):
                         mode=SelectSelectorMode.DROPDOWN,
                     )
                 ),
-                vol.Optional(
-                    CONF_SUNRISE_EARLIEST,
-                    description={"suggested_value": options.get(CONF_SUNRISE_EARLIEST)},
-                ): TimeSelector(),
-                vol.Optional(
-                    CONF_SUNRISE_LATEST,
-                    description={"suggested_value": options.get(CONF_SUNRISE_LATEST)},
-                ): TimeSelector(),
-                vol.Optional(
-                    CONF_SUNSET_EARLIEST,
-                    description={"suggested_value": options.get(CONF_SUNSET_EARLIEST)},
-                ): TimeSelector(),
-                vol.Optional(
-                    CONF_SUNSET_LATEST,
-                    description={"suggested_value": options.get(CONF_SUNSET_LATEST)},
-                ): TimeSelector(),
+                vol.Required("notify_options"): section(
+                    vol.Schema({
+                        vol.Required(CONF_NOTIFY_ENABLED, default=False): BooleanSelector(),
+                        vol.Optional(
+                            CONF_NOTIFY_ACTION,
+                            default=options.get(CONF_NOTIFY_ACTION, DEFAULT_NOTIFY_ACTION),
+                        ): SelectSelector(
+                            SelectSelectorConfig(
+                                options=notify_services,
+                                multiple=False,
+                                mode=SelectSelectorMode.DROPDOWN,
+                            )
+                        ),
+                        vol.Optional(
+                            CONF_NOTIFY_TARGETS,
+                            default=options.get(CONF_NOTIFY_TARGETS, []),
+                        ): TextSelector(TextSelectorConfig(multiple=True)),
+                    }),
+                    {"collapsed": True},
+                ),
+                vol.Required("sunrise_options"): section(
+                    vol.Schema({
+                        vol.Optional(
+                            CONF_SUNRISE_EARLIEST,
+                            description={"suggested_value": options.get(CONF_SUNRISE_EARLIEST)},
+                        ): TimeSelector(),
+                        vol.Optional(
+                            CONF_SUNRISE_LATEST,
+                            description={"suggested_value": options.get(CONF_SUNRISE_LATEST)},
+                        ): TimeSelector(),
+                    }),
+                    {"collapsed": True},
+                ),
+                vol.Required("sunset_options"): section(
+                    vol.Schema({
+                        vol.Optional(
+                            CONF_SUNSET_EARLIEST,
+                            description={"suggested_value": options.get(CONF_SUNSET_EARLIEST)},
+                        ): TimeSelector(),
+                        vol.Optional(
+                            CONF_SUNSET_LATEST,
+                            description={"suggested_value": options.get(CONF_SUNSET_LATEST)},
+                        ): TimeSelector(),
+                    }),
+                    {"collapsed": True},
+                ),
             }),
         )

@@ -1,38 +1,37 @@
+from typing import TYPE_CHECKING
+
 from homeassistant.core import HomeAssistant
 
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.const import ChangeSource
 
+if TYPE_CHECKING:
+    from homeassistant.helpers.typing import ConfigType
+
 TEST_PANEL = "alarm_control_panel.test_panel"
 
 
-async def test_notify_skipped_when_no_service(hass: HomeAssistant) -> None:
+def test_notify_skipped_when_no_service(hass: HomeAssistant) -> None:
     """Test that notification is skipped when no service is configured."""
-    armer = AlarmArmer(hass, TEST_PANEL, notify={})
-    calls: list[dict] = []
-
-    def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
-        calls.append({"service": call.service, "data": dict(call.data)})
-
-    hass.services.async_register("notify", "test_service", mock_handler)
-    await armer.notifier.notify(ChangeSource.BUTTON, message="Test message")
-    # No service configured, so handler should not be called
-    assert len(calls) == 0
+    armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=False)
+    assert armer.notifier is None
 
 
 async def test_notify_calls_service(hass: HomeAssistant) -> None:
     """Test that notify calls hass.services.async_call with correct parameters."""
-    notify_config = {
-        "common": {"service": "notify.test_service"},
+    notify_config: ConfigType = {
         "backstop": {},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(ChangeSource.BUTTON, message="Test message")
 
     assert len(calls) == 1
@@ -42,17 +41,19 @@ async def test_notify_calls_service(hass: HomeAssistant) -> None:
 
 async def test_notify_with_custom_title(hass: HomeAssistant) -> None:
     """Test that notify uses custom title when provided."""
-    notify_config = {
-        "common": {"service": "notify.test_service"},
+    notify_config: ConfigType = {
         "backstop": {},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(ChangeSource.BUTTON, message="Test message", title="Custom Title")
 
     assert len(calls) == 1
@@ -61,17 +62,18 @@ async def test_notify_with_custom_title(hass: HomeAssistant) -> None:
 
 async def test_notify_profile_merging(hass: HomeAssistant) -> None:
     """Test that selected profile is merged with common profile."""
-    notify_config = {
+    notify_config: ConfigType = {
         "common": {"service": "notify.common_service", "data": {"priority": "low"}},
         "quiet": {"service": "notify.quiet_service", "source": [ChangeSource.BUTTON], "data": {"sound": "none"}},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_profiles=notify_config)
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "quiet_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(ChangeSource.BUTTON, message="Test message")
 
     assert len(calls) == 1
@@ -82,17 +84,20 @@ async def test_notify_profile_merging(hass: HomeAssistant) -> None:
 
 async def test_notify_source_replacement(hass: HomeAssistant) -> None:
     """Test that source is set in data when data['source'] is None."""
-    notify_config = {
-        "common": {"service": "notify.test_service", "data": {"source": None}},
+    notify_config: ConfigType = {
+        "common": {"data": {"source": None}},
         "backstop": {},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(ChangeSource.ALARM_PANEL, message="Test message")
 
     assert len(calls) == 1
@@ -101,17 +106,18 @@ async def test_notify_source_replacement(hass: HomeAssistant) -> None:
 
 async def test_notify_supernotify_scenario(hass: HomeAssistant) -> None:
     """Test that supernotify scenarios are added to data when configured."""
-    notify_config = {
-        "common": {"service": "notify.test_service", "supernotify": True, "scenario": ["urgent"]},
+    notify_config: ConfigType = {
+        "common": {"scenario": ["urgent"], "supernotify": True},
         "backstop": {},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_action="notify.supernotify", notify_profiles=notify_config)
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
-    hass.services.async_register("notify", "test_service", mock_handler)
+    hass.services.async_register("notify", "supernotify", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(ChangeSource.BUTTON, message="Test message")
 
     assert len(calls) == 1
@@ -121,14 +127,16 @@ async def test_notify_supernotify_scenario(hass: HomeAssistant) -> None:
 async def test_notify_exception_records_runtime_error(hass: HomeAssistant) -> None:
     """Test that exceptions during notify call record_runtime_error."""
     # Use a non-existent service to trigger ServiceNotFound exception
-    notify_config = {
-        "common": {"service": "notify.nonexistent_service"},
+    notify_config: ConfigType = {
         "backstop": {},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.nonexistent_service", notify_profiles=notify_config
+    )
     initial_failures = armer.app_health_tracker.failures
 
     # Don't register the service - this should cause an exception
+    assert armer.notifier is not None
     await armer.notifier.notify(ChangeSource.BUTTON, message="Test message")
 
     assert armer.app_health_tracker.failures == initial_failures + 1
@@ -136,17 +144,17 @@ async def test_notify_exception_records_runtime_error(hass: HomeAssistant) -> No
 
 async def test_notify_strips_notify_prefix_from_service(hass: HomeAssistant) -> None:
     """Test that 'notify.' prefix is stripped from service name."""
-    notify_config = {
-        "common": {"service": "notify.mobile_app"},
+    notify_config: ConfigType = {
         "backstop": {},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_action="notify.mobile_app", notify_profiles=notify_config)
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "mobile_app", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(ChangeSource.BUTTON, message="Test message")
 
     assert len(calls) == 1
@@ -157,21 +165,23 @@ async def test_notify_selects_profile_by_from_state(hass: HomeAssistant) -> None
     """Test that profile is selected when from_state matches."""
     from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 
-    notify_config = {
-        "common": {"service": "notify.default_service"},
+    notify_config: ConfigType = {
         "away_alert": {
             "service": "notify.away_service",
             "state": [AlarmControlPanelState.ARMED_AWAY],
             "data": {"priority": "high"},
         },
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.default_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "away_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(
         ChangeSource.BUTTON,
         from_state=AlarmControlPanelState.ARMED_AWAY,
@@ -186,21 +196,23 @@ async def test_notify_selects_profile_by_to_state(hass: HomeAssistant) -> None:
     """Test that profile is selected when to_state matches."""
     from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 
-    notify_config = {
-        "common": {"service": "notify.default_service"},
+    notify_config: ConfigType = {
         "vacation_alert": {
             "service": "notify.vacation_service",
             "state": [AlarmControlPanelState.ARMED_VACATION],
             "data": {"channel": "vacation"},
         },
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.default_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "vacation_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(
         ChangeSource.CALENDAR,
         from_state=AlarmControlPanelState.ARMED_HOME,
@@ -215,15 +227,16 @@ async def test_notify_skips_profile_when_state_not_matched(hass: HomeAssistant) 
     """Test that no notification is sent when no profile matches the state."""
     from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 
-    notify_config = {
-        "common": {"service": "notify.default_service"},
+    notify_config: ConfigType = {
         "away_only": {
             "service": "notify.away_service",
             "state": [AlarmControlPanelState.ARMED_AWAY],
             "data": {"tag": "away"},
         },
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.default_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
@@ -231,6 +244,7 @@ async def test_notify_skips_profile_when_state_not_matched(hass: HomeAssistant) 
 
     hass.services.async_register("notify", "default_service", mock_handler)
     hass.services.async_register("notify", "away_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(
         ChangeSource.BUTTON,
         from_state=AlarmControlPanelState.ARMED_HOME,
@@ -242,15 +256,16 @@ async def test_notify_skips_profile_when_state_not_matched(hass: HomeAssistant) 
 
 async def test_notify_skips_profile_when_source_not_matched(hass: HomeAssistant) -> None:
     """Test that no notification is sent when no profile matches the source."""
-    notify_config = {
-        "common": {"service": "notify.default_service"},
+    notify_config: ConfigType = {
         "button_only": {
             "service": "notify.button_service",
             "source": [ChangeSource.BUTTON],
             "data": {"tag": "button"},
         },
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.default_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
@@ -258,6 +273,7 @@ async def test_notify_skips_profile_when_source_not_matched(hass: HomeAssistant)
 
     hass.services.async_register("notify", "default_service", mock_handler)
     hass.services.async_register("notify", "button_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(ChangeSource.CALENDAR, message="Test message")
 
     assert len(calls) == 0
@@ -267,17 +283,19 @@ async def test_notify_auto_generates_title_from_to_state(hass: HomeAssistant) ->
     """Test that title is auto-generated from to_state when not provided."""
     from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 
-    notify_config = {
-        "common": {"service": "notify.test_service"},
+    notify_config: ConfigType = {
         "backstop": {},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(
         ChangeSource.BUTTON,
         to_state=AlarmControlPanelState.ARMED_AWAY,
@@ -291,17 +309,19 @@ async def test_notify_auto_generates_message_from_states(hass: HomeAssistant) ->
     """Test that message is auto-generated from from_state and to_state."""
     from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 
-    notify_config = {
-        "common": {"service": "notify.test_service"},
+    notify_config: ConfigType = {
         "backstop": {},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(
         ChangeSource.ALARM_PANEL,
         from_state=AlarmControlPanelState.ARMED_HOME,
@@ -315,17 +335,20 @@ async def test_notify_auto_generates_message_from_states(hass: HomeAssistant) ->
 
 async def test_notify_profile_name_replacement(hass: HomeAssistant) -> None:
     """Test that profile name is set in data when data['profile'] is None."""
-    notify_config = {
-        "common": {"service": "notify.test_service", "data": {"profile": None}},
-        "urgent": {"service": "notify.test_service", "source": [ChangeSource.BUTTON]},
+    notify_config: ConfigType = {
+        "common": {"data": {"profile": None}},
+        "urgent": {"source": [ChangeSource.BUTTON]},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
+    assert armer.notifier is not None
     await armer.notifier.notify(ChangeSource.BUTTON, message="Test message")
 
     assert len(calls) == 1
@@ -334,10 +357,12 @@ async def test_notify_profile_name_replacement(hass: HomeAssistant) -> None:
 
 async def test_notify_common_profile_not_selected_as_match(hass: HomeAssistant) -> None:
     """Test that common profile is skipped during profile selection."""
-    notify_config = {
-        "common": {"service": "notify.common_service", "source": [ChangeSource.BUTTON]},
+    notify_config: ConfigType = {
+        "common": {"source": [ChangeSource.BUTTON]},
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.common_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
@@ -346,6 +371,7 @@ async def test_notify_common_profile_not_selected_as_match(hass: HomeAssistant) 
     hass.services.async_register("notify", "common_service", mock_handler)
     # common is not selected as a matching profile, and with no other profiles
     # no notification is sent
+    assert armer.notifier is not None
     await armer.notifier.notify(ChangeSource.BUTTON, message="Test message")
 
     assert len(calls) == 0
@@ -355,8 +381,7 @@ async def test_notify_selects_profile_with_both_source_and_state(hass: HomeAssis
     """Test profile selection when both source and state filters are configured."""
     from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 
-    notify_config = {
-        "common": {"service": "notify.default_service"},
+    notify_config: ConfigType = {
         "button_away": {
             "service": "notify.special_service",
             "source": [ChangeSource.BUTTON],
@@ -364,7 +389,9 @@ async def test_notify_selects_profile_with_both_source_and_state(hass: HomeAssis
             "data": {"special": True},
         },
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.default_service", notify_profiles=notify_config
+    )
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
@@ -374,6 +401,7 @@ async def test_notify_selects_profile_with_both_source_and_state(hass: HomeAssis
     hass.services.async_register("notify", "default_service", mock_handler)
 
     # Both source and state match
+    assert armer.notifier is not None
     await armer.notifier.notify(
         ChangeSource.BUTTON,
         from_state=AlarmControlPanelState.DISARMED,
@@ -394,7 +422,7 @@ async def test_notify_profile_ordering_by_state_specificity(hass: HomeAssistant)
     """Test that more specific profiles (fewer states) are checked first."""
     from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 
-    notify_config = {
+    notify_config: ConfigType = {
         "common": {"service": "notify.default_service"},
         "backstop": {},
         # Broad profile - matches many states
@@ -414,7 +442,7 @@ async def test_notify_profile_ordering_by_state_specificity(hass: HomeAssistant)
             "data": {"profile": "specific"},
         },
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_profiles=notify_config)
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
@@ -424,6 +452,7 @@ async def test_notify_profile_ordering_by_state_specificity(hass: HomeAssistant)
     hass.services.async_register("notify", "specific_service", mock_handler)
 
     # Both profiles match ARMED_AWAY, but specific should win due to fewer states
+    assert armer.notifier is not None
     await armer.notifier.notify(
         ChangeSource.BUTTON,
         from_state=AlarmControlPanelState.DISARMED,
@@ -439,7 +468,7 @@ async def test_notify_profile_with_state_filter_preferred_over_no_filter(hass: H
     """Test that profiles with state filters are preferred over those without."""
     from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 
-    notify_config = {
+    notify_config: ConfigType = {
         "common": {"service": "notify.default_service"},
         "backstop": {},
         # No state filter - matches all states
@@ -456,7 +485,7 @@ async def test_notify_profile_with_state_filter_preferred_over_no_filter(hass: H
             "data": {"profile": "filtered"},
         },
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_profiles=notify_config)
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
@@ -466,6 +495,7 @@ async def test_notify_profile_with_state_filter_preferred_over_no_filter(hass: H
     hass.services.async_register("notify", "filtered_service", mock_handler)
 
     # Both profiles match source, but filtered should win (has state filter)
+    assert armer.notifier is not None
     await armer.notifier.notify(
         ChangeSource.BUTTON,
         from_state=AlarmControlPanelState.DISARMED,
@@ -481,7 +511,7 @@ async def test_notify_fallback_to_broader_profile_when_specific_not_matched(hass
     """Test that broader profile is used when specific profile doesn't match state."""
     from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 
-    notify_config = {
+    notify_config: ConfigType = {
         "common": {"service": "notify.default_service"},
         "backstop": {},
         # Specific profile - only matches ARMED_VACATION
@@ -501,7 +531,7 @@ async def test_notify_fallback_to_broader_profile_when_specific_not_matched(hass
             "data": {"profile": "general"},
         },
     }
-    armer = AlarmArmer(hass, TEST_PANEL, notify=notify_config)
+    armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_profiles=notify_config)
     calls: list[dict] = []
 
     async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
@@ -512,6 +542,7 @@ async def test_notify_fallback_to_broader_profile_when_specific_not_matched(hass
 
     # vacation_only is checked first (more specific) but doesn't match ARMED_AWAY
     # general should be used instead
+    assert armer.notifier is not None
     await armer.notifier.notify(
         ChangeSource.BUTTON,
         from_state=AlarmControlPanelState.DISARMED,

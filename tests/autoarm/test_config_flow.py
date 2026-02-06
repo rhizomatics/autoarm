@@ -11,9 +11,12 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ENTITIES,
     CONF_NO_EVENT_MODE,
+    CONF_NOTIFY_ACTION,
+    CONF_NOTIFY_TARGETS,
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
+    CONF_SUNRISE_EARLIEST,
 )
 from custom_components.autoarm.const import (
     CONF_ALARM_PANEL,
@@ -185,6 +188,12 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
             CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
             CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_night",
             CONF_NO_EVENT_MODE: "manual",
+            "notify_options": {
+                CONF_NOTIFY_ACTION: "notify.supernotify",
+                CONF_NOTIFY_TARGETS: ["mobile_app_phone"],
+            },
+            "sunrise_options": {CONF_SUNRISE_EARLIEST: "05:30:00"},
+            "sunset_options": {},
         },
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
@@ -194,3 +203,6 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     assert entry.options[CONF_OCCUPANCY_DEFAULT_DAY] == "disarmed"
     assert entry.options[CONF_OCCUPANCY_DEFAULT_NIGHT] == "armed_night"
     assert entry.options[CONF_NO_EVENT_MODE] == "manual"
+    assert entry.options[CONF_NOTIFY_ACTION] == "notify.supernotify"
+    assert entry.options[CONF_NOTIFY_TARGETS] == ["mobile_app_phone"]
+    assert entry.options[CONF_SUNRISE_EARLIEST] == "05:30:00"

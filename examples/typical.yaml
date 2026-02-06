@@ -60,8 +60,6 @@ autoarm:
   # YAML-only: notification configuration
   notify:
     common:
-      service: notify.supernotify
-      supernotify: true
       data:
         actions:
           - action: ALARM_PANEL_DISARM

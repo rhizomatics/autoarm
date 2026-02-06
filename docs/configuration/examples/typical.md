@@ -18,7 +18,8 @@ With the config flow, some settings are now managed in the UI:
 | Per-calendar poll interval | YAML | How often to check each calendar |
 | Transitions | YAML | Condition templates for state transitions |
 | Buttons | YAML | Physical button entity mappings |
-| Notifications | YAML | Notification service and profile configuration |
+| Notifications | UI (options) | Notification service and targets |
+| Notification Profiles | YAML | Notification profile configuration |
 | Rate limit | YAML | Throttling for arm calls |
 
 ## Full YAML Example

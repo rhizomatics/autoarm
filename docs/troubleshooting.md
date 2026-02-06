@@ -18,8 +18,7 @@
 
 ## Notifications Not Sending
 
-**Check notify profile configuration**: Notifications require at least one non-common profile to match. The `common` profile only provides base configuration (service, data) that is merged into matched profiles, with default `silent` and `normal` profiles
-created if no explicit ones given.
+**Check notify profile configuration**: Notifications require at least one non-common profile to match. The `common` profile only provides base configuration (service, data) that is merged into matched profiles, with default `silent` and `normal` profiles created if no explicit ones given.
 
 **Check the service name**: Ensure the notify service exists. The `notify.` prefix is stripped automatically, so `notify.mobile_app` becomes a call to the `mobile_app` service in the `notify` domain.
 

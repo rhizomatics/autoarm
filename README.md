@@ -78,8 +78,6 @@ The alarm status message by default uses a `quiet` profile, and another one call
 
 ```yaml
 notify:
-    common:
-      service: notify.supernotify
     quiet:
       scenario: nerdy
       data:

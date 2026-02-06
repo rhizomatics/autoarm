@@ -21,7 +21,7 @@ Existing YAML-only installations are **automatically migrated** to a config entr
 | `calendar_control.calendars[].poll_interval` | YAML | YAML (unchanged) |
 | `transitions` | YAML | YAML (unchanged) |
 | `buttons` | YAML | YAML (unchanged) |
-| `notify` | YAML | YAML (unchanged) |
+| `notify` | YAML | Profiles in YAML (unchanged), Service in UI (Options) |
 | `rate_limit` | YAML | YAML (unchanged) |
 | `occupancy.delay_time` | YAML | YAML (unchanged) |
 
@@ -31,7 +31,7 @@ On restart, if AutoArm finds a YAML configuration without a matching config entr
 
 1. Creates a config entry with the alarm panel entity from YAML
 2. Populates options with calendar entities, person entities, occupancy defaults, and no-event mode from YAML
-3. Continues to read advanced settings (transitions, buttons, notifications, etc.) from YAML
+3. Continues to read advanced settings (transitions, buttons, notification profiles, etc.) from YAML
 
 ## Cleaning Up YAML After Migration
 
