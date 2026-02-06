@@ -11,7 +11,6 @@ While core settings (alarm panel, calendars, persons, occupancy defaults) are ma
 - Transition conditions
 - Physical button mappings
 - Notification profiles
-- Diurnal (sunrise/sunset) settings
 - Rate limiting
 - Per-calendar state pattern overrides and poll intervals
 

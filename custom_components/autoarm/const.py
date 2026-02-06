@@ -162,7 +162,14 @@ OCCUPANCY_SCHEMA = vol.Schema({
 
 CONF_DIURNAL = "diurnal"
 CONF_SUNRISE = "sunrise"
+CONF_SUNSET = "sunset"
 CONF_EARLIEST = "earliest"
+CONF_LATEST = "latest"
+
+DIURNAL_TIME_SCHEMA = vol.Schema({
+    vol.Optional(CONF_EARLIEST): cv.time,
+    vol.Optional(CONF_LATEST): cv.time,
+})
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -172,7 +179,8 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Required(CONF_ENTITY_ID): cv.entity_id,
             }),
             vol.Optional(CONF_DIURNAL): vol.Schema({
-                vol.Optional(CONF_SUNRISE): vol.Schema({vol.Optional(CONF_EARLIEST): cv.time})
+                vol.Optional(CONF_SUNRISE): DIURNAL_TIME_SCHEMA,
+                vol.Optional(CONF_SUNSET): DIURNAL_TIME_SCHEMA,
             }),
             vol.Optional(CONF_TRANSITIONS): {vol.In(ALARM_STATES): TRANSITION_SCHEMA},
             vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
@@ -186,16 +194,23 @@ CONFIG_SCHEMA = vol.Schema(
 )
 
 DEFAULT_TRANSITIONS: dict[str, str | list[str]] = {
-    "armed_home": [
-        "{{ autoarm.occupied and not autoarm.night }}",
-        "{{ autoarm.computed and autoarm.occupied_daytime_state == 'armed_home'}}",
-    ],
-    "armed_away": "{{ not autoarm.occupied and autoarm.computed}}",
     "disarmed": [
-        "{{ autoarm.occupied and not autoarm.night }}",
-        "{{ autoarm.computed and autoarm.occupied_daytime_state == 'disarmed'}}",
+        "{{ autoarm.computed and autoarm.occupied}}",
+        "{{ (autoarm.day and autoarm.occupied_daytime_state == 'disarmed') or"
+        " (autoarm.night and autoarm.occupied_nighttime_state == 'disarmed') }}",
     ],
-    "armed_night": "{{ autoarm.occupied and autoarm.night and autoarm.computed}}",
+    "armed_home": [
+        "{{ autoarm.computed }}",
+        "{{ (autoarm.day and autoarm.occupied and autoarm.occupied_daytime_state == 'armed_home') or"
+        " ( autoarm.night and autoarm.occupied and autoarm.occupied_nighttime_state == 'armed_home' ) or"
+        " ( autoarm.day and autoarm.occupied is none ) }}",
+    ],
+    "armed_night": [
+        "{{ autoarm.computed }}",
+        "{{ ( autoarm.night and autoarm.occupied and autoarm.occupied_nighttime_state == 'armed_night' ) or "
+        " ( autoarm.night and autoarm.occupied is none )}}",
+    ],
+    "armed_away": "{{ autoarm.computed and not autoarm.occupied and autoarm.occupied is not none}}",
     "armed_vacation": "{{ autoarm.vacation }}",
 }
 
@@ -222,11 +237,13 @@ class ConditionVariables:
             "not_home": self.at_home or [],
             "vacation": self.state == AlarmControlPanelState.ARMED_VACATION,
             "night": self.night,
+            "day": not self.night,
             "bypass": self.state == AlarmControlPanelState.ARMED_CUSTOM_BYPASS,
             "manual": self.state in (AlarmControlPanelState.ARMED_VACATION, AlarmControlPanelState.ARMED_CUSTOM_BYPASS),
             "calendar_event": self.calendar_event,
             "state": str(self.state),
-            "occupied_daytime_state": self.occupied_defaults.get(CONF_DAY, AlarmControlPanelState.ARMED_HOME),
+            "occupied_daytime_state": str(self.occupied_defaults.get(CONF_DAY, AlarmControlPanelState.DISARMED)),
+            "occupied_nighttime_state": str(self.occupied_defaults.get(CONF_NIGHT, AlarmControlPanelState.ARMED_NIGHT)),
             "disarmed": self.state == AlarmControlPanelState.DISARMED,
             "computed": not self.calendar_event
             and self.state not in (AlarmControlPanelState.ARMED_VACATION, AlarmControlPanelState.ARMED_CUSTOM_BYPASS),

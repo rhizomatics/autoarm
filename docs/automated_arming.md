@@ -71,9 +71,11 @@ If there's no calendar event live, then arming state can fall back to [Diurnal C
 This does three things to support [Automated Transitions]:
 
 1. Re-evaluate the alarm state at **sunrise**
-    - There's a `earliest` cutoff option for `diurnal`->`sunrise` configuration to prevent alarm
-being armed at 4am if you live far North, like Norway or Scotland.
+    - There's a `earliest` and `latest` cutoff option in the UI config to stop alarm being disarmed at 4am if you live far North, like Canada or Scotland.
+    - The cutoffs for sunrise can be set to the same time to override the `sun` integration altogeher for sunsrise
 2. Re-evaluate the alarm state at **sunset**
+    - There's a `earliest` and `latest` cutoff option in the UI config, which works
+    identically to that for sunrise
 3. Provide a `day` and `night` value for conditions
 
 ## Occupancy Control

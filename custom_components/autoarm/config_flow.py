@@ -1,5 +1,6 @@
 """Config flow for Auto Arm integration."""
 
+import datetime as dt
 from typing import Any
 
 import voluptuous as vol
@@ -11,6 +12,7 @@ from homeassistant.helpers.selector import (
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
+    TimeSelector,
 )
 
 from .const import (
@@ -20,9 +22,14 @@ from .const import (
     CONF_CALENDAR_NO_EVENT,
     CONF_CALENDARS,
     CONF_DAY,
+    CONF_DIURNAL,
+    CONF_EARLIEST,
+    CONF_LATEST,
     CONF_NIGHT,
     CONF_OCCUPANCY,
     CONF_OCCUPANCY_DEFAULT,
+    CONF_SUNRISE,
+    CONF_SUNSET,
     DOMAIN,
     NO_CAL_EVENT_OPTIONS,
 )
@@ -32,6 +39,16 @@ CONF_PERSON_ENTITIES = "person_entities"
 CONF_OCCUPANCY_DEFAULT_DAY = "occupancy_default_day"
 CONF_OCCUPANCY_DEFAULT_NIGHT = "occupancy_default_night"
 CONF_NO_EVENT_MODE = "no_event_mode"
+CONF_SUNRISE_EARLIEST = "sunrise_earliest"
+CONF_SUNRISE_LATEST = "sunrise_latest"
+CONF_SUNSET_EARLIEST = "sunset_earliest"
+CONF_SUNSET_LATEST = "sunset_latest"
+
+
+def _time_to_str(t: dt.time | None) -> str | None:
+    """Convert a datetime.time to HH:MM:SS string for ConfigEntry storage."""
+    return t.isoformat() if t else None
+
 
 DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_CALENDAR_ENTITIES: [],
@@ -39,6 +56,10 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
     CONF_OCCUPANCY_DEFAULT_NIGHT: None,
     CONF_NO_EVENT_MODE: "auto",
+    CONF_SUNRISE_EARLIEST: None,
+    CONF_SUNRISE_LATEST: None,
+    CONF_SUNSET_EARLIEST: None,
+    CONF_SUNSET_LATEST: None,
 }
 
 
@@ -92,6 +113,10 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_OCCUPANCY_DEFAULT_DAY: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_DAY],
                 CONF_OCCUPANCY_DEFAULT_NIGHT: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_NIGHT],
                 CONF_NO_EVENT_MODE: DEFAULT_OPTIONS[CONF_NO_EVENT_MODE],
+                CONF_SUNRISE_EARLIEST: None,
+                CONF_SUNRISE_LATEST: None,
+                CONF_SUNSET_EARLIEST: None,
+                CONF_SUNSET_LATEST: None,
             }
 
             return self.async_create_entry(
@@ -125,12 +150,20 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         calendar_entities = [cal[CONF_ENTITY_ID] for cal in calendar_config.get(CONF_CALENDARS, []) if CONF_ENTITY_ID in cal]
         no_event_mode = calendar_config.get(CONF_CALENDAR_NO_EVENT, DEFAULT_OPTIONS[CONF_NO_EVENT_MODE])
 
+        diurnal_config = import_data.get(CONF_DIURNAL, {})
+        sunrise_config = diurnal_config.get(CONF_SUNRISE, {}) if diurnal_config else {}
+        sunset_config = diurnal_config.get(CONF_SUNSET, {}) if diurnal_config else {}
+
         options = {
             CONF_CALENDAR_ENTITIES: calendar_entities,
             CONF_PERSON_ENTITIES: person_entities,
             CONF_OCCUPANCY_DEFAULT_DAY: occupancy_defaults.get(CONF_DAY, DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_DAY]),
             CONF_OCCUPANCY_DEFAULT_NIGHT: occupancy_defaults.get(CONF_NIGHT),
             CONF_NO_EVENT_MODE: no_event_mode,
+            CONF_SUNRISE_EARLIEST: _time_to_str(sunrise_config.get(CONF_EARLIEST)),
+            CONF_SUNRISE_LATEST: _time_to_str(sunrise_config.get(CONF_LATEST)),
+            CONF_SUNSET_EARLIEST: _time_to_str(sunset_config.get(CONF_EARLIEST)),
+            CONF_SUNSET_LATEST: _time_to_str(sunset_config.get(CONF_LATEST)),
         }
 
         return self.async_create_entry(
@@ -193,5 +226,21 @@ class AutoArmOptionsFlow(OptionsFlow):
                         mode=SelectSelectorMode.DROPDOWN,
                     )
                 ),
+                vol.Optional(
+                    CONF_SUNRISE_EARLIEST,
+                    description={"suggested_value": options.get(CONF_SUNRISE_EARLIEST)},
+                ): TimeSelector(),
+                vol.Optional(
+                    CONF_SUNRISE_LATEST,
+                    description={"suggested_value": options.get(CONF_SUNRISE_LATEST)},
+                ): TimeSelector(),
+                vol.Optional(
+                    CONF_SUNSET_EARLIEST,
+                    description={"suggested_value": options.get(CONF_SUNSET_EARLIEST)},
+                ): TimeSelector(),
+                vol.Optional(
+                    CONF_SUNSET_LATEST,
+                    description={"suggested_value": options.get(CONF_SUNSET_LATEST)},
+                ): TimeSelector(),
             }),
         )

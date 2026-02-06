@@ -61,6 +61,10 @@ from .config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
+    CONF_SUNRISE_EARLIEST,
+    CONF_SUNRISE_LATEST,
+    CONF_SUNSET_EARLIEST,
+    CONF_SUNSET_LATEST,
 )
 from .const import (
     ATTR_RESET,
@@ -75,6 +79,7 @@ from .const import (
     CONF_DELAY_TIME,
     CONF_DIURNAL,
     CONF_EARLIEST,
+    CONF_LATEST,
     CONF_NIGHT,
     CONF_NOTIFY,
     CONF_OCCUPANCY,
@@ -83,6 +88,7 @@ from .const import (
     CONF_RATE_LIMIT_CALLS,
     CONF_RATE_LIMIT_PERIOD,
     CONF_SUNRISE,
+    CONF_SUNSET,
     CONF_TRANSITIONS,
     CONFIG_SCHEMA,
     DEFAULT_TRANSITIONS,
@@ -120,7 +126,7 @@ class AutoArmData:
     other_data: dict[str, str | dict[str, str] | list[str] | int | float | bool | None]
 
 
-async def async_setup(  # noqa: RUF029
+async def async_setup(
     hass: HomeAssistant,
     config: ConfigType,
 ) -> bool:
@@ -176,7 +182,16 @@ async def async_setup(  # noqa: RUF029
         stashed_yaml = hass.data.get(YAML_DATA_KEY, {})
         data: ConfigType = {
             CONF_ALARM_PANEL: entry.data.get(CONF_ALARM_PANEL),
-            CONF_DIURNAL: stashed_yaml.get(CONF_DIURNAL),
+            CONF_DIURNAL: {
+                CONF_SUNRISE: {
+                    CONF_EARLIEST: entry.options.get(CONF_SUNRISE_EARLIEST),
+                    CONF_LATEST: entry.options.get(CONF_SUNRISE_LATEST),
+                },
+                CONF_SUNSET: {
+                    CONF_EARLIEST: entry.options.get(CONF_SUNSET_EARLIEST),
+                    CONF_LATEST: entry.options.get(CONF_SUNSET_LATEST),
+                },
+            },
             CONF_CALENDAR_CONTROL: stashed_yaml.get(CONF_CALENDAR_CONTROL),
             CONF_BUTTONS: stashed_yaml.get(CONF_BUTTONS, {}),
             CONF_OCCUPANCY: {
@@ -217,7 +232,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001, RUF029
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001
     """Unload Auto Arm config entry."""
     if HASS_DATA_KEY in hass.data:
         hass.data[HASS_DATA_KEY].armer.shutdown()
@@ -279,10 +294,24 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
     # Build notify config (from YAML, with defaults applied)
     notify = yaml_config.get(CONF_NOTIFY, {})
 
+    # Build diurnal cutoffs: options take priority, YAML is fallback
+    yaml_diurnal = yaml_config.get(CONF_DIURNAL, {}) or {}
+    yaml_sunrise = yaml_diurnal.get(CONF_SUNRISE, {}) or {}
+    yaml_sunset = yaml_diurnal.get(CONF_SUNSET, {}) or {}
+
+    def _parse_time(option_key: str, yaml_fallback: dt.time | None) -> dt.time | None:
+        val = entry.options.get(option_key)
+        if val is not None:
+            return cv.time(val) if isinstance(val, str) else val
+        return yaml_fallback
+
     return AlarmArmer(
         hass,
         alarm_panel=alarm_panel,
-        diurnal=yaml_config.get(CONF_DIURNAL, {}),
+        sunrise_earliest=_parse_time(CONF_SUNRISE_EARLIEST, yaml_sunrise.get(CONF_EARLIEST)),
+        sunrise_latest=_parse_time(CONF_SUNRISE_LATEST, yaml_sunrise.get(CONF_LATEST)),
+        sunset_earliest=_parse_time(CONF_SUNSET_EARLIEST, yaml_sunset.get(CONF_EARLIEST)),
+        sunset_latest=_parse_time(CONF_SUNSET_LATEST, yaml_sunset.get(CONF_LATEST)),
         buttons=yaml_config.get(CONF_BUTTONS, {}),
         occupancy=occupancy,
         notify=notify,
@@ -357,14 +386,16 @@ class AlarmArmer:
         occupancy: ConfigType | None = None,
         actions: list[str] | None = None,
         notify: ConfigType | None = None,
-        diurnal: ConfigType | None = None,
+        sunrise_earliest: dt.time | None = None,
+        sunrise_latest: dt.time | None = None,
+        sunset_earliest: dt.time | None = None,
+        sunset_latest: dt.time | None = None,
         rate_limit: ConfigType | None = None,
         calendar_config: ConfigType | None = None,
         transitions: dict[str, dict[str, list[ConfigType]]] | None = None,
     ) -> None:
         occupancy = occupancy or {}
         rate_limit = rate_limit or {}
-        diurnal = diurnal or {}
 
         self.hass: HomeAssistant = hass
         self.app_health_tracker: AppHealthTracker = AppHealthTracker(hass)
@@ -375,7 +406,10 @@ class AlarmArmer:
         self.calendars: list[TrackedCalendar] = []
         self.calendar_no_event_mode: str | None = calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO)
         self.alarm_panel: str = alarm_panel
-        self.sunrise_cutoff: dt.time | None = diurnal.get(CONF_SUNRISE, {}).get(CONF_EARLIEST)
+        self.sunrise_earliest: dt.time | None = sunrise_earliest
+        self.sunrise_latest: dt.time | None = sunrise_latest
+        self.sunset_earliest: dt.time | None = sunset_earliest
+        self.sunset_latest: dt.time | None = sunset_latest
         self.occupants: list[str] = occupancy.get(CONF_ENTITY_ID, [])
         self.occupied_defaults: dict[str, AlarmControlPanelState] = occupancy.get(
             CONF_OCCUPANCY_DEFAULT, {CONF_DAY: AlarmControlPanelState.ARMED_HOME}
@@ -464,6 +498,26 @@ class AlarmArmer:
         # events API expects a function, however underlying HassJob is fine with coroutines
         self.unsubscribes.append(async_track_sunrise(self.hass, self.on_sunrise, None))  # type: ignore
         self.unsubscribes.append(async_track_sunset(self.hass, self.on_sunset, None))  # type: ignore
+        if self.sunrise_latest:
+            self.unsubscribes.append(
+                async_track_time_change(
+                    self.hass,
+                    self.on_sunrise_latest,
+                    hour=self.sunrise_latest.hour,
+                    minute=self.sunrise_latest.minute,
+                    second=self.sunrise_latest.second,
+                )
+            )
+        if self.sunset_latest:
+            self.unsubscribes.append(
+                async_track_time_change(
+                    self.hass,
+                    self.on_sunset_latest,
+                    hour=self.sunset_latest.hour,
+                    minute=self.sunset_latest.minute,
+                    second=self.sunset_latest.second,
+                )
+            )
 
     def initialize_occupancy(self) -> None:
         """Configure occupants, and listen for changes in their state"""
@@ -609,7 +663,7 @@ class AlarmArmer:
         return any(cal.has_active_event() for cal in self.calendars)
 
     def is_occupied(self) -> bool | None:
-        '''Ternary - true at least one person entity has state home, false none of them, null if no occupants defined'''
+        """Ternary - true at least one person entity has state home, false none of them, null if no occupants defined"""
         if self.occupants:
             return any(safe_state(self.hass.states.get(p)) == STATE_HOME for p in self.occupants)
         return None
@@ -625,7 +679,7 @@ class AlarmArmer:
         return None
 
     def is_unoccupied(self) -> bool | None:
-        '''Ternary - false at least one person entity has state home, true none of them, null if no occupants defined'''
+        """Ternary - false at least one person entity has state home, true none of them, null if no occupants defined"""
         if self.occupants:
             return all(safe_state(self.hass.states.get(p)) != STATE_HOME for p in self.occupants)
         return None
@@ -755,9 +809,9 @@ class AlarmArmer:
         """Compute a new state using occupancy, sun and transition conditions"""
         evaluated_state: AlarmControlPanelState | None = None
         condition_vars: ConditionVariables = ConditionVariables(
-            self.is_occupied(),
-            self.is_unoccupied(),
-            self.is_night(),
+            occupied=self.is_occupied(),
+            unoccupied=self.is_unoccupied(),
+            night=self.is_night(),
             state=self.armed_state(),
             calendar_event=self.active_calendar_event(),
             occupied_defaults=self.occupied_defaults,
@@ -873,25 +927,41 @@ class AlarmArmer:
     @callback
     async def on_sunrise(self, *args: Any) -> None:  # noqa: ARG002
         _LOGGER.debug("AUTOARM Sunrise")
-        now = dt_util.now()  # uses Home Assistant's time zone setting
-        if not self.sunrise_cutoff or now.time() >= self.sunrise_cutoff:
-            # sun is up, and not earlier than cutoff
+        now = dt_util.now()
+        if not self.sunrise_earliest or now.time() >= self.sunrise_earliest:
             await self.reset_armed_state(source=ChangeSource.SUNRISE)
-        elif self.sunrise_cutoff and now.time() < self.sunrise_cutoff:
-            _LOGGER.debug(
-                "AUTOARM Rescheduling delayed sunrise action to %s",
-                self.sunrise_cutoff,
-            )
+        else:
+            _LOGGER.debug("AUTOARM Rescheduling delayed sunrise action to %s", self.sunrise_earliest)
             self.schedule_state(
-                dt.datetime.combine(now.date(), self.sunrise_cutoff, tzinfo=dt_util.DEFAULT_TIME_ZONE),
+                dt.datetime.combine(now.date(), self.sunrise_earliest, tzinfo=dt_util.DEFAULT_TIME_ZONE),
                 intervention=None,
                 state=None,
                 source=ChangeSource.SUNRISE,
             )
 
     @callback
+    async def on_sunrise_latest(self, *args: Any) -> None:  # noqa: ARG002
+        _LOGGER.debug("AUTOARM Sunrise latest cutoff reached")
+        await self.reset_armed_state(source=ChangeSource.SUNRISE)
+
+    @callback
     async def on_sunset(self, *args: Any) -> None:  # noqa: ARG002
         _LOGGER.debug("AUTOARM Sunset")
+        now = dt_util.now()
+        if not self.sunset_earliest or now.time() >= self.sunset_earliest:
+            await self.reset_armed_state(source=ChangeSource.SUNSET)
+        else:
+            _LOGGER.debug("AUTOARM Rescheduling delayed sunset action to %s", self.sunset_earliest)
+            self.schedule_state(
+                dt.datetime.combine(now.date(), self.sunset_earliest, tzinfo=dt_util.DEFAULT_TIME_ZONE),
+                intervention=None,
+                state=None,
+                source=ChangeSource.SUNSET,
+            )
+
+    @callback
+    async def on_sunset_latest(self, *args: Any) -> None:  # noqa: ARG002
+        _LOGGER.debug("AUTOARM Sunset latest cutoff reached")
         await self.reset_armed_state(source=ChangeSource.SUNSET)
 
     @callback

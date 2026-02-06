@@ -59,6 +59,7 @@ async def test_vacation_day_unoccupied(autoarmer: AlarmArmer, day: None, unoccup
 
 
 def test_occupied_day_armed_default(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
+    autoarmer.occupied_defaults["day"] = AlarmControlPanelState.ARMED_HOME
     assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_HOME
 
 

@@ -34,7 +34,11 @@
                     "person_entities":  "People for occupancy based arming",
                     "occupancy_default_day": "Default arming state when occupied during day",
                     "occupancy_default_night": "Default arming state when occupied at night",
-                    "no_event_mode": "Arming state when a calendar event ends"
+                    "no_event_mode": "Arming state when a calendar event ends",
+                    "sunrise_earliest": "Sunrise no earlier than time",
+                    "sunrise_latest": "Sunrise no later than time",
+                    "sunset_earliest": "Sunset no earlier than time",
+                    "sunset_latest": "Sunset no later than time"
                 }
             }
         }

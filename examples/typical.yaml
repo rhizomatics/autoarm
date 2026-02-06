@@ -1,13 +1,9 @@
 autoarm:
-  # UI: person entities and default_state are configurable via Options
   # YAML: delay_time remains YAML-only
   occupancy:
     delay_time:
       not_home: 180
-  # YAML-only: sunrise/sunset configuration
-  diurnal:
-    sunrise:
-      earliest: "06:30:00"
+      home: 0 # the default
   # YAML-only: transition conditions
   transitions:
     armed_home:
@@ -28,7 +24,6 @@ autoarm:
   # UI: calendar entities and no_event_mode are configurable via Options
   # YAML: per-calendar state_patterns and poll_interval remain here
   calendar_control:
-    no_event_mode: auto
     calendars:
       - entity_id: calendar.alarm_control
         alias: Local Calendar only used for autoarm
