@@ -17,7 +17,6 @@ from homeassistant.components.sun.const import STATE_BELOW_HORIZON
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
     CONF_CONDITIONS,
-    CONF_ENABLED,
     CONF_ENTITY_ID,
     CONF_SERVICE,
     EVENT_HOMEASSISTANT_STOP,
