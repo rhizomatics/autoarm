@@ -3,17 +3,17 @@ name = "autoarm"
 readme = "README.md"
 description = "Automated setting of Home Assistant Alarm Control Panel based on occupancy rules."
 dynamic = ["version"]
-requires-python = ">=3.13.2"
+requires-python = ">=3.14.2"
 
 dependencies = [
-    "homeassistant>=2026.1.1",
+    "homeassistant>=2026.3.1",
     "ical"
 ]
 
 [dependency-groups]
 dev=[
-    "homeassistant-stubs == 2026.1.1",
-    "pytest==9.0.2",
+    "homeassistant-stubs == 2026.3.1",
+    "pytest",
     "pytest-cov==7.0.0",
     "pytest-homeassistant-custom-component>=0.13.306",
     "pytest-unordered",
