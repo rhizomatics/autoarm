@@ -29,7 +29,7 @@ dev=[
 docs=[
     "mkdocs-minify-plugin",
     "pymdown-extensions",
-    "mkdocs-material[imaging]>=9.7.1",
+    "mkdocs-material[imaging]",
     "mkdocs-autorefs",
     "mkdocs-coverage",
     "mkdocs-pagetree-plugin",
