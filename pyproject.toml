@@ -14,7 +14,7 @@ dependencies = [
 dev=[
     "homeassistant-stubs >= 2026.3.1",
     "pytest",
-    "pytest-cov==7.0.0",
+    "pytest-cov",
     "pytest-homeassistant-custom-component>=0.13.306",
     "pytest-unordered",
     "pytest-mock",
@@ -28,13 +28,11 @@ dev=[
 docs=[
     "mkdocs-minify-plugin",
     "pymdown-extensions",
-    "mkdocs-material>=9.7.1",
-    "pillow>=12.0", # mkdocs-material[imaging] has elderly pillow demand
-    "cairosvg~=2.6", # mkdocs-material[imaging]
+    "mkdocs-material[imaging]>=9.7.1",
     "mkdocs-autorefs",
     "mkdocs-coverage",
     "mkdocs-pagetree-plugin",
-    "mkdocs",
+    "mkdocs<2.0.0",
     "pngquant",
     "mkdocstrings",
     "mkdocstrings-python",
