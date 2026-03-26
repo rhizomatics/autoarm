@@ -350,19 +350,19 @@ docs = [
 
 [package.metadata]
 requires-dist = [
-    { name = "homeassistant", specifier = ">=2026.3.1" },
+    { name = "homeassistant", specifier = ">=2026.3.2" },
     { name = "ical" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "genbadge", extras = ["all"] },
-    { name = "homeassistant-stubs", specifier = ">=2026.3.1" },
+    { name = "homeassistant-stubs", specifier = ">=2026.3.2" },
     { name = "mypy" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },
-    { name = "pytest-homeassistant-custom-component", specifier = ">=0.13.306" },
+    { name = "pytest-homeassistant-custom-component", specifier = ">=0.13.320" },
     { name = "pytest-icdiff" },
     { name = "pytest-mock" },
     { name = "pytest-unordered" },
