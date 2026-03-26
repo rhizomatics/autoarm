@@ -377,7 +377,7 @@ docs = [
     { name = "mkdocs-coverage" },
     { name = "mkdocs-git-revision-date-localized-plugin" },
     { name = "mkdocs-htmlproofer-plugin" },
-    { name = "mkdocs-material", extras = ["imaging"], specifier = ">=9.7.1" },
+    { name = "mkdocs-material", extras = ["imaging"] },
     { name = "mkdocs-material-extensions" },
     { name = "mkdocs-meta-descriptions-plugin" },
     { name = "mkdocs-minify-html-plugin" },
