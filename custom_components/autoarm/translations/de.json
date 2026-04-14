@@ -1,0 +1,104 @@
+{
+    "title": "AutoArm",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Alarmzentrale auswählen",
+                "data": {
+                    "alarm_panel": "Zu verwaltende Alarmzentrale"
+                }
+            },
+            "calendars": {
+                "title": "Kalender auswählen",
+                "data": {
+                    "calendar_entities": "Kalender für die Scharf-Zeitplanung"
+                }
+            },
+            "persons": {
+                "title": "Personen auswählen",
+                "data": {
+                    "person_entities": "Personen für die belegungsbasierte Scharfschaltung"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "AutoArm ist bereits konfiguriert"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "AutoArm-Optionen",
+                "data": {
+                    "calendar_entities": "Kalender für die Scharf-Zeitplanung",
+                    "person_entities": "Personen für die belegungsbasierte Scharfschaltung",
+                    "occupancy_default_day": "Standard-Scharmodus bei Belegung tagsüber",
+                    "occupancy_default_night": "Standard-Scharmodus bei Belegung nachts",
+                    "no_event_mode": "Scharmodus nach Ende eines Kalenderereignisses"
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "Kalender-Belegungsüberschreibung",
+                        "data": {
+                            "calendar_occupancy_override_states": "Zustände, die die Belegung überschreiben kann"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "Wenn ein Kalenderereignis einen dieser Zustände setzt, können Belegungsänderungen (Ankünfte und Abfahrten) den Alarmzustand noch aktualisieren. Wenn der Kalender zum Beispiel 'Deaktiviert' angibt, aber alle das Haus verlassen, wechselt er zu 'Scharf Abwesend'."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Benachrichtigungen",
+                        "data": {
+                            "notify_enabled": "Benachrichtigungen aktiviert",
+                            "notify_action": "Benachrichtigungsaktion",
+                            "notify_targets": "Benachrichtigungsempfänger"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Benachrichtigungen für Alarmzustandsänderungen aktivieren",
+                            "notify_action": "Home Assistant-Aktion (Dienst) zum Senden von Benachrichtigungen",
+                            "notify_targets": "Liste von Adressen oder Notify-Entitäten; kann für Supernotify leer gelassen werden"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "Sonnenaufgang-Einschränkungen",
+                        "data": {
+                            "sunrise_earliest": "Frühestens",
+                            "sunrise_latest": "Spätestens"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "Sonnenaufgang nicht früher als diese Uhrzeit",
+                            "sunrise_latest": "Sonnenaufgang nicht später als diese Uhrzeit"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "Sonnenuntergang-Einschränkungen",
+                        "data": {
+                            "sunset_earliest": "Frühestens",
+                            "sunset_latest": "Spätestens"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "Sonnenuntergang nicht früher als diese Uhrzeit",
+                            "sunset_latest": "Sonnenuntergang nicht später als diese Uhrzeit"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "services": {
+        "reload": {
+            "name": "Neu laden",
+            "description": "Lädt die AutoArm-Konfiguration neu."
+        }
+    },
+    "issues": {
+        "transition_condition": {
+            "title": "Ungültige Übergangsbedingung",
+            "description": "Die Übergangsbedingung für {state} konnte nicht validiert werden: ({error})"
+        },
+        "yaml_core_config_deprecated": {
+            "title": "YAML-Kernkonfiguration ist veraltet",
+            "description": "Die AutoArm-Kerneinstellungen (alarm_panel, occupancy, calendars) wurden in den UI-Konfigurationseintrag migriert. Entferne sie aus deiner YAML-Konfiguration und verwalte sie über die Benutzeroberfläche. Erweiterte Einstellungen (transitions, buttons, notify, diurnal, rate_limit) können in YAML verbleiben."
+        }
+    }
+}

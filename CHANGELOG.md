@@ -6,6 +6,8 @@
 ### Occupancy
 - Occupancy changes can selectively override calendar event based states, with configurable list of states, defaulting to `disarmed`,`armed_home` and `armed_night`. So if the calendar says `disarmed`
 but you've left the house it will override automatically to `armed_away`.
+### International
+- Strings now translated into Italian, French, German and Japanese
 ## 1.0.0
 ### Configuration
 - The basic setup, along with calendars, occupancy and some tuning is now UI based using Home Assistant ConfigFlow and ConfigEntry, with automated migration of existing YAML config

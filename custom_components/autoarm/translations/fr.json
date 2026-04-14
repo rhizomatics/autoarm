@@ -1,0 +1,104 @@
+{
+    "title": "AutoArm",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Sélectionner le panneau d'alarme",
+                "data": {
+                    "alarm_panel": "Panneau de contrôle d'alarme à gérer"
+                }
+            },
+            "calendars": {
+                "title": "Sélectionner les calendriers",
+                "data": {
+                    "calendar_entities": "Calendriers à utiliser pour les planifications d'armement"
+                }
+            },
+            "persons": {
+                "title": "Sélectionner les personnes",
+                "data": {
+                    "person_entities": "Personnes pour l'armement basé sur l'occupation"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "AutoArm est déjà configuré"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Options AutoArm",
+                "data": {
+                    "calendar_entities": "Calendriers à utiliser pour les planifications d'armement",
+                    "person_entities": "Personnes pour l'armement basé sur l'occupation",
+                    "occupancy_default_day": "État d'armement par défaut lorsqu'occupé pendant la journée",
+                    "occupancy_default_night": "État d'armement par défaut lorsqu'occupé la nuit",
+                    "no_event_mode": "État d'armement à la fin d'un événement calendrier"
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "Remplacement d'occupation calendrier",
+                        "data": {
+                            "calendar_occupancy_override_states": "États que l'occupation peut remplacer"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "Quand un événement calendrier définit l'un de ces états, les changements d'occupation (arrivées et départs) peuvent encore mettre à jour l'état de l'alarme. Par exemple, si le calendrier indique Désarmé mais que tout le monde part, il passera à Armé Absent."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Notifications",
+                        "data": {
+                            "notify_enabled": "Notifications activées",
+                            "notify_action": "Action de notification",
+                            "notify_targets": "Destinataires de notification"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Activer les notifications pour les changements d'état de l'alarme",
+                            "notify_action": "Action (service) Home Assistant à utiliser pour notifier",
+                            "notify_targets": "Liste d'adresses ou d'entités notify à notifier, peut être laissée vide pour Supernotify"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "Contraintes de lever du soleil",
+                        "data": {
+                            "sunrise_earliest": "Plus tôt",
+                            "sunrise_latest": "Plus tard"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "Lever du soleil au plus tôt à cette heure",
+                            "sunrise_latest": "Lever du soleil au plus tard à cette heure"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "Contraintes de coucher du soleil",
+                        "data": {
+                            "sunset_earliest": "Plus tôt",
+                            "sunset_latest": "Plus tard"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "Coucher du soleil au plus tôt à cette heure",
+                            "sunset_latest": "Coucher du soleil au plus tard à cette heure"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "services": {
+        "reload": {
+            "name": "Recharger",
+            "description": "Recharge la configuration d'AutoArm."
+        }
+    },
+    "issues": {
+        "transition_condition": {
+            "title": "Condition de transition invalide",
+            "description": "La condition de transition pour {state} a échoué la validation avec une erreur ({error})"
+        },
+        "yaml_core_config_deprecated": {
+            "title": "La configuration YAML principale est obsolète",
+            "description": "Les paramètres principaux d'AutoArm (alarm_panel, occupancy, calendars) ont été migrés vers l'interface utilisateur. Supprimez-les de votre configuration YAML et utilisez l'interface pour les gérer. Les paramètres avancés (transitions, buttons, notify, diurnal, rate_limit) peuvent rester en YAML."
+        }
+    }
+}

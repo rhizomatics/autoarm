@@ -1,0 +1,104 @@
+{
+    "title": "AutoArm",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Seleziona pannello di allarme",
+                "data": {
+                    "alarm_panel": "Pannello di controllo allarme da gestire"
+                }
+            },
+            "calendars": {
+                "title": "Seleziona calendari",
+                "data": {
+                    "calendar_entities": "Calendari da usare per la pianificazione dell'inserimento"
+                }
+            },
+            "persons": {
+                "title": "Seleziona persone",
+                "data": {
+                    "person_entities": "Persone per l'inserimento basato sulla presenza"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "AutoArm è già configurato"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Opzioni AutoArm",
+                "data": {
+                    "calendar_entities": "Calendari da usare per la pianificazione dell'inserimento",
+                    "person_entities": "Persone per l'inserimento basato sulla presenza",
+                    "occupancy_default_day": "Stato di inserimento predefinito quando occupato di giorno",
+                    "occupancy_default_night": "Stato di inserimento predefinito quando occupato di notte",
+                    "no_event_mode": "Stato di inserimento al termine di un evento del calendario"
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "Sostituzione occupazione calendario",
+                        "data": {
+                            "calendar_occupancy_override_states": "Stati che la presenza può sovrascrivere"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Notifiche",
+                        "data": {
+                            "notify_enabled": "Notifiche abilitate",
+                            "notify_action": "Azione di notifica",
+                            "notify_targets": "Destinatari notifica"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Abilita le notifiche per i cambiamenti di stato dell'allarme",
+                            "notify_action": "Azione (servizio) di Home Assistant da usare per notificare",
+                            "notify_targets": "Elenco di indirizzi o entità notify da notificare, può essere lasciato vuoto per Supernotify"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "Vincoli alba",
+                        "data": {
+                            "sunrise_earliest": "Prima",
+                            "sunrise_latest": "Ultima"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "Alba non prima di questa ora",
+                            "sunrise_latest": "Alba non dopo questa ora"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "Vincoli tramonto",
+                        "data": {
+                            "sunset_earliest": "Prima",
+                            "sunset_latest": "Ultima"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "Tramonto non prima di questa ora",
+                            "sunset_latest": "Tramonto non dopo questa ora"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "services": {
+        "reload": {
+            "name": "Ricarica",
+            "description": "Ricarica la configurazione di AutoArm."
+        }
+    },
+    "issues": {
+        "transition_condition": {
+            "title": "Condizione di transizione non valida",
+            "description": "La condizione di transizione per {state} non è riuscita a validarsi con un errore ({error})"
+        },
+        "yaml_core_config_deprecated": {
+            "title": "La configurazione YAML principale è obsoleta",
+            "description": "Le impostazioni principali di AutoArm (alarm_panel, occupancy, calendars) sono state migrate all'interfaccia utente. Rimuovile dalla tua configurazione YAML e usa l'interfaccia utente per gestirle. Le impostazioni avanzate (transitions, buttons, notify, diurnal, rate_limit) possono rimanere in YAML."
+        }
+    }
+}

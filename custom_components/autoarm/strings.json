@@ -37,12 +37,26 @@
                     "no_event_mode": "Arming state when a calendar event ends"
                 },
                 "sections": {
+                    "calendar_options": {
+                        "name": "Calendar Occupancy Override",
+                        "data": {
+                            "calendar_occupancy_override_states": "States that occupancy can override"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "When a calendar event sets one of these states, occupancy changes (arrivals and departures) can still update the alarm state. For example, if the calendar says Disarmed but everyone leaves, it will switch to Armed Away."
+                        }
+                    },
                     "notify_options": {
                         "name": "Notifications",
                         "data": {
-                            "notify_enabled":"Notifications Enabled",
+                            "notify_enabled": "Notifications Enabled",
                             "notify_action": "Notification Action",
                             "notify_targets": "Notification Targets"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Enable notifications for alarm state changes",
+                            "notify_action": "Home Assistant action (service) to use to notify",
+                            "notify_targets": "List of addresses or notify entities to notify, can be left blank for Supernotify"
                         }
                     },
                     "sunrise_options": {

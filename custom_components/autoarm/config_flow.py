@@ -261,15 +261,20 @@ class AutoArmOptionsFlow(OptionsFlow):
                         mode=SelectSelectorMode.DROPDOWN,
                     )
                 ),
-                vol.Optional(
-                    CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
-                    default=options.get(CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES),
-                ): SelectSelector(
-                    SelectSelectorConfig(
-                        options=ALARM_STATES,
-                        multiple=True,
-                        mode=SelectSelectorMode.LIST,
-                    )
+                vol.Required("calendar_options"): section(
+                    vol.Schema({
+                        vol.Optional(
+                            CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
+                            default=options.get(CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES),
+                        ): SelectSelector(
+                            SelectSelectorConfig(
+                                options=ALARM_STATES,
+                                multiple=True,
+                                mode=SelectSelectorMode.LIST,
+                            )
+                        ),
+                    }),
+                    {"collapsed": True},
                 ),
                 vol.Required("notify_options"): section(
                     vol.Schema({

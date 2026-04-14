@@ -1,0 +1,104 @@
+{
+    "title": "AutoArm",
+    "config": {
+        "step": {
+            "user": {
+                "title": "アラームパネルを選択",
+                "data": {
+                    "alarm_panel": "管理するアラームコントロールパネル"
+                }
+            },
+            "calendars": {
+                "title": "カレンダーを選択",
+                "data": {
+                    "calendar_entities": "警戒スケジュールに使用するカレンダー"
+                }
+            },
+            "persons": {
+                "title": "人物を選択",
+                "data": {
+                    "person_entities": "在室ベースの警戒に使用する人物"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "AutoArm はすでに設定済みです"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "AutoArm オプション",
+                "data": {
+                    "calendar_entities": "警戒スケジュールに使用するカレンダー",
+                    "person_entities": "在室ベースの警戒に使用する人物",
+                    "occupancy_default_day": "日中在室時のデフォルト警戒状態",
+                    "occupancy_default_night": "夜間在室時のデフォルト警戒状態",
+                    "no_event_mode": "カレンダーイベント終了後の警戒状態"
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "カレンダー在室オーバーライド",
+                        "data": {
+                            "calendar_occupancy_override_states": "在室状況がオーバーライドできる状態"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "カレンダーイベントがこれらの状態のいずれかを設定した場合、在室状況の変化（到着・出発）によってアラーム状態を更新できます。例えば、カレンダーが「解除」と設定していても全員が外出した場合、「外出モード」に切り替わります。"
+                        }
+                    },
+                    "notify_options": {
+                        "name": "通知",
+                        "data": {
+                            "notify_enabled": "通知を有効にする",
+                            "notify_action": "通知アクション",
+                            "notify_targets": "通知先"
+                        },
+                        "data_description": {
+                            "notify_enabled": "アラーム状態変化の通知を有効にする",
+                            "notify_action": "通知に使用する Home Assistant アクション（サービス）",
+                            "notify_targets": "通知先アドレスまたは notify エンティティのリスト（Supernotify の場合は空白可）"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "日の出の制約",
+                        "data": {
+                            "sunrise_earliest": "最早",
+                            "sunrise_latest": "最遅"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "この時刻より早く日の出を処理しない",
+                            "sunrise_latest": "この時刻より遅く日の出を処理しない"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "日の入りの制約",
+                        "data": {
+                            "sunset_earliest": "最早",
+                            "sunset_latest": "最遅"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "この時刻より早く日の入りを処理しない",
+                            "sunset_latest": "この時刻より遅く日の入りを処理しない"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "services": {
+        "reload": {
+            "name": "リロード",
+            "description": "AutoArm の設定を再読み込みします。"
+        }
+    },
+    "issues": {
+        "transition_condition": {
+            "title": "無効なトランジション条件",
+            "description": "状態 {state} のトランジション条件がエラー ({error}) で検証に失敗しました"
+        },
+        "yaml_core_config_deprecated": {
+            "title": "YAML コア設定は非推奨です",
+            "description": "AutoArm のコア設定（alarm_panel、occupancy、calendars）は UI 設定エントリに移行されました。YAML 設定から削除し、UI で管理してください。高度な設定（transitions、buttons、notify、diurnal、rate_limit）は YAML に残すことができます。"
+        }
+    }
+}
