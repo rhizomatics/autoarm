@@ -9,6 +9,7 @@ from homeassistant.components.calendar import CalendarEntity
 from homeassistant.core import HomeAssistant
 
 from custom_components.autoarm.autoarming import AlarmArmer, Intervention
+from custom_components.autoarm.calendar import TrackedCalendarEvent
 from custom_components.autoarm.const import ChangeSource
 
 TEST_PANEL = "alarm_control_panel.test_panel"
@@ -216,9 +217,9 @@ async def test_housekeeping_prunes_calendar_events(hass: HomeAssistant, local_ca
         calendar_config={"calendars": [{"entity_id": "calendar.testing_calendar", "state_patterns": {"disarmed": ".*"}}]},
     )
     await autoarmer.initialize()
-    cal_event = autoarmer.active_calendar_event()
+    cal_event: TrackedCalendarEvent | None = autoarmer.active_calendar_event()
     assert cal_event is not None
-    assert cal_event.summary == "Testing Day"
+    assert cal_event.event.summary == "Testing Day"
 
     await asyncio.sleep(2)
     await autoarmer.housekeeping(dt_util.now())

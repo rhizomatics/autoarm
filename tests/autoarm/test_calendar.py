@@ -124,7 +124,7 @@ async def test_calendar_follows_event_name_change_no_longer_in_scope(
     local_calendar: CalendarEntity,
 ) -> None:
 
-    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0]  # type: ignore
+    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event  # type: ignore
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
         {
@@ -142,7 +142,7 @@ async def test_calendar_follows_event_date_change_out_of_window(
     local_calendar: CalendarEntity,
 ) -> None:
 
-    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0]  # type: ignore
+    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event  # type: ignore
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
         {
@@ -161,7 +161,7 @@ async def test_calendar_follows_event_date_change_within_window(
     local_calendar: CalendarEntity,
 ) -> None:
 
-    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0]  # type: ignore
+    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event  # type: ignore
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
         {
@@ -181,7 +181,7 @@ async def test_calendar_terminates_early(
     local_calendar: CalendarEntity,
 ) -> None:
 
-    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0]  # type: ignore
+    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event  # type: ignore
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
         {
@@ -198,7 +198,7 @@ async def test_calendar_follows_event_deleted(
     calendar_with_holiday_event: TrackedCalendar,
     local_calendar: CalendarEntity,
 ) -> None:
-    uid: str = calendar_with_holiday_event.active_events()[0].uid  # type: ignore
+    uid: str = calendar_with_holiday_event.active_events()[0].event.uid  # type: ignore
     await local_calendar.async_delete_event(uid)
     await calendar_with_holiday_event.on_timed_poll(dt_util.now())
     assert not calendar_with_holiday_event.has_active_event()

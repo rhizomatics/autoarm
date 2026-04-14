@@ -45,6 +45,7 @@ CONF_PERSON_ENTITIES = "person_entities"
 CONF_OCCUPANCY_DEFAULT_DAY = "occupancy_default_day"
 CONF_OCCUPANCY_DEFAULT_NIGHT = "occupancy_default_night"
 CONF_NO_EVENT_MODE = "no_event_mode"
+CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES = "calendar_occupancy_override_states"
 CONF_NOTIFY_ACTION = "notify_action"
 CONF_NOTIFY_TARGETS = "notify_targets"
 CONF_NOTIFY_ENABLED = "notify_enabled"
@@ -52,6 +53,8 @@ CONF_SUNRISE_EARLIEST = "sunrise_earliest"
 CONF_SUNRISE_LATEST = "sunrise_latest"
 CONF_SUNSET_EARLIEST = "sunset_earliest"
 CONF_SUNSET_LATEST = "sunset_latest"
+
+DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES = ["disarmed", "armed_home", "armed_night"]
 
 
 def _time_to_str(t: dt.time | None) -> str | None:
@@ -67,6 +70,7 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
     CONF_OCCUPANCY_DEFAULT_NIGHT: None,
     CONF_NO_EVENT_MODE: "auto",
+    CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_NOTIFY_ENABLED: True,
     CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
     CONF_NOTIFY_TARGETS: [],
@@ -127,6 +131,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_OCCUPANCY_DEFAULT_DAY: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_DAY],
                 CONF_OCCUPANCY_DEFAULT_NIGHT: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_NIGHT],
                 CONF_NO_EVENT_MODE: DEFAULT_OPTIONS[CONF_NO_EVENT_MODE],
+                CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
                 CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
                 CONF_NOTIFY_ENABLED: True,
                 CONF_NOTIFY_TARGETS: [],
@@ -254,6 +259,16 @@ class AutoArmOptionsFlow(OptionsFlow):
                     SelectSelectorConfig(
                         options=NO_CAL_EVENT_OPTIONS,
                         mode=SelectSelectorMode.DROPDOWN,
+                    )
+                ),
+                vol.Optional(
+                    CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
+                    default=options.get(CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES),
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=ALARM_STATES,
+                        multiple=True,
+                        mode=SelectSelectorMode.LIST,
                     )
                 ),
                 vol.Required("notify_options"): section(

@@ -10,6 +10,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ENTITIES,
+    CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_NO_EVENT_MODE,
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
@@ -231,3 +232,76 @@ async def test_calendar_multiple_calendars(local_calendar: CalendarEntity, hass:
     await _setup_entry(hass, options=local_options)
 
     assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
+
+
+async def test_calendar_occupancy_override_blocked(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    """Occupancy changes are blocked when the calendar state is not in the override list."""
+    start_of_day = dt_util.start_of_local_day()
+    end_of_day = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
+    await local_calendar.async_create_event(
+        dtstart=start_of_day,
+        dtend=end_of_day,
+        summary="Away",  # maps to armed_away via YAML_CONFIG
+    )
+    hass.states.async_set("person.house_owner", "not_home", {"friendly_name": "Bob"})
+    hass.states.async_set("person.tenant", "not_home", {"friendly_name": "Jill"})
+    local_options = ENTRY_OPTIONS.copy()
+    # armed_away is NOT in the override list — occupancy cannot override it
+    local_options[CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES] = ["disarmed", "armed_home", "armed_night"]
+    await _setup_entry(hass, options=local_options)
+
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
+
+    # Person arriving home should not override the active calendar armed_away event
+    hass.states.async_set("person.house_owner", "home", {"friendly_name": "Bob"})
+    await hass.async_block_till_done()
+
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
+
+
+async def test_calendar_occupancy_override_allowed(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    """reset_armed_state proceeds (not ignored) when calendar state is in the occupancy override list."""
+    start_of_day = dt_util.start_of_local_day()
+    end_of_day = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
+    await local_calendar.async_create_event(
+        dtstart=start_of_day,
+        dtend=end_of_day,
+        summary="Away",  # maps to armed_away via YAML_CONFIG
+    )
+    hass.states.async_set("person.house_owner", "not_home", {"friendly_name": "Bob"})
+    hass.states.async_set("person.tenant", "not_home", {"friendly_name": "Jill"})
+    local_options = ENTRY_OPTIONS.copy()
+    # armed_away IS in the override list — occupancy resets are not blocked
+    local_options[CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES] = ["disarmed", "armed_home", "armed_night", "armed_away"]
+    await _setup_entry(hass, options=local_options)
+
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
+
+    # Person arrives home — occupancy change triggers reset_armed_state(OCCUPANCY)
+    hass.states.async_set("person.house_owner", "home", {"friendly_name": "Bob"})
+    await hass.async_block_till_done()
+
+    # The reset was NOT blocked — action is "no_change" (proceeded but determine_state returned None
+    # since default transitions require autoarm.computed which is False during a calendar event),
+    # not "ignore_for_active_calendar_event".
+    last_calc = hass.states.get("sensor.autoarm_last_calculation")
+    assert last_calc is not None
+    assert last_calc.attributes.get("action") != "ignore_for_active_calendar_event"
+
+
+async def test_calendar_manual_mode_blocks_occupancy_reset(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    """When no_event_mode is manual and no calendar event is active, occupancy resets are ignored."""
+    # No events created — calendar is empty
+    hass.states.async_set("person.house_owner", "home", {"friendly_name": "Bob"})
+    hass.states.async_set("alarm_panel.testing", "armed_home")
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_NO_EVENT_MODE] = "manual"
+    await _setup_entry(hass, options=local_options)
+
+    # Person leaves — occupancy change should be blocked by manual mode
+    hass.states.async_set("person.house_owner", "not_home", {"friendly_name": "Bob"})
+    await hass.async_block_till_done()
+
+    last_calc = hass.states.get("sensor.autoarm_last_calculation")
+    assert last_calc is not None
+    assert last_calc.attributes.get("action") == "ignore_for_calendar_manual_default"

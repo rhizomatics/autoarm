@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING, Any
 import homeassistant.util.dt as dt_util
 import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, AlarmControlPanelState
-from homeassistant.components.calendar import CalendarEvent
 from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
@@ -55,9 +54,10 @@ from homeassistant.util.hass_dict import HassKey
 from custom_components.autoarm.hass_api import HomeAssistantAPI
 from custom_components.autoarm.notifier import Notifier
 
-from .calendar import TrackedCalendar
+from .calendar import TrackedCalendar, TrackedCalendarEvent
 from .config_flow import (
     CONF_CALENDAR_ENTITIES,
+    CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
     CONF_NOTIFY_ENABLED,
@@ -69,6 +69,7 @@ from .config_flow import (
     CONF_SUNRISE_LATEST,
     CONF_SUNSET_EARLIEST,
     CONF_SUNSET_LATEST,
+    DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     DEFAULT_NOTIFY_ACTION,
 )
 from .const import (
@@ -132,7 +133,7 @@ class AutoArmData:
     other_data: dict[str, str | dict[str, str] | list[str] | int | float | bool | None]
 
 
-async def async_setup(
+async def async_setup(  # noqa: RUF029
     hass: HomeAssistant,
     config: ConfigType,
 ) -> bool:
@@ -244,7 +245,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001, RUF029
     """Unload Auto Arm config entry."""
     if HASS_DATA_KEY in hass.data:
         hass.data[HASS_DATA_KEY].armer.shutdown()
@@ -333,6 +334,9 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         rate_limit=yaml_config.get(CONF_RATE_LIMIT, {}),
         calendar_config=calendar_config,
         transitions=yaml_config.get(CONF_TRANSITIONS),
+        calendar_occupancy_override_states=entry.options.get(
+            CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
+        ),
     )
 
 
@@ -411,6 +415,7 @@ class AlarmArmer:
         rate_limit: ConfigType | None = None,
         calendar_config: ConfigType | None = None,
         transitions: dict[str, dict[str, list[ConfigType]]] | None = None,
+        calendar_occupancy_override_states: list[str] | None = None,
     ) -> None:
         occupancy = occupancy or {}
         rate_limit = rate_limit or {}
@@ -431,6 +436,11 @@ class AlarmArmer:
         self.calendar_configs: list[ConfigType] = calendar_config.get(CONF_CALENDARS, []) or []
         self.calendars: list[TrackedCalendar] = []
         self.calendar_no_event_mode: str | None = calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO)
+        self.calendar_occupancy_override_states: list[str] = (
+            calendar_occupancy_override_states
+            if calendar_occupancy_override_states is not None
+            else DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
+        )
         self.alarm_panel: str = alarm_panel
         self.sunrise_earliest: dt.time | None = sunrise_earliest
         self.sunrise_latest: dt.time | None = sunrise_latest
@@ -676,8 +686,8 @@ class AlarmArmer:
         self.stop_listener = None
         _LOGGER.info("AUTOARM shut down")
 
-    def active_calendar_event(self) -> CalendarEvent | None:
-        events: list[CalendarEvent] = []
+    def active_calendar_event(self) -> TrackedCalendarEvent | None:
+        events: list[TrackedCalendarEvent] = []
         for cal in self.calendars:
             events.extend(cal.active_events())
         if events:
@@ -754,7 +764,7 @@ class AlarmArmer:
         existing_state: AlarmControlPanelState | None = None
         must_change_state: bool = False
         last_state_intervention: Intervention | None = None
-        active_calendar_event: CalendarEvent | None = None
+        active_calendar_event: TrackedCalendarEvent | None = None
 
         if source is None and intervention is not None:
             source = intervention.source
@@ -763,23 +773,36 @@ class AlarmArmer:
             intervention,
             source,
         )
-
+        action: str = "no_change"
         try:
             existing_state = self.armed_state()
             state = existing_state
             if self.calendars:
                 active_calendar_event = self.active_calendar_event()
                 if active_calendar_event:
-                    _LOGGER.debug("AUTOARM Ignoring reset while calendar event active")
-                    return existing_state
+                    cal_state: AlarmControlPanelState = active_calendar_event.arming_state
+                    if (
+                        source == ChangeSource.OCCUPANCY
+                        and cal_state is not None
+                        and str(cal_state) in self.calendar_occupancy_override_states
+                    ):
+                        _LOGGER.debug(
+                            "AUTOARM Allowing occupancy reset while calendar event active in overridable state %s", cal_state
+                        )
+                    else:
+                        _LOGGER.debug("AUTOARM Ignoring reset while calendar event active")
+                        action = "ignore_for_active_calendar_event"
+                        return existing_state
                 if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_MANUAL:
                     _LOGGER.debug(
                         "AUTOARM Ignoring reset while calendar configured, no active event, and default mode is manual"
                     )
+                    action = "ignore_for_calendar_manual_default"
                     return existing_state
                 if self.calendar_no_event_mode in AlarmControlPanelState:
                     # TODO: may be dupe logic with on_cal event
                     _LOGGER.debug("AUTOARM Applying fixed reset on end of calendar event, %s", self.calendar_no_event_mode)
+                    action = "reset_on_calendar_event_end"
                     return await self.arm(alarm_state_as_enum(self.calendar_no_event_mode), ChangeSource.CALENDAR)
                 if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
                     _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
@@ -799,10 +822,12 @@ class AlarmArmer:
                         last_state_intervention.source,
                         last_state_intervention.created_at,
                     )
+                    action = "ignore_after_manual_intervention"
                     return existing_state
             state = self.determine_state()
             if state is not None and state != AlarmControlPanelState.PENDING and state != existing_state:
                 state = await self.arm(state, source=source)
+                action = "change_state"
         finally:
             self.hass.states.async_set(
                 f"sensor.{DOMAIN}_last_calculation",
@@ -811,13 +836,14 @@ class AlarmArmer:
                     "new_state": str(state),
                     "old_state": str(existing_state),
                     "source": source,
-                    "active_calendar_event": deobjectify(active_calendar_event),
+                    "active_calendar_event": deobjectify(active_calendar_event.event) if active_calendar_event else None,
                     "occupied": self.is_occupied(),
                     "night": self.is_night(),
                     "must_change_state": str(must_change_state),
                     "last_state_intervention": deobjectify(last_state_intervention),
                     "intervention": intervention.as_dict() if intervention else None,
                     "time": dt_util.now().isoformat(),
+                    "action": action
                 },
             )
 
@@ -834,12 +860,13 @@ class AlarmArmer:
     def determine_state(self) -> AlarmControlPanelState | None:
         """Compute a new state using occupancy, sun and transition conditions"""
         evaluated_state: AlarmControlPanelState | None = None
+        active_calendar_event: TrackedCalendarEvent | None = self.active_calendar_event()
         condition_vars: ConditionVariables = ConditionVariables(
             occupied=self.is_occupied(),
             unoccupied=self.is_unoccupied(),
             night=self.is_night(),
             state=self.armed_state(),
-            calendar_event=self.active_calendar_event(),
+            calendar_event=active_calendar_event.event if active_calendar_event else None,
             occupied_defaults=self.occupied_defaults,
             at_home=self.at_home(),
             not_home=self.not_home(),
