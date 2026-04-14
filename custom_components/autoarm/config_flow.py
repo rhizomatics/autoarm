@@ -265,7 +265,9 @@ class AutoArmOptionsFlow(OptionsFlow):
                     vol.Schema({
                         vol.Optional(
                             CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
-                            default=options.get(CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES),
+                            default=options.get(
+                                CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
+                            ),
                         ): SelectSelector(
                             SelectSelectorConfig(
                                 options=ALARM_STATES,

@@ -18,7 +18,6 @@ from custom_components.autoarm.config_flow import (
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
     CONF_SUNRISE_EARLIEST,
-    DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
 )
 from custom_components.autoarm.const import (
     CONF_ALARM_PANEL,

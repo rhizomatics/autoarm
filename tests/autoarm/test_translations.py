@@ -36,9 +36,7 @@ def translations() -> dict[str, dict]:
 
 def test_all_locales_present(translations: dict[str, dict]) -> None:
     """All expected locale files exist."""
-    assert translations.keys() >= EXPECTED_LOCALES, (
-        f"Missing locales: {EXPECTED_LOCALES - translations.keys()}"
-    )
+    assert translations.keys() >= EXPECTED_LOCALES, f"Missing locales: {EXPECTED_LOCALES - translations.keys()}"
 
 
 @pytest.mark.parametrize("locale", sorted(EXPECTED_LOCALES))
