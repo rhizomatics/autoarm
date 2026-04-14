@@ -68,7 +68,7 @@ The full list of how alarm panel state can be set:
 
 | Source        | Description                                                               |
 |---------------|---------------------------------------------------------------------------|
-| calendar      | Calendar events                                                           |
+| calendar      | Calendar events (with optional override for selected events by occupancy) |
 | mobile        | Mobile action                                                             |
 | occupancy     | Occupancy calculation, e.g. automatically switching off `ARMED_AWAY`      |
 | alarm_panel   | Changes made to Alarm Control Panel outside of AutoArm                    |

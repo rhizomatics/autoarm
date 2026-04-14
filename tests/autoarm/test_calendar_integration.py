@@ -40,8 +40,8 @@ YAML_CONFIG: dict[str, Any] = {
                 CONF_ENTITY_ID: "calendar.testing_calendar",
                 CONF_CALENDAR_POLL_INTERVAL: 10,
                 CONF_CALENDAR_EVENT_STATES: {
-                    "armed_away": [re.compile("Away")],
-                    "armed_vacation": [re.compile("Holiday.*")],
+                    "armed_away": [re.compile(r"Away")],
+                    "armed_vacation": [re.compile(r"Holiday.*")],
                 },
             }
         ],
@@ -234,7 +234,7 @@ async def test_calendar_multiple_calendars(local_calendar: CalendarEntity, hass:
     assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
 
 
-async def test_calendar_occupancy_override_blocked(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+async def test_calendar_occupancy_override_blocked(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
     """Occupancy changes are blocked when the calendar state is not in the override list."""
     start_of_day = dt_util.start_of_local_day()
     end_of_day = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
@@ -259,7 +259,7 @@ async def test_calendar_occupancy_override_blocked(local_calendar: CalendarEntit
     assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
 
 
-async def test_calendar_occupancy_override_allowed(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+async def test_calendar_occupancy_override_allowed(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
     """reset_armed_state proceeds (not ignored) when calendar state is in the occupancy override list."""
     start_of_day = dt_util.start_of_local_day()
     end_of_day = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
@@ -289,8 +289,9 @@ async def test_calendar_occupancy_override_allowed(local_calendar: CalendarEntit
     assert last_calc.attributes.get("action") != "ignore_for_active_calendar_event"
 
 
-async def test_calendar_manual_mode_blocks_occupancy_reset(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+async def test_calendar_manual_mode_blocks_occupancy_reset(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
     """When no_event_mode is manual and no calendar event is active, occupancy resets are ignored."""
+    assert local_calendar  # used only for its side effect in HA having at least one calendar
     # No events created — calendar is empty
     hass.states.async_set("person.house_owner", "home", {"friendly_name": "Bob"})
     hass.states.async_set("alarm_panel.testing", "armed_home")
