@@ -24,6 +24,7 @@ from custom_components.autoarm.config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
+    DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
 )
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY
 from custom_components.autoarm.hass_api import HomeAssistantAPI
@@ -118,6 +119,8 @@ def mock_armer_real_hass(hass: HomeAssistant) -> AlarmArmer:
     mocked.hass = hass
     mocked.app_health_tracker = Mock(spec=AppHealthTracker)
     mocked.notifier = AsyncMock(spec=Notifier)
+    mocked.calendar_occupancy_override_states = DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
+    mocked.occupied_defaults = {}
     return mocked
 
 

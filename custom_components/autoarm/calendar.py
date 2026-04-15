@@ -111,7 +111,40 @@ class TrackedCalendarEvent:
 
     async def on_calendar_event_start(self, triggered_at: dt.datetime) -> None:
         _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", self.id, triggered_at)
-        new_state = await self.armer.arm(arming_state=self.arming_state, source=ChangeSource.CALENDAR)
+        target_state: AlarmControlPanelState = self.arming_state
+        new_state: AlarmControlPanelState | None = None
+        overridden: bool = False
+        if str(self.arming_state) in self.armer.calendar_occupancy_override_states:
+            occupied = self.armer.is_occupied()
+            current_state: AlarmControlPanelState = self.armer.armed_state()
+            if self.is_recurring():  # optionally allow occupancy overrides of recurring events
+                if (
+                    occupied is False
+                    and target_state
+                    in (AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
+                    and current_state in (AlarmControlPanelState.ARMED_AWAY)
+                ):
+                    _LOGGER.debug(
+                        "AUTOARM Calendar event %s: empty occupancy override cancelling calendar change to %s",
+                        self.id,
+                        self.arming_state,
+                    )
+                    overridden = True
+                elif (
+                    occupied is True
+                    and target_state in (AlarmControlPanelState.ARMED_AWAY)
+                    and current_state
+                    in (AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
+                ):
+                    _LOGGER.debug(
+                        "AUTOARM Calendar event %s: present occupancy override cancelling calendar change to %s",
+                        self.id,
+                        self.arming_state,
+                    )
+                    overridden = True
+
+        if not overridden:
+            new_state = await self.armer.arm(arming_state=target_state, source=ChangeSource.CALENDAR)
         self.hass.states.async_set(
             f"sensor.{DOMAIN}_last_calendar_event",
             new_state=self.event.summary or str(self.id),
@@ -123,6 +156,7 @@ class TrackedCalendarEvent:
                 "description": self.event.description,
                 "uid": self.event.uid,
                 "new_state": new_state,
+                "overridden": overridden,
             },
         )
 
@@ -154,6 +188,9 @@ class TrackedCalendarEvent:
             return False
         now_local: dt.datetime = dt_util.now()
         return now_local >= self.event.start_datetime_local and now_local <= self.event.end_datetime_local
+
+    def is_recurring(self) -> bool:
+        return self.event.recurrence_id is not None
 
     def is_future(self) -> bool:
         if self.track_status == "ended":

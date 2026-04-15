@@ -54,7 +54,7 @@ CONF_SUNRISE_LATEST = "sunrise_latest"
 CONF_SUNSET_EARLIEST = "sunset_earliest"
 CONF_SUNSET_LATEST = "sunset_latest"
 
-DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES = ["disarmed", "armed_home", "armed_night"]
+DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES: list[str] = ["disarmed", "armed_home", "armed_night", "armed_away"]
 
 
 def _time_to_str(t: dt.time | None) -> str | None:

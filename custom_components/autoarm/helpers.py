@@ -9,7 +9,7 @@ from homeassistant.components.alarm_control_panel.const import AlarmControlPanel
 from homeassistant.core import State
 from homeassistant.helpers.json import ExtendedJSONEncoder
 
-from .const import DOMAIN
+from .const import DOMAIN, ChangeSource
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,6 +21,16 @@ def alarm_state_as_enum(state_str: str | None) -> AlarmControlPanelState | None:
         return AlarmControlPanelState(state_str)
     except ValueError as e:
         _LOGGER.warning("AUTOARM Invalid alarm state: %s", e)
+        return None
+
+
+def change_source_as_enum(source_str: str | None) -> ChangeSource | None:
+    if source_str is None:
+        return None
+    try:
+        return ChangeSource(source_str)
+    except ValueError as e:
+        _LOGGER.warning("AUTOARM Invalid change source: %s", e)
         return None
 
 

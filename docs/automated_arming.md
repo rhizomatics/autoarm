@@ -123,7 +123,7 @@ stable for `home`->`not_home`, and zero delay when arriving home.
       not_home: 180
 ```
 
-Occupancy checks can override calendar driven alarm states if desired. In the configuration screen, select the
+Occupancy checks can override recurring calendar driven alarm states if desired. In the configuration screen, select the
 alarm states for which the calendar state should be overridden. This means you can have a simple repeating `disarmed`
 / `armed_night` calendar setup but still have the alarm automatically go to `armed_away` if everyone leaves home.
 

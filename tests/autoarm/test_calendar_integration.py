@@ -266,6 +266,7 @@ async def test_calendar_occupancy_override_allowed(local_calendar: CalendarEntit
     await local_calendar.async_create_event(
         dtstart=start_of_day,
         dtend=end_of_day,
+        rrule="FREQ=DAILY;COUNT=10",
         summary="Away",  # maps to armed_away via YAML_CONFIG
     )
     hass.states.async_set("person.house_owner", "not_home", {"friendly_name": "Bob"})
@@ -306,3 +307,77 @@ async def test_calendar_manual_mode_blocks_occupancy_reset(local_calendar: Calen
     last_calc = hass.states.get("sensor.autoarm_last_calculation")
     assert last_calc is not None
     assert last_calc.attributes.get("action") == "ignore_for_calendar_manual_default"
+
+
+async def test_calendar_event_start_not_occupied_uses_armed_away(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
+    """Calendar event with overridable state arms to armed_away when nobody is home."""
+    start_of_day = dt_util.start_of_local_day()
+    end_of_day = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
+    custom_yaml: dict[str, Any] = {
+        CONF_CALENDAR_CONTROL: {
+            CONF_CALENDAR_NO_EVENT: "auto",
+            CONF_CALENDARS: [
+                {
+                    CONF_ENTITY_ID: "calendar.testing_calendar",
+                    CONF_CALENDAR_POLL_INTERVAL: 10,
+                    CONF_CALENDAR_EVENT_STATES: {
+                        "armed_home": [re.compile(r"Home")],
+                    },
+                }
+            ],
+        },
+    }
+    await local_calendar.async_create_event(
+        dtstart=start_of_day,
+        dtend=end_of_day,
+        rrule="FREQ=DAILY;COUNT=10",
+        summary="Home",  # maps to armed_home, which IS in override list
+    )
+    hass.states.async_set("alarm_panel.testing", "armed_away")
+    hass.states.async_set("person.house_owner", "not_home", {"friendly_name": "Bob"})
+    hass.states.async_set("person.tenant", "not_home", {"friendly_name": "Jill"})
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES] = ["disarmed", "armed_home", "armed_night"]
+    await _setup_entry(hass, yaml_config=custom_yaml, options=local_options)
+
+    # Nobody home → should arm to armed_away despite calendar saying armed_home
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
+
+
+async def test_calendar_event_start_occupied_uses_occupancy_defaults(
+    local_calendar: CalendarEntity, hass: HomeAssistant
+) -> None:
+    """Calendar event with overridable state doesn't override occupancy set state when someone is home."""
+    start_of_day = dt_util.start_of_local_day()
+    end_of_day = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
+    custom_yaml: dict[str, Any] = {
+        CONF_CALENDAR_CONTROL: {
+            CONF_CALENDAR_NO_EVENT: "auto",
+            CONF_CALENDARS: [
+                {
+                    CONF_ENTITY_ID: "calendar.testing_calendar",
+                    CONF_CALENDAR_POLL_INTERVAL: 10,
+                    CONF_CALENDAR_EVENT_STATES: {
+                        "armed_away": [re.compile(r"Armed Away")],
+                    },
+                }
+            ],
+        },
+    }
+    await local_calendar.async_create_event(
+        dtstart=start_of_day,
+        dtend=end_of_day,
+        rrule="FREQ=DAILY;COUNT=10",
+        summary="Armed Away",  # maps to disarmed, which IS in override list
+    )
+
+    hass.states.async_set("alarm_panel.testing", "armed_home")
+    hass.states.async_set("person.house_owner", "home", {"friendly_name": "Bob"})
+    hass.states.async_set("person.tenant", "home", {"friendly_name": "Jill"})
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES] = ["disarmed", "armed_home", "armed_night", "armed_away"]
+    local_options[CONF_OCCUPANCY_DEFAULT_DAY] = "armed_home"
+    await _setup_entry(hass, yaml_config=custom_yaml, options=local_options)
+
+    # Someone home during day → should arm to armed_home (occupancy default) not disarmed
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_HOME

@@ -276,3 +276,4 @@ class ChangeSource(StrEnum):
     SUNSET = auto()
     ZOMBIFICATION = auto()
     STARTUP = auto()
+    UNKNOWN = auto()

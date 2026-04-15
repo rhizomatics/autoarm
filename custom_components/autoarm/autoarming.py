@@ -106,7 +106,15 @@ from .const import (
     ChangeSource,
     ConditionVariables,
 )
-from .helpers import AppHealthTracker, ExtendedExtendedJSONEncoder, Limiter, alarm_state_as_enum, deobjectify, safe_state
+from .helpers import (
+    AppHealthTracker,
+    ExtendedExtendedJSONEncoder,
+    Limiter,
+    alarm_state_as_enum,
+    change_source_as_enum,
+    deobjectify,
+    safe_state,
+)
 
 if TYPE_CHECKING:
     from homeassistant.helpers.condition import ConditionCheckerType
@@ -394,6 +402,13 @@ class Intervention:
             "source": str(self.source),
             "state": str(self.state) if self.state is not None else None,
         }
+
+
+@dataclass
+class AlarmStateWithAttributes:
+    state: AlarmControlPanelState
+    source: ChangeSource
+    attributes: dict[str, str]
 
 
 class AlarmArmer:
@@ -725,11 +740,26 @@ class AlarmArmer:
 
     def armed_state(self) -> AlarmControlPanelState:
         raw_state: str | None = safe_state(self.hass.states.get(self.alarm_panel))
-        alarm_state = alarm_state_as_enum(raw_state)
+        alarm_state: AlarmControlPanelState | None = alarm_state_as_enum(raw_state)
         if alarm_state is None:
             _LOGGER.warning("AUTOARM No alarm state available - treating as PENDING")
             return AlarmControlPanelState.PENDING
         return alarm_state
+
+    def current_state(self) -> AlarmStateWithAttributes:
+        state: State | None = self.hass.states.get(self.alarm_panel)
+        source: ChangeSource | None = None
+        alarm_state: AlarmControlPanelState | None = (
+            alarm_state_as_enum(state.state) if state and state.state is not None else None
+        )
+
+        if state and state.attributes and state.attributes.get(ATTR_CHANGED_BY):
+            source = change_source_as_enum(state.attributes[ATTR_CHANGED_BY].split("_", 1)[-1])
+        return AlarmStateWithAttributes(
+            state=alarm_state or AlarmControlPanelState.PENDING,
+            source=source or ChangeSource.UNKNOWN,
+            attributes=state.attributes if state else {},
+        )
 
     def _extract_event(self, event: Event[EventStateChangedData]) -> tuple[str | None, str | None, str | None, dict[str, str]]:
         entity_id = old = new = None
@@ -784,11 +814,10 @@ class AlarmArmer:
                     if (
                         source == ChangeSource.OCCUPANCY
                         and cal_state is not None
+                        and active_calendar_event.is_recurring()
                         and str(cal_state) in self.calendar_occupancy_override_states
                     ):
-                        _LOGGER.debug(
-                            "AUTOARM Allowing occupancy reset while calendar event active in overridable state %s", cal_state
-                        )
+                        _LOGGER.debug("AUTOARM Allowing occupancy reset for recurring overridable calendar event %s", cal_state)
                     else:
                         _LOGGER.debug("AUTOARM Ignoring reset while calendar event active")
                         action = "ignore_for_active_calendar_event"
