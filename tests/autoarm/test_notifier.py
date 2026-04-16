@@ -1,9 +1,12 @@
 from typing import TYPE_CHECKING
+from unittest.mock import Mock
 
 from homeassistant.core import HomeAssistant
 
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.const import ChangeSource
+from custom_components.autoarm.helpers import AppHealthTracker
+from custom_components.autoarm.notifier import Notifier
 
 if TYPE_CHECKING:
     from homeassistant.helpers.typing import ConfigType
@@ -552,3 +555,36 @@ async def test_notify_fallback_to_broader_profile_when_specific_not_matched(hass
     assert len(calls) == 1
     assert calls[0]["service"] == "general_service"
     assert calls[0]["data"]["data"]["profile"] == "general"
+
+
+async def test_notify_skipped_when_no_action_resolved(hass: HomeAssistant) -> None:
+    """Test that notification is skipped when notify_action resolves to None."""
+    notifier = Notifier({"backstop": {}}, hass, Mock(spec=AppHealthTracker), notify_action=None)
+    await notifier.notify(ChangeSource.BUTTON, message="No action")
+
+
+async def test_notify_includes_targets_in_service_data(hass: HomeAssistant) -> None:
+    """Test that notify_targets are passed as 'target' in service_data."""
+    notifier = Notifier(
+        {"backstop": {}},
+        hass,
+        Mock(spec=AppHealthTracker),
+        notify_action="notify.test_service",
+        notify_targets=["device.abc123"],
+    )
+    calls: list[dict] = []
+
+    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+        calls.append({"service": call.service, "data": dict(call.data)})
+
+    hass.services.async_register("notify", "test_service", mock_handler)
+    await notifier.notify(ChangeSource.BUTTON, message="Target test")
+
+    assert len(calls) == 1
+    assert calls[0]["data"]["target"] == ["device.abc123"]
+
+
+async def test_notify_skipped_when_action_is_empty_string(hass: HomeAssistant) -> None:
+    """Test that notification hits else branch when notify_action is empty string."""
+    notifier = Notifier({"backstop": {}}, hass, Mock(spec=AppHealthTracker), notify_action="")
+    await notifier.notify(ChangeSource.BUTTON, message="Empty action")
