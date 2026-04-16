@@ -20,7 +20,6 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
-    ALARM_STATES,
     CONF_ALARM_PANEL,
     CONF_CALENDAR_CONTROL,
     CONF_CALENDAR_NO_EVENT,
