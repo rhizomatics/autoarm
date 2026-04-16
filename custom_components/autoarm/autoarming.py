@@ -951,6 +951,14 @@ class AlarmArmer:
                 _LOGGER.info("AUTOARM Setting %s from %s to %s for %s", self.alarm_panel, existing_state, arming_state, source)
                 if self.notifier and source and arming_state:
                     await self.notifier.notify(source=source, from_state=existing_state, to_state=arming_state)
+
+                self.hass_api.fire_event(event_name="autoarming",
+                                         event_data={
+                                                     "panel": self.alarm_panel,
+                                                     "original_state": existing_state,
+                                                     "new_state": arming_state,
+                                                     "change_source": source,
+                                                     "attributes": attrs})
                 return arming_state
             _LOGGER.debug("Skipping arm for %s, as %s already %s", source, self.alarm_panel, arming_state)
             return existing_state

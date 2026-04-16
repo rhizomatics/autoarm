@@ -103,6 +103,10 @@ class HomeAssistantAPI:
             _LOGGER.error("AUTOARM Condition eval failed: %s", e)
             raise
 
+    def fire_event(self, event_name: str, event_data: dict[str, Any] | None = None) -> None:
+        if self._hass is not None:
+            self._hass.bus.async_fire(event_name, event_data)
+
 
 class ConditionErrorLoggingAdaptor(logging.LoggerAdapter):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
