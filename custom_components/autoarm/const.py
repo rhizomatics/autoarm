@@ -37,6 +37,7 @@ CONF_ALARM_PANEL = "alarm_panel"
 CONF_ALARM_STATES = "alarm_states"
 
 ALARM_STATES = [k.lower() for k in AlarmControlPanelState.__members__]
+PUBLIC_ALARM_STATES = [s for s in ALARM_STATES if s not in ("pending", "triggered", "arming", "disarming")]
 
 NO_CAL_EVENT_MODE_AUTO = "auto"
 NO_CAL_EVENT_MODE_MANUAL = "manual"

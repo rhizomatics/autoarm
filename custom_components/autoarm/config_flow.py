@@ -38,6 +38,7 @@ from .const import (
     DOMAIN,
     NO_CAL_EVENT_OPTIONS,
     NOTIFY_COMMON,
+    PUBLIC_ALARM_STATES,
 )
 
 CONF_CALENDAR_ENTITIES = "calendar_entities"
@@ -239,7 +240,7 @@ class AutoArmOptionsFlow(OptionsFlow):
                     default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "armed_home"),
                 ): SelectSelector(
                     SelectSelectorConfig(
-                        options=ALARM_STATES,
+                        options=PUBLIC_ALARM_STATES,
                         mode=SelectSelectorMode.DROPDOWN,
                     )
                 ),
@@ -248,7 +249,7 @@ class AutoArmOptionsFlow(OptionsFlow):
                     description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")},
                 ): SelectSelector(
                     SelectSelectorConfig(
-                        options=ALARM_STATES,
+                        options=PUBLIC_ALARM_STATES,
                         mode=SelectSelectorMode.DROPDOWN,
                     )
                 ),
@@ -270,7 +271,7 @@ class AutoArmOptionsFlow(OptionsFlow):
                             ),
                         ): SelectSelector(
                             SelectSelectorConfig(
-                                options=ALARM_STATES,
+                                options=PUBLIC_ALARM_STATES,
                                 multiple=True,
                                 mode=SelectSelectorMode.LIST,
                             )
