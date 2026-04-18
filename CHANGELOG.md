@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.1
+- Renamed event to `autoarm_change` to better fit HA standards
 ## 1.1.0
 ### Auto Transitions
 - `action` attribute now records what drove decision for state reset

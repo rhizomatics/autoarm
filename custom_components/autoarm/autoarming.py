@@ -948,17 +948,21 @@ class AlarmArmer:
                     attrs.update(panel_state.attributes)
                 attrs[ATTR_CHANGED_BY] = f"{DOMAIN}.{source}"
                 self.hass.states.async_set(entity_id=self.alarm_panel, new_state=str(arming_state), attributes=attrs)
+
                 _LOGGER.info("AUTOARM Setting %s from %s to %s for %s", self.alarm_panel, existing_state, arming_state, source)
                 if self.notifier and source and arming_state:
                     await self.notifier.notify(source=source, from_state=existing_state, to_state=arming_state)
 
                 self.hass_api.fire_event(
-                    event_name="autoarming",
+                    event_name="change",
                     event_data={
                         "panel": self.alarm_panel,
+                        "panel_state": panel_state,
                         "original_state": existing_state,
                         "new_state": arming_state,
                         "change_source": source,
+                        "occupied": self.is_occupied(),
+                        "night": self.is_night(),
                         "attributes": attrs,
                     },
                 )
