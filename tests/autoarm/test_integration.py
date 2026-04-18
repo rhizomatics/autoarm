@@ -237,3 +237,24 @@ async def test_setup_entry_raises_not_ready_on_failure(
         await hass.async_block_till_done()
 
     assert entry.state is ConfigEntryState.SETUP_RETRY
+
+
+async def test_arm_fires_autoarming_event(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+    hass.states.async_set("alarm_panel.testing", "disarmed")
+    hass.states.async_set("person.house_owner", "home")
+    hass.states.async_set("person.tenant", "home")
+    await _setup_entry(hass)
+
+    received: list[Any] = []
+    hass.bus.async_listen("autoarming", lambda event: received.append(event))
+
+    hass.states.async_set("person.house_owner", "not_home")
+    hass.states.async_set("person.tenant", "not_home")
+    await hass.async_block_till_done()
+
+    assert len(received) == 1
+    data = received[0].data
+    assert data["panel"] == "alarm_panel.testing"
+    assert data["original_state"] == AlarmControlPanelState.ARMED_HOME
+    assert data["new_state"] == AlarmControlPanelState.ARMED_AWAY
+    assert data["change_source"] == "occupancy"
