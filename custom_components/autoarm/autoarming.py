@@ -963,7 +963,7 @@ class AlarmArmer:
                     },
                 )
                 return arming_state
-            _LOGGER.debug("Skipping arm for %s, as %s already %s", source, self.alarm_panel, arming_state)
+            _LOGGER.debug("AUTOARM Skipping arm for %s, as %s already %s", source, self.alarm_panel, arming_state)
             return existing_state
         except Exception as e:
             _LOGGER.error("AUTOARM Failed to arm: %s", e)
@@ -983,10 +983,10 @@ class AlarmArmer:
 
         job: Callable
         if state is None:
-            _LOGGER.debug("Delayed reset, triggered at: %s, source%s", trigger_time, source)
+            _LOGGER.debug("AUTOARM Delayed reset, triggered at: %s, source%s", trigger_time, source)
             job = partial(self.delayed_reset_armed_state, intervention=intervention, source=source, requested_at=dt_util.now())
         else:
-            _LOGGER.debug("Delayed arm %s, triggered at: %s, source%s", state, trigger_time, source)
+            _LOGGER.debug("AUTOARM Delayed arm %s, triggered at: %s, source%s", state, trigger_time, source)
 
             job = partial(self.delayed_arm, arming_state=state, source=source, requested_at=dt_util.now())
 

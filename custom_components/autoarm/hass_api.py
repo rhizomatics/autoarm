@@ -105,6 +105,7 @@ class HomeAssistantAPI:
 
     def fire_event(self, event_name: str, event_data: dict[str, Any] | None = None) -> None:
         if self._hass is not None:
+            _LOGGER.debug("AUTOARM Firing %s event: %s",event_name,event_data)
             self._hass.bus.async_fire(event_name, event_data)
 
 

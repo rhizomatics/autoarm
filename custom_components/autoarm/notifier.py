@@ -46,19 +46,19 @@ class Notifier:
                     continue
                 profile: dict[str, Any] = self.notify_profiles[profile_name]
                 if profile.get(CONF_SOURCE) and source not in profile.get(CONF_SOURCE, []):
-                    _LOGGER.debug("Notification not selected for %s profile for source match on %s", profile_name, source)
+                    _LOGGER.debug("AUTOARM Notification not selected for %s profile for source match on %s", profile_name, source)
                     continue
                 only_for_states: list[AlarmControlPanelState] | None = profile.get(CONF_STATE)
                 if only_for_states and from_state not in only_for_states and to_state not in only_for_states:
                     _LOGGER.debug(
-                        "Notification not selected for %s profile for state match on %s->%s", profile_name, from_state, to_state
+                        "AUTOARM Notification not selected for %s profile for state match on %s->%s", profile_name, from_state, to_state
                     )
                     continue
                 selected_profile = profile
                 selected_profile_name = profile_name
                 break
             if selected_profile is None:
-                _LOGGER.debug("No profile selected for %s notification: %s", source, message)
+                _LOGGER.debug("AUTOARM No profile selected for %s notification: %s", source, message)
                 return
 
             # separately merge base dict and data sub-dict as cheap and nasty semi-deep-merge
