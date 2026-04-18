@@ -1,7 +1,5 @@
 # Changelog
 
-## 1.1.1
-- Renamed event to `autoarm_change` to better fit HA standards
 ## 1.1.0
 ### Auto Transitions
 - `action` attribute now records what drove decision for state reset
@@ -10,7 +8,7 @@
   - Effects occupancy driven changes, which continue even if a calendar event in progress, and start of calendar event, which won't
   override an occupancy state
 ### Events
-- An `autoarming` event is now fired on the Home Assistant bus
+- An `autoarm_change` event is now fired on the Home Assistant bus when alarm state is changed by autoarm
 ### International
 - Strings now translated into Italian, French, German and Japanese
 ### Other
