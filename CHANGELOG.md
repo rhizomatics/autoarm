@@ -13,6 +13,7 @@
 - Strings now translated into Italian, French, German and Japanese
 ### Other
 - Removed noisy internal alarm states from config dialogs
+- Add context for every arming change, in debug logs and the `autoarm_change` event
 ## 1.0.0
 ### Configuration
 - The basic setup, along with calendars, occupancy and some tuning is now UI based using Home Assistant ConfigFlow and ConfigEntry, with automated migration of existing YAML config

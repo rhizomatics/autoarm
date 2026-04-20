@@ -246,7 +246,7 @@ async def test_arm_fires_autoarming_event(hass: HomeAssistant, mock_notify: Any)
     await _setup_entry(hass)
 
     received: list[Any] = []
-    hass.bus.async_listen("autoarming", lambda event: received.append(event))
+    hass.bus.async_listen("autoarm_change", lambda event: received.append(event))
 
     hass.states.async_set("person.house_owner", "not_home")
     hass.states.async_set("person.tenant", "not_home")

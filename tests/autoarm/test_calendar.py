@@ -58,9 +58,15 @@ async def test_calendar_finds_alarm_states(simple_tracked_calendar: TrackedCalen
     )
     await simple_tracked_calendar.on_timed_poll(dt_util.now())
     assert simple_tracked_calendar.has_active_event()
+    tracked_event: TrackedCalendarEvent = next(i for i in simple_tracked_calendar.tracked_events.values())
     simple_tracked_calendar.armer.arm.assert_called_once_with(
         arming_state=AlarmControlPanelState.ARMED_AWAY,  # type: ignore
         source=ChangeSource.CALENDAR,
+        change_context={
+            "caller": "calendar.on_calendar_event_start",
+            "calendar_id": "calendar.testing_calendar",
+            "event_id": tracked_event.id,
+        },
     )  # type: ignore
 
 
@@ -89,6 +95,11 @@ async def test_calendar_tracks_event(
     mock_armer_real_hass.arm.assert_called_once_with(  # type: ignore
         arming_state=AlarmControlPanelState.ARMED_VACATION,
         source=ChangeSource.CALENDAR,
+        change_context={
+            "caller": "calendar.on_calendar_event_start",
+            "calendar_id": "calendar.testing_calendar",
+            "event_id": tracked_event.id,
+        },
     )  # type: ignore
     calendar_with_holiday_event.shutdown()
     assert not calendar_with_holiday_event.has_active_event()

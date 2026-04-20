@@ -775,9 +775,19 @@ class AlarmArmer:
                 new_attributes = new_obj.attributes
         return entity_id, old, new, new_attributes
 
-    async def pending_state(self, source: ChangeSource | None) -> None:
+    async def pending_state(self, source: ChangeSource | None, change_context: dict[str, Any] | None = None) -> None:
         self.pre_pending_state = self.armed_state()
-        await self.arm(AlarmControlPanelState.PENDING, source=source)
+        change_context = change_context or {}
+        change_context.update({
+            "original_caller": change_context.get("caller"),
+            "caller": "pending_state",
+            "pre_pending_state": self.pre_pending_state,
+        })
+        await self.arm(
+            AlarmControlPanelState.PENDING,
+            source=source,
+            change_context={"caller": "pending_state", "pre_pending_state": self.pre_pending_state},
+        )
 
     @callback
     async def delayed_reset_armed_state(self, triggered_at: dt.datetime, requested_at: dt.datetime | None, **kwargs) -> None:
@@ -832,7 +842,11 @@ class AlarmArmer:
                     # TODO: may be dupe logic with on_cal event
                     _LOGGER.debug("AUTOARM Applying fixed reset on end of calendar event, %s", self.calendar_no_event_mode)
                     action = "reset_on_calendar_event_end"
-                    return await self.arm(alarm_state_as_enum(self.calendar_no_event_mode), ChangeSource.CALENDAR)
+                    return await self.arm(
+                        alarm_state_as_enum(self.calendar_no_event_mode),
+                        source=ChangeSource.CALENDAR,
+                        change_context={"action": action, "caller": "reset_armed_state"},
+                    )
                 if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
                     _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
                 else:
@@ -855,8 +869,9 @@ class AlarmArmer:
                     return existing_state
             state = self.determine_state()
             if state is not None and state != AlarmControlPanelState.PENDING and state != existing_state:
-                state = await self.arm(state, source=source)
                 action = "change_state"
+                state = await self.arm(state, source=source, change_context={"action": action, "caller": "reset_armed_state"})
+
         finally:
             self.hass.states.async_set(
                 f"sensor.{DOMAIN}_last_calculation",
@@ -917,7 +932,10 @@ class AlarmArmer:
         await self.arm(**kwargs)
 
     async def arm(
-        self, arming_state: AlarmControlPanelState | None, source: ChangeSource | None = None
+        self,
+        arming_state: AlarmControlPanelState | None,
+        source: ChangeSource | None = None,
+        change_context: dict[str, Any] | None = None,
     ) -> AlarmControlPanelState | None:
         """Change alarm panel state
 
@@ -925,15 +943,20 @@ class AlarmArmer:
         ----
             arming_state (str, optional): _description_. Defaults to None.
             source (str,optional): Source of the change, for example 'calendar' or 'button'
+            change_context (dict,optional): Detailed context for the reason arm triggered
 
         Returns:
         -------
             str: New arming state
 
         """
+        _LOGGER.debug("AUTOARM arm(arming_state=%s,source=%s,change_context=%s", arming_state, source, change_context)
         if arming_state is None:
             return None
         if self.armed_state() == arming_state:
+            return None
+        if self.arming_in_progress.is_set():
+            _LOGGER.warning("AUTOARM arming already in progress, skipping for %s", source)
             return None
         if self.rate_limiter.triggered():
             _LOGGER.debug("AUTOARM Rate limit triggered by %s, skipping arm", source)
@@ -964,6 +987,7 @@ class AlarmArmer:
                         "occupied": self.is_occupied(),
                         "night": self.is_night(),
                         "attributes": attrs,
+                        "context": change_context or {},
                     },
                 )
                 return arming_state
@@ -1069,12 +1093,20 @@ class AlarmArmer:
         match event.data.get("action"):
             case "ALARM_PANEL_DISARM":
                 self.record_intervention(source=source, state=AlarmControlPanelState.DISARMED)
-                await self.arm(AlarmControlPanelState.DISARMED, source=source)
+                await self.arm(
+                    AlarmControlPanelState.DISARMED,
+                    source=source,
+                    change_context={"caller": "on_mobile_action", "event_data": event.data, "event_type": event.event_type},
+                )
             case "ALARM_PANEL_RESET":
                 await self.reset_armed_state(intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None))
             case "ALARM_PANEL_AWAY":
                 self.record_intervention(source=source, state=AlarmControlPanelState.ARMED_AWAY)
-                await self.arm(AlarmControlPanelState.ARMED_AWAY, source=source)
+                await self.arm(
+                    AlarmControlPanelState.ARMED_AWAY,
+                    source=source,
+                    change_context={"caller": "on_mobile_action", "event_data": event.data, "event_type": event.event_type},
+                )
             case _:
                 _LOGGER.debug("AUTOARM Ignoring mobile action: %s", event.data)
 
@@ -1093,7 +1125,11 @@ class AlarmArmer:
                     title=f"Arm set to {state} process starting",
                 )
         else:
-            await self.arm(state, source=ChangeSource.BUTTON)
+            await self.arm(
+                state,
+                source=ChangeSource.BUTTON,
+                change_context={"caller": "on_alarm_state_button", "event_data": event.data, "event_type": event.event_type},
+            )
 
     @callback
     async def on_reset_button(self, delay: dt.timedelta | None, event: Event) -> None:

@@ -144,7 +144,15 @@ class TrackedCalendarEvent:
                     overridden = True
 
         if not overridden:
-            new_state = await self.armer.arm(arming_state=target_state, source=ChangeSource.CALENDAR)
+            new_state = await self.armer.arm(
+                arming_state=target_state,
+                source=ChangeSource.CALENDAR,
+                change_context={
+                    "caller": "calendar.on_calendar_event_start",
+                    "calendar_id": self.calendar_id,
+                    "event_id": self.id,
+                },
+            )
         self.hass.states.async_set(
             f"sensor.{DOMAIN}_last_calendar_event",
             new_state=self.event.summary or str(self.id),
@@ -168,14 +176,40 @@ class TrackedCalendarEvent:
         if self.no_event_mode == NO_CAL_EVENT_MODE_AUTO:
             _LOGGER.info("AUTOARM Calendar event %s ended, and arming state", self.id)
             # avoid having state locked in vacation by state calculator
-            await self.armer.pending_state(source=ChangeSource.CALENDAR)
+            await self.armer.pending_state(
+                source=ChangeSource.CALENDAR,
+                change_context={
+                    "caller": "calendar.on_calendar_event_end",
+                    "calendar_id": self.calendar_id,
+                    "event_id": self.id,
+                    "no_event_mode": self.no_event_mode,
+                },
+            )
             await self.armer.reset_armed_state(source=ChangeSource.CALENDAR)
         elif self.no_event_mode in AlarmControlPanelState:
             _LOGGER.info("AUTOARM Calendar event %s ended, and returning to fixed state %s", self.id, self.no_event_mode)
-            await self.armer.arm(alarm_state_as_enum(self.no_event_mode), source=ChangeSource.CALENDAR)
+            await self.armer.arm(
+                alarm_state_as_enum(self.no_event_mode),
+                source=ChangeSource.CALENDAR,
+                change_context={
+                    "caller": "calendar.on_calendar_event_end",
+                    "calendar_id": self.calendar_id,
+                    "event_id": self.id,
+                    "no_event_mode": self.no_event_mode,
+                },
+            )
         else:
             _LOGGER.debug("AUTOARM Reinstate previous state on calendar event end in manual mode")
-            await self.armer.arm(self.previous_state, source=ChangeSource.CALENDAR)
+            await self.armer.arm(
+                self.previous_state,
+                source=ChangeSource.CALENDAR,
+                change_context={
+                    "caller": "calendar.on_calendar_event_end",
+                    "calendar_id": self.calendar_id,
+                    "event_id": self.id,
+                    "no_event_mode": self.no_event_mode,
+                },
+            )
 
     @classmethod
     def event_id(cls, calendar_id: str, event: CalendarEvent) -> str:
