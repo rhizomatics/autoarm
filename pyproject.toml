@@ -14,8 +14,8 @@ dependencies = [
 [dependency-groups]
 dev=[
     "homeassistant-stubs >= 2026.3.2",
-    "pytest",
-    "pytest-cov",
+    "pytest==9.0.0",
+    "pytest-cov==7.0.0",
     "pytest-homeassistant-custom-component>=0.13.320",
     "pytest-unordered",
     "pytest-mock",
