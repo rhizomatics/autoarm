@@ -2,7 +2,7 @@
 
 ## 1.1.0
 ### Auto Transitions
-- `action` attribute now records what drove decision for state reset
+- `reset_decision` attribute now records what drove decision for state reset
 ### Occupancy
 - Occupancy changes can selectively override recurring calendar event based states, with configurable list of states, defaulting to `disarmed`,`armed_home` and `armed_night`. So if the calendar says `disarmed` but you've left the house it will override automatically to `armed_away`.
   - Effects occupancy driven changes, which continue even if a calendar event in progress, and start of calendar event, which won't
