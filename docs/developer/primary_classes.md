@@ -26,10 +26,10 @@ tags:
 
 ## Calendar
 
-::: custom_components.autoarm.calendar.TrackedCalendar
+::: custom_components.autoarm.calendar_events.TrackedCalendar
     handler: python
     heading_level: 4
 
-::: custom_components.autoarm.calendar.TrackedCalendarEvent
+::: custom_components.autoarm.calendar_events.TrackedCalendarEvent
     handler: python
     heading_level: 4

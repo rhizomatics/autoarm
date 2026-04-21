@@ -13,7 +13,7 @@ from custom_components.autoarm.autoarming import AlarmArmer, Intervention
 from custom_components.autoarm.const import ChangeSource
 
 if TYPE_CHECKING:
-    from custom_components.autoarm.calendar import TrackedCalendarEvent
+    from custom_components.autoarm.calendar_events import TrackedCalendarEvent
 
 TEST_PANEL = "alarm_control_panel.test_panel"
 

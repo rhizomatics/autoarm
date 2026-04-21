@@ -54,7 +54,7 @@ from homeassistant.util.hass_dict import HassKey
 from custom_components.autoarm.hass_api import HomeAssistantAPI
 from custom_components.autoarm.notifier import Notifier
 
-from .calendar import TrackedCalendar, TrackedCalendarEvent
+from .calendar_events import TrackedCalendar, TrackedCalendarEvent
 from .config_flow import (
     CONF_CALENDAR_ENTITIES,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,

@@ -8,7 +8,7 @@ from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.helpers.entity_platform import EntityPlatform
 
 from custom_components.autoarm.autoarming import AlarmArmer
-from custom_components.autoarm.calendar import TrackedCalendar, TrackedCalendarEvent
+from custom_components.autoarm.calendar_events import TrackedCalendar, TrackedCalendarEvent
 from custom_components.autoarm.const import (
     CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_POLL_INTERVAL,
@@ -66,6 +66,7 @@ async def test_calendar_finds_alarm_states(simple_tracked_calendar: TrackedCalen
             "caller": "calendar.on_calendar_event_start",
             "calendar_id": "calendar.testing_calendar",
             "event_id": tracked_event.id,
+            "recurring": False,
         },
     )  # type: ignore
 
@@ -99,6 +100,7 @@ async def test_calendar_tracks_event(
             "caller": "calendar.on_calendar_event_start",
             "calendar_id": "calendar.testing_calendar",
             "event_id": tracked_event.id,
+            "recurring": False,
         },
     )  # type: ignore
     calendar_with_holiday_event.shutdown()

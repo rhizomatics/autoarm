@@ -306,7 +306,7 @@ async def test_calendar_manual_mode_blocks_occupancy_reset(local_calendar: Calen
 
     last_calc = hass.states.get("sensor.autoarm_last_calculation")
     assert last_calc is not None
-    assert last_calc.attributes.get("action") == "ignore_for_calendar_manual_default"
+    assert last_calc.attributes.get("reset_decision") == "ignore_for_calendar_manual_default"
 
 
 async def test_calendar_event_start_not_occupied_uses_armed_away(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
