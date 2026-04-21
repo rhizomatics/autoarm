@@ -116,7 +116,8 @@ class TrackedCalendarEvent:
         overridden: bool = False
 
         # optionally allow occupancy overrides of recurring events
-        if self.is_recurring() and str(self.arming_state) in self.armer.calendar_occupancy_override_states:
+        overridable_event: bool = str(self.arming_state) in self.armer.calendar_occupancy_override_states
+        if self.is_recurring() and overridable_event:
             occupied = self.armer.is_occupied()
             current_state: AlarmControlPanelState = self.armer.armed_state()
             if (
@@ -155,6 +156,7 @@ class TrackedCalendarEvent:
                     "calendar_id": self.calendar_id,
                     "event_id": self.id,
                     "recurring": self.is_recurring(),
+                    "overridable_event": overridable_event
                 },
             )
         self.hass.states.async_set(

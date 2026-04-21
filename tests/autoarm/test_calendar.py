@@ -67,6 +67,7 @@ async def test_calendar_finds_alarm_states(simple_tracked_calendar: TrackedCalen
             "calendar_id": "calendar.testing_calendar",
             "event_id": tracked_event.id,
             "recurring": False,
+            "overridable_event": True
         },
     )  # type: ignore
 
@@ -101,6 +102,7 @@ async def test_calendar_tracks_event(
             "calendar_id": "calendar.testing_calendar",
             "event_id": tracked_event.id,
             "recurring": False,
+            "overridable_event": False
         },
     )  # type: ignore
     calendar_with_holiday_event.shutdown()
