@@ -813,7 +813,7 @@ class AlarmArmer:
             intervention,
             source,
         )
-        action: str = "no_change"
+        reset_decision: str = "no_change"
         try:
             existing_state = self.armed_state()
             state = existing_state
@@ -830,22 +830,22 @@ class AlarmArmer:
                         _LOGGER.debug("AUTOARM Allowing occupancy reset for recurring overridable calendar event %s", cal_state)
                     else:
                         _LOGGER.debug("AUTOARM Ignoring reset while calendar event active")
-                        action = "ignore_for_active_calendar_event"
+                        reset_decision = "ignore_for_active_calendar_event"
                         return existing_state
                 if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_MANUAL:
                     _LOGGER.debug(
                         "AUTOARM Ignoring reset while calendar configured, no active event, and default mode is manual"
                     )
-                    action = "ignore_for_calendar_manual_default"
+                    reset_decision = "ignore_for_calendar_manual_default"
                     return existing_state
                 if self.calendar_no_event_mode in AlarmControlPanelState:
                     # TODO: may be dupe logic with on_cal event
                     _LOGGER.debug("AUTOARM Applying fixed reset on end of calendar event, %s", self.calendar_no_event_mode)
-                    action = "reset_on_calendar_event_end"
+                    reset_decision = "reset_on_calendar_event_end"
                     return await self.arm(
                         alarm_state_as_enum(self.calendar_no_event_mode),
                         source=ChangeSource.CALENDAR,
-                        change_context={"action": action, "caller": "reset_armed_state"},
+                        change_context={"reset_decision": reset_decision, "caller": "reset_armed_state"},
                     )
                 if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
                     _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
@@ -865,12 +865,14 @@ class AlarmArmer:
                         last_state_intervention.source,
                         last_state_intervention.created_at,
                     )
-                    action = "ignore_after_manual_intervention"
+                    reset_decision = "ignore_after_manual_intervention"
                     return existing_state
             state = self.determine_state()
             if state is not None and state != AlarmControlPanelState.PENDING and state != existing_state:
-                action = "change_state"
-                state = await self.arm(state, source=source, change_context={"action": action, "caller": "reset_armed_state"})
+                reset_decision = "change_state"
+                state = await self.arm(
+                    state, source=source, change_context={"reset_decision": reset_decision, "caller": "reset_armed_state"}
+                )
 
         finally:
             self.hass.states.async_set(
@@ -887,7 +889,7 @@ class AlarmArmer:
                     "last_state_intervention": deobjectify(last_state_intervention),
                     "intervention": intervention.as_dict() if intervention else None,
                     "time": dt_util.now().isoformat(),
-                    "action": action,
+                    "reset_decision": reset_decision,
                 },
             )
 

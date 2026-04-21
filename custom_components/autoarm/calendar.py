@@ -114,36 +114,39 @@ class TrackedCalendarEvent:
         target_state: AlarmControlPanelState = self.arming_state
         new_state: AlarmControlPanelState | None = None
         overridden: bool = False
-        if str(self.arming_state) in self.armer.calendar_occupancy_override_states:
+
+        # optionally allow occupancy overrides of recurring events
+        if self.is_recurring() and str(self.arming_state) in self.armer.calendar_occupancy_override_states:
             occupied = self.armer.is_occupied()
             current_state: AlarmControlPanelState = self.armer.armed_state()
-            if self.is_recurring():  # optionally allow occupancy overrides of recurring events
-                if (
-                    occupied is False
-                    and target_state
-                    in (AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
-                    and current_state in (AlarmControlPanelState.ARMED_AWAY)
-                ):
-                    _LOGGER.debug(
-                        "AUTOARM Calendar event %s: empty occupancy override cancelling calendar change to %s",
-                        self.id,
-                        self.arming_state,
-                    )
-                    overridden = True
-                elif (
-                    occupied is True
-                    and target_state in (AlarmControlPanelState.ARMED_AWAY)
-                    and current_state
-                    in (AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
-                ):
-                    _LOGGER.debug(
-                        "AUTOARM Calendar event %s: present occupancy override cancelling calendar change to %s",
-                        self.id,
-                        self.arming_state,
-                    )
-                    overridden = True
+            if (
+                occupied is False
+                and target_state
+                in (AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
+                and current_state in (AlarmControlPanelState.ARMED_AWAY)
+            ):
+                _LOGGER.debug(
+                    "AUTOARM Calendar event %s: empty occupancy override cancelling calendar change to %s",
+                    self.id,
+                    self.arming_state,
+                )
+                overridden = True
+            elif (
+                occupied is True
+                and target_state in (AlarmControlPanelState.ARMED_AWAY)
+                and current_state
+                in (AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
+            ):
+                _LOGGER.debug(
+                    "AUTOARM Calendar event %s: present occupancy override cancelling calendar change to %s",
+                    self.id,
+                    self.arming_state,
+                )
+                overridden = True
 
-        if not overridden:
+        if overridden:
+            _LOGGER.info("AUTOARM Calendar arming to %s overridden by occupancy", target_state)
+        else:
             new_state = await self.armer.arm(
                 arming_state=target_state,
                 source=ChangeSource.CALENDAR,
@@ -151,6 +154,7 @@ class TrackedCalendarEvent:
                     "caller": "calendar.on_calendar_event_start",
                     "calendar_id": self.calendar_id,
                     "event_id": self.id,
+                    "recurring": self.is_recurring(),
                 },
             )
         self.hass.states.async_set(
