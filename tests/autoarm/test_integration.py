@@ -243,6 +243,7 @@ async def test_arm_fires_autoarming_event(hass: HomeAssistant, mock_notify: Any)
     hass.states.async_set("alarm_panel.testing", "disarmed")
     hass.states.async_set("person.house_owner", "home")
     hass.states.async_set("person.tenant", "home")
+    hass.states.async_set("sun.sun", "above_horizon")
     await _setup_entry(hass)
 
     received: list[Any] = []
