@@ -49,7 +49,7 @@ docs=[
 [tool.codespell]
 ignore-words-list = "HASS,hass,NotIn,datas,dof,dur,farenheit,hist,iff,ines,ist,lightsensor,mut,nd,pres,referer,ser,serie,te,technik,ue,uint,visability,wan,wanna,withing"
 # Skip binary/data files, build artifacts, and non-English markdown (locale-named files and locale dirs)
-skip = "*.csv,*.json,./.*,./site,./htmlcov,README.??.md,./README.??-??.md,./docs/??/*.md,./docs/??-??/*.md"
+skip = "*.csv,./.*,./site,./htmlcov,README.??.md,./README.??-??.md,./docs/??/*.md,./docs/??-??/*.md,./custom_components/autoarm/translations/de.json,./custom_components/autoarm/translations/fr.json,./custom_components/autoarm/translations/it.json,./custom_components/autoarm/translations/ja.json"
 quiet-level = 2
 
 [tool.poetry]
