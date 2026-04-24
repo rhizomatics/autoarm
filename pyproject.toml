@@ -23,6 +23,7 @@ dev=[
     "pre-commit",
     "ruff",
     "mypy",
+    "codespell",
     "genbadge[all]",
     "uv" # hass compatibility
 ]
