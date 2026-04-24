@@ -156,7 +156,7 @@ class TrackedCalendarEvent:
                     "calendar_id": self.calendar_id,
                     "event_id": self.id,
                     "recurring": self.is_recurring(),
-                    "overridable_event": overridable_event
+                    "overridable_event": overridable_event,
                 },
             )
         self.hass.states.async_set(
