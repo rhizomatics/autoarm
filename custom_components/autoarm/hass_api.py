@@ -52,7 +52,7 @@ class HomeAssistantAPI:
 
     async def build_condition(
         self, condition_config: list[ConfigType], strict: bool = False, validate: bool = False, name: str = DOMAIN
-    ) -> "Callable[[TemplateVarsType], bool] | None":
+    ) -> Callable[[TemplateVarsType], bool] | None:
         if self._hass is None:
             raise ValueError("HomeAssistant not available")
         capturing_logger: ConditionErrorLoggingAdaptor = ConditionErrorLoggingAdaptor(_LOGGER)
@@ -92,7 +92,7 @@ class HomeAssistantAPI:
 
     def evaluate_condition(
         self,
-        checker: "Callable[[TemplateVarsType], bool]",
+        checker: Callable[[TemplateVarsType], bool],
         condition_variables: ConditionVariables | None = None,
     ) -> bool | None:
         if self._hass is None:
