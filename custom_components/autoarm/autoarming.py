@@ -669,9 +669,9 @@ class AlarmArmer:
                 except ConditionError as ce:
                     _LOGGER.error(f"AUTOARM Transition {state_str} conditions fails Home Assistant condition check {ce}")
                     if hasattr(ce, "message"):
-                        error = ce.message  # type: ignore[attr-defined]
-                    elif hasattr(ce, "error") and hasattr(ce.error, "message"):  # type: ignore[attr-defined]
-                        error = ce.error.message  # type: ignore[attr-defined]
+                        error = ce.message  # type: ignore[attr-defined,unused-ignore]
+                    elif hasattr(ce, "error") and hasattr(ce.error, "message"):  # type: ignore[attr-defined,unused-ignore]
+                        error = ce.error.message  # type: ignore[attr-defined,unused-ignore]
                     else:
                         error = str(ce)
                 except Exception as e:
