@@ -3,6 +3,8 @@
 ## 1.1.1
 ### Diagnostics
 - Improvements to `change_context` passed to events
+### Notifications
+- By default, only notify on public alarm states, e.g. ignore `pending`
 ### Internals
 - Clean up new issues from updated mypy
 ## 1.1.0

@@ -69,8 +69,8 @@ def _apply_notify_defaults(config: dict[str, Any]) -> dict[str, Any]:
     if not config:
         config = config or {}
         # backward compatible with old fixed pair profiles
-        config.setdefault(NOTIFY_QUIET, {})
-        config.setdefault(NOTIFY_NORMAL, {})
+        config.setdefault(NOTIFY_QUIET, {CONF_STATE:PUBLIC_ALARM_STATES})
+        config.setdefault(NOTIFY_NORMAL, {CONF_STATE:PUBLIC_ALARM_STATES})
     sources: list[str] = [s for profile in config.values() for s in profile.get(CONF_SOURCE, []) if not profile.get(CONF_STATE)]
 
     if NOTIFY_QUIET in config:
