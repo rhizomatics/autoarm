@@ -1,55 +1,25 @@
 import asyncio
 import datetime as dt
-from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING
 
 import homeassistant.util.dt as dt_util
-import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEntity
 from homeassistant.core import HomeAssistant
 
+from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer, Intervention
 from custom_components.autoarm.const import ChangeSource
 
 if TYPE_CHECKING:
     from custom_components.autoarm.calendar_events import TrackedCalendarEvent
 
-TEST_PANEL = "alarm_control_panel.test_panel"
-
-
-@pytest.fixture
-async def autoarmer(hass: HomeAssistant) -> AsyncGenerator[AlarmArmer]:
-    uut = AlarmArmer(hass, TEST_PANEL, occupancy={"entity_id": ["person.tester_bob"]})
-    await uut.initialize()
-    yield uut
-    uut.shutdown()
-
-
-@pytest.fixture
-def day(hass: HomeAssistant) -> None:
-    hass.states.async_set("sun.sun", "above_horizon")
-
-
-@pytest.fixture
-def night(hass: HomeAssistant) -> None:
-    hass.states.async_set("sun.sun", "below_horizon")
-
-
-@pytest.fixture
-def occupied(hass: HomeAssistant) -> None:
-    hass.states.async_set("person.tester_bob", "home")
-
-
-@pytest.fixture
-def unoccupied(hass: HomeAssistant) -> None:
-    hass.states.async_set("person.tester_bob", "away")
-
 
 async def test_arm_preserves_panel_attributes(autoarmer: AlarmArmer, hass: HomeAssistant) -> None:
     hass.states.async_set(entity_id=TEST_PANEL, new_state="disarmed", attributes={"icon": "mdi:alarm-panel"})
     await autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
-    assert hass.states.get(TEST_PANEL).attributes.get("icon") == "mdi:alarm-panel"  # type:ignore[attr-defined]
+    panel_attrs = hass.states.get(TEST_PANEL).attributes
+    assert panel_attrs.get("icon") == "mdi:alarm-panel"  # type:ignore[attr-defined]
 
 
 async def test_vacation_day_occupied(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001

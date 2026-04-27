@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from homeassistant.core import HomeAssistant
-    from homeassistant.helpers.typing import ConfigType
+    from homeassistant.helpers.typing import ConfigType, TemplateVarsType
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ class HomeAssistantAPI:
 
     async def build_condition(
         self, condition_config: list[ConfigType], strict: bool = False, validate: bool = False, name: str = DOMAIN
-    ) -> Callable | None:
+    ) -> "Callable[[TemplateVarsType], bool] | None":
         if self._hass is None:
             raise ValueError("HomeAssistant not available")
         capturing_logger: ConditionErrorLoggingAdaptor = ConditionErrorLoggingAdaptor(_LOGGER)
@@ -72,7 +72,7 @@ class HomeAssistantAPI:
             if strict:
                 force_strict_template_mode(cond_list, undo=False)
 
-            test: Callable = await condition.async_conditions_from_config(
+            test: Callable[[TemplateVarsType], bool] = await condition.async_conditions_from_config(
                 self._hass, cond_list, cast("logging.Logger", capturing_logger), name
             )
             if test is None:
@@ -92,13 +92,13 @@ class HomeAssistantAPI:
 
     def evaluate_condition(
         self,
-        condition: Callable,
+        checker: "Callable[[TemplateVarsType], bool]",
         condition_variables: ConditionVariables | None = None,
     ) -> bool | None:
         if self._hass is None:
             raise ValueError("HomeAssistant not available")
         try:
-            return condition({DOMAIN: condition_variables.as_dict()} if condition_variables else None)
+            return checker({DOMAIN: condition_variables.as_dict()} if condition_variables else None)
         except Exception as e:
             _LOGGER.error("AUTOARM Condition eval failed: %s", e)
             raise
@@ -109,7 +109,7 @@ class HomeAssistantAPI:
             self._hass.bus.async_fire(f"{DOMAIN}_{event_name}", event_data)
 
 
-class ConditionErrorLoggingAdaptor(logging.LoggerAdapter):
+class ConditionErrorLoggingAdaptor(logging.LoggerAdapter["logging.Logger"]):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.condition_errors: list[ConditionError] = []

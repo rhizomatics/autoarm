@@ -24,8 +24,9 @@ dev=[
     "ruff",
     "mypy",
     "codespell",
-    "genbadge[all]",
-    "uv" # hass compatibility
+    "genbadge[all]", # hass compatibility
+    "uv",
+    "pyright>=1.1.409",
 ]
 docs=[
     "mkdocs-minify-plugin",
@@ -126,6 +127,14 @@ unfixable = ["B"]
 preview = true
 
 
+
+[tool.mypy]
+files = ["custom_components/autoarm", "tests", "conftest.py"]
+disallow_any_generics = true
+
+[[tool.mypy.overrides]]
+module = "pytest_homeassistant_custom_component.*"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

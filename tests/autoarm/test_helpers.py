@@ -2,6 +2,8 @@ import datetime as dt
 import re
 from unittest.mock import Mock
 
+from homeassistant.core import HomeAssistant
+
 from custom_components.autoarm.const import ChangeSource
 from custom_components.autoarm.helpers import (
     AppHealthTracker,
@@ -65,7 +67,7 @@ def test_extended_json_encoder_time() -> None:
     assert result == "01:10:30.000101+00:00"
 
 
-def test_app_health_tracker_records_runtime_error(hass) -> None:  # noqa: ANN001
+def test_app_health_tracker_records_runtime_error(hass: HomeAssistant) -> None:
     tracker = AppHealthTracker(hass)
     assert tracker.failures == 0
     tracker.record_runtime_error()

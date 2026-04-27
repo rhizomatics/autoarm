@@ -5,7 +5,8 @@ from homeassistant.components.alarm_control_panel.const import AlarmControlPanel
 from homeassistant.exceptions import ConditionError, HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 
-from custom_components.autoarm.hass_api import ConditionErrorLoggingAdaptor, ConditionVariables, HomeAssistantAPI
+from custom_components.autoarm.const import ConditionVariables
+from custom_components.autoarm.hass_api import ConditionErrorLoggingAdaptor, HomeAssistantAPI
 
 _LOGGER = logging.getLogger(__name__)
 

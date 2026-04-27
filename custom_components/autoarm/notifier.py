@@ -72,14 +72,14 @@ class Notifier:
             merged_profile = dict(base_profile)
             merged_profile_data = dict(base_profile_data)
             if selected_profile is not None:
-                selected_profile_data: dict = selected_profile.get("data", {})
+                selected_profile_data: dict[str, Any] = selected_profile.get("data", {})
                 merged_profile.update(selected_profile)
                 merged_profile_data.update(selected_profile_data)
             merged_profile["data"] = merged_profile_data
 
             data = merged_profile.get("data", {})
             if "source" in data and data["source"] is None:
-                data["source"] = source
+                data["source"] = str(source)
             if "profile" in data and data["profile"] is None:
                 data["profile"] = selected_profile_name
             if merged_profile.get(CONF_SUPERNOTIFY) and merged_profile.get(CONF_SCENARIO):

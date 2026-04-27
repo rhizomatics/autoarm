@@ -3,6 +3,7 @@ import datetime as dt
 
 import homeassistant.util.dt as dt_util
 import pytest
+from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import EVENT_END, EVENT_START, CalendarEntity, CalendarEvent
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.helpers.entity_platform import EntityPlatform
@@ -13,7 +14,6 @@ from custom_components.autoarm.const import (
     CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_POLL_INTERVAL,
     NO_CAL_EVENT_MODE_AUTO,
-    AlarmControlPanelState,
     ChangeSource,
 )
 
@@ -207,6 +207,29 @@ async def test_calendar_terminates_early(
     )
     await calendar_with_holiday_event.on_timed_poll(dt_util.now())
     assert not calendar_with_holiday_event.has_active_event()
+
+
+async def test_calendar_event_end_auto_mode_calls_pending_and_reset(
+    calendar_with_holiday_event: TrackedCalendar,
+    local_calendar: CalendarEntity,
+    autoarmer: AlarmArmer
+) -> None:
+    tracked_event: TrackedCalendarEvent = next(iter(calendar_with_holiday_event.tracked_events.values()))
+    tracked_event.no_event_mode = NO_CAL_EVENT_MODE_AUTO
+    tracked_event.armer = autoarmer
+
+    await local_calendar.async_update_event(
+        tracked_event.event.uid,  # type: ignore
+        {
+            EVENT_START: tracked_event.event.start_datetime_local,
+            EVENT_END: dt_util.now() - dt.timedelta(seconds=1),
+            "summary": "Cancelled holidays in Bahamas!!",
+        },
+    )
+    await calendar_with_holiday_event.on_timed_poll(dt_util.now())
+
+    await tracked_event.on_calendar_event_end(dt_util.now())
+    assert autoarmer.pre_pending_state == AlarmControlPanelState.ARMED_AWAY
 
 
 async def test_calendar_follows_event_deleted(

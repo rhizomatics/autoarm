@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+### Diagnostics
+- Improvements to `change_context` passed to events
+### Internals
+- Clean up new issues from updated mypy
 ## 1.1.0
 ### Auto Transitions
 - `reset_decision` attribute now records what drove decision for state reset

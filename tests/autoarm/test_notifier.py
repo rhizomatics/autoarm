@@ -1,7 +1,7 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from unittest.mock import Mock
 
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
 
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.const import ChangeSource
@@ -28,9 +28,9 @@ async def test_notify_calls_service(hass: HomeAssistant) -> None:
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
@@ -50,9 +50,9 @@ async def test_notify_with_custom_title(hass: HomeAssistant) -> None:
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
@@ -70,9 +70,9 @@ async def test_notify_profile_merging(hass: HomeAssistant) -> None:
         "quiet": {"service": "notify.quiet_service", "source": [ChangeSource.BUTTON], "data": {"sound": "none"}},
     }
     armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_profiles=notify_config)
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "quiet_service", mock_handler)
@@ -94,9 +94,9 @@ async def test_notify_source_replacement(hass: HomeAssistant) -> None:
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
@@ -114,9 +114,9 @@ async def test_notify_supernotify_scenario(hass: HomeAssistant) -> None:
         "backstop": {},
     }
     armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_action="notify.supernotify", notify_profiles=notify_config)
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "supernotify", mock_handler)
@@ -151,9 +151,9 @@ async def test_notify_strips_notify_prefix_from_service(hass: HomeAssistant) -> 
         "backstop": {},
     }
     armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_action="notify.mobile_app", notify_profiles=notify_config)
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "mobile_app", mock_handler)
@@ -178,9 +178,9 @@ async def test_notify_selects_profile_by_from_state(hass: HomeAssistant) -> None
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.default_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "away_service", mock_handler)
@@ -209,9 +209,9 @@ async def test_notify_selects_profile_by_to_state(hass: HomeAssistant) -> None:
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.default_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "vacation_service", mock_handler)
@@ -240,9 +240,9 @@ async def test_notify_skips_profile_when_state_not_matched(hass: HomeAssistant) 
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.default_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "default_service", mock_handler)
@@ -269,9 +269,9 @@ async def test_notify_skips_profile_when_source_not_matched(hass: HomeAssistant)
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.default_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "default_service", mock_handler)
@@ -292,9 +292,9 @@ async def test_notify_auto_generates_title_from_to_state(hass: HomeAssistant) ->
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
@@ -318,9 +318,9 @@ async def test_notify_auto_generates_message_from_states(hass: HomeAssistant) ->
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
@@ -345,9 +345,9 @@ async def test_notify_profile_name_replacement(hass: HomeAssistant) -> None:
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)
@@ -366,9 +366,9 @@ async def test_notify_common_profile_not_selected_as_match(hass: HomeAssistant) 
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.common_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "common_service", mock_handler)
@@ -395,9 +395,9 @@ async def test_notify_selects_profile_with_both_source_and_state(hass: HomeAssis
     armer = AlarmArmer(
         hass, TEST_PANEL, notify_enabled=True, notify_action="notify.default_service", notify_profiles=notify_config
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "special_service", mock_handler)
@@ -446,9 +446,9 @@ async def test_notify_profile_ordering_by_state_specificity(hass: HomeAssistant)
         },
     }
     armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_profiles=notify_config)
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "broad_service", mock_handler)
@@ -489,9 +489,9 @@ async def test_notify_profile_with_state_filter_preferred_over_no_filter(hass: H
         },
     }
     armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_profiles=notify_config)
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "catch_all_service", mock_handler)
@@ -535,9 +535,9 @@ async def test_notify_fallback_to_broader_profile_when_specific_not_matched(hass
         },
     }
     armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_profiles=notify_config)
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "vacation_service", mock_handler)
@@ -572,9 +572,9 @@ async def test_notify_includes_targets_in_service_data(hass: HomeAssistant) -> N
         notify_action="notify.test_service",
         notify_targets=["device.abc123"],
     )
-    calls: list[dict] = []
+    calls: list[dict[str, Any]] = []
 
-    async def mock_handler(call) -> None:  # noqa: ANN001, RUF029, RUF100
+    async def mock_handler(call: ServiceCall) -> None:  # noqa: RUF029
         calls.append({"service": call.service, "data": dict(call.data)})
 
     hass.services.async_register("notify", "test_service", mock_handler)

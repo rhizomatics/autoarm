@@ -21,8 +21,8 @@ RELOAD_FIXTURE = pathlib.Path(__file__).parent.joinpath("fixtures", "empty_confi
 
 
 @pytest.fixture
-def preconfigured_autoarm(hass: HomeAssistant) -> ConfigEntry:
-    existing = MockConfigEntry(
+def preconfigured_autoarm(hass: HomeAssistant) -> MockConfigEntry:
+    existing: MockConfigEntry = MockConfigEntry(
         domain=DOMAIN,
         title="Auto Arm",
         data={CONF_ALARM_PANEL: "alarm_control_panel.testing"},

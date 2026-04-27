@@ -59,8 +59,8 @@ class TrackedCalendarEvent:
         self.event: CalendarEvent = event
         self.no_event_mode: str | None = no_event_mode
         self.arming_state: AlarmControlPanelState = arming_state
-        self.start_listener: Callable | None = None
-        self.end_listener: Callable | None = None
+        self.start_listener: CALLBACK_TYPE | None = None
+        self.end_listener: CALLBACK_TYPE | None = None
         self.armer: AlarmArmer = armer  # type: ignore # noqa: F821
         self.hass: HomeAssistant = hass
         self.previous_state: AlarmControlPanelState | None = armer.armed_state()
@@ -181,7 +181,7 @@ class TrackedCalendarEvent:
             return
         if self.no_event_mode == NO_CAL_EVENT_MODE_AUTO:
             _LOGGER.info("AUTOARM Calendar event %s ended, and arming state", self.id)
-            # avoid having state locked in vacation by state calculator
+            # avoid having state locked in vacation by state calculator by moving via 'Pending'
             await self.armer.pending_state(
                 source=ChangeSource.CALENDAR,
                 change_context={
@@ -189,7 +189,7 @@ class TrackedCalendarEvent:
                     "calendar_id": self.calendar_id,
                     "event_id": self.id,
                     "no_event_mode": self.no_event_mode,
-                },
+                }
             )
             await self.armer.reset_armed_state(source=ChangeSource.CALENDAR)
         elif self.no_event_mode in AlarmControlPanelState:
@@ -270,7 +270,7 @@ class TrackedCalendar:
         self.alias: str = cast("str", calendar_config.get(CONF_ALIAS, ""))
         self.entity_id: str = cast("str", calendar_config.get(CONF_ENTITY_ID))
         self.poll_interval: int = calendar_config.get(CONF_CALENDAR_POLL_INTERVAL, 30)
-        self.state_mappings: dict[str, list[str]] = cast("dict", calendar_config.get(CONF_CALENDAR_EVENT_STATES))
+        self.state_mappings: dict[str, list[str]] = cast("dict[str, list[str]]", calendar_config.get(CONF_CALENDAR_EVENT_STATES))
         # self.notify_on_change: str = calendar_config.get(CONF_CALENDAR_ENTRY_NOTIFICATIONS, ENTRY_NOTIFICATION_MATCHED)
         self.tracked_events: dict[str, TrackedCalendarEvent] = {}
         self.poller_listener: CALLBACK_TYPE | None = None

@@ -1,12 +1,12 @@
-from collections.abc import Generator
+from collections.abc import AsyncGenerator, Generator
 from typing import TYPE_CHECKING, Any
 from unittest.mock import Mock, patch
 
 import pytest
 from homeassistant.components.alarm_control_panel.const import DOMAIN as ALARM_PANEL_DOMAIN
 from homeassistant.components.calendar import CalendarEntity
-from homeassistant.components.local_calendar import CONF_CALENDAR_NAME, LocalCalendarStore  # type: ignore
-from homeassistant.components.local_calendar.const import DOMAIN as LOCAL_CALENDAR_DOMAIN  # type: ignore
+from homeassistant.components.local_calendar import CONF_CALENDAR_NAME, LocalCalendarStore  # type: ignore[attr-defined]
+from homeassistant.components.local_calendar.const import DOMAIN as LOCAL_CALENDAR_DOMAIN  # type: ignore[import-not-found]
 from homeassistant.components.notify.legacy import BaseNotificationService
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_NAME, Platform
@@ -34,9 +34,11 @@ from custom_components.autoarm.notifier import Notifier
 if TYPE_CHECKING:
     from homeassistant.helpers.typing import ConfigType
 
+TEST_PANEL = "alarm_control_panel.test_panel"
+
 
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations) -> None:  # noqa: ANN001, ARG001
+def auto_enable_custom_integrations(enable_custom_integrations: Any) -> None:  # noqa: ARG001
     """Enable custom integrations in all tests."""
     return
 
@@ -77,12 +79,12 @@ async def local_calendar(
     await hass.config_entries.async_forward_entry_setups(config_entry, [Platform.CALENDAR])
     await hass.async_block_till_done()
 
-    calendar: CalendarEntity = calendar_platform.domain_entities[f"calendar.{slugify(name)}"]  # type: ignore
+    calendar: CalendarEntity = calendar_platform.domain_entities[f"calendar.{slugify(name)}"]
     return calendar
 
 
 @pytest.fixture
-async def alarm_panel(hass: HomeAssistant) -> str:
+async def alarm_panel(hass: HomeAssistant) -> Any:
     alarm_config: ConfigType = {ALARM_PANEL_DOMAIN: {"platform": "manual", CONF_NAME: "Testing", "code_arm_required": False}}
     assert await async_setup_component(hass, ALARM_PANEL_DOMAIN, alarm_config)
     return alarm_config[ALARM_PANEL_DOMAIN][CONF_NAME]
@@ -115,13 +117,41 @@ async def calendar_platform(hass: HomeAssistant) -> entity_platform.EntityPlatfo
 
 @pytest.fixture
 def mock_armer_real_hass(hass: HomeAssistant) -> AlarmArmer:
-    mocked = AsyncMock(spec=AlarmArmer)
+    mocked: AlarmArmer = AsyncMock(spec=AlarmArmer)
     mocked.hass = hass
     mocked.app_health_tracker = Mock(spec=AppHealthTracker)
     mocked.notifier = AsyncMock(spec=Notifier)
     mocked.calendar_occupancy_override_states = DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
     mocked.occupied_defaults = {}
     return mocked
+
+
+@pytest.fixture
+async def autoarmer(hass: HomeAssistant) -> AsyncGenerator[AlarmArmer]:
+    uut = AlarmArmer(hass, TEST_PANEL, occupancy={"entity_id": ["person.tester_bob"]})
+    await uut.initialize()
+    yield uut
+    uut.shutdown()
+
+
+@pytest.fixture
+def day(hass: HomeAssistant) -> None:
+    hass.states.async_set("sun.sun", "above_horizon")
+
+
+@pytest.fixture
+def night(hass: HomeAssistant) -> None:
+    hass.states.async_set("sun.sun", "below_horizon")
+
+
+@pytest.fixture
+def occupied(hass: HomeAssistant) -> None:
+    hass.states.async_set("person.tester_bob", "home")
+
+
+@pytest.fixture
+def unoccupied(hass: HomeAssistant) -> None:
+    hass.states.async_set("person.tester_bob", "away")
 
 
 class MockAction(BaseNotificationService):
@@ -143,10 +173,10 @@ def mock_notify(hass: HomeAssistant) -> MockAction:
     mock_action: MockAction = MockAction()
     hass.services.async_register(
         "notify", "send_message", mock_action.async_send_message, supports_response=SupportsResponse.NONE
-    )  # type: ignore
+    )
     hass.services.async_register(
         "notify", "supernotify", mock_action.async_send_message, supports_response=SupportsResponse.NONE
-    )  # type: ignore
+    )
 
     return mock_action
 

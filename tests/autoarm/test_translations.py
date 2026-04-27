@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -22,25 +23,25 @@ def _key_paths(obj: object, prefix: str = "") -> set[str]:
 
 
 @pytest.fixture(scope="module")
-def strings() -> dict:
-    return json.loads(STRINGS_PATH.read_text())
+def strings() -> dict[str, str]:
+    return cast("dict[str,str]", json.loads(STRINGS_PATH.read_text()))
 
 
 @pytest.fixture(scope="module")
-def translations() -> dict[str, dict]:
+def translations() -> dict[str, dict[str, Any]]:
     result = {}
     for path in TRANSLATIONS_DIR.glob("*.json"):
         result[path.stem] = json.loads(path.read_text())
     return result
 
 
-def test_all_locales_present(translations: dict[str, dict]) -> None:
+def test_all_locales_present(translations: dict[str, dict[str, Any]]) -> None:
     """All expected locale files exist."""
     assert translations.keys() >= EXPECTED_LOCALES, f"Missing locales: {EXPECTED_LOCALES - translations.keys()}"
 
 
 @pytest.mark.parametrize("locale", sorted(EXPECTED_LOCALES))
-def test_translation_keys_match_strings(locale: str, strings: dict, translations: dict[str, dict]) -> None:
+def test_translation_keys_match_strings(locale: str, strings: dict[str, Any], translations: dict[str, dict[str, Any]]) -> None:
     """Every translation has exactly the same keys as strings.json."""
     assert locale in translations, f"Translation file {locale}.json not found"
     strings_paths = _key_paths(strings)

@@ -64,7 +64,7 @@ NOTIFY_DEF_SCHEMA = vol.Schema({
 })
 
 
-def _apply_notify_defaults(config: dict[str, Any]) -> dict:
+def _apply_notify_defaults(config: dict[str, Any]) -> dict[str, Any]:
     """Apply defaults for known notify profiles."""
     if not config:
         config = config or {}

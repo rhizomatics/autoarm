@@ -1,7 +1,7 @@
 import datetime as dt
 import logging
 import re
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any
 
 import homeassistant.util.dt as dt_util
 from homeassistant.auth import HomeAssistant
@@ -10,6 +10,9 @@ from homeassistant.core import State
 from homeassistant.helpers.json import ExtendedJSONEncoder
 
 from .const import DOMAIN, ChangeSource
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -75,7 +78,7 @@ def deobjectify(obj: object) -> dict[Any, Any] | str | int | float | bool | None
         return obj
     if isinstance(obj, (dt.datetime, dt.time, dt.date)):
         return obj.isoformat()
-    as_dict = getattr(obj, "as_dict", None)
+    as_dict: Callable[[], dict[Any, Any]] | None = getattr(obj, "as_dict", None)
     if as_dict is None:
         return str(obj)
     return as_dict()
@@ -111,10 +114,10 @@ class AppHealthTracker:
 class ExtendedExtendedJSONEncoder(ExtendedJSONEncoder):
     def default(self, o: Any) -> Any:
         if isinstance(o, dt.time):
-            return cast("dt.time", o).isoformat()
+            return o.isoformat()
         if isinstance(o, dt.timedelta):
-            td: dt.timedelta = cast("dt.timedelta", o)
+            td: dt.timedelta = o
             return f"{td.seconds} seconds"
         if isinstance(o, re.Pattern):
-            return {cast("re.Pattern", o).pattern}
+            return {o.pattern}
         return super().default(o)

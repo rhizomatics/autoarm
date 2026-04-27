@@ -3,10 +3,10 @@ import datetime as dt
 import json
 import logging
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import homeassistant.util.dt as dt_util
 import voluptuous as vol
@@ -16,6 +16,7 @@ from homeassistant.components.sun.const import STATE_BELOW_HORIZON
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
     CONF_CONDITIONS,
+    CONF_DELAY_TIME,
     CONF_ENTITY_ID,
     CONF_SERVICE,
     EVENT_HOMEASSISTANT_STOP,
@@ -82,7 +83,6 @@ from .const import (
     CONF_CALENDAR_POLL_INTERVAL,
     CONF_CALENDARS,
     CONF_DAY,
-    CONF_DELAY_TIME,
     CONF_DIURNAL,
     CONF_EARLIEST,
     CONF_LATEST,
@@ -117,7 +117,9 @@ from .helpers import (
 )
 
 if TYPE_CHECKING:
-    from homeassistant.helpers.condition import ConditionCheckerType
+    from collections.abc import Mapping
+
+    ConditionCheckerType = Callable[[Mapping[str, Any] | None], bool]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -141,7 +143,7 @@ class AutoArmData:
     other_data: dict[str, str | dict[str, str] | list[str] | int | float | bool | None]
 
 
-async def async_setup(
+async def async_setup(  # noqa: RUF029
     hass: HomeAssistant,
     config: ConfigType,
 ) -> bool:
@@ -226,7 +228,7 @@ async def async_setup(
         }
         try:
             jsonized: str = json.dumps(obj=data, cls=ExtendedExtendedJSONEncoder)
-            return json.loads(jsonized)
+            return cast("dict[str,Any]", json.loads(jsonized))
         except Exception as err:
             raise HomeAssistantError(f"Failed to serialize configuration: {err}") from err
 
@@ -253,7 +255,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001, RUF029
     """Unload Auto Arm config entry."""
     if HASS_DATA_KEY in hass.data:
         hass.data[HASS_DATA_KEY].armer.shutdown()
@@ -581,7 +583,7 @@ class AlarmArmer:
     def initialize_buttons(self) -> None:
         """Initialize (optional) physical alarm state control buttons"""
 
-        def setup_button(state_name: str, button_entity: str, cb: Callable) -> None:
+        def setup_button(state_name: str, button_entity: str, cb: Callable[..., Coroutine[Any, Any, None]]) -> None:
             self.button_device[state_name] = button_entity
             if self.button_device[state_name]:
                 self.unsubscribes.append(async_track_state_change_event(self.hass, [button_entity], cb))
@@ -667,9 +669,9 @@ class AlarmArmer:
                 except ConditionError as ce:
                     _LOGGER.error(f"AUTOARM Transition {state_str} conditions fails Home Assistant condition check {ce}")
                     if hasattr(ce, "message"):
-                        error = ce.message  # type: ignore
+                        error = ce.message  # type: ignore[attr-defined]
                     elif hasattr(ce, "error") and hasattr(ce.error, "message"):  # type: ignore[attr-defined]
-                        error = ce.error.message  # type: ignore
+                        error = ce.error.message  # type: ignore[attr-defined]
                     else:
                         error = str(ce)
                 except Exception as e:
@@ -779,6 +781,7 @@ class AlarmArmer:
         self.pre_pending_state = self.armed_state()
         change_context = change_context or {}
         change_context.update({
+            "source": str(source),
             "original_caller": change_context.get("caller"),
             "caller": "pending_state",
             "pre_pending_state": self.pre_pending_state,
@@ -786,11 +789,13 @@ class AlarmArmer:
         await self.arm(
             AlarmControlPanelState.PENDING,
             source=source,
-            change_context={"caller": "pending_state", "pre_pending_state": self.pre_pending_state},
+            change_context=change_context,
         )
 
     @callback
-    async def delayed_reset_armed_state(self, triggered_at: dt.datetime, requested_at: dt.datetime | None, **kwargs) -> None:
+    async def delayed_reset_armed_state(
+        self, triggered_at: dt.datetime, requested_at: dt.datetime | None, **kwargs: Any
+    ) -> None:
         _LOGGER.debug("AUTOARM delayed_arm at %s, requested_at: %s", triggered_at, requested_at)
         if self.is_intervention_since_request(requested_at):
             return
@@ -845,7 +850,9 @@ class AlarmArmer:
                     return await self.arm(
                         alarm_state_as_enum(self.calendar_no_event_mode),
                         source=ChangeSource.CALENDAR,
-                        change_context={"reset_decision": reset_decision, "caller": "reset_armed_state"},
+                        change_context={"reset_decision": reset_decision,
+                                        "calendar_no_event_mode": self.calendar_no_event_mode,
+                                         "caller": "reset_armed_state"},
                     )
                 if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
                     _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
@@ -881,7 +888,7 @@ class AlarmArmer:
                 attributes={
                     "new_state": str(state),
                     "old_state": str(existing_state),
-                    "source": source,
+                    "source": str(source),
                     "active_calendar_event": deobjectify(active_calendar_event.event) if active_calendar_event else None,
                     "occupied": self.is_occupied(),
                     "night": self.is_night(),
@@ -988,7 +995,6 @@ class AlarmArmer:
                         "change_source": source,
                         "occupied": self.is_occupied(),
                         "night": self.is_night(),
-                        "attributes": attrs,
                         "context": change_context or {},
                     },
                 )
@@ -1011,7 +1017,7 @@ class AlarmArmer:
     ) -> None:
         source = source or intervention.source if intervention else None
 
-        job: Callable
+        job: Callable[[dt.datetime], Coroutine[Any, Any, None] | None]
         if state is None:
             _LOGGER.debug("AUTOARM Delayed reset, triggered at: %s, source%s", trigger_time, source)
             job = partial(self.delayed_reset_armed_state, intervention=intervention, source=source, requested_at=dt_util.now())
@@ -1130,7 +1136,10 @@ class AlarmArmer:
             await self.arm(
                 state,
                 source=ChangeSource.BUTTON,
-                change_context={"caller": "on_alarm_state_button", "event_data": event.data, "event_type": event.event_type},
+                change_context={"caller": "on_alarm_state_button",
+                                "event_data": event.data,
+                                "delay": str(delay),
+                                "event_type": event.event_type},
             )
 
     @callback
