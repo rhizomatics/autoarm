@@ -850,9 +850,11 @@ class AlarmArmer:
                     return await self.arm(
                         alarm_state_as_enum(self.calendar_no_event_mode),
                         source=ChangeSource.CALENDAR,
-                        change_context={"reset_decision": reset_decision,
-                                        "calendar_no_event_mode": self.calendar_no_event_mode,
-                                         "caller": "reset_armed_state"},
+                        change_context={
+                            "reset_decision": reset_decision,
+                            "calendar_no_event_mode": self.calendar_no_event_mode,
+                            "caller": "reset_armed_state",
+                        },
                     )
                 if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
                     _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
@@ -1136,10 +1138,12 @@ class AlarmArmer:
             await self.arm(
                 state,
                 source=ChangeSource.BUTTON,
-                change_context={"caller": "on_alarm_state_button",
-                                "event_data": event.data,
-                                "delay": str(delay),
-                                "event_type": event.event_type},
+                change_context={
+                    "caller": "on_alarm_state_button",
+                    "event_data": event.data,
+                    "delay": str(delay),
+                    "event_type": event.event_type,
+                },
             )
 
     @callback

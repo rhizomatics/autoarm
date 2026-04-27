@@ -210,9 +210,7 @@ async def test_calendar_terminates_early(
 
 
 async def test_calendar_event_end_auto_mode_calls_pending_and_reset(
-    calendar_with_holiday_event: TrackedCalendar,
-    local_calendar: CalendarEntity,
-    autoarmer: AlarmArmer
+    calendar_with_holiday_event: TrackedCalendar, local_calendar: CalendarEntity, autoarmer: AlarmArmer
 ) -> None:
     tracked_event: TrackedCalendarEvent = next(iter(calendar_with_holiday_event.tracked_events.values()))
     tracked_event.no_event_mode = NO_CAL_EVENT_MODE_AUTO
