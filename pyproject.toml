@@ -126,6 +126,9 @@ unfixable = ["B"]
 [tool.ruff.format]
 preview = true
 
+[tool.uv]
+exclude-newer = "5 days"
+add-bounds = "major"
 
 
 [tool.mypy]
