@@ -17,8 +17,7 @@ from .const import DOMAIN, ConditionVariables
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from homeassistant.core import HomeAssistant
-    from homeassistant.helpers.typing import ConfigType, TemplateVarsType
+    from homeassistant.helpers.typing import TemplateVarsType
 
 
 _LOGGER = logging.getLogger(__name__)
