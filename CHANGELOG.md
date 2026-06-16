@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.2
+- Dependencies and tests updated for both py3.13 (HomeAssistant 2026.2.x ) and py3.14 with recent version of HA
 ## 1.1.1
 ### Diagnostics
 - Improvements to `change_context` passed to events
