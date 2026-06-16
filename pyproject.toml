@@ -6,7 +6,8 @@ dynamic = ["version"]
 requires-python = ">=3.13.2"
 
 dependencies = [
-    "homeassistant>=2026.2.3",
+    "homeassistant>=2026.6.0; python_full_version > '3.14.2'",
+    "homeassistant<2026.3.0; python_full_version < '3.14.2'",
     "ical",
 ]
 
@@ -27,6 +28,8 @@ dev=[
     "genbadge[all]", # hass compatibility
     "uv",
     "pyright>=1.1.409",
+    "aiontfy==0.8.2; python_full_version < '3.14.2'",
+    "aiontfy==0.8.5; python_full_version >= '3.14.2'",
 ]
 docs=[
     "mkdocs-minify-plugin",
@@ -126,6 +129,20 @@ preview = true
 [tool.uv]
 exclude-newer = "5 days"
 add-bounds = "major"
+# Skip the 3.14.0-3.14.1 gap: HA 2026.3+ requires >=3.14.2, so those patch
+# versions are unusable regardless.
+environments = [
+    "python_full_version < '3.14'",
+    "python_full_version >= '3.14.2'",
+]
+override-dependencies = [
+    #"voluptuous-openapi==0.2.0"
+    "homeassistant==2026.2.3; python_full_version < '3.14.2'",
+    "homeassistant==2026.5.4; python_full_version >= '3.14.2'",
+    "homeassistant-stubs==2026.2.3; python_full_version < '3.14.2'",
+    "homeassistant-stubs==2026.5.4; python_full_version >= '3.14.2'",
+
+]
 
 
 [tool.mypy]
