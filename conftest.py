@@ -37,14 +37,14 @@ if TYPE_CHECKING:
 TEST_PANEL = "alarm_control_panel.test_panel"
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def auto_enable_custom_integrations(enable_custom_integrations: Any) -> None:  # noqa: ARG001
     """Enable custom integrations in all tests."""
     return
 
 
-@pytest.fixture(name="skip_notifications", autouse=True)
-def skip_notifications_fixture() -> Generator[None, Any, None]:
+@pytest.fixture(name="skip_notifications")
+def skip_notifications_fixture() -> Generator[None, Any]:
     """Prevents HomeAssistant from attempting to create and dismiss persistent notifications.
 
     These calls would fail without this fixture since the persistent_notification

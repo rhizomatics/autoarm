@@ -5,19 +5,18 @@ from functools import partial
 from typing import TYPE_CHECKING, Any, cast
 
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
-from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConditionError, ConditionErrorContainer
 from homeassistant.helpers import condition as condition
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.template import Template
-from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN, ConditionVariables
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from homeassistant.helpers.typing import TemplateVarsType
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.typing import ConfigType, TemplateVarsType
 
 
 _LOGGER = logging.getLogger(__name__)
