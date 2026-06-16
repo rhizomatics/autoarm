@@ -1,5 +1,6 @@
 import asyncio
 import datetime as dt
+from collections.abc import AsyncGenerator
 
 import homeassistant.util.dt as dt_util
 import pytest
@@ -21,7 +22,7 @@ from custom_components.autoarm.const import (
 @pytest.fixture
 async def simple_tracked_calendar(
     local_calendar: CalendarEntity, calendar_platform: EntityPlatform, mock_armer_real_hass: AlarmArmer
-) -> TrackedCalendar:
+) -> AsyncGenerator[TrackedCalendar]:
     uut = TrackedCalendar(
         mock_armer_real_hass.hass,
         {
@@ -34,7 +35,8 @@ async def simple_tracked_calendar(
         app_health_tracker=mock_armer_real_hass.app_health_tracker,
     )
     await uut.initialize(calendar_platform)
-    return uut
+    yield uut
+    uut.shutdown()
 
 
 @pytest.fixture
