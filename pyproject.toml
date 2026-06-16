@@ -1,7 +1,7 @@
 [project]
 name = "autoarm"
 readme = "README.md"
-description = "Automated setting of Home Assistant Alarm Control Panel based on occupancy rules."
+description = "Automated setting of Home Assistant Alarm Control Panel based on occupancy rules, calendars, buttons or sun."
 dynamic = ["version"]
 requires-python = ">=3.13.2"
 
@@ -135,7 +135,6 @@ environments = [
     "python_full_version >= '3.14.2'",
 ]
 override-dependencies = [
-    #"voluptuous-openapi==0.2.0"
     "homeassistant<2026.3.0; python_full_version < '3.14.2'",
     "homeassistant>=2026.6.0; python_full_version >= '3.14.2'",
     "homeassistant-stubs<2026.3.0; python_full_version < '3.14.2'",
