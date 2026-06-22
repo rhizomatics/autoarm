@@ -27,7 +27,7 @@ dev=[
     "codespell",
     "genbadge[all]", # hass compatibility
     "uv",
-    "pyright>=1.1.409",
+    "pyright>=1.1.410",
     "aiontfy==0.8.2; python_full_version < '3.14.2'"
 ]
 docs=[
