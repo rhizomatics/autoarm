@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 TEST_PANEL = "alarm_control_panel.test_panel"
 
 
-@pytest.fixture(autouse=True)  # noqa: RUF076
+@pytest.fixture(autouse=True)
 def auto_enable_custom_integrations(enable_custom_integrations: Any) -> None:  # noqa: ARG001
     """Enable custom integrations in all tests."""
     return
