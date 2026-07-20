@@ -34,7 +34,7 @@ async def _setup_entry(hass: HomeAssistant) -> MockConfigEntry:
     return entry
 
 
-async def test_diagnostics(hass: HomeAssistant, mock_notify: Any) -> None:  # noqa: ARG001
+async def test_diagnostics(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
     entry = await _setup_entry(hass)
 
     result = await async_get_config_entry_diagnostics(hass, entry)
