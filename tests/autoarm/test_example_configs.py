@@ -48,10 +48,10 @@ async def _reload_and_verify(hass: HomeAssistant, monkeypatch: pytest.MonkeyPatc
 async def test_empty_config_installed(
     hass: HomeAssistant,
     monkeypatch: pytest.MonkeyPatch,
-    test_config_calendars: None,  # noqa: ARG001
-    mock_notify: MockAction,  # noqa: ARG001
-    alarm_panel: str,  # noqa: ARG001
-    preconfigured_autoarm: ConfigEntry,  # noqa: ARG001
+    test_config_calendars: None,  # ruff:ignore[unused-function-argument]
+    mock_notify: MockAction,  # ruff:ignore[unused-function-argument]
+    alarm_panel: str,  # ruff:ignore[unused-function-argument]
+    preconfigured_autoarm: ConfigEntry,  # ruff:ignore[unused-function-argument]
 ) -> None:
     """Test empty YAML config with pre-existing ConfigEntry initializes correctly."""
     assert await async_setup_component(hass, DOMAIN, {})
@@ -72,10 +72,10 @@ async def test_empty_config_installed(
 async def test_supplemental_config_installed(
     hass: HomeAssistant,
     monkeypatch: pytest.MonkeyPatch,
-    test_config_calendars: None,  # noqa: ARG001
-    mock_notify: MockAction,  # noqa: ARG001
-    alarm_panel: str,  # noqa: ARG001
-    preconfigured_autoarm: ConfigEntry,  # noqa: ARG001
+    test_config_calendars: None,  # ruff:ignore[unused-function-argument]
+    mock_notify: MockAction,  # ruff:ignore[unused-function-argument]
+    alarm_panel: str,  # ruff:ignore[unused-function-argument]
+    preconfigured_autoarm: ConfigEntry,  # ruff:ignore[unused-function-argument]
 ) -> None:
     """Test supplemental YAML config with pre-existing ConfigEntry picks up YAML-only settings."""
     config: dict[Any, Any] = await hass.async_add_executor_job(load_yaml_config_file, str(EXAMPLES_ROOT / "typical.yaml"))
@@ -110,10 +110,10 @@ async def test_supplemental_config_installed(
 async def test_legacy_config_installed(
     hass: HomeAssistant,
     monkeypatch: pytest.MonkeyPatch,
-    test_config_calendars: None,  # noqa: ARG001
-    mock_notify: MockAction,  # noqa: ARG001
-    alarm_panel: str,  # noqa: ARG001
-    preconfigured_autoarm: ConfigEntry,  # noqa: ARG001
+    test_config_calendars: None,  # ruff:ignore[unused-function-argument]
+    mock_notify: MockAction,  # ruff:ignore[unused-function-argument]
+    alarm_panel: str,  # ruff:ignore[unused-function-argument]
+    preconfigured_autoarm: ConfigEntry,  # ruff:ignore[unused-function-argument]
 ) -> None:
     """Test legacy full YAML config with pre-existing ConfigEntry ignores YAML core settings."""
     config: dict[Any, Any] = await hass.async_add_executor_job(load_yaml_config_file, str(EXAMPLES_ROOT / "legacy.yaml"))
@@ -150,9 +150,9 @@ async def test_legacy_config_installed(
 async def test_legacy_config_fresh_install(
     hass: HomeAssistant,
     monkeypatch: pytest.MonkeyPatch,
-    test_config_calendars: None,  # noqa: ARG001
-    mock_notify: MockAction,  # noqa: ARG001
-    alarm_panel: str,  # noqa: ARG001
+    test_config_calendars: None,  # ruff:ignore[unused-function-argument]
+    mock_notify: MockAction,  # ruff:ignore[unused-function-argument]
+    alarm_panel: str,  # ruff:ignore[unused-function-argument]
 ) -> None:
     """Test legacy full YAML config without ConfigEntry triggers import flow."""
     config: dict[Any, Any] = await hass.async_add_executor_job(load_yaml_config_file, str(EXAMPLES_ROOT / "legacy.yaml"))

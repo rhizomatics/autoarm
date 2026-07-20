@@ -143,7 +143,7 @@ class AutoArmData:
     other_data: dict[str, str | dict[str, str] | list[str] | int | float | bool | None]
 
 
-async def async_setup(  # noqa: RUF029
+async def async_setup(  # ruff:ignore[unused-async]
     hass: HomeAssistant,
     config: ConfigType,
 ) -> bool:
@@ -255,7 +255,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # noqa: ARG001, RUF029
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:  # ruff:ignore[unused-function-argument, unused-async]
     """Unload Auto Arm config entry."""
     if HASS_DATA_KEY in hass.data:
         hass.data[HASS_DATA_KEY].armer.shutdown()
@@ -1056,7 +1056,7 @@ class AlarmArmer:
         return None
 
     @callback
-    async def on_sunrise(self, *args: Any) -> None:  # noqa: ARG002
+    async def on_sunrise(self, *args: Any) -> None:  # ruff:ignore[unused-method-argument]
         _LOGGER.debug("AUTOARM Sunrise")
         now = dt_util.now()
         if not self.sunrise_earliest or now.time() >= self.sunrise_earliest:
@@ -1071,12 +1071,12 @@ class AlarmArmer:
             )
 
     @callback
-    async def on_sunrise_latest(self, *args: Any) -> None:  # noqa: ARG002
+    async def on_sunrise_latest(self, *args: Any) -> None:  # ruff:ignore[unused-method-argument]
         _LOGGER.debug("AUTOARM Sunrise latest cutoff reached")
         await self.reset_armed_state(source=ChangeSource.SUNRISE)
 
     @callback
-    async def on_sunset(self, *args: Any) -> None:  # noqa: ARG002
+    async def on_sunset(self, *args: Any) -> None:  # ruff:ignore[unused-method-argument]
         _LOGGER.debug("AUTOARM Sunset")
         now = dt_util.now()
         if not self.sunset_earliest or now.time() >= self.sunset_earliest:
@@ -1091,7 +1091,7 @@ class AlarmArmer:
             )
 
     @callback
-    async def on_sunset_latest(self, *args: Any) -> None:  # noqa: ARG002
+    async def on_sunset_latest(self, *args: Any) -> None:  # ruff:ignore[unused-method-argument]
         _LOGGER.debug("AUTOARM Sunset latest cutoff reached")
         await self.reset_armed_state(source=ChangeSource.SUNSET)
 

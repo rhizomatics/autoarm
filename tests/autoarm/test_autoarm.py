@@ -22,35 +22,35 @@ async def test_arm_preserves_panel_attributes(autoarmer: AlarmArmer, hass: HomeA
     assert panel_attrs.get("icon") == "mdi:alarm-panel"  # type:ignore[attr-defined]
 
 
-async def test_vacation_day_occupied(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
+async def test_vacation_day_occupied(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # ruff:ignore[unused-function-argument]
     await autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
     assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_VACATION
 
 
-async def test_vacation_day_unoccupied(autoarmer: AlarmArmer, day: None, unoccupied: None) -> None:  # noqa: ARG001
+async def test_vacation_day_unoccupied(autoarmer: AlarmArmer, day: None, unoccupied: None) -> None:  # ruff:ignore[unused-function-argument]
     await autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
     assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_VACATION
 
 
-def test_occupied_day_armed_default(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
+def test_occupied_day_armed_default(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # ruff:ignore[unused-function-argument]
     autoarmer.occupied_defaults["day"] = AlarmControlPanelState.ARMED_HOME
     assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_HOME
 
 
-def test_occupied_day_disarmed_default(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # noqa: ARG001
+def test_occupied_day_disarmed_default(autoarmer: AlarmArmer, day: None, occupied: None) -> None:  # ruff:ignore[unused-function-argument]
     autoarmer.occupied_defaults["day"] = AlarmControlPanelState.DISARMED
     assert autoarmer.determine_state() == AlarmControlPanelState.DISARMED
 
 
-def test_occupied_night(autoarmer: AlarmArmer, night: None, occupied: None) -> None:  # noqa: ARG001
+def test_occupied_night(autoarmer: AlarmArmer, night: None, occupied: None) -> None:  # ruff:ignore[unused-function-argument]
     assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_NIGHT
 
 
-def test_unoccupied_day(autoarmer: AlarmArmer, day: None, unoccupied: None) -> None:  # noqa: ARG001
+def test_unoccupied_day(autoarmer: AlarmArmer, day: None, unoccupied: None) -> None:  # ruff:ignore[unused-function-argument]
     assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_AWAY
 
 
-def test_unoccupied_night(autoarmer: AlarmArmer, night: None, unoccupied: None) -> None:  # noqa: ARG001
+def test_unoccupied_night(autoarmer: AlarmArmer, night: None, unoccupied: None) -> None:  # ruff:ignore[unused-function-argument]
     assert autoarmer.determine_state() == AlarmControlPanelState.ARMED_AWAY
 
 
