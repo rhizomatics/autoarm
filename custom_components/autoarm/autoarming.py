@@ -863,7 +863,12 @@ class AlarmArmer:
 
             # TODO: expose as config ( for manual disarm override ) and condition logic
             must_change_state = existing_state is None or existing_state == AlarmControlPanelState.PENDING
-            if intervention or source in (ChangeSource.CALENDAR, ChangeSource.OCCUPANCY) or must_change_state:
+            if (
+                intervention
+                or source in (ChangeSource.CALENDAR, ChangeSource.OCCUPANCY)
+                or must_change_state
+                or (self.is_unoccupied() and state in (AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_HOME))
+            ):
                 _LOGGER.debug("AUTOARM Ignoring previous interventions")
             else:
                 last_state_intervention = self.last_state_intervention()
