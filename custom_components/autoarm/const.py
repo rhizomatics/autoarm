@@ -210,19 +210,25 @@ CONFIG_SCHEMA = vol.Schema(
 DEFAULT_TRANSITIONS: dict[str, str | list[str]] = {
     "disarmed": [
         "{{ autoarm.computed and autoarm.occupied}}",
-        "{{ (autoarm.day and autoarm.occupied_daytime_state == 'disarmed') or"
-        " (autoarm.night and autoarm.occupied_nighttime_state == 'disarmed') }}",
+        (
+            "{{ (autoarm.day and autoarm.occupied_daytime_state == 'disarmed') or"
+            " (autoarm.night and autoarm.occupied_nighttime_state == 'disarmed') }}"
+        ),
     ],
     "armed_home": [
         "{{ autoarm.computed }}",
-        "{{ (autoarm.day and autoarm.occupied and autoarm.occupied_daytime_state == 'armed_home') or"
-        " ( autoarm.night and autoarm.occupied and autoarm.occupied_nighttime_state == 'armed_home' ) or"
-        " ( autoarm.day and autoarm.occupied is none ) }}",
+        (
+            "{{ (autoarm.day and autoarm.occupied and autoarm.occupied_daytime_state == 'armed_home') or"
+            " ( autoarm.night and autoarm.occupied and autoarm.occupied_nighttime_state == 'armed_home' ) or"
+            " ( autoarm.day and autoarm.occupied is none ) }}"
+        ),
     ],
     "armed_night": [
         "{{ autoarm.computed }}",
-        "{{ ( autoarm.night and autoarm.occupied and autoarm.occupied_nighttime_state == 'armed_night' ) or "
-        " ( autoarm.night and autoarm.occupied is none )}}",
+        (
+            "{{ ( autoarm.night and autoarm.occupied and autoarm.occupied_nighttime_state == 'armed_night' ) or "
+            " ( autoarm.night and autoarm.occupied is none )}}"
+        ),
     ],
     "armed_away": "{{ autoarm.computed and not autoarm.occupied and autoarm.occupied is not none}}",
     "armed_vacation": "{{ autoarm.vacation }}",

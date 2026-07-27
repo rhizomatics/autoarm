@@ -78,14 +78,14 @@ async def _setup_entry(hass: HomeAssistant, yaml_config: dict[str, Any] | None =
     return entry
 
 
-async def test_configure(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_configure(hass: HomeAssistant, mock_notify: Any) -> None:
     await _setup_entry(hass)
 
     hass.states.async_set("alarm_panel.testing", "disarmed")
     await hass.async_block_till_done()
 
 
-async def test_exposed_entities(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_exposed_entities(hass: HomeAssistant, mock_notify: Any) -> None:
     await _setup_entry(hass)
 
     configuration = hass.states.get("binary_sensor.autoarm_initialized")
@@ -95,7 +95,7 @@ async def test_exposed_entities(hass: HomeAssistant, mock_notify: Any) -> None: 
     assert hass.states.get("sensor.autoarm_last_calendar_event") is not None
 
 
-async def test_actions(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_actions(hass: HomeAssistant, mock_notify: Any) -> None:
     await _setup_entry(hass)
 
     config: Any = await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True)
@@ -105,7 +105,7 @@ async def test_actions(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:i
     assert json.dumps(config)
 
 
-async def test_reset_service(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_reset_service(hass: HomeAssistant, mock_notify: Any) -> None:
     await _setup_entry(hass)
 
     response = await hass.services.async_call("autoarm", "reset_state", None, blocking=True, return_response=True)
@@ -117,7 +117,7 @@ async def test_reset_service(hass: HomeAssistant, mock_notify: Any) -> None:  # 
 async def test_broken_condition_raises_issue(
     hass: HomeAssistant,
     issue_registry: ir.IssueRegistry,
-    mock_notify: Any,  # ruff:ignore[unused-function-argument]
+    mock_notify: Any,
 ) -> None:
     yaml_config = {
         CONF_TRANSITIONS: {
@@ -136,7 +136,7 @@ async def test_broken_condition_raises_issue(
     assert issue.severity == ir.IssueSeverity.ERROR
 
 
-async def test_on_panel_change_ignores_autoarm_generated_event(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_on_panel_change_ignores_autoarm_generated_event(hass: HomeAssistant, mock_notify: Any) -> None:
     await _setup_entry(hass)
 
     hass.states.async_set("binary_sensor.button_middle", "on")
@@ -151,7 +151,7 @@ async def test_on_panel_change_ignores_autoarm_generated_event(hass: HomeAssista
     assert hass.states.get("sensor.autoarm_last_intervention").state == "alarm_panel"  # type: ignore
 
 
-async def test_arm_on_away(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_arm_on_away(hass: HomeAssistant, mock_notify: Any) -> None:
     hass.states.async_set("person.house_owner", "not_home", {"friendly_name": "Jack"})
     hass.states.async_set("person.tenant", "home", {"friendly_name": "Jill"})
     hass.states.async_set("alarm_panel.testing", "disarmed")
@@ -164,7 +164,7 @@ async def test_arm_on_away(hass: HomeAssistant, mock_notify: Any) -> None:  # ru
     assert hass.states.get("alarm_panel.testing").state == "armed_away"  # type: ignore
 
 
-async def test_disarm_on_button(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_disarm_on_button(hass: HomeAssistant, mock_notify: Any) -> None:
     hass.states.async_set("alarm_panel.testing", "armed_away")
     await _setup_entry(hass)
 
@@ -173,7 +173,7 @@ async def test_disarm_on_button(hass: HomeAssistant, mock_notify: Any) -> None: 
     assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
 
 
-async def test_disarm_on_mobile_action(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_disarm_on_mobile_action(hass: HomeAssistant, mock_notify: Any) -> None:
     hass.states.async_set("alarm_panel.testing", "armed_away")
     await _setup_entry(hass)
 
@@ -182,7 +182,7 @@ async def test_disarm_on_mobile_action(hass: HomeAssistant, mock_notify: Any) ->
     assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
 
 
-async def test_delayed_arm_on_button(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_delayed_arm_on_button(hass: HomeAssistant, mock_notify: Any) -> None:
     await _setup_entry(hass)
     hass.states.async_set("alarm_panel.testing", "disarmed")
 
@@ -193,7 +193,7 @@ async def test_delayed_arm_on_button(hass: HomeAssistant, mock_notify: Any) -> N
     assert hass.states.get("alarm_panel.testing").state == "armed_away"  # type: ignore
 
 
-async def test_yaml_import_migration(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_yaml_import_migration(hass: HomeAssistant, mock_notify: Any) -> None:
     """Test that YAML config with alarm_panel triggers import flow and creates ConfigEntry."""
     full_yaml_config = {
         DOMAIN: {
@@ -215,7 +215,7 @@ async def test_yaml_import_migration(hass: HomeAssistant, mock_notify: Any) -> N
 
 async def test_setup_entry_raises_not_ready_on_failure(
     hass: HomeAssistant,
-    mock_notify: Any,  # ruff:ignore[unused-function-argument]
+    mock_notify: Any,
 ) -> None:
     """Test that async_setup_entry raises ConfigEntryNotReady when initialization fails."""
     from unittest.mock import patch
@@ -239,7 +239,7 @@ async def test_setup_entry_raises_not_ready_on_failure(
     assert entry.state is ConfigEntryState.SETUP_RETRY
 
 
-async def test_arm_fires_autoarming_event(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_arm_fires_autoarming_event(hass: HomeAssistant, mock_notify: Any) -> None:
     hass.states.async_set("alarm_panel.testing", "disarmed")
     hass.states.async_set("person.house_owner", "home")
     hass.states.async_set("person.tenant", "home")

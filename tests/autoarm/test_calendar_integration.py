@@ -109,7 +109,7 @@ async def test_fragile_calendar_fixture(local_calendar: CalendarEntity, hass: Ho
     assert events[0].summary == "Arming Party"
 
 
-async def test_calendar_live_event(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_calendar_live_event(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:
     start_of_day = dt_util.start_of_local_day()
     end_of_day = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
     await local_calendar.async_create_event(
@@ -127,7 +127,7 @@ async def test_calendar_live_event(local_calendar: CalendarEntity, hass: HomeAss
     assert last_event.attributes["summary"] == "Holidays in Bahamas!!"
 
 
-async def test_calendar_dead_events(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_calendar_dead_events(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:
     await local_calendar.async_create_event(
         dtstart=dt_util.now() - dt.timedelta(hours=1),
         dtend=dt_util.now() - dt.timedelta(seconds=1),
@@ -144,7 +144,7 @@ async def test_calendar_dead_events(local_calendar: CalendarEntity, hass: HomeAs
     assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
 
 
-async def test_calendar_near_future_event(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_calendar_near_future_event(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:
     start = dt_util.now() + dt.timedelta(seconds=2)
     end = start + dt.timedelta(days=1) - dt.timedelta(seconds=1)
     await local_calendar.async_create_event(
@@ -159,7 +159,7 @@ async def test_calendar_near_future_event(local_calendar: CalendarEntity, hass: 
     assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
 
 
-async def test_calendar_event_ending_shortly(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_calendar_event_ending_shortly(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:
     hass.states.async_set("person.tenant", "home", {"friendly_name": "Jill"})
 
     start: dt.datetime = dt_util.start_of_local_day()
@@ -177,7 +177,7 @@ async def test_calendar_event_ending_shortly(local_calendar: CalendarEntity, has
     assert panel_state(hass) in (AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
 
 
-async def test_calendar_event_ending_fixed_mode(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_calendar_event_ending_fixed_mode(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:
     hass.states.async_set("person.tenant", "home", {"friendly_name": "Jill"})
 
     start = dt_util.start_of_local_day()
@@ -197,7 +197,7 @@ async def test_calendar_event_ending_fixed_mode(local_calendar: CalendarEntity, 
     assert panel_state(hass) == AlarmControlPanelState.DISARMED
 
 
-async def test_calendar_event_ending_manual_mode(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_calendar_event_ending_manual_mode(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:
     hass.states.async_set("person.tenant", "home", {"friendly_name": "Jill"})
 
     start: dt.datetime = dt_util.start_of_local_day()
@@ -217,7 +217,7 @@ async def test_calendar_event_ending_manual_mode(local_calendar: CalendarEntity,
     assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
 
 
-async def test_calendar_multiple_calendars(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_calendar_multiple_calendars(local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any) -> None:
     start_of_day: dt.datetime = dt_util.start_of_local_day()
     end_of_day: dt.datetime = start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1)
     await local_calendar.async_create_event(

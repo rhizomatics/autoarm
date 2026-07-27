@@ -202,7 +202,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
     @staticmethod
-    def async_get_options_flow(config_entry: ConfigEntry) -> "AutoArmOptionsFlow":  # ruff:ignore[unused-static-method-argument]
+    def async_get_options_flow(config_entry: ConfigEntry) -> "AutoArmOptionsFlow":
         """Get the options flow for this handler."""
         return AutoArmOptionsFlow()
 

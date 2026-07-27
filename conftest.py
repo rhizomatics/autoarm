@@ -38,7 +38,7 @@ TEST_PANEL = "alarm_control_panel.test_panel"
 
 
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations: Any) -> None:  # ruff:ignore[unused-function-argument]
+def auto_enable_custom_integrations(enable_custom_integrations: Any) -> None:
     """Enable custom integrations in all tests."""
     return
 
@@ -60,7 +60,7 @@ def skip_notifications_fixture() -> Generator[None, Any]:
 @pytest.fixture
 def hass_api(hass: HomeAssistant) -> HomeAssistantAPI:
     hass_api = HomeAssistantAPI(hass)
-    return hass_api  # ruff:ignore[unnecessary-assign]
+    return hass_api
 
 
 @pytest.fixture
@@ -184,7 +184,7 @@ def mock_notify(hass: HomeAssistant) -> MockAction:
 @pytest.fixture
 async def setup_autoarm(
     hass: HomeAssistant,
-    mock_notify: MockAction,  # ruff:ignore[unused-function-argument]
+    mock_notify: MockAction,
 ) -> MockConfigEntry:
     """Set up autoarm via ConfigEntry with default test config."""
     entry = MockConfigEntry(

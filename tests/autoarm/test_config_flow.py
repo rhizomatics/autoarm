@@ -32,7 +32,7 @@ from custom_components.autoarm.const import (
 )
 
 
-async def test_user_flow_complete(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_user_flow_complete(hass: HomeAssistant, mock_notify: Any) -> None:
     """Test the full user config flow with all steps."""
     hass.data[YAML_DATA_KEY] = {}
 
@@ -67,7 +67,7 @@ async def test_user_flow_complete(hass: HomeAssistant, mock_notify: Any) -> None
     assert result["options"][CONF_NO_EVENT_MODE] == "auto"
 
 
-async def test_user_flow_minimal(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_user_flow_minimal(hass: HomeAssistant, mock_notify: Any) -> None:
     """Test minimal user flow - alarm panel only, no calendars or persons."""
     hass.data[YAML_DATA_KEY] = {}
 
@@ -93,7 +93,7 @@ async def test_user_flow_minimal(hass: HomeAssistant, mock_notify: Any) -> None:
     assert result["options"][CONF_PERSON_ENTITIES] == []
 
 
-async def test_user_flow_already_configured(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_user_flow_already_configured(hass: HomeAssistant, mock_notify: Any) -> None:
     """Test that a second config entry is aborted."""
     hass.data[YAML_DATA_KEY] = {}
     existing = MockConfigEntry(
@@ -121,7 +121,7 @@ async def test_user_flow_already_configured(hass: HomeAssistant, mock_notify: An
     assert result["reason"] == "already_configured"
 
 
-async def test_import_flow(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_import_flow(hass: HomeAssistant, mock_notify: Any) -> None:
     """Test YAML import creates correct config entry."""
     hass.data[YAML_DATA_KEY] = {}
     import_data: dict[str, Any] = {
@@ -151,7 +151,7 @@ async def test_import_flow(hass: HomeAssistant, mock_notify: Any) -> None:  # ru
     assert result["options"][CONF_NO_EVENT_MODE] == "manual"
 
 
-async def test_import_flow_already_configured(hass: HomeAssistant, mock_notify: Any) -> None:  # ruff:ignore[unused-function-argument]
+async def test_import_flow_already_configured(hass: HomeAssistant, mock_notify: Any) -> None:
     """Test YAML import aborts when config entry already exists."""
     hass.data[YAML_DATA_KEY] = {}
     existing = MockConfigEntry(

@@ -1,9 +1,9 @@
 import logging
 from typing import Any
 
-from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import CONF_SERVICE, CONF_SOURCE, CONF_STATE, CONF_TARGET
+from homeassistant.core import HomeAssistant
 
 from custom_components.autoarm.const import ALARM_STATES, CONF_SCENARIO, CONF_SUPERNOTIFY, NOTIFY_COMMON, ChangeSource
 from custom_components.autoarm.helpers import AppHealthTracker
@@ -116,6 +116,6 @@ class Notifier:
             else:
                 _LOGGER.debug("AUTOARM Skipped notification, service: %s, data: %s", self.notify_action, merged_profile)
 
-        except Exception as e:
+        except Exception:
             self.app_health_tracker.record_runtime_error()
-            _LOGGER.exception("AUTOARM %s failed: %s", self.notify_action, e)
+            _LOGGER.exception("AUTOARM %s failed", self.notify_action)

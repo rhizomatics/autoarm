@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.exceptions import ConditionError, ConditionErrorContainer
-from homeassistant.helpers import condition as condition
+from homeassistant.helpers import condition as condition_helper
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.template import Template
 
@@ -59,18 +59,18 @@ class HomeAssistantAPI:
         try:
             if validate:
                 cond_list = cast(
-                    "list[ConfigType]", await condition.async_validate_conditions_config(self._hass, condition_config)
+                    "list[ConfigType]", await condition_helper.async_validate_conditions_config(self._hass, condition_config)
                 )
             else:
                 cond_list = condition_config
-        except Exception as e:
-            _LOGGER.exception("AUTOARM Condition validation failed: %s", e)
+        except Exception:
+            _LOGGER.exception("AUTOARM Condition validation failed")
             raise
         try:
             if strict:
                 force_strict_template_mode(cond_list, undo=False)
 
-            test: Callable[[TemplateVarsType], bool] = await condition.async_conditions_from_config(
+            test: Callable[[TemplateVarsType], bool] = await condition_helper.async_conditions_from_config(
                 self._hass, cond_list, cast("logging.Logger", capturing_logger), name
             )
             if test is None:
@@ -81,8 +81,8 @@ class HomeAssistantAPI:
                     _LOGGER.warning("AUTOARM Invalid condition %s:%s", condition_config, exception)
                 raise capturing_logger.condition_errors[0]
             return test
-        except Exception as e:
-            _LOGGER.exception("AUTOARM Condition eval failed: %s", e)
+        except Exception:
+            _LOGGER.exception("AUTOARM Condition eval failed")
             raise
         finally:
             if strict:
