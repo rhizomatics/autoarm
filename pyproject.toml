@@ -6,7 +6,7 @@ dynamic = ["version"]
 requires-python = ">=3.13.2"
 
 dependencies = [
-    "homeassistant>=2026.6.4; python_full_version >= '3.14.2'",
+    "homeassistant>=2026.3.0; python_full_version >= '3.14.2'",
     "homeassistant<2026.3.0; python_full_version < '3.14.2'",
     "ical",
 ]
@@ -118,9 +118,6 @@ ignore = [
     "S101","C901","FURB113","PGH003",
     "BLE001"] # blind exception
 
-unfixable = ["B"]
-
-
 [tool.ruff.format]
 preview = true
 
@@ -136,9 +133,9 @@ environments = [
 ]
 override-dependencies = [
     "homeassistant<2026.3.0; python_full_version < '3.14.2'",
-    "homeassistant>=2026.6.4; python_full_version >= '3.14.2'",
+    "homeassistant>=2026.3.0; python_full_version >= '3.14.2'",
     "homeassistant-stubs<2026.3.0; python_full_version < '3.14.2'",
-    "homeassistant-stubs>=2026.6.4; python_full_version >= '3.14.2'",
+    "homeassistant-stubs>=2026.3.0; python_full_version >= '3.14.2'",
 ]
 
 
