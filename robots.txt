@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://autoarm.rhizomatics.org.uk/sitemap.xml
