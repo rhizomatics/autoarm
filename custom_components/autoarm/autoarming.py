@@ -325,7 +325,7 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         val = entry.options.get(option_key)
         if val is not None:
             return cv.time(val) if isinstance(val, str) else val
-        return yaml_fallback
+        return cv.time(yaml_fallback) if isinstance(yaml_fallback, str) else yaml_fallback
 
     return AlarmArmer(
         hass,
@@ -500,6 +500,37 @@ class AlarmArmer:
         self.initialize_integration()
         self.initialize_housekeeping()
         self.initialize_home_assistant()
+
+        # Apply diurnal constraints at startup - don't bypass sunrise/sunset
+        # earliest/latest restrictions just because the integration (re)loaded
+        now = dt_util.now()
+        if self.is_night() and self.sunset_earliest and now.time() < self.sunset_earliest:
+            if self._has_sunset_passed_today(now):
+                _LOGGER.info(
+                    "AUTOARM Deferring startup reset to sunset earliest: %s", self.sunset_earliest
+                )
+                self.schedule_state(
+                    dt.datetime.combine(now.date(), self.sunset_earliest, tzinfo=now.tzinfo),
+                    intervention=None,
+                    state=None,
+                    source=ChangeSource.STARTUP,
+                )
+                _LOGGER.info("AUTOARM Initialized, deferred to sunset earliest: %s", self.sunset_earliest)
+                return
+        elif not self.is_night() and self.sunrise_earliest and now.time() < self.sunrise_earliest:
+            if self._has_sunrise_occurred_today(now):
+                _LOGGER.info(
+                    "AUTOARM Deferring startup reset to sunrise earliest: %s", self.sunrise_earliest
+                )
+                self.schedule_state(
+                    dt.datetime.combine(now.date(), self.sunrise_earliest, tzinfo=now.tzinfo),
+                    intervention=None,
+                    state=None,
+                    source=ChangeSource.STARTUP,
+                )
+                _LOGGER.info("AUTOARM Initialized, deferred to sunrise earliest: %s", self.sunrise_earliest)
+                return
+
         await self.reset_armed_state(source=ChangeSource.STARTUP)
 
         _LOGGER.info("AUTOARM Initialized, state: %s", self.armed_state())
@@ -738,6 +769,14 @@ class AlarmArmer:
 
     def is_night(self) -> bool:
         return safe_state(self.hass.states.get("sun.sun")) == STATE_BELOW_HORIZON
+
+    def _has_sunset_passed_today(self, now: dt.datetime) -> bool:
+        """Check if the sun has already set today (vs. yesterday, pre-dawn)."""
+        return now.hour >= 12  # PM means today's sunset is relevant
+
+    def _has_sunrise_occurred_today(self, now: dt.datetime) -> bool:
+        """Check if the sun has already risen today (vs. not yet, pre-dawn)."""
+        return now.hour < 12  # AM means today's sunrise is relevant
 
     def armed_state(self) -> AlarmControlPanelState:
         raw_state: str | None = safe_state(self.hass.states.get(self.alarm_panel))
