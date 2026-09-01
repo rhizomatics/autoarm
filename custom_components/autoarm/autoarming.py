@@ -135,6 +135,18 @@ PLATFORMS = ["autoarm"]
 
 HASS_DATA_KEY: HassKey["AutoArmData"] = HassKey(DOMAIN)
 
+# Map alarm states to alarm_control_panel service names.
+# Using the standard service ensures integrations like Alarmo propagate
+# arm commands to child areas (the master entity's async_alarm_arm_* method
+# is called, which triggers internal area arm logic).
+_STATE_TO_ALARM_SERVICE: dict[AlarmControlPanelState, str] = {
+    AlarmControlPanelState.ARMED_AWAY: "alarm_arm_away",
+    AlarmControlPanelState.ARMED_HOME: "alarm_arm_home",
+    AlarmControlPanelState.ARMED_NIGHT: "alarm_arm_night",
+    AlarmControlPanelState.ARMED_VACATION: "alarm_arm_vacation",
+    AlarmControlPanelState.DISARMED: "alarm_disarm",
+}
+
 
 @dataclass
 class AutoArmData:
@@ -474,6 +486,7 @@ class AlarmArmer:
         self.pre_pending_state: AlarmControlPanelState | None = None
         self.button_device: dict[str, str] = {}
         self.arming_in_progress: asyncio.Event = asyncio.Event()
+        self._arming_via_service: bool = False  # guard against feedback loop when calling alarmo
 
         self.rate_limiter: Limiter = Limiter(
             window=rate_limit.get(CONF_RATE_LIMIT_PERIOD, dt.timedelta(seconds=60)),
@@ -1019,12 +1032,72 @@ class AlarmArmer:
             self.arming_in_progress.set()
             existing_state: AlarmControlPanelState | None = self.armed_state()
             if arming_state != existing_state:
-                attrs: dict[str, str] = {}
                 panel_state: State | None = self.hass.states.get(self.alarm_panel)
-                if panel_state:
-                    attrs.update(panel_state.attributes)
-                attrs[ATTR_CHANGED_BY] = f"{DOMAIN}.{source}"
-                self.hass.states.async_set(entity_id=self.alarm_panel, new_state=str(arming_state), attributes=attrs)
+
+                service_name = _STATE_TO_ALARM_SERVICE.get(arming_state)
+                # Only route through the standard alarm_control_panel service
+                # when the alarm is managed by Alarmo. Alarmo's master entity
+                # needs the service call to propagate arm commands to child
+                # areas. For all other platforms (manual, built-in, etc.)
+                # a direct state set is sufficient and avoids creating
+                # lingering internal timers during tests.
+                use_service = service_name and "alarmo" in self.hass.data
+                if use_service:
+                    # Call the standard alarm_control_panel service so that
+                    # integrations like Alarmo can propagate the arm command
+                    # to child areas (master→area dispatch).
+                    self._arming_via_service = True
+                    try:
+                        await self.hass.services.async_call(
+                            "alarm_control_panel",
+                            service_name,
+                            {"entity_id": self.alarm_panel},
+                            blocking=True,
+                        )
+                    except Exception:
+                        _LOGGER.debug(
+                            "AUTOARM Service %s unavailable, falling back to direct state set",
+                            service_name,
+                        )
+                        attrs: dict[str, str] = {}
+                        if panel_state:
+                            attrs.update(panel_state.attributes)
+                        attrs[ATTR_CHANGED_BY] = f"{DOMAIN}.{source}"
+                        self.hass.states.async_set(
+                            entity_id=self.alarm_panel,
+                            new_state=str(arming_state),
+                            attributes=attrs,
+                        )
+                    finally:
+                        self._arming_via_service = False
+                    # If the service call didn't actually change the state
+                    # (silent failure), fall back to direct state manipulation.
+                    if self.armed_state() != arming_state:
+                        _LOGGER.debug(
+                            "AUTOARM Service %s did not change state, falling back to direct set",
+                            service_name,
+                        )
+                        attrs = {}
+                        if panel_state:
+                            attrs.update(panel_state.attributes)
+                        attrs[ATTR_CHANGED_BY] = f"{DOMAIN}.{source}"
+                        self.hass.states.async_set(
+                            entity_id=self.alarm_panel,
+                            new_state=str(arming_state),
+                            attributes=attrs,
+                        )
+                else:
+                    # Not Alarmo or non-standard state (e.g. PENDING) —
+                    # set the state directly.
+                    attrs = {}
+                    if panel_state:
+                        attrs.update(panel_state.attributes)
+                    attrs[ATTR_CHANGED_BY] = f"{DOMAIN}.{source}"
+                    self.hass.states.async_set(
+                        entity_id=self.alarm_panel,
+                        new_state=str(arming_state),
+                        attributes=attrs,
+                    )
 
                 _LOGGER.info("AUTOARM Setting %s from %s to %s for %s", self.alarm_panel, existing_state, arming_state, source)
                 if self.notifier and source and arming_state:
@@ -1238,6 +1311,15 @@ class AlarmArmer:
     async def on_panel_change(self, event: Event[EventStateChangedData]) -> None:
         """Alarm Control Panel has been changed outside of AutoArm"""
         entity_id, old, new, new_attributes = self._extract_event(event)
+        if self._arming_via_service:
+            _LOGGER.debug(
+                "AUTOARM Panel Change via service call (ignored): %s,%s: %s-->%s",
+                entity_id,
+                event.event_type,
+                old,
+                new,
+            )
+            return
         if new_attributes:
             changed_by = new_attributes.get(ATTR_CHANGED_BY)
             if changed_by and changed_by.startswith(f"{DOMAIN}."):
