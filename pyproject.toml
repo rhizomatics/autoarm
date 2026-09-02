@@ -116,6 +116,7 @@ ignore = [
     "TD002","TD003","TD005","SIM102","SIM117","ANN002", "ANN003","SIM108",
     "D103","D100","D101","D102","D104","D107","D415","D400","D415","ANN401",
     "S101","C901","FURB113","PGH003",
+    "PLW0108", # lambdas are lovely
     "BLE001"] # blind exception
 
 [tool.ruff.format]
