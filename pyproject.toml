@@ -52,7 +52,7 @@ docs=[
 [tool.codespell]
 ignore-words-list = "HASS,hass,NotIn,datas,dof,dur,farenheit,hist,iff,ines,ist,lightsensor,mut,nd,pres,referer,ser,serie,te,technik,ue,uint,visability,wan,wanna,withing"
 # Skip binary/data files, build artifacts, and non-English markdown (locale-named files and locale dirs)
-skip = "*.csv,./.*,./site,./htmlcov,README.??.md,./README.??-??.md,./docs/??/*.md,./docs/??-??/*.md,./custom_components/autoarm/translations/de.json,./custom_components/autoarm/translations/es.json,./custom_components/autoarm/translations/fr.json,./custom_components/autoarm/translations/hi.json,./custom_components/autoarm/translations/it.json,./custom_components/autoarm/translations/ja.json,./custom_components/autoarm/translations/nl.jso,./custom_components/autoarm/translations/pl.json,./custom_components/autoarm/translations/pt.json,./custom_components/autoarm/translations/zh-Hans.json"
+skip = "*.csv,./.*,./site,./htmlcov,README.??.md,./README.??-??.md,./docs/??/*.md,./docs/??-??/*.md,./custom_components/autoarm/translations/de.json,./custom_components/autoarm/translations/es.json,./custom_components/autoarm/translations/fr.json,./custom_components/autoarm/translations/hi.json,./custom_components/autoarm/translations/it.json,./custom_components/autoarm/translations/ja.json,./custom_components/autoarm/translations/nl.json,./custom_components/autoarm/translations/pl.json,./custom_components/autoarm/translations/pt.json,./custom_components/autoarm/translations/zh-Hans.json"
 quiet-level = 2
 
 [tool.poetry]
