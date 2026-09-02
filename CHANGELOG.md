@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.4
+- Show **Alarm Control Panel** entity in config UI, and allow it to be changed
+- Added translations for es,hi,nl,pl,pt and zh-Hans languages
+
 ## 1.1.3
 - Dependencies updated.
 - Tests fixed for recent HA versions

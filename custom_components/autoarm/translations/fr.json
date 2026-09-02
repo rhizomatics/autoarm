@@ -30,6 +30,7 @@
             "init": {
                 "title": "Options AutoArm",
                 "data": {
+                    "alarm_panel": "Panneau de contrôle d'alarme à gérer",
                     "calendar_entities": "Calendriers à utiliser pour les planifications d'armement",
                     "person_entities": "Personnes pour l'armement basé sur l'occupation",
                     "occupancy_default_day": "État d'armement par défaut lorsqu'occupé pendant la journée",

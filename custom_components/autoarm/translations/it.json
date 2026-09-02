@@ -30,6 +30,7 @@
             "init": {
                 "title": "Opzioni AutoArm",
                 "data": {
+                    "alarm_panel": "Pannello di controllo allarme da gestire",
                     "calendar_entities": "Calendari da usare per la pianificazione dell'inserimento",
                     "person_entities": "Persone per l'inserimento basato sulla presenza",
                     "occupancy_default_day": "Stato di inserimento predefinito quando occupato di giorno",

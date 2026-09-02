@@ -184,6 +184,7 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     result = await hass.config_entries.options.async_configure(
         result["flow_id"],
         {
+            CONF_ALARM_PANEL: "alarm_control_panel.new_panel",
             CONF_CALENDAR_ENTITIES: ["calendar.holidays"],
             CONF_PERSON_ENTITIES: ["person.new_person"],
             CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
@@ -202,6 +203,8 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
 
+    assert entry.data[CONF_ALARM_PANEL] == "alarm_control_panel.new_panel"
+    assert CONF_ALARM_PANEL not in entry.options
     assert entry.options[CONF_CALENDAR_ENTITIES] == ["calendar.holidays"]
     assert entry.options[CONF_PERSON_ENTITIES] == ["person.new_person"]
     assert entry.options[CONF_OCCUPANCY_DEFAULT_DAY] == "disarmed"

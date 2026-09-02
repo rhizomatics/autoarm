@@ -218,6 +218,15 @@ class AutoArmOptionsFlow(OptionsFlow):
             for v in user_input.values():
                 if isinstance(v, dict):
                     data.update(v)
+
+            # The alarm panel entity lives in config_entry.data, not options.
+            alarm_panel = data.pop(CONF_ALARM_PANEL)
+            if alarm_panel != self.config_entry.data.get(CONF_ALARM_PANEL):
+                self.hass.config_entries.async_update_entry(
+                    self.config_entry,
+                    data={**self.config_entry.data, CONF_ALARM_PANEL: alarm_panel},
+                )
+
             return self.async_create_entry(title="", data=data)
 
         options = self.config_entry.options
@@ -226,6 +235,10 @@ class AutoArmOptionsFlow(OptionsFlow):
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
+                vol.Required(
+                    CONF_ALARM_PANEL,
+                    default=self.config_entry.data.get(CONF_ALARM_PANEL, ""),
+                ): EntitySelector(EntitySelectorConfig(domain="alarm_control_panel")),
                 vol.Optional(
                     CONF_CALENDAR_ENTITIES,
                     default=options.get(CONF_CALENDAR_ENTITIES, []),

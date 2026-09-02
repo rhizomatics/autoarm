@@ -1,0 +1,105 @@
+{
+    "title": "AutoArm",
+    "config": {
+        "step": {
+            "user": {
+                "title": "अलार्म पैनल चुनें",
+                "data": {
+                    "alarm_panel": "प्रबंधित करने के लिए अलार्म कंट्रोल पैनल"
+                }
+            },
+            "calendars": {
+                "title": "कैलेंडर चुनें",
+                "data": {
+                    "calendar_entities": "आर्मिंग शेड्यूल के लिए उपयोग किए जाने वाले कैलेंडर"
+                }
+            },
+            "persons": {
+                "title": "व्यक्ति चुनें",
+                "data": {
+                    "person_entities": "उपस्थिति आधारित आर्मिंग के लिए लोग"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "AutoArm पहले से ही कॉन्फ़िगर है"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Auto Arm विकल्प",
+                "data": {
+                    "alarm_panel": "प्रबंधित करने के लिए अलार्म कंट्रोल पैनल",
+                    "calendar_entities": "आर्मिंग शेड्यूल के लिए उपयोग किए जाने वाले कैलेंडर",
+                    "person_entities": "उपस्थिति आधारित आर्मिंग के लिए लोग",
+                    "occupancy_default_day": "दिन में उपस्थित होने पर डिफ़ॉल्ट आर्मिंग स्थिति",
+                    "occupancy_default_night": "रात में उपस्थित होने पर डिफ़ॉल्ट आर्मिंग स्थिति",
+                    "no_event_mode": "कैलेंडर इवेंट समाप्त होने पर आर्मिंग स्थिति"
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "कैलेंडर द्वारा उपस्थिति ओवरराइड",
+                        "data": {
+                            "calendar_occupancy_override_states": "वे स्थितियाँ जिन्हें उपस्थिति ओवरराइड कर सकती है"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "जब कोई कैलेंडर इवेंट इनमें से कोई स्थिति सेट करता है, तो उपस्थिति में बदलाव (आगमन और प्रस्थान) फिर भी अलार्म की स्थिति को अपडेट कर सकते हैं। उदाहरण के लिए, यदि कैलेंडर Disarmed दिखाता है लेकिन सभी चले जाते हैं, तो यह Armed Away में बदल जाएगा।"
+                        }
+                    },
+                    "notify_options": {
+                        "name": "सूचनाएं",
+                        "data": {
+                            "notify_enabled": "सूचनाएं सक्षम",
+                            "notify_action": "सूचना क्रिया",
+                            "notify_targets": "सूचना लक्ष्य"
+                        },
+                        "data_description": {
+                            "notify_enabled": "अलार्म स्थिति परिवर्तन के लिए सूचनाएं सक्षम करें",
+                            "notify_action": "सूचित करने के लिए उपयोग की जाने वाली Home Assistant क्रिया (सेवा)",
+                            "notify_targets": "सूचित करने के लिए पतों या सूचना इकाइयों की सूची; Supernotify के लिए खाली छोड़ा जा सकता है"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "सूर्योदय प्रतिबंध",
+                        "data": {
+                            "sunrise_earliest": "सबसे जल्दी",
+                            "sunrise_latest": "सबसे देर"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "सूर्योदय इस समय से पहले नहीं",
+                            "sunrise_latest": "सूर्योदय इस समय के बाद नहीं"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "सूर्यास्त प्रतिबंध",
+                        "data": {
+                            "sunset_earliest": "सबसे जल्दी",
+                            "sunset_latest": "सबसे देर"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "सूर्यास्त इस समय से पहले नहीं",
+                            "sunset_latest": "सूर्यास्त इस समय के बाद नहीं"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "services": {
+        "reload": {
+            "name": "पुनः लोड करें",
+            "description": "autoarm कॉन्फ़िगरेशन को पुनः लोड करता है।"
+        }
+    },
+    "issues": {
+        "transition_condition": {
+            "title": "अमान्य ट्रांज़िशन शर्त",
+            "description": "{state} के लिए ट्रांज़िशन शर्त एक त्रुटि ({error}) के साथ मान्य नहीं हो सकी"
+        },
+        "yaml_core_config_deprecated": {
+            "title": "YAML मुख्य कॉन्फ़िगरेशन अप्रचलित है",
+            "description": "मुख्य AutoArm सेटिंग्स (alarm_panel, occupancy, calendars) को UI कॉन्फ़िगरेशन एंट्री में स्थानांतरित कर दिया गया है। इन्हें अपने YAML कॉन्फ़िगरेशन से हटाएं और इन्हें प्रबंधित करने के लिए UI का उपयोग करें। उन्नत सेटिंग्स (transitions, buttons, notify, diurnal, rate_limit) YAML में बनी रह सकती हैं।"
+        }
+    }
+}

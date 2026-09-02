@@ -30,6 +30,7 @@
             "init": {
                 "title": "AutoArm オプション",
                 "data": {
+                    "alarm_panel": "管理するアラームコントロールパネル",
                     "calendar_entities": "警戒スケジュールに使用するカレンダー",
                     "person_entities": "在室ベースの警戒に使用する人物",
                     "occupancy_default_day": "日中在室時のデフォルト警戒状態",

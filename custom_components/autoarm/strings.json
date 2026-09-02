@@ -30,6 +30,7 @@
             "init": {
                 "title": "Auto Arm Options",
                 "data": {
+                    "alarm_panel": "Alarm Control Panel to manage",
                     "calendar_entities": "Calendars to use for arming schedules",
                     "person_entities": "People for occupancy based arming",
                     "occupancy_default_day": "Default arming state when occupied during day",

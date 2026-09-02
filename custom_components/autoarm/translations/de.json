@@ -30,6 +30,7 @@
             "init": {
                 "title": "AutoArm-Optionen",
                 "data": {
+                    "alarm_panel": "Zu verwaltende Alarmzentrale",
                     "calendar_entities": "Kalender für die Scharf-Zeitplanung",
                     "person_entities": "Personen für die belegungsbasierte Scharfschaltung",
                     "occupancy_default_day": "Standard-Scharmodus bei Belegung tagsüber",

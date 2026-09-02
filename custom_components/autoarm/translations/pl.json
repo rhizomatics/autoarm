@@ -1,0 +1,105 @@
+{
+    "title": "AutoArm",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Wybierz panel alarmowy",
+                "data": {
+                    "alarm_panel": "Panel kontroli alarmu do zarządzania"
+                }
+            },
+            "calendars": {
+                "title": "Wybierz kalendarze",
+                "data": {
+                    "calendar_entities": "Kalendarze używane do harmonogramów uzbrajania"
+                }
+            },
+            "persons": {
+                "title": "Wybierz osoby",
+                "data": {
+                    "person_entities": "Osoby do uzbrajania na podstawie obecności"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "AutoArm jest już skonfigurowany"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Opcje Auto Arm",
+                "data": {
+                    "alarm_panel": "Panel kontroli alarmu do zarządzania",
+                    "calendar_entities": "Kalendarze używane do harmonogramów uzbrajania",
+                    "person_entities": "Osoby do uzbrajania na podstawie obecności",
+                    "occupancy_default_day": "Domyślny stan uzbrojenia przy obecności w ciągu dnia",
+                    "occupancy_default_night": "Domyślny stan uzbrojenia przy obecności w nocy",
+                    "no_event_mode": "Stan uzbrojenia po zakończeniu wydarzenia w kalendarzu"
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "Nadpisanie obecności przez kalendarz",
+                        "data": {
+                            "calendar_occupancy_override_states": "Stany, które obecność może nadpisać"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "Gdy wydarzenie w kalendarzu ustawia jeden z tych stanów, zmiany obecności (przyjazdy i wyjazdy) nadal mogą aktualizować stan alarmu. Na przykład, jeśli kalendarz wskazuje Rozbrojony, ale wszyscy wyjdą, stan zmieni się na Uzbrojony poza domem."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Powiadomienia",
+                        "data": {
+                            "notify_enabled": "Powiadomienia włączone",
+                            "notify_action": "Akcja powiadomienia",
+                            "notify_targets": "Odbiorcy powiadomień"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Włącz powiadomienia o zmianach stanu alarmu",
+                            "notify_action": "Akcja (usługa) Home Assistant używana do powiadamiania",
+                            "notify_targets": "Lista adresów lub encji powiadomień do powiadomienia; można pozostawić puste dla Supernotify"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "Ograniczenia wschodu słońca",
+                        "data": {
+                            "sunrise_earliest": "Najwcześniej",
+                            "sunrise_latest": "Najpóźniej"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "Wschód słońca nie wcześniej niż o tej godzinie",
+                            "sunrise_latest": "Wschód słońca nie później niż o tej godzinie"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "Ograniczenia zachodu słońca",
+                        "data": {
+                            "sunset_earliest": "Najwcześniej",
+                            "sunset_latest": "Najpóźniej"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "Zachód słońca nie wcześniej niż o tej godzinie",
+                            "sunset_latest": "Zachód słońca nie później niż o tej godzinie"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "services": {
+        "reload": {
+            "name": "Przeładuj",
+            "description": "Przeładowuje konfigurację autoarm."
+        }
+    },
+    "issues": {
+        "transition_condition": {
+            "title": "Nieprawidłowy warunek przejścia",
+            "description": "Warunek przejścia dla {state} nie przeszedł walidacji z powodu błędu ({error})"
+        },
+        "yaml_core_config_deprecated": {
+            "title": "Podstawowa konfiguracja YAML jest przestarzała",
+            "description": "Podstawowe ustawienia AutoArm (alarm_panel, occupancy, calendars) zostały przeniesione do wpisu konfiguracyjnego interfejsu. Usuń je z konfiguracji YAML i zarządzaj nimi za pomocą interfejsu. Ustawienia zaawansowane (transitions, buttons, notify, diurnal, rate_limit) mogą pozostać w YAML."
+        }
+    }
+}

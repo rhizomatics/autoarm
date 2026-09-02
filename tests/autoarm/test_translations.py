@@ -8,7 +8,7 @@ import pytest
 
 STRINGS_PATH = Path("custom_components/autoarm/strings.json")
 TRANSLATIONS_DIR = Path("custom_components/autoarm/translations")
-EXPECTED_LOCALES = {"en", "de", "fr", "it", "ja"}
+EXPECTED_LOCALES = {"en", "de", "fr", "it", "ja", "es", "hi", "nl", "pl", "pt", "zh-Hans"}
 
 
 def _key_paths(obj: object, prefix: str = "") -> set[str]:
@@ -20,6 +20,25 @@ def _key_paths(obj: object, prefix: str = "") -> set[str]:
         child = f"{prefix}.{key}" if prefix else key
         paths |= _key_paths(value, child)
     return paths
+
+
+def _leaf_values(obj: object, prefix: str = "") -> dict[str, Any]:
+    """Recursively collect {key path: leaf value} for a nested dict."""
+    if not isinstance(obj, dict):
+        return {prefix: obj}
+    values: dict[str, Any] = {}
+    for key, value in obj.items():
+        child = f"{prefix}.{key}" if prefix else key
+        values.update(_leaf_values(value, child))
+    return values
+
+
+# Key paths where identical text across locales is expected, either because the term is a
+# brand name (never translated) or a genuine cognate in that specific language.
+GLOBAL_UNTRANSLATED_PATHS = {"title"}
+LOCALE_COGNATE_PATHS: dict[str, set[str]] = {
+    "fr": {"options.step.init.sections.notify_options.name"},
+}
 
 
 @pytest.fixture(scope="module")
@@ -52,3 +71,19 @@ def test_translation_keys_match_strings(locale: str, strings: dict[str, Any], tr
 
     assert not missing, f"{locale}.json is missing keys: {sorted(missing)}"
     assert not extra, f"{locale}.json has extra keys not in strings.json: {sorted(extra)}"
+
+
+@pytest.mark.parametrize("locale", sorted(EXPECTED_LOCALES - {"en"}))
+def test_translations_differ_from_english(locale: str, translations: dict[str, dict[str, Any]]) -> None:
+    """Non-English translations should actually be translated, not copied from English."""
+    en_values = _leaf_values(translations["en"])
+    locale_values = _leaf_values(translations[locale])
+    allowed = GLOBAL_UNTRANSLATED_PATHS | LOCALE_COGNATE_PATHS.get(locale, set())
+
+    untranslated = {
+        path: value
+        for path, value in locale_values.items()
+        if path not in allowed and path in en_values and value == en_values[path]
+    }
+
+    assert not untranslated, f"{locale}.json has untranslated text copied from English: {untranslated}"

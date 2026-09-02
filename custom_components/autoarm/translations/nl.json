@@ -1,0 +1,105 @@
+{
+    "title": "AutoArm",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Alarmpaneel selecteren",
+                "data": {
+                    "alarm_panel": "Te beheren alarmcentrale"
+                }
+            },
+            "calendars": {
+                "title": "Agenda's selecteren",
+                "data": {
+                    "calendar_entities": "Agenda's om te gebruiken voor inschakelschema's"
+                }
+            },
+            "persons": {
+                "title": "Personen selecteren",
+                "data": {
+                    "person_entities": "Personen voor aanwezigheid-gebaseerd inschakelen"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "AutoArm is al geconfigureerd"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Auto Arm-opties",
+                "data": {
+                    "alarm_panel": "Te beheren alarmcentrale",
+                    "calendar_entities": "Agenda's om te gebruiken voor inschakelschema's",
+                    "person_entities": "Personen voor aanwezigheid-gebaseerd inschakelen",
+                    "occupancy_default_day": "Standaard inschakelstatus bij aanwezigheid overdag",
+                    "occupancy_default_night": "Standaard inschakelstatus bij aanwezigheid 's nachts",
+                    "no_event_mode": "Inschakelstatus wanneer een agenda-item eindigt"
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "Aanwezigheid-override via agenda",
+                        "data": {
+                            "calendar_occupancy_override_states": "Statussen die aanwezigheid mag overschrijven"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "Wanneer een agenda-item een van deze statussen instelt, kunnen aanwezigheidswijzigingen (aankomsten en vertrekken) de alarmstatus nog steeds bijwerken. Als de agenda bijvoorbeeld Uitgeschakeld aangeeft maar iedereen vertrekt, schakelt het over naar Ingeschakeld Afwezig."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Meldingen",
+                        "data": {
+                            "notify_enabled": "Meldingen ingeschakeld",
+                            "notify_action": "Meldingsactie",
+                            "notify_targets": "Meldingsdoelen"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Meldingen inschakelen bij wijzigingen van de alarmstatus",
+                            "notify_action": "Home Assistant-actie (service) om mee te melden",
+                            "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden; kan leeg blijven voor Supernotify"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "Zonsopgangbeperkingen",
+                        "data": {
+                            "sunrise_earliest": "Vroegst",
+                            "sunrise_latest": "Laatst"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "Zonsopgang niet eerder dan dit tijdstip",
+                            "sunrise_latest": "Zonsopgang niet later dan dit tijdstip"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "Zonsondergangbeperkingen",
+                        "data": {
+                            "sunset_earliest": "Vroegst",
+                            "sunset_latest": "Laatst"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "Zonsondergang niet eerder dan dit tijdstip",
+                            "sunset_latest": "Zonsondergang niet later dan dit tijdstip"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "services": {
+        "reload": {
+            "name": "Herladen",
+            "description": "Herlaadt de autoarm-configuratie."
+        }
+    },
+    "issues": {
+        "transition_condition": {
+            "title": "Ongeldige overgangsvoorwaarde",
+            "description": "Overgangsvoorwaarde voor {state} kon niet worden gevalideerd door een fout ({error})"
+        },
+        "yaml_core_config_deprecated": {
+            "title": "YAML-kernconfiguratie is verouderd",
+            "description": "De kerninstellingen van AutoArm (alarm_panel, occupancy, calendars) zijn gemigreerd naar de UI-configuratie-item. Verwijder deze uit uw YAML-configuratie en gebruik de UI om ze te beheren. Geavanceerde instellingen (transitions, buttons, notify, diurnal, rate_limit) kunnen in YAML blijven staan."
+        }
+    }
+}

@@ -1,0 +1,105 @@
+{
+    "title": "AutoArm",
+    "config": {
+        "step": {
+            "user": {
+                "title": "选择警报面板",
+                "data": {
+                    "alarm_panel": "要管理的警报控制面板"
+                }
+            },
+            "calendars": {
+                "title": "选择日历",
+                "data": {
+                    "calendar_entities": "用于布防计划的日历"
+                }
+            },
+            "persons": {
+                "title": "选择人员",
+                "data": {
+                    "person_entities": "用于基于在家状态布防的人员"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "AutoArm 已配置"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Auto Arm 选项",
+                "data": {
+                    "alarm_panel": "要管理的警报控制面板",
+                    "calendar_entities": "用于布防计划的日历",
+                    "person_entities": "用于基于在家状态布防的人员",
+                    "occupancy_default_day": "白天有人在家时的默认布防状态",
+                    "occupancy_default_night": "夜间有人在家时的默认布防状态",
+                    "no_event_mode": "日历事件结束时的布防状态"
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "日历对在家状态的覆盖",
+                        "data": {
+                            "calendar_occupancy_override_states": "在家状态可以覆盖的状态"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。"
+                        }
+                    },
+                    "notify_options": {
+                        "name": "通知",
+                        "data": {
+                            "notify_enabled": "启用通知",
+                            "notify_action": "通知操作",
+                            "notify_targets": "通知目标"
+                        },
+                        "data_description": {
+                            "notify_enabled": "在警报状态发生变化时启用通知",
+                            "notify_action": "用于发送通知的 Home Assistant 操作（服务）",
+                            "notify_targets": "要通知的地址或通知实体列表；如使用 Supernotify 可留空"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "日出限制",
+                        "data": {
+                            "sunrise_earliest": "最早",
+                            "sunrise_latest": "最晚"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "日出不早于此时间",
+                            "sunrise_latest": "日出不晚于此时间"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "日落限制",
+                        "data": {
+                            "sunset_earliest": "最早",
+                            "sunset_latest": "最晚"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "日落不早于此时间",
+                            "sunset_latest": "日落不晚于此时间"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "services": {
+        "reload": {
+            "name": "重新加载",
+            "description": "重新加载 autoarm 配置。"
+        }
+    },
+    "issues": {
+        "transition_condition": {
+            "title": "无效的转换条件",
+            "description": "{state} 的转换条件验证失败，出现错误（{error}）"
+        },
+        "yaml_core_config_deprecated": {
+            "title": "YAML 核心配置已弃用",
+            "description": "AutoArm 的核心设置（alarm_panel、occupancy、calendars）已迁移到 UI 配置项。请从您的 YAML 配置中删除这些设置，并使用 UI 进行管理。高级设置（transitions、buttons、notify、diurnal、rate_limit）可以保留在 YAML 中。"
+        }
+    }
+}

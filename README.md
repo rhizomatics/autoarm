@@ -23,7 +23,7 @@
 Automate the arming and disarming of the built-in Home Assistant [Alarm
 Control Panel Integrations][], with additional support for calendar integration, occupancy-driven arming and disarming, manual override via remote control buttons, and mobile push actionable notifications.
 
-Calendar, occupancy and diurnal scheduling available with **zero YAML**, everything configured from the Home Assistant settings. Advanced configuration for physical buttons, and fine-tuning for other scheduling, available from optional YAML configuration.
+Calendar, occupancy and diurnal scheduling available with **zero YAML**, support for 11 languages, and everything configured from the Home Assistant settings. Advanced configuration for physical buttons, and fine-tuning for other scheduling, available from optional YAML configuration.
 
 !!! question inline end "Why use alarm control panels?"
     A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful, even if there is no real alarm system, as a **single central state of the home**, and then use that to drive automations, notifications etc rather than littering notifications with checks for presence, time of day, vacations or similar.
@@ -37,7 +37,7 @@ Calendar, occupancy and diurnal scheduling available with **zero YAML**, everyth
 
 ## Setup
 
-AutoArm is one of the default repositories on [HACS][], so there's no need to register  a custom repo.
+AutoArm is one of the default repositories on [HACS][], so there's no need to register a custom repo.
 
 Notifications will work with any HomeAssistant notification implementation, with additional support for [Supernotify](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
 
