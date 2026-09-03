@@ -216,6 +216,9 @@ async def test_startup_defers_to_sunset_earliest(hass: HomeAssistant, night: Non
         occupancy={"entity_id": ["person.tester_bob"]},
         sunset_earliest=future_earliest,
     )
+    # Override so the defer branch is taken regardless of the actual clock
+    # hour (test may run in the AM, when _has_sunset_passed_today = False).
+    autoarmer._has_sunset_passed_today = lambda now: True  # type: ignore[method-assign]
     await autoarmer.initialize()
     # Should not have armed immediately — deferred to sunset_earliest
     assert autoarmer.armed_state() == AlarmControlPanelState.DISARMED
