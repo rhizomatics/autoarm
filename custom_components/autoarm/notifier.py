@@ -106,7 +106,7 @@ class Notifier:
                 service_data: dict[str, Any] = {"message": message, "title": title}
                 if data and notify_action != "notify.send_message":
                     # new notify entities can't handle nested data section
-                    service_data["data"]=data
+                    service_data["data"] = data
                 domain, action = notify_action.split(".", 1)
                 target: dict[str, Any] | None = None
                 if notify_targets:
@@ -126,7 +126,7 @@ class Notifier:
                         target=target,
                     )
                 except Exception as e:
-                    _LOGGER.error("AUTOARM notify failure, %s.%s: %s [%s]",domain,action,service_data,e)
+                    _LOGGER.error("AUTOARM notify failure, %s.%s: %s [%s]", domain, action, service_data, e)
                     raise
             else:
                 _LOGGER.debug("AUTOARM Skipped notification, service: %s, data: %s", self.notify_action, merged_profile)
