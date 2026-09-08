@@ -3,6 +3,7 @@
 ## 1.1.5
 - Fixed compatibility issues with `notify.send_message` new style notifications
 - Move documentation site build to *properdocs*
+- Built and tested against Home Assistant 2026.9.1
 
 ## 1.1.4
 - Show **Alarm Control Panel** entity in config UI, and allow it to be changed
