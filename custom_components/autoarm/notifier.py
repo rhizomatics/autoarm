@@ -103,19 +103,27 @@ class Notifier:
                     message = "Alarm control panel operation complete"
 
             if notify_action and merged_profile:
-                service_data: dict[str, Any] = {"message": message, "title": title, "data": data}
-                if notify_targets:
-                    service_data["target"] = notify_targets
+                service_data: dict[str, Any] = {"message": message, "title": title}
+                if data and notify_action != "notify.send_message":
+                    # new notify entities can't handle nested data section
+                    service_data["data"]=data
                 domain, action = notify_action.split(".", 1)
-                if "data" in service_data and not service_data["data"]:
-                    # remove an empty data dict that can upset schema check
-                    del service_data["data"]
-                _LOGGER.debug("AUTOARM Notifying %s.%s with %s", domain, action, service_data)
+                target: dict[str, Any] | None = None
+                if notify_targets:
+                    if domain == "notify" and action == "send_message":
+                        # notify.send_message is entity-based and targets via entity_id,
+                        # not a "target" key in service_data like legacy notify services
+                        target = {"entity_id": notify_targets}
+                    else:
+                        service_data["target"] = notify_targets
+
+                _LOGGER.debug("AUTOARM Notifying %s.%s with %s target=%s", domain, action, service_data, target)
                 try:
                     await self.hass.services.async_call(
                         domain,
                         action,
                         service_data=service_data,
+                        target=target,
                     )
                 except Exception as e:
                     _LOGGER.error("AUTOARM notify failure, %s.%s: %s [%s]",domain,action,service_data,e)

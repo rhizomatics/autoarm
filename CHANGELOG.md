@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.1.5
-- Prune empty `data` dicts for notifications
+- Fixed compatibility issues with `notify.send_message` new style notifications
 - Move documentation site build to *properdocs*
 
 ## 1.1.4

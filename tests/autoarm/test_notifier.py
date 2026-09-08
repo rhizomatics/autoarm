@@ -603,6 +603,29 @@ async def test_notify_includes_targets_in_service_data(hass: HomeAssistant) -> N
     assert calls[0]["data"]["target"] == ["device.abc123"]
 
 
+async def test_notify_send_message_uses_entity_id_target(hass: HomeAssistant) -> None:
+    """Test that notify.send_message targets via entity_id, not a 'target' data key."""
+    notifier = Notifier(
+        {"backstop": {}},
+        hass,
+        Mock(spec=AppHealthTracker),
+        notify_action="notify.send_message",
+        notify_targets=["notify.mobile_app_test"],
+    )
+    calls: list[dict[str, Any]] = []
+
+    @callback
+    def mock_handler(call: ServiceCall) -> None:
+        calls.append({"service": call.service, "data": dict(call.data)})
+
+    hass.services.async_register("notify", "send_message", mock_handler)
+    await notifier.notify(ChangeSource.BUTTON, message="Target test")
+
+    assert len(calls) == 1
+    assert calls[0]["data"]["entity_id"] == ["notify.mobile_app_test"]
+    assert "target" not in calls[0]["data"]
+
+
 async def test_notify_skipped_when_action_is_empty_string(hass: HomeAssistant) -> None:
     """Test that notification hits else branch when notify_action is empty string."""
     notifier = Notifier({"backstop": {}}, hass, Mock(spec=AppHealthTracker), notify_action="")
