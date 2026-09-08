@@ -6,9 +6,10 @@ dynamic = ["version"]
 requires-python = ">=3.13.2"
 
 dependencies = [
-    "homeassistant>=2026.3.0; python_full_version >= '3.14.2'",
+    "homeassistant>=2026.9.1; python_full_version >= '3.14.2'",
     "homeassistant>=2025.10.4,<2026.3.0; python_full_version < '3.14.2'",
     "ical",
+    "properdocs",
 ]
 
 [dependency-groups]
@@ -37,7 +38,7 @@ docs=[
     "mkdocs-autorefs",
     "mkdocs-coverage",
     "mkdocs-pagetree-plugin",
-    "mkdocs<2.0.0",
+    "properdocs",
     "pngquant",
     "mkdocstrings",
     "mkdocstrings-python",

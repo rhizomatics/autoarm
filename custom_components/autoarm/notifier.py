@@ -107,12 +107,19 @@ class Notifier:
                 if notify_targets:
                     service_data["target"] = notify_targets
                 domain, action = notify_action.split(".", 1)
+                if "data" in service_data and not service_data["data"]:
+                    # remove an empty data dict that can upset schema check
+                    del service_data["data"]
                 _LOGGER.debug("AUTOARM Notifying %s.%s with %s", domain, action, service_data)
-                await self.hass.services.async_call(
-                    domain,
-                    action,
-                    service_data=service_data,
-                )
+                try:
+                    await self.hass.services.async_call(
+                        domain,
+                        action,
+                        service_data=service_data,
+                    )
+                except Exception as e:
+                    _LOGGER.error("AUTOARM notify failure, %s.%s: %s [%s]",domain,action,service_data,e)
+                    raise
             else:
                 _LOGGER.debug("AUTOARM Skipped notification, service: %s, data: %s", self.notify_action, merged_profile)
 
