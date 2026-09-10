@@ -519,9 +519,7 @@ class AlarmArmer:
         now = dt_util.now()
         if self.is_night() and self.sunset_earliest and now.time() < self.sunset_earliest:
             if self._has_sunset_passed_today(now):
-                _LOGGER.info(
-                    "AUTOARM Deferring startup reset to sunset earliest: %s", self.sunset_earliest
-                )
+                _LOGGER.info("AUTOARM Deferring startup reset to sunset earliest: %s", self.sunset_earliest)
                 self.schedule_state(
                     dt.datetime.combine(now.date(), self.sunset_earliest, tzinfo=now.tzinfo),
                     intervention=None,
@@ -532,9 +530,7 @@ class AlarmArmer:
                 return
         elif not self.is_night() and self.sunrise_earliest and now.time() < self.sunrise_earliest:
             if self._has_sunrise_occurred_today(now):
-                _LOGGER.info(
-                    "AUTOARM Deferring startup reset to sunrise earliest: %s", self.sunrise_earliest
-                )
+                _LOGGER.info("AUTOARM Deferring startup reset to sunrise earliest: %s", self.sunrise_earliest)
                 self.schedule_state(
                     dt.datetime.combine(now.date(), self.sunrise_earliest, tzinfo=now.tzinfo),
                     intervention=None,
