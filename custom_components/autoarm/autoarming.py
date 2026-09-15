@@ -1055,37 +1055,29 @@ class AlarmArmer:
                             blocking=True,
                         )
                     except Exception:
-                        _LOGGER.debug(
-                            "AUTOARM Service %s unavailable, falling back to direct state set",
-                            service_name,
+                        # Do NOT fall back to direct state set for Alarmo;
+                        # bypassing alarmo leaves a stale state-machine entry
+                        # on master_alarm that prevents Alarmo from re-registering
+                        # the entity correctly on the next reload (causes _2 shadow).
+                        _LOGGER.warning(
+                            "AUTOARM Alarmo service %s failed for %s (source=%s);"
+                            " NOT setting state directly to avoid breaking Alarmo",
+                            service_name, self.alarm_panel, source,
                         )
-                        attrs: dict[str, str] = {}
-                        if panel_state:
-                            attrs.update(panel_state.attributes)
-                        attrs[ATTR_CHANGED_BY] = f"{DOMAIN}.{source}"
-                        self.hass.states.async_set(
-                            entity_id=self.alarm_panel,
-                            new_state=str(arming_state),
-                            attributes=attrs,
-                        )
+                        return None
                     finally:
                         self._arming_via_service = False
                     # If the service call didn't actually change the state
-                    # (silent failure), fall back to direct state manipulation.
+                    # (silent failure), skip. Direct state set on alarmo would
+                    # leave stale state entries that break the entity registry on
+                    # the next reload (see exception branch above).
                     if self.armed_state() != arming_state:
-                        _LOGGER.debug(
-                            "AUTOARM Service %s did not change state, falling back to direct set",
-                            service_name,
+                        _LOGGER.warning(
+                            "AUTOARM Alarmo service %s did not change state for %s"
+                            " (source=%s); leaving alarmo to handle state",
+                            service_name, self.alarm_panel, source,
                         )
-                        attrs = {}
-                        if panel_state:
-                            attrs.update(panel_state.attributes)
-                        attrs[ATTR_CHANGED_BY] = f"{DOMAIN}.{source}"
-                        self.hass.states.async_set(
-                            entity_id=self.alarm_panel,
-                            new_state=str(arming_state),
-                            attributes=attrs,
-                        )
+                        return None
                 else:
                     # Not Alarmo or non-standard state (e.g. PENDING) —
                     # set the state directly.
