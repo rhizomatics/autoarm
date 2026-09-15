@@ -212,7 +212,8 @@ async def test_startup_defers_to_sunset_earliest(hass: HomeAssistant, night: Non
     await hass.async_block_till_done()
     future_earliest = (dt_util.now() + dt.timedelta(seconds=2)).time()
     autoarmer = AlarmArmer(
-        hass, TEST_PANEL,
+        hass,
+        TEST_PANEL,
         occupancy={"entity_id": ["person.tester_bob"]},
         sunset_earliest=future_earliest,
     )

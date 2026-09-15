@@ -519,9 +519,7 @@ class AlarmArmer:
         now = dt_util.now()
         if self.is_night() and self.sunset_earliest and now.time() < self.sunset_earliest:
             if self._has_sunset_passed_today(now):
-                _LOGGER.info(
-                    "AUTOARM Deferring startup reset to sunset earliest: %s", self.sunset_earliest
-                )
+                _LOGGER.info("AUTOARM Deferring startup reset to sunset earliest: %s", self.sunset_earliest)
                 self.schedule_state(
                     dt.datetime.combine(now.date(), self.sunset_earliest, tzinfo=now.tzinfo),
                     intervention=None,
@@ -532,9 +530,7 @@ class AlarmArmer:
                 return
         elif not self.is_night() and self.sunrise_earliest and now.time() < self.sunrise_earliest:
             if self._has_sunrise_occurred_today(now):
-                _LOGGER.info(
-                    "AUTOARM Deferring startup reset to sunrise earliest: %s", self.sunrise_earliest
-                )
+                _LOGGER.info("AUTOARM Deferring startup reset to sunrise earliest: %s", self.sunrise_earliest)
                 self.schedule_state(
                     dt.datetime.combine(now.date(), self.sunrise_earliest, tzinfo=now.tzinfo),
                     intervention=None,
@@ -1062,7 +1058,9 @@ class AlarmArmer:
                         _LOGGER.warning(
                             "AUTOARM Alarmo service %s failed for %s (source=%s);"
                             " NOT setting state directly to avoid breaking Alarmo",
-                            service_name, self.alarm_panel, source,
+                            service_name,
+                            self.alarm_panel,
+                            source,
                         )
                         return None
                     finally:
@@ -1073,9 +1071,10 @@ class AlarmArmer:
                     # the next reload (see exception branch above).
                     if self.armed_state() != arming_state:
                         _LOGGER.warning(
-                            "AUTOARM Alarmo service %s did not change state for %s"
-                            " (source=%s); leaving alarmo to handle state",
-                            service_name, self.alarm_panel, source,
+                            "AUTOARM Alarmo service %s did not change state for %s (source=%s); leaving alarmo to handle state",
+                            service_name,
+                            self.alarm_panel,
+                            source,
                         )
                         return None
                 else:
