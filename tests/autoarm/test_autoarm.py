@@ -76,6 +76,34 @@ async def test_on_sunset(autoarmer: AlarmArmer) -> None:
     assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
 
 
+async def test_on_sunset_with_earliest_constraint(
+    autoarmer: AlarmArmer,
+    hass: HomeAssistant,
+) -> None:
+    """Sunset fires but earliest constraint hasn't been met — deferred arm later fires."""
+    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    await hass.async_block_till_done()
+    autoarmer.sunset_earliest = (dt_util.now() + dt.timedelta(seconds=2)).time()
+    autoarmer.interventions = []
+    await autoarmer.on_sunset()
+    await hass.async_block_till_done()
+    await asyncio.sleep(2)
+    assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
+
+
+async def test_on_sunset_with_earliest_constraint_already_met(
+    autoarmer: AlarmArmer,
+    hass: HomeAssistant,
+) -> None:
+    """Sunset fires and earliest constraint is already past — arms immediately."""
+    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    await hass.async_block_till_done()
+    autoarmer.sunset_earliest = (dt_util.now() - dt.timedelta(seconds=1)).time()
+    autoarmer.interventions = []
+    await autoarmer.on_sunset()
+    assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
+
+
 async def test_on_sunrise(autoarmer: AlarmArmer) -> None:
     await autoarmer.arm(AlarmControlPanelState.PENDING)
     assert autoarmer.armed_state() == AlarmControlPanelState.PENDING
@@ -83,13 +111,14 @@ async def test_on_sunrise(autoarmer: AlarmArmer) -> None:
     assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
 
 
-async def test_on_sunrise_with_cutoff_active_no_interventions(
+async def test_on_sunrise_with_earliest_active_no_interventions(
     autoarmer: AlarmArmer,
     hass: HomeAssistant,
 ) -> None:
+    """Sunrise fires but earliest constraint hasn't been met yet — deferred arm later fires."""
     await autoarmer.arm(AlarmControlPanelState.PENDING)
     await hass.async_block_till_done()
-    autoarmer.sunrise_cutoff = (dt_util.now() + dt.timedelta(seconds=2)).time()  # type: ignore[attr-defined]
+    autoarmer.sunrise_earliest = (dt_util.now() + dt.timedelta(seconds=2)).time()
     autoarmer.interventions = []
     await autoarmer.on_sunrise()
     await hass.async_block_till_done()
@@ -98,12 +127,13 @@ async def test_on_sunrise_with_cutoff_active_no_interventions(
     assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
 
 
-async def test_on_sunrise_with_intervention_before_cutoff(
+async def test_on_sunrise_with_intervention_before_earliest(
     autoarmer: AlarmArmer,
     hass: HomeAssistant,
 ) -> None:
+    """Deferred sunrise arm is cancelled by manual intervention."""
     await autoarmer.arm(AlarmControlPanelState.ARMED_AWAY)
-    autoarmer.sunrise_cutoff = (dt_util.now() + dt.timedelta(seconds=2)).time()  # type: ignore[attr-defined]
+    autoarmer.sunrise_earliest = (dt_util.now() + dt.timedelta(seconds=2)).time()
     await autoarmer.on_sunrise()
     hass.states.async_set(TEST_PANEL, "pending")
     await hass.async_block_till_done()
@@ -174,6 +204,29 @@ async def test_reset_armed_state_uses_daytime_default(hass: HomeAssistant) -> No
     hass.states.async_set(TEST_PANEL, "unknown")
     await hass.async_block_till_done()
     assert await autoarmer.reset_armed_state() == "disarmed"
+
+
+async def test_startup_defers_to_sunset_earliest(hass: HomeAssistant, night: None) -> None:
+    """Integration startup during nighttime before sunset_earliest defers the arm."""
+    hass.states.async_set(TEST_PANEL, "disarmed")
+    await hass.async_block_till_done()
+    future_earliest = (dt_util.now() + dt.timedelta(seconds=2)).time()
+    autoarmer = AlarmArmer(
+        hass,
+        TEST_PANEL,
+        occupancy={"entity_id": ["person.tester_bob"]},
+        sunset_earliest=future_earliest,
+    )
+    # Override so the defer branch is taken regardless of the actual clock
+    # hour (test may run in the AM, when _has_sunset_passed_today = False).
+    autoarmer._has_sunset_passed_today = lambda now: True  # type: ignore[method-assign]
+    await autoarmer.initialize()
+    # Should not have armed immediately — deferred to sunset_earliest
+    assert autoarmer.armed_state() == AlarmControlPanelState.DISARMED
+    await asyncio.sleep(2)
+    # After the deferred time, should have armed
+    assert autoarmer.armed_state() != AlarmControlPanelState.DISARMED
+    autoarmer.shutdown()
 
 
 async def test_housekeeping_prunes_calendar_events(hass: HomeAssistant, local_calendar: CalendarEntity) -> None:
