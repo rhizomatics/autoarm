@@ -10,7 +10,7 @@ With the config flow, some settings are now managed in the UI:
 |---------|-------|-------|
 | Alarm panel entity | UI (setup) | Selected when adding the integration |
 | Change state using panel actions | UI (options) | For panels like Alarmo, see [Create Panel](../create_panel.md) |
-| Built-in agent sentences | UI (options) | Voice and chat commands, see [Automated Arming](../../automated_arming.md#built-in-agent-sentences) |
+| Arm and explain by voice, Disarm by voice | UI (options) | Voice and chat commands, see [Automated Arming](../../automated_arming.md#built-in-agent-sentences) |
 | Calendar entities | UI (options) | Which calendars to use |
 | Person entities | UI (options) | Which persons to track for occupancy |
 | Occupancy day/night defaults | UI (options) | Default alarm state when occupied |

@@ -9,6 +9,7 @@
 - The **Notification Action** chosen in the options is now used rather than the YAML default, and notifications work without any YAML
 - Assist, the native voice and chat agent for Home Assistant, can now be used to arm and disarm the panel, and get an explanation for the current armed state.
   - This is non-AI, so conversation flexibility is limited, however doesn't require any AI subscription or local service.
+  - Arming and explaining are on by default. Disarming by voice is off by default, since no code is asked for, and can be switched on in the options
   - Using speech-to-text requires a Nabu Casa subscription, or use of the on device STS if app and device support it
 ## 1.1.5
 - Fixed compatibility issues with `notify.send_message` new style notifications
