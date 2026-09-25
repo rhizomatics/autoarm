@@ -240,7 +240,7 @@ async def test_setup_entry_raises_not_ready_on_failure(
 
 
 async def test_arm_fires_autoarming_event(hass: HomeAssistant, mock_notify: Any) -> None:
-    hass.states.async_set("alarm_panel.testing", "disarmed")
+    hass.states.async_set("alarm_panel.testing", "armed_home")
     hass.states.async_set("person.house_owner", "home")
     hass.states.async_set("person.tenant", "home")
     hass.states.async_set("sun.sun", "above_horizon")
