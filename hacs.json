@@ -1,5 +1,7 @@
 {
     "name": "AutoArm",
     "homeassistant": "2025.10.4",
-    "render_readme": true
+    "render_readme": true,
+    "zip_release": true,
+    "filename": "autoarm.zip"
 }
