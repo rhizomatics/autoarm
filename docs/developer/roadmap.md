@@ -96,3 +96,14 @@ Companion App, or a device registered on the wrong account.
 #### Recommendation
 
 Start with A, adding a picker of Companion App devices to a collapsed **Occupancy Tuning** section. Add E as the way out for other trackers or wrong owners. Move to B if the pairing needs a UI, or more per-person settings turn up.
+
+## Alarm Panel Codes
+
+AutoArm never passes a code when it changes the panel's state, so panels that need a code to arm or
+disarm, shown by the `code_format` and `code_arm_required` attributes, can't be driven by it. Support
+would mean:
+
+- Somewhere to keep the code, such as a password field in the options, or a secret in YAML.
+- Passing `code` in the `alarm_control_panel` action calls when the panel needs one.
+- Letting Assist disarm only when a code is said, such as "disarm the alarm 1234", checked against the
+  panel, rather than disarming for anyone who can talk to Assist.

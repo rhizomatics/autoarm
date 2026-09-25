@@ -17,7 +17,8 @@ from custom_components.autoarm.config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
-    CONF_SENTENCE_COMMANDS,
+    CONF_SENTENCE_ARM,
+    CONF_SENTENCE_DISARM,
     CONF_SUNRISE_EARLIEST,
     CONF_USE_ALARM_SERVICE,
 )
@@ -200,7 +201,7 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
                 CONF_NOTIFY_ACTION: "notify.supernotify",
                 CONF_NOTIFY_TARGETS: ["mobile_app_phone"],
             },
-            "assist_options": {CONF_SENTENCE_COMMANDS: True},
+            "assist_options": {CONF_SENTENCE_ARM: False, CONF_SENTENCE_DISARM: True},
             "sunrise_options": {CONF_SUNRISE_EARLIEST: "05:30:00"},
             "sunset_options": {},
         },
@@ -209,7 +210,8 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
 
     assert entry.data[CONF_ALARM_PANEL] == "alarm_control_panel.new_panel"
     assert entry.options[CONF_USE_ALARM_SERVICE] is True
-    assert entry.options[CONF_SENTENCE_COMMANDS] is True
+    assert entry.options[CONF_SENTENCE_ARM] is False
+    assert entry.options[CONF_SENTENCE_DISARM] is True
     assert CONF_ALARM_PANEL not in entry.options
     assert entry.options[CONF_CALENDAR_ENTITIES] == ["calendar.holidays"]
     assert entry.options[CONF_PERSON_ENTITIES] == ["person.new_person"]

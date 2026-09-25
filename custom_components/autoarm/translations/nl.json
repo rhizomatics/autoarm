@@ -64,10 +64,12 @@
                     "assist_options": {
                         "name": "Spraakassistent",
                         "data": {
-                            "sentence_commands": "Zinnen voor de ingebouwde agent"
+                            "sentence_arm": "Inschakelen en uitleggen met spraak",
+                            "sentence_disarm": "Uitschakelen met spraak"
                         },
                         "data_description": {
-                            "sentence_commands": "Engelse zinnen voor de ingebouwde Assist-agent van Home Assistant, zoals 'arm the alarm', 'disarm the alarm' en 'why is the alarm armed'. Iedereen die met Assist kan praten, kan dan het alarm uitschakelen."
+                            "sentence_arm": "Engelse zinnen voor de ingebouwde Assist-agent van Home Assistant, zoals 'arm the alarm', 'arm the alarm in night mode' en 'why is the alarm armed'.",
+                            "sentence_disarm": "Voegt 'disarm the alarm' toe. Waarschuwing: er wordt geen code gevraagd, dus iedereen die met Assist kan praten, via een spraaksatelliet of in de chat, kan het alarm uitschakelen."
                         }
                     },
                     "sunrise_options": {

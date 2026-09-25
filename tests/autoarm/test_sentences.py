@@ -16,7 +16,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer
-from custom_components.autoarm.config_flow import CONF_SENTENCE_COMMANDS
+from custom_components.autoarm.config_flow import CONF_SENTENCE_ARM, CONF_SENTENCE_DISARM
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY, ChangeSource
 from custom_components.autoarm.sentences import SENTENCES, async_respond, explain
 
@@ -179,11 +179,9 @@ async def test_why_mentions_active_calendar_event(hass: HomeAssistant, autoarmer
         assert explain(autoarmer).endswith("The calendar event Away for the day is in control until 23:00.")
 
 
-async def _setup(hass: HomeAssistant, sentence_commands: bool) -> MockConfigEntry:
+async def _setup(hass: HomeAssistant, options: dict[str, Any]) -> MockConfigEntry:
     hass.states.async_set(TEST_PANEL, "disarmed")
-    entry = MockConfigEntry(
-        domain=DOMAIN, data={CONF_ALARM_PANEL: TEST_PANEL}, options={CONF_SENTENCE_COMMANDS: sentence_commands}
-    )
+    entry = MockConfigEntry(domain=DOMAIN, data={CONF_ALARM_PANEL: TEST_PANEL}, options=options)
     entry.add_to_hass(hass)
     hass.data[YAML_DATA_KEY] = {}
     assert await hass.config_entries.async_setup(entry.entry_id)
@@ -191,11 +189,39 @@ async def _setup(hass: HomeAssistant, sentence_commands: bool) -> MockConfigEntr
     return entry
 
 
-async def test_sentences_not_registered_unless_switched_on(hass: HomeAssistant) -> None:
+async def test_sentences_not_registered_when_switched_off(hass: HomeAssistant) -> None:
     with patch("custom_components.autoarm.sentences.async_initialize_triggers") as initialize:
-        await _setup(hass, sentence_commands=False)
+        await _setup(hass, {CONF_SENTENCE_ARM: False, CONF_SENTENCE_DISARM: False})
 
     initialize.assert_not_called()
+
+
+async def _registered_commands(hass: HomeAssistant, options: dict[str, Any]) -> set[str]:
+    async def validate(_hass: HomeAssistant, config: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return config
+
+    initialize = AsyncMock(return_value=Mock())
+    with (
+        patch("custom_components.autoarm.sentences.async_validate_trigger_config", side_effect=validate),
+        patch("custom_components.autoarm.sentences.async_initialize_triggers", initialize),
+    ):
+        await _setup(hass, options)
+    return {c["id"] for c in initialize.call_args.args[1]}
+
+
+async def test_disarm_sentences_not_registered_by_default(hass: HomeAssistant) -> None:
+    commands = await _registered_commands(hass, {})
+    assert commands == set(SENTENCES) - {"disarmed"}
+
+
+async def test_disarm_sentences_registered_when_switched_on(hass: HomeAssistant) -> None:
+    commands = await _registered_commands(hass, {CONF_SENTENCE_DISARM: True})
+    assert commands == set(SENTENCES)
+
+
+async def test_disarm_sentences_alone(hass: HomeAssistant) -> None:
+    commands = await _registered_commands(hass, {CONF_SENTENCE_ARM: False, CONF_SENTENCE_DISARM: True})
+    assert commands == {"disarmed"}
 
 
 async def test_sentences_registered_and_answer(hass: HomeAssistant) -> None:
@@ -209,7 +235,7 @@ async def test_sentences_registered_and_answer(hass: HomeAssistant) -> None:
         patch("custom_components.autoarm.sentences.async_validate_trigger_config", side_effect=validate),
         patch("custom_components.autoarm.sentences.async_initialize_triggers", initialize),
     ):
-        entry = await _setup(hass, sentence_commands=True)
+        entry = await _setup(hass, {CONF_SENTENCE_ARM: True, CONF_SENTENCE_DISARM: True})
 
     configs: list[dict[str, Any]] = initialize.call_args.args[1]
     assert {c["id"]: c["command"] for c in configs} == SENTENCES
@@ -234,6 +260,6 @@ async def test_sentences_not_registered_when_conversation_unavailable(hass: Home
         ),
         patch("custom_components.autoarm.sentences.async_initialize_triggers") as initialize,
     ):
-        await _setup(hass, sentence_commands=True)
+        await _setup(hass, {CONF_SENTENCE_ARM: True})
 
     initialize.assert_not_called()

@@ -64,10 +64,12 @@
                     "assist_options": {
                         "name": "वॉइस सहायक",
                         "data": {
-                            "sentence_commands": "अंतर्निहित एजेंट वाक्य"
+                            "sentence_arm": "आवाज़ से आर्म करें और कारण बताएं",
+                            "sentence_disarm": "आवाज़ से डिसआर्म करें"
                         },
                         "data_description": {
-                            "sentence_commands": "Home Assistant के अंतर्निहित Assist एजेंट के लिए अंग्रेज़ी वाक्य, जैसे 'arm the alarm', 'disarm the alarm' और 'why is the alarm armed'। जो भी Assist से बात कर सकता है, वह अलार्म को डिसआर्म कर सकेगा।"
+                            "sentence_arm": "Home Assistant के अंतर्निहित Assist एजेंट के लिए अंग्रेज़ी वाक्य, जैसे 'arm the alarm', 'arm the alarm in night mode' और 'why is the alarm armed'।",
+                            "sentence_disarm": "'disarm the alarm' जोड़ता है। चेतावनी: कोई कोड नहीं पूछा जाता, इसलिए जो भी Assist से बात कर सकता है, वॉइस सैटेलाइट पर या चैट में, वह अलार्म को डिसआर्म कर सकेगा।"
                         }
                     },
                     "sunrise_options": {

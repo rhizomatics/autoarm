@@ -65,7 +65,8 @@ from .config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
-    CONF_SENTENCE_COMMANDS,
+    CONF_SENTENCE_ARM,
+    CONF_SENTENCE_DISARM,
     CONF_SUNRISE_EARLIEST,
     CONF_SUNRISE_LATEST,
     CONF_SUNSET_EARLIEST,
@@ -266,7 +267,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await armer.initialize()
     except Exception as err:
         raise ConfigEntryNotReady(f"Failed to initialize Auto Arm: {err}") from err
-    if entry.options.get(CONF_SENTENCE_COMMANDS) and (remove_sentences := await async_register_sentences(hass, armer)):
+    if remove_sentences := await async_register_sentences(
+        hass,
+        armer,
+        arm=entry.options.get(CONF_SENTENCE_ARM, True),
+        disarm=entry.options.get(CONF_SENTENCE_DISARM, False),
+    ):
         entry.async_on_unload(remove_sentences)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True

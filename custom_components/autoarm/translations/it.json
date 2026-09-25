@@ -64,10 +64,12 @@
                     "assist_options": {
                         "name": "Assistente vocale",
                         "data": {
-                            "sentence_commands": "Frasi per l'agente integrato"
+                            "sentence_arm": "Inserire e spiegare a voce",
+                            "sentence_disarm": "Disinserire a voce"
                         },
                         "data_description": {
-                            "sentence_commands": "Frasi in inglese per l'agente Assist integrato di Home Assistant, come 'arm the alarm', 'disarm the alarm' e 'why is the alarm armed'. Chiunque possa parlare con Assist potrà disinserire l'allarme."
+                            "sentence_arm": "Frasi in inglese per l'agente Assist integrato di Home Assistant, come 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
+                            "sentence_disarm": "Aggiunge 'disarm the alarm'. Attenzione: non viene chiesto alcun codice, quindi chiunque possa parlare con Assist, da un satellite vocale o nella chat, potrà disinserire l'allarme."
                         }
                     },
                     "sunrise_options": {

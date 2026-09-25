@@ -64,10 +64,12 @@
                     "assist_options": {
                         "name": "Assistente de voz",
                         "data": {
-                            "sentence_commands": "Frases para o agente integrado"
+                            "sentence_arm": "Armar e explicar por voz",
+                            "sentence_disarm": "Desarmar por voz"
                         },
                         "data_description": {
-                            "sentence_commands": "Frases em inglês para o agente Assist integrado do Home Assistant, como 'arm the alarm', 'disarm the alarm' e 'why is the alarm armed'. Qualquer pessoa que fale com o Assist poderá desarmar o alarme."
+                            "sentence_arm": "Frases em inglês para o agente Assist integrado do Home Assistant, como 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
+                            "sentence_disarm": "Adiciona 'disarm the alarm'. Aviso: nenhum código é pedido, por isso qualquer pessoa que fale com o Assist, num satélite de voz ou no chat, poderá desarmar o alarme."
                         }
                     },
                     "sunrise_options": {

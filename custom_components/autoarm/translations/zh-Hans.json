@@ -64,10 +64,12 @@
                     "assist_options": {
                         "name": "语音助手",
                         "data": {
-                            "sentence_commands": "内置代理语句"
+                            "sentence_arm": "语音布防和解释",
+                            "sentence_disarm": "语音撤防"
                         },
                         "data_description": {
-                            "sentence_commands": "用于 Home Assistant 内置 Assist 代理的英语语句，例如 'arm the alarm'、'disarm the alarm' 和 'why is the alarm armed'。任何能与 Assist 对话的人都可以撤防警报。"
+                            "sentence_arm": "用于 Home Assistant 内置 Assist 代理的英语语句，例如 'arm the alarm'、'arm the alarm in night mode' 和 'why is the alarm armed'。",
+                            "sentence_disarm": "添加 'disarm the alarm'。警告：不会要求输入密码，因此任何能通过语音卫星或聊天与 Assist 对话的人都可以撤防警报。"
                         }
                     },
                     "sunrise_options": {

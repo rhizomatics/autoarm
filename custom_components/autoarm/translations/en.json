@@ -64,10 +64,12 @@
                     "assist_options": {
                         "name": "Assist",
                         "data": {
-                            "sentence_commands": "Built-in agent sentences"
+                            "sentence_arm": "Arm and explain by voice",
+                            "sentence_disarm": "Disarm by voice"
                         },
                         "data_description": {
-                            "sentence_commands": "English sentences for Home Assistant's built-in Assist agent, such as 'arm the alarm', 'disarm the alarm' and 'why is the alarm armed'. Anyone who can talk to Assist can then disarm the alarm."
+                            "sentence_arm": "English sentences for Home Assistant's built-in Assist agent, such as 'arm the alarm', 'arm the alarm in night mode' and 'why is the alarm armed'.",
+                            "sentence_disarm": "Adds 'disarm the alarm'. Warning: no code is asked for, so anyone who can talk to Assist, on a voice satellite or in the chat, can disarm the alarm."
                         }
                     },
                     "sunrise_options": {

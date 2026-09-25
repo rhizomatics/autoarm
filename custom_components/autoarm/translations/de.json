@@ -64,10 +64,12 @@
                     "assist_options": {
                         "name": "Sprachassistent",
                         "data": {
-                            "sentence_commands": "Sätze für den eingebauten Agenten"
+                            "sentence_arm": "Scharfschalten und erklären per Sprache",
+                            "sentence_disarm": "Unscharf schalten per Sprache"
                         },
                         "data_description": {
-                            "sentence_commands": "Englische Sätze für den eingebauten Assist-Agenten von Home Assistant, z. B. 'arm the alarm', 'disarm the alarm' und 'why is the alarm armed'. Jeder, der mit Assist sprechen kann, kann dann die Alarmanlage unscharf schalten."
+                            "sentence_arm": "Englische Sätze für den eingebauten Assist-Agenten von Home Assistant, z. B. 'arm the alarm', 'arm the alarm in night mode' und 'why is the alarm armed'.",
+                            "sentence_disarm": "Fügt 'disarm the alarm' hinzu. Warnung: Es wird kein Code abgefragt, daher kann jeder, der mit Assist sprechen kann, über einen Sprachsatelliten oder im Chat, die Alarmanlage unscharf schalten."
                         }
                     },
                     "sunrise_options": {

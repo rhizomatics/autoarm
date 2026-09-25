@@ -64,10 +64,12 @@
                     "assist_options": {
                         "name": "Assistant vocal",
                         "data": {
-                            "sentence_commands": "Phrases pour l'agent intégré"
+                            "sentence_arm": "Armer et expliquer par la voix",
+                            "sentence_disarm": "Désarmer par la voix"
                         },
                         "data_description": {
-                            "sentence_commands": "Phrases en anglais pour l'agent Assist intégré de Home Assistant, comme 'arm the alarm', 'disarm the alarm' et 'why is the alarm armed'. Toute personne pouvant parler à Assist pourra alors désarmer l'alarme."
+                            "sentence_arm": "Phrases en anglais pour l'agent Assist intégré de Home Assistant, comme 'arm the alarm', 'arm the alarm in night mode' et 'why is the alarm armed'.",
+                            "sentence_disarm": "Ajoute 'disarm the alarm'. Attention : aucun code n'est demandé, donc toute personne pouvant parler à Assist, sur un satellite vocal ou dans le chat, pourra désarmer l'alarme."
                         }
                     },
                     "sunrise_options": {

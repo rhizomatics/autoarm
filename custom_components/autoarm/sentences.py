@@ -3,7 +3,8 @@
 The built-in agent doesn't use an AI model, it matches fixed sentences, so AutoArm registers a few
 of its own, the same way an automation with a conversation trigger does. These take priority over
 the built-in agent's own alarm sentences, so a change by voice counts as a manual intervention.
-English only for now, and switched on in the options.
+English only for now. Arming and explaining are on by default, disarming is switched on separately in the options,
+since anyone who can talk to Assist could then disarm the alarm.
 """
 
 from __future__ import annotations
@@ -69,8 +70,17 @@ SPOKEN_SOURCES: dict[ChangeSource, str] = {
 COMPUTED_SOURCES = (ChangeSource.OCCUPANCY, ChangeSource.SUNRISE, ChangeSource.SUNSET, ChangeSource.STARTUP)
 
 
-async def async_register_sentences(hass: HomeAssistant, armer: AlarmArmer) -> CALLBACK_TYPE | None:
+async def async_register_sentences(
+    hass: HomeAssistant, armer: AlarmArmer, arm: bool = True, disarm: bool = False
+) -> CALLBACK_TYPE | None:
     """Register the sentences with the built-in conversation agent, returning how to remove them"""
+    commands: dict[str, list[str]] = {
+        command: sentences
+        for command, sentences in SENTENCES.items()
+        if (disarm if command == AlarmControlPanelState.DISARMED else arm)
+    }
+    if not commands:
+        return None
 
     async def action(run_variables: dict[str, Any], _context: HAContext | None = None) -> ScriptRunResult:
         trigger: dict[str, Any] = run_variables["trigger"]
@@ -80,10 +90,7 @@ async def async_register_sentences(hass: HomeAssistant, armer: AlarmArmer) -> CA
     try:
         config = await async_validate_trigger_config(
             hass,
-            [
-                {"platform": "conversation", "id": str(command), "command": sentences}
-                for command, sentences in SENTENCES.items()
-            ],
+            [{"platform": "conversation", "id": str(command), "command": sentences} for command, sentences in commands.items()],
         )
     except Exception as e:
         _LOGGER.warning("AUTOARM Unable to register sentences with the built-in conversation agent: %s", e)

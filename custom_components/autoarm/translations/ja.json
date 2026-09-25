@@ -64,10 +64,12 @@
                     "assist_options": {
                         "name": "音声アシスタント",
                         "data": {
-                            "sentence_commands": "組み込みエージェント用の文"
+                            "sentence_arm": "音声で警戒と理由の説明",
+                            "sentence_disarm": "音声で解除"
                         },
                         "data_description": {
-                            "sentence_commands": "Home Assistant の組み込み Assist エージェント用の英語の文（'arm the alarm'、'disarm the alarm'、'why is the alarm armed' など）。Assist に話しかけられる人は誰でもアラームを解除できるようになります。"
+                            "sentence_arm": "Home Assistant の組み込み Assist エージェント用の英語の文（'arm the alarm'、'arm the alarm in night mode'、'why is the alarm armed' など）。",
+                            "sentence_disarm": "'disarm the alarm' を追加します。警告: コードは求められないため、音声サテライトやチャットで Assist に話しかけられる人は誰でもアラームを解除できます。"
                         }
                     },
                     "sunrise_options": {

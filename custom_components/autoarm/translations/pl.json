@@ -64,10 +64,12 @@
                     "assist_options": {
                         "name": "Asystent głosowy",
                         "data": {
-                            "sentence_commands": "Zdania dla wbudowanego agenta"
+                            "sentence_arm": "Uzbrajanie i wyjaśnianie głosem",
+                            "sentence_disarm": "Rozbrajanie głosem"
                         },
                         "data_description": {
-                            "sentence_commands": "Angielskie zdania dla wbudowanego agenta Assist w Home Assistant, takie jak 'arm the alarm', 'disarm the alarm' i 'why is the alarm armed'. Każdy, kto może mówić do Assist, będzie mógł rozbroić alarm."
+                            "sentence_arm": "Angielskie zdania dla wbudowanego agenta Assist w Home Assistant, takie jak 'arm the alarm', 'arm the alarm in night mode' i 'why is the alarm armed'.",
+                            "sentence_disarm": "Dodaje 'disarm the alarm'. Uwaga: kod nie jest wymagany, więc każdy, kto może mówić do Assist, przez satelitę głosowego lub na czacie, będzie mógł rozbroić alarm."
                         }
                     },
                     "sunrise_options": {

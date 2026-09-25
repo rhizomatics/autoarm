@@ -55,7 +55,8 @@ CONF_SUNRISE_LATEST = "sunrise_latest"
 CONF_SUNSET_EARLIEST = "sunset_earliest"
 CONF_SUNSET_LATEST = "sunset_latest"
 CONF_USE_ALARM_SERVICE = "use_alarm_service"
-CONF_SENTENCE_COMMANDS = "sentence_commands"
+CONF_SENTENCE_ARM = "sentence_arm"
+CONF_SENTENCE_DISARM = "sentence_disarm"
 
 DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES: list[str] = ["disarmed", "armed_home", "armed_night", "armed_away"]
 
@@ -82,7 +83,8 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_SUNSET_EARLIEST: None,
     CONF_SUNSET_LATEST: None,
     CONF_USE_ALARM_SERVICE: False,
-    CONF_SENTENCE_COMMANDS: False,
+    CONF_SENTENCE_ARM: True,
+    CONF_SENTENCE_DISARM: False,
 }
 
 
@@ -145,7 +147,8 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_SUNSET_EARLIEST: None,
                 CONF_SUNSET_LATEST: None,
                 CONF_USE_ALARM_SERVICE: False,
-                CONF_SENTENCE_COMMANDS: False,
+                CONF_SENTENCE_ARM: True,
+                CONF_SENTENCE_DISARM: False,
             }
 
             return self.async_create_entry(
@@ -201,7 +204,8 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_SUNSET_EARLIEST: _time_to_str(sunset_config.get(CONF_EARLIEST)),
             CONF_SUNSET_LATEST: _time_to_str(sunset_config.get(CONF_LATEST)),
             CONF_USE_ALARM_SERVICE: False,
-            CONF_SENTENCE_COMMANDS: False,
+            CONF_SENTENCE_ARM: True,
+            CONF_SENTENCE_DISARM: False,
         }
 
         return self.async_create_entry(
@@ -332,8 +336,12 @@ class AutoArmOptionsFlow(OptionsFlow):
                 vol.Required("assist_options"): section(
                     vol.Schema({
                         vol.Required(
-                            CONF_SENTENCE_COMMANDS,
-                            default=options.get(CONF_SENTENCE_COMMANDS, False),
+                            CONF_SENTENCE_ARM,
+                            default=options.get(CONF_SENTENCE_ARM, True),
+                        ): BooleanSelector(),
+                        vol.Required(
+                            CONF_SENTENCE_DISARM,
+                            default=options.get(CONF_SENTENCE_DISARM, False),
                         ): BooleanSelector(),
                     }),
                     {"collapsed": True},
