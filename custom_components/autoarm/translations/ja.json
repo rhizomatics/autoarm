@@ -31,6 +31,7 @@
                 "title": "AutoArm オプション",
                 "data": {
                     "alarm_panel": "管理するアラームコントロールパネル",
+                    "use_alarm_service": "アラームパネルのアクションで状態を変更",
                     "calendar_entities": "警戒スケジュールに使用するカレンダー",
                     "person_entities": "在室ベースの警戒に使用する人物",
                     "occupancy_default_day": "日中在室時のデフォルト警戒状態",
@@ -60,6 +61,15 @@
                             "notify_targets": "通知先アドレスまたは notify エンティティのリスト（Supernotify の場合は空白可）"
                         }
                     },
+                    "assist_options": {
+                        "name": "音声アシスタント",
+                        "data": {
+                            "sentence_commands": "組み込みエージェント用の文"
+                        },
+                        "data_description": {
+                            "sentence_commands": "Home Assistant の組み込み Assist エージェント用の英語の文（'arm the alarm'、'disarm the alarm'、'why is the alarm armed' など）。Assist に話しかけられる人は誰でもアラームを解除できるようになります。"
+                        }
+                    },
                     "sunrise_options": {
                         "name": "日の出の制約",
                         "data": {
@@ -82,6 +92,9 @@
                             "sunset_latest": "この時刻より遅く日の入りを処理しない"
                         }
                     }
+                },
+                "data_description": {
+                    "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルはコードを要求しない設定にしてください。"
                 }
             }
         }

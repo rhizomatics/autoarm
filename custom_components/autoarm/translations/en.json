@@ -31,6 +31,7 @@
                 "title": "Auto Arm Options",
                 "data": {
                     "alarm_panel": "Alarm Control Panel to manage",
+                    "use_alarm_service": "Change state using the alarm panel's actions",
                     "calendar_entities": "Calendars to use for arming schedules",
                     "person_entities":  "People for occupancy based arming",
                     "occupancy_default_day": "Default arming state when occupied during day",
@@ -60,6 +61,15 @@
                             "notify_targets":"List of addresses or notify entities to notify, can be left blank for Supernotify"
                         }
                     },
+                    "assist_options": {
+                        "name": "Assist",
+                        "data": {
+                            "sentence_commands": "Built-in agent sentences"
+                        },
+                        "data_description": {
+                            "sentence_commands": "English sentences for Home Assistant's built-in Assist agent, such as 'arm the alarm', 'disarm the alarm' and 'why is the alarm armed'. Anyone who can talk to Assist can then disarm the alarm."
+                        }
+                    },
                     "sunrise_options": {
                         "name": "Sunrise Constraints",
                         "data": {
@@ -82,6 +92,9 @@
                             "sunset_latest": "Sunset no earlier than time"
                         }
                     }
+                },
+                "data_description": {
+                    "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. The panel must not require a code."
                 }
             }
         }

@@ -155,6 +155,7 @@ class TrackedCalendarEvent:
                     "caller": "calendar.on_calendar_event_start",
                     "calendar_id": self.calendar_id,
                     "event_id": self.id,
+                    "summary": self.event.summary,
                     "recurring": self.is_recurring(),
                     "overridable_event": overridable_event,
                 },

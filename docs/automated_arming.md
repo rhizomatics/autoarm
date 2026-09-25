@@ -19,6 +19,37 @@ similar. Use the *Settings*->*Voice Assistants* page in Home Assistant to do thi
 Alexa has additional controls to prevent unauthorized disarming ( otherwise burgulars could shout
 through the letterbox! ), see [Connect Your Home Security System to Echo Hub](https://www.amazon.co.uk/gp/help/customer/display.html?nodeId=T3hgRgU3Wx5DZxfZCB) on the Amazon documentation.
 
+### Built-in Agent Sentences
+
+!!! warning "Early Access"
+    Limited to English. Feedback, and suggested wording for other languages, is welcome on
+    [GitHub issues](https://github.com/rhizomatics/autoarm/issues).
+
+Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agent, which doesn't use AI, matches fixed
+sentences. Switch on **Built-in agent sentences** in the **Assist** section of the AutoArm options, and it understands
+these, by voice or in the chat:
+
+| Say                                    | Does                                               |
+|----------------------------------------|----------------------------------------------------|
+| "Arm the alarm"                        | Arms away                                          |
+| "Arm the alarm in *home* mode"         | Arms *home*, *away*, *night* or *vacation*         |
+| "Set the security system to *night*"   | The same, "holiday" also works for vacation        |
+| "Disarm the alarm"                     | Disarms                                            |
+| "Why is the alarm armed?"              | Says who or what last changed it, when, and why    |
+| "What changed the alarm?"              | The same                                           |
+
+"Alarm", "security system" and "burglar alarm" all work. These sentences take priority over Assist's own alarm
+sentences, so arming or disarming by voice goes through AutoArm and counts as a *Manual Intervention*, like a button.
+
+Asking why gives the time of the change and what made it, such as a calendar event, sunset, a button or someone
+leaving. For changes worked out from who's home and the time of day, it also says whether anyone was home and whether
+it was night. Changes made directly on the alarm panel are reported as such. AutoArm only knows about changes since
+Home Assistant last started.
+
+!!! danger "Disarming by voice"
+    Anyone who can talk to Assist can disarm the alarm this way, and no code is asked for. Think about who can
+    reach your voice satellites and chat before switching this on.
+
 ## Physical Button Control
 
 Handy if you have a Zigbee, 433Mhz or similar button panel by the door - choose one of the

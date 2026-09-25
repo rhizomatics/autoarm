@@ -17,7 +17,9 @@ from custom_components.autoarm.config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
+    CONF_SENTENCE_COMMANDS,
     CONF_SUNRISE_EARLIEST,
+    CONF_USE_ALARM_SERVICE,
 )
 from custom_components.autoarm.const import (
     CONF_ALARM_PANEL,
@@ -185,6 +187,7 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
         result["flow_id"],
         {
             CONF_ALARM_PANEL: "alarm_control_panel.new_panel",
+            CONF_USE_ALARM_SERVICE: True,
             CONF_CALENDAR_ENTITIES: ["calendar.holidays"],
             CONF_PERSON_ENTITIES: ["person.new_person"],
             CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
@@ -197,6 +200,7 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
                 CONF_NOTIFY_ACTION: "notify.supernotify",
                 CONF_NOTIFY_TARGETS: ["mobile_app_phone"],
             },
+            "assist_options": {CONF_SENTENCE_COMMANDS: True},
             "sunrise_options": {CONF_SUNRISE_EARLIEST: "05:30:00"},
             "sunset_options": {},
         },
@@ -204,6 +208,8 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     assert result["type"] is FlowResultType.CREATE_ENTRY
 
     assert entry.data[CONF_ALARM_PANEL] == "alarm_control_panel.new_panel"
+    assert entry.options[CONF_USE_ALARM_SERVICE] is True
+    assert entry.options[CONF_SENTENCE_COMMANDS] is True
     assert CONF_ALARM_PANEL not in entry.options
     assert entry.options[CONF_CALENDAR_ENTITIES] == ["calendar.holidays"]
     assert entry.options[CONF_PERSON_ENTITIES] == ["person.new_person"]
@@ -214,3 +220,22 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     assert entry.options[CONF_NOTIFY_ACTION] == "notify.supernotify"
     assert entry.options[CONF_NOTIFY_TARGETS] == ["mobile_app_phone"]
     assert entry.options[CONF_SUNRISE_EARLIEST] == "05:30:00"
+
+
+async def test_options_flow_offers_supernotify_action(hass: HomeAssistant, setup_autoarm: MockConfigEntry) -> None:
+    """supernotify.notify is offered as the notification action when Supernotify provides it."""
+    hass.services.async_register("supernotify", "notify", lambda _call: None)
+
+    result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
+
+    notify_section = result["data_schema"].schema["notify_options"].schema.schema
+    action_selector = next(v for k, v in notify_section.items() if k == CONF_NOTIFY_ACTION)
+    assert action_selector.config["options"][0] == "supernotify.notify"
+
+
+async def test_options_flow_without_supernotify_action(hass: HomeAssistant, setup_autoarm: MockConfigEntry) -> None:
+    result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
+
+    notify_section = result["data_schema"].schema["notify_options"].schema.schema
+    action_selector = next(v for k, v in notify_section.items() if k == CONF_NOTIFY_ACTION)
+    assert "supernotify.notify" not in action_selector.config["options"]

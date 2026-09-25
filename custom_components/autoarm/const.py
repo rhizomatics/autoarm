@@ -64,6 +64,14 @@ NOTIFY_DEF_SCHEMA = vol.Schema({
 })
 
 
+SUPERNOTIFY_ACTION = "supernotify.notify"
+SUPERNOTIFY_MOBILE_ACTIONS: list[dict[str, str]] = [
+    {CONF_ACTION: "ALARM_PANEL_DISARM", "title": "Disarm Alarm Panel", "icon": "sfsymbols:bell.slash"},
+    {CONF_ACTION: "ALARM_PANEL_RESET", "title": "Reset Alarm Panel", "icon": "sfsymbols:bell"},
+    {CONF_ACTION: "ALARM_PANEL_AWAY", "title": "Arm Alarm Panel Away", "icon": "sfsymbols:airplane"},
+]
+
+
 def _apply_notify_defaults(config: dict[str, Any]) -> dict[str, Any]:
     """Apply defaults for known notify profiles."""
     if not config:
@@ -92,15 +100,12 @@ def _apply_notify_defaults(config: dict[str, Any]) -> dict[str, Any]:
     config[NOTIFY_COMMON].setdefault(CONF_SERVICE, "notify.send_message")
 
     if config[NOTIFY_COMMON].get(CONF_SUPERNOTIFY) is None:
-        config[NOTIFY_COMMON][CONF_SUPERNOTIFY] = any(
-            config[NOTIFY_COMMON][CONF_SERVICE].endswith(v) for v in ("supernotify", "supernotifier")
+        config[NOTIFY_COMMON][CONF_SUPERNOTIFY] = (
+            any(config[NOTIFY_COMMON][CONF_SERVICE].endswith(v) for v in ("supernotify", "supernotifier"))
+            or config[NOTIFY_COMMON][CONF_SERVICE] == SUPERNOTIFY_ACTION
         )
     if config[NOTIFY_COMMON].get(CONF_SUPERNOTIFY) and CONF_ACTIONS not in config[NOTIFY_COMMON][CONF_DATA]:
-        config[NOTIFY_COMMON][CONF_DATA][CONF_ACTIONS] = [
-            {CONF_ACTION: "ALARM_PANEL_DISARM", "title": "Disarm Alarm Panel", "icon": "sfsymbols:bell.slash"},
-            {CONF_ACTION: "ALARM_PANEL_RESET", "title": "Reset Alarm Panel", "icon": "sfsymbols:bell"},
-            {CONF_ACTION: "ALARM_PANEL_AWAY", "title": "Arm Alarm Panel Away", "icon": "sfsymbols:airplane"},
-        ]
+        config[NOTIFY_COMMON][CONF_DATA][CONF_ACTIONS] = SUPERNOTIFY_MOBILE_ACTIONS
     return config
 
 
@@ -282,5 +287,6 @@ class ChangeSource(StrEnum):
     SUNRISE = auto()
     SUNSET = auto()
     ZOMBIFICATION = auto()
+    VOICE = auto()
     STARTUP = auto()
     UNKNOWN = auto()

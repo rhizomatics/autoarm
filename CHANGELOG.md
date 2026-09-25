@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0
+- Support for Alarm Control Panels, such as Alarmo, that require direct service calls to change state. Contributed by @tabascoz
+  - Switched on by **Change state using the alarm panel's actions** in the options
+  - Panels with an exit delay no longer have their final change to armed treated as a manual intervention
+- The improved `supernotify.notify` action can now be used for notifications, original one still works
+  - Offered in the **Notification Action** list when Supernotify is installed
+- The **Notification Action** chosen in the options is now used rather than the YAML default, and notifications work without any YAML
+- Assist, the native voice and chat agent for Home Assistant, can now be used to arm and disarm the panel, and get an explanation for the current armed state.
+  - This is non-AI, so conversation flexibility is limited, however doesn't require any AI subscription or local service.
+  - Using speech-to-text requires a Nabu Casa subscription, or use of the on device STS if app and device support it
 ## 1.1.5
 - Fixed compatibility issues with `notify.send_message` new style notifications
 - Move documentation site build to *properdocs*

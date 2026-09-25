@@ -31,6 +31,7 @@
                 "title": "Opzioni AutoArm",
                 "data": {
                     "alarm_panel": "Pannello di controllo allarme da gestire",
+                    "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                     "calendar_entities": "Calendari da usare per la pianificazione dell'inserimento",
                     "person_entities": "Persone per l'inserimento basato sulla presenza",
                     "occupancy_default_day": "Stato di inserimento predefinito quando occupato di giorno",
@@ -60,6 +61,15 @@
                             "notify_targets": "Elenco di indirizzi o entità notify da notificare, può essere lasciato vuoto per Supernotify"
                         }
                     },
+                    "assist_options": {
+                        "name": "Assistente vocale",
+                        "data": {
+                            "sentence_commands": "Frasi per l'agente integrato"
+                        },
+                        "data_description": {
+                            "sentence_commands": "Frasi in inglese per l'agente Assist integrato di Home Assistant, come 'arm the alarm', 'disarm the alarm' e 'why is the alarm armed'. Chiunque possa parlare con Assist potrà disinserire l'allarme."
+                        }
+                    },
                     "sunrise_options": {
                         "name": "Vincoli alba",
                         "data": {
@@ -82,6 +92,9 @@
                             "sunset_latest": "Tramonto non dopo questa ora"
                         }
                     }
+                },
+                "data_description": {
+                    "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. La centrale non deve richiedere un codice."
                 }
             }
         }

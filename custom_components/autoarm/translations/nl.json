@@ -31,6 +31,7 @@
                 "title": "Auto Arm-opties",
                 "data": {
                     "alarm_panel": "Te beheren alarmcentrale",
+                    "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
                     "calendar_entities": "Agenda's om te gebruiken voor inschakelschema's",
                     "person_entities": "Personen voor aanwezigheid-gebaseerd inschakelen",
                     "occupancy_default_day": "Standaard inschakelstatus bij aanwezigheid overdag",
@@ -60,6 +61,15 @@
                             "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden; kan leeg blijven voor Supernotify"
                         }
                     },
+                    "assist_options": {
+                        "name": "Spraakassistent",
+                        "data": {
+                            "sentence_commands": "Zinnen voor de ingebouwde agent"
+                        },
+                        "data_description": {
+                            "sentence_commands": "Engelse zinnen voor de ingebouwde Assist-agent van Home Assistant, zoals 'arm the alarm', 'disarm the alarm' en 'why is the alarm armed'. Iedereen die met Assist kan praten, kan dan het alarm uitschakelen."
+                        }
+                    },
                     "sunrise_options": {
                         "name": "Zonsopgangbeperkingen",
                         "data": {
@@ -82,6 +92,9 @@
                             "sunset_latest": "Zonsondergang niet later dan dit tijdstip"
                         }
                     }
+                },
+                "data_description": {
+                    "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Het paneel mag geen code vereisen."
                 }
             }
         }

@@ -5,7 +5,15 @@ from homeassistant.components.alarm_control_panel.const import AlarmControlPanel
 from homeassistant.const import CONF_SERVICE, CONF_SOURCE, CONF_STATE, CONF_TARGET
 from homeassistant.core import HomeAssistant
 
-from custom_components.autoarm.const import ALARM_STATES, CONF_SCENARIO, CONF_SUPERNOTIFY, NOTIFY_COMMON, ChangeSource
+from custom_components.autoarm.const import (
+    ALARM_STATES,
+    CONF_SCENARIO,
+    CONF_SUPERNOTIFY,
+    NOTIFY_COMMON,
+    SUPERNOTIFY_ACTION,
+    SUPERNOTIFY_MOBILE_ACTIONS,
+    ChangeSource,
+)
 from custom_components.autoarm.helpers import AppHealthTracker
 
 _LOGGER = logging.getLogger(__name__)
@@ -82,10 +90,16 @@ class Notifier:
                 data["source"] = str(source)
             if "profile" in data and data["profile"] is None:
                 data["profile"] = selected_profile_name
-            if merged_profile.get(CONF_SUPERNOTIFY) and merged_profile.get(CONF_SCENARIO):
+            # a profile's own service wins, then the action chosen in the options, then the common profile's
+            notify_action: str | None = (
+                selected_profile.get(CONF_SERVICE) or self.notify_action or merged_profile.get(CONF_SERVICE)
+            )
+            supernotify_action: bool = notify_action == SUPERNOTIFY_ACTION
+            if supernotify_action:
+                data.setdefault("actions", SUPERNOTIFY_MOBILE_ACTIONS)
+            if (merged_profile.get(CONF_SUPERNOTIFY) or supernotify_action) and merged_profile.get(CONF_SCENARIO):
                 data["apply_scenarios"] = merged_profile.get(CONF_SCENARIO)
 
-            notify_action: str | None = merged_profile.get(CONF_SERVICE, self.notify_action)
             notify_targets: list[str] | None = merged_profile.get(CONF_TARGET, self.notify_targets)
             if notify_action is None:
                 _LOGGER.debug("AUTOARM Notifications disabled, no notification action")
@@ -104,7 +118,10 @@ class Notifier:
 
             if notify_action and merged_profile:
                 service_data: dict[str, Any] = {"message": message, "title": title}
-                if data and notify_action != "notify.send_message":
+                if supernotify_action:
+                    # supernotify.notify takes the data fields at the top level
+                    service_data.update(data)
+                elif data and notify_action != "notify.send_message":
                     # new notify entities can't handle nested data section
                     service_data["data"] = data
                 domain, action = notify_action.split(".", 1)

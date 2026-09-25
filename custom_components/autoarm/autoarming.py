@@ -65,10 +65,12 @@ from .config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
+    CONF_SENTENCE_COMMANDS,
     CONF_SUNRISE_EARLIEST,
     CONF_SUNRISE_LATEST,
     CONF_SUNSET_EARLIEST,
     CONF_SUNSET_LATEST,
+    CONF_USE_ALARM_SERVICE,
     DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     DEFAULT_NOTIFY_ACTION,
 )
@@ -101,6 +103,7 @@ from .const import (
     NO_CAL_EVENT_MODE_AUTO,
     NO_CAL_EVENT_MODE_MANUAL,
     NOTIFY_COMMON,
+    NOTIFY_SCHEMA,
     YAML_DATA_KEY,
     ChangeSource,
     ConditionVariables,
@@ -114,6 +117,7 @@ from .helpers import (
     deobjectify,
     safe_state,
 )
+from .sentences import async_register_sentences
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -262,6 +266,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await armer.initialize()
     except Exception as err:
         raise ConfigEntryNotReady(f"Failed to initialize Auto Arm: {err}") from err
+    if entry.options.get(CONF_SENTENCE_COMMANDS) and (remove_sentences := await async_register_sentences(hass, armer)):
+        entry.async_on_unload(remove_sentences)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
 
@@ -326,7 +332,7 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         }
 
     # Build notify config: service from options overrides YAML when explicitly set
-    notify_profiles = yaml_config.get(CONF_NOTIFY, {})
+    notify_profiles = yaml_config.get(CONF_NOTIFY) or NOTIFY_SCHEMA({})
 
     # Build diurnal cutoffs: options take priority, YAML is fallback
     yaml_diurnal = yaml_config.get(CONF_DIURNAL, {}) or {}
@@ -358,6 +364,7 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         calendar_occupancy_override_states=entry.options.get(
             CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
         ),
+        use_alarm_service=entry.options.get(CONF_USE_ALARM_SERVICE, False),
     )
 
 
@@ -418,6 +425,19 @@ class Intervention:
 
 
 @dataclass
+class StateChange:
+    """Record of a state change made by AutoArm, so it can be explained later"""
+
+    created_at: dt.datetime
+    source: ChangeSource | None
+    from_state: AlarmControlPanelState | None
+    to_state: AlarmControlPanelState
+    context: dict[str, Any]
+    occupied: bool | None
+    night: bool
+
+
+@dataclass
 class AlarmStateWithAttributes:
     state: AlarmControlPanelState
     source: ChangeSource
@@ -444,6 +464,7 @@ class AlarmArmer:
         calendar_config: ConfigType | None = None,
         transitions: dict[str, dict[str, list[ConfigType]]] | None = None,
         calendar_occupancy_override_states: list[str] | None = None,
+        use_alarm_service: bool = False,
     ) -> None:
         occupancy = occupancy or {}
         rate_limit = rate_limit or {}
@@ -486,7 +507,11 @@ class AlarmArmer:
         self.pre_pending_state: AlarmControlPanelState | None = None
         self.button_device: dict[str, str] = {}
         self.arming_in_progress: asyncio.Event = asyncio.Event()
-        self._arming_via_service: bool = False  # guard against feedback loop when calling alarmo
+        # change state with alarm_control_panel actions rather than setting it, for panels like Alarmo
+        self.use_alarm_service: bool = use_alarm_service
+        self._arming_via_service: bool = False  # guard against feedback loop when calling the panel's actions
+        self._service_target: AlarmControlPanelState | None = None  # state the panel is still arming towards
+        self.last_change: StateChange | None = None
 
         self.rate_limiter: Limiter = Limiter(
             window=rate_limit.get(CONF_RATE_LIMIT_PERIOD, dt.timedelta(seconds=60)),
@@ -1032,16 +1057,16 @@ class AlarmArmer:
 
                 service_name = _STATE_TO_ALARM_SERVICE.get(arming_state)
                 # Only route through the standard alarm_control_panel service
-                # when the alarm is managed by Alarmo. Alarmo's master entity
+                # when configured to, for panels such as Alarmo whose master entity
                 # needs the service call to propagate arm commands to child
                 # areas. For all other platforms (manual, built-in, etc.)
                 # a direct state set is sufficient and avoids creating
                 # lingering internal timers during tests.
-                use_service = service_name and "alarmo" in self.hass.data
-                if use_service:
+                if service_name and self.use_alarm_service:
                     # Call the standard alarm_control_panel service so that
                     # integrations like Alarmo can propagate the arm command
                     # to child areas (master→area dispatch).
+                    self._service_target = None
                     self._arming_via_service = True
                     try:
                         await self.hass.services.async_call(
@@ -1056,8 +1081,8 @@ class AlarmArmer:
                         # on master_alarm that prevents Alarmo from re-registering
                         # the entity correctly on the next reload (causes _2 shadow).
                         _LOGGER.warning(
-                            "AUTOARM Alarmo service %s failed for %s (source=%s);"
-                            " NOT setting state directly to avoid breaking Alarmo",
+                            "AUTOARM Alarm panel service %s failed for %s (source=%s);"
+                            " NOT setting state directly to avoid breaking the panel integration",
                             service_name,
                             self.alarm_panel,
                             source,
@@ -1069,18 +1094,21 @@ class AlarmArmer:
                     # (silent failure), skip. Direct state set on alarmo would
                     # leave stale state entries that break the entity registry on
                     # the next reload (see exception branch above).
-                    if self.armed_state() != arming_state:
+                    if self.armed_state() == AlarmControlPanelState.ARMING:
+                        # exit delay - the panel's own change to the armed state follows later
+                        self._service_target = arming_state
+                    elif self.armed_state() != arming_state:
                         _LOGGER.warning(
-                            "AUTOARM Alarmo service %s did not change state for %s (source=%s); leaving alarmo to handle state",
+                            "AUTOARM Alarm panel service %s did not change state for %s (source=%s); leaving the panel to handle state",
                             service_name,
                             self.alarm_panel,
                             source,
                         )
                         return None
                 else:
-                    # Not Alarmo or non-standard state (e.g. PENDING) —
+                    # Not using the service, or non-standard state (e.g. PENDING) —
                     # set the state directly.
-                    attrs = {}
+                    attrs: dict[str, Any] = {}
                     if panel_state:
                         attrs.update(panel_state.attributes)
                     attrs[ATTR_CHANGED_BY] = f"{DOMAIN}.{source}"
@@ -1094,6 +1122,15 @@ class AlarmArmer:
                 if self.notifier and source and arming_state:
                     await self.notifier.notify(source=source, from_state=existing_state, to_state=arming_state)
 
+                self.last_change = StateChange(
+                    created_at=dt_util.now(),
+                    source=source,
+                    from_state=existing_state,
+                    to_state=arming_state,
+                    context=change_context or {},
+                    occupied=self.is_occupied(),
+                    night=self.is_night(),
+                )
                 self.hass_api.fire_event(
                     event_name="change",
                     event_data={
@@ -1311,6 +1348,11 @@ class AlarmArmer:
                 new,
             )
             return
+        if self._service_target is not None:
+            target, self._service_target = self._service_target, None
+            if new == target:
+                _LOGGER.debug("AUTOARM Panel Change completes arming via service (ignored): %s: %s-->%s", entity_id, old, new)
+                return
         if new_attributes:
             changed_by = new_attributes.get(ATTR_CHANGED_BY)
             if changed_by and changed_by.startswith(f"{DOMAIN}."):

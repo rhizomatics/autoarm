@@ -31,6 +31,7 @@
                 "title": "Auto Arm 选项",
                 "data": {
                     "alarm_panel": "要管理的警报控制面板",
+                    "use_alarm_service": "使用报警面板的操作更改状态",
                     "calendar_entities": "用于布防计划的日历",
                     "person_entities": "用于基于在家状态布防的人员",
                     "occupancy_default_day": "白天有人在家时的默认布防状态",
@@ -60,6 +61,15 @@
                             "notify_targets": "要通知的地址或通知实体列表；如使用 Supernotify 可留空"
                         }
                     },
+                    "assist_options": {
+                        "name": "语音助手",
+                        "data": {
+                            "sentence_commands": "内置代理语句"
+                        },
+                        "data_description": {
+                            "sentence_commands": "用于 Home Assistant 内置 Assist 代理的英语语句，例如 'arm the alarm'、'disarm the alarm' 和 'why is the alarm armed'。任何能与 Assist 对话的人都可以撤防警报。"
+                        }
+                    },
                     "sunrise_options": {
                         "name": "日出限制",
                         "data": {
@@ -82,6 +92,9 @@
                             "sunset_latest": "日落不晚于此时间"
                         }
                     }
+                },
+                "data_description": {
+                    "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。面板不得要求密码。"
                 }
             }
         }

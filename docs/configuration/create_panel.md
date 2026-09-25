@@ -21,6 +21,18 @@ alarm_control_panel:
 
 The alarm panel entity is selected during the AutoArm UI config flow. Go to **Settings** > **Devices & Services** > **Add Integration**, search for **AutoArm**, and select your alarm panel entity in the first step.
 
+## Panels That Must Be Changed Through Their Actions
+
+By default AutoArm sets the alarm panel's state directly, which is all a *manual* panel needs. Some alarm
+integrations do more than hold a state when armed or disarmed. For example, [Alarmo](https://github.com/nielsfaber/alarmo)
+arms its child areas when its master panel is armed. For these, switch on **Change state using the alarm panel's actions**
+in the AutoArm options, so AutoArm calls `alarm_control_panel.alarm_arm_away`, `alarm_control_panel.alarm_disarm` and so on instead.
+
+- The panel mustn't need a code to arm or disarm, as AutoArm doesn't have one to give it.
+- If the action fails, or doesn't change the state, AutoArm leaves the panel alone rather than set the state behind the integration's back. A warning is logged.
+- An exit delay is fine: when the panel goes to `arming`, and then to the armed state, AutoArm doesn't mistake that for someone changing it by hand.
+- `pending` has no action, so it's still set directly, for example between calendar events.
+
 ### Legacy YAML Reference
 
 Before the UI config flow, the alarm panel was specified in YAML. This is still supported for auto-migration, but new installations should use the UI.

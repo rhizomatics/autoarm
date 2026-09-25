@@ -31,6 +31,7 @@
                 "title": "AutoArm-Optionen",
                 "data": {
                     "alarm_panel": "Zu verwaltende Alarmzentrale",
+                    "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                     "calendar_entities": "Kalender für die Scharf-Zeitplanung",
                     "person_entities": "Personen für die belegungsbasierte Scharfschaltung",
                     "occupancy_default_day": "Standard-Scharmodus bei Belegung tagsüber",
@@ -60,6 +61,15 @@
                             "notify_targets": "Liste von Adressen oder Notify-Entitäten; kann für Supernotify leer gelassen werden"
                         }
                     },
+                    "assist_options": {
+                        "name": "Sprachassistent",
+                        "data": {
+                            "sentence_commands": "Sätze für den eingebauten Agenten"
+                        },
+                        "data_description": {
+                            "sentence_commands": "Englische Sätze für den eingebauten Assist-Agenten von Home Assistant, z. B. 'arm the alarm', 'disarm the alarm' und 'why is the alarm armed'. Jeder, der mit Assist sprechen kann, kann dann die Alarmanlage unscharf schalten."
+                        }
+                    },
                     "sunrise_options": {
                         "name": "Sonnenaufgang-Einschränkungen",
                         "data": {
@@ -82,6 +92,9 @@
                             "sunset_latest": "Sonnenuntergang nicht später als diese Uhrzeit"
                         }
                     }
+                },
+                "data_description": {
+                    "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Die Zentrale darf keinen Code verlangen."
                 }
             }
         }

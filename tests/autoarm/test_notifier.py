@@ -1,10 +1,20 @@
 from typing import TYPE_CHECKING, Any
 from unittest.mock import Mock
 
+from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.core import HomeAssistant, ServiceCall, callback
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.autoarm.autoarming import AlarmArmer
-from custom_components.autoarm.const import ChangeSource
+from custom_components.autoarm.autoarming import HASS_DATA_KEY, AlarmArmer
+from custom_components.autoarm.config_flow import CONF_NOTIFY_ACTION, CONF_NOTIFY_ENABLED
+from custom_components.autoarm.const import (
+    CONF_ALARM_PANEL,
+    DOMAIN,
+    NOTIFY_SCHEMA,
+    SUPERNOTIFY_MOBILE_ACTIONS,
+    YAML_DATA_KEY,
+    ChangeSource,
+)
 from custom_components.autoarm.helpers import AppHealthTracker
 from custom_components.autoarm.notifier import Notifier
 
@@ -630,3 +640,94 @@ async def test_notify_skipped_when_action_is_empty_string(hass: HomeAssistant) -
     """Test that notification hits else branch when notify_action is empty string."""
     notifier = Notifier({"backstop": {}}, hass, Mock(spec=AppHealthTracker), notify_action="")
     await notifier.notify(ChangeSource.BUTTON, message="Empty action")
+
+
+async def test_notify_supernotify_action_takes_data_at_top_level(hass: HomeAssistant) -> None:
+    """supernotify.notify has no nested data section, and gets the mobile actions by default."""
+    notify_config: ConfigType = NOTIFY_SCHEMA({
+        "common": {"data": {"priority": "high"}},
+        "normal": {"scenario": ["security"]},
+    })
+    armer = AlarmArmer(
+        hass,
+        TEST_PANEL,
+        notify_enabled=True,
+        notify_action="supernotify.notify",
+        notify_targets=["person.jey"],
+        notify_profiles=notify_config,
+    )
+    calls: list[dict[str, Any]] = []
+
+    @callback
+    def mock_handler(call: ServiceCall) -> None:
+        calls.append(dict(call.data))
+
+    hass.services.async_register("supernotify", "notify", mock_handler)
+    assert armer.notifier is not None
+    await armer.notifier.notify(ChangeSource.CALENDAR, AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_AWAY)
+    await hass.async_block_till_done()
+
+    [data] = calls
+    assert "data" not in data
+    assert data["message"] == "Alarm state changed from disarmed to armed_away by Calendar"
+    assert data["priority"] == "high"
+    assert data["apply_scenarios"] == ["security"]
+    assert data["target"] == ["person.jey"]
+    assert data["actions"] == SUPERNOTIFY_MOBILE_ACTIONS
+
+
+async def test_notify_uses_options_action_over_common_default(hass: HomeAssistant) -> None:
+    """The action chosen in the options is used rather than the common profile's default notify.send_message."""
+    armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_action="notify.chosen", notify_profiles=NOTIFY_SCHEMA({}))
+    calls: list[str] = []
+
+    @callback
+    def mock_handler(call: ServiceCall) -> None:
+        calls.append(call.service)
+
+    hass.services.async_register("notify", "chosen", mock_handler)
+    hass.services.async_register("notify", "send_message", mock_handler)
+    assert armer.notifier is not None
+    await armer.notifier.notify(ChangeSource.CALENDAR, AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_AWAY)
+    await hass.async_block_till_done()
+
+    assert calls == ["chosen"]
+
+
+async def test_notify_profile_service_beats_options_action(hass: HomeAssistant) -> None:
+    notify_config: ConfigType = NOTIFY_SCHEMA({"quiet": {"service": "notify.quiet_service", "source": ["calendar"]}})
+    armer = AlarmArmer(hass, TEST_PANEL, notify_enabled=True, notify_action="notify.chosen", notify_profiles=notify_config)
+    calls: list[str] = []
+
+    @callback
+    def mock_handler(call: ServiceCall) -> None:
+        calls.append(call.service)
+
+    hass.services.async_register("notify", "chosen", mock_handler)
+    hass.services.async_register("notify", "quiet_service", mock_handler)
+    assert armer.notifier is not None
+    await armer.notifier.notify(ChangeSource.CALENDAR, AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_AWAY)
+    await hass.async_block_till_done()
+
+    assert calls == ["quiet_service"]
+
+
+async def test_notify_from_options_without_yaml(hass: HomeAssistant, mock_notify: Any) -> None:
+    """A UI only setup, with no YAML notify profiles, still notifies with the options action."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_ALARM_PANEL: TEST_PANEL},
+        options={CONF_NOTIFY_ENABLED: True, CONF_NOTIFY_ACTION: "notify.supernotify"},
+    )
+    entry.add_to_hass(hass)
+    hass.data[YAML_DATA_KEY] = {}
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    mock_notify.calls.clear()
+
+    notifier = hass.data[HASS_DATA_KEY].armer.notifier
+    assert notifier is not None
+    await notifier.notify(ChangeSource.CALENDAR, AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_AWAY)
+    await hass.async_block_till_done()
+
+    assert len(mock_notify.calls) == 1

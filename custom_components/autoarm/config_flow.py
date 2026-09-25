@@ -38,6 +38,7 @@ from .const import (
     NO_CAL_EVENT_OPTIONS,
     NOTIFY_COMMON,
     PUBLIC_ALARM_STATES,
+    SUPERNOTIFY_ACTION,
 )
 
 CONF_CALENDAR_ENTITIES = "calendar_entities"
@@ -53,6 +54,8 @@ CONF_SUNRISE_EARLIEST = "sunrise_earliest"
 CONF_SUNRISE_LATEST = "sunrise_latest"
 CONF_SUNSET_EARLIEST = "sunset_earliest"
 CONF_SUNSET_LATEST = "sunset_latest"
+CONF_USE_ALARM_SERVICE = "use_alarm_service"
+CONF_SENTENCE_COMMANDS = "sentence_commands"
 
 DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES: list[str] = ["disarmed", "armed_home", "armed_night", "armed_away"]
 
@@ -78,6 +81,8 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_SUNRISE_LATEST: None,
     CONF_SUNSET_EARLIEST: None,
     CONF_SUNSET_LATEST: None,
+    CONF_USE_ALARM_SERVICE: False,
+    CONF_SENTENCE_COMMANDS: False,
 }
 
 
@@ -139,6 +144,8 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_SUNRISE_LATEST: None,
                 CONF_SUNSET_EARLIEST: None,
                 CONF_SUNSET_LATEST: None,
+                CONF_USE_ALARM_SERVICE: False,
+                CONF_SENTENCE_COMMANDS: False,
             }
 
             return self.async_create_entry(
@@ -193,6 +200,8 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_SUNRISE_LATEST: _time_to_str(sunrise_config.get(CONF_LATEST)),
             CONF_SUNSET_EARLIEST: _time_to_str(sunset_config.get(CONF_EARLIEST)),
             CONF_SUNSET_LATEST: _time_to_str(sunset_config.get(CONF_LATEST)),
+            CONF_USE_ALARM_SERVICE: False,
+            CONF_SENTENCE_COMMANDS: False,
         }
 
         return self.async_create_entry(
@@ -231,6 +240,8 @@ class AutoArmOptionsFlow(OptionsFlow):
 
         options = self.config_entry.options
         notify_services = sorted(f"notify.{service}" for service in self.hass.services.async_services().get("notify", {}))
+        if self.hass.services.has_service("supernotify", "notify"):
+            notify_services.insert(0, SUPERNOTIFY_ACTION)
 
         return self.async_show_form(
             step_id="init",
@@ -239,6 +250,10 @@ class AutoArmOptionsFlow(OptionsFlow):
                     CONF_ALARM_PANEL,
                     default=self.config_entry.data.get(CONF_ALARM_PANEL, ""),
                 ): EntitySelector(EntitySelectorConfig(domain="alarm_control_panel")),
+                vol.Required(
+                    CONF_USE_ALARM_SERVICE,
+                    default=options.get(CONF_USE_ALARM_SERVICE, False),
+                ): BooleanSelector(),
                 vol.Optional(
                     CONF_CALENDAR_ENTITIES,
                     default=options.get(CONF_CALENDAR_ENTITIES, []),
@@ -311,6 +326,15 @@ class AutoArmOptionsFlow(OptionsFlow):
                             CONF_NOTIFY_TARGETS,
                             default=options.get(CONF_NOTIFY_TARGETS, []),
                         ): TextSelector(TextSelectorConfig(multiple=True)),
+                    }),
+                    {"collapsed": True},
+                ),
+                vol.Required("assist_options"): section(
+                    vol.Schema({
+                        vol.Required(
+                            CONF_SENTENCE_COMMANDS,
+                            default=options.get(CONF_SENTENCE_COMMANDS, False),
+                        ): BooleanSelector(),
                     }),
                     {"collapsed": True},
                 ),

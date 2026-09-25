@@ -31,6 +31,7 @@
                 "title": "Opciones de Auto Arm",
                 "data": {
                     "alarm_panel": "Panel de control de alarma a gestionar",
+                    "use_alarm_service": "Cambiar el estado con las acciones del panel de alarma",
                     "calendar_entities": "Calendarios a usar para los horarios de armado",
                     "person_entities": "Personas para el armado basado en ocupación",
                     "occupancy_default_day": "Estado de armado predeterminado cuando está ocupado durante el día",
@@ -60,6 +61,15 @@
                             "notify_targets": "Lista de direcciones o entidades de notificación a las que notificar; puede dejarse en blanco para Supernotify"
                         }
                     },
+                    "assist_options": {
+                        "name": "Asistente de voz",
+                        "data": {
+                            "sentence_commands": "Frases para el agente integrado"
+                        },
+                        "data_description": {
+                            "sentence_commands": "Frases en inglés para el agente Assist integrado de Home Assistant, como 'arm the alarm', 'disarm the alarm' y 'why is the alarm armed'. Cualquiera que pueda hablar con Assist podrá desarmar la alarma."
+                        }
+                    },
                     "sunrise_options": {
                         "name": "Restricciones de amanecer",
                         "data": {
@@ -82,6 +92,9 @@
                             "sunset_latest": "El atardecer no después de esta hora"
                         }
                     }
+                },
+                "data_description": {
+                    "use_alarm_service": "Llama a las acciones alarm_control_panel de armado y desarmado en lugar de establecer el estado directamente. Necesario para paneles como Alarmo que hacen su propio procesamiento, como armar áreas hijas. El panel no debe requerir código."
                 }
             }
         }

@@ -31,6 +31,7 @@
                 "title": "Auto Arm विकल्प",
                 "data": {
                     "alarm_panel": "प्रबंधित करने के लिए अलार्म कंट्रोल पैनल",
+                    "use_alarm_service": "अलार्म पैनल की क्रियाओं से स्थिति बदलें",
                     "calendar_entities": "आर्मिंग शेड्यूल के लिए उपयोग किए जाने वाले कैलेंडर",
                     "person_entities": "उपस्थिति आधारित आर्मिंग के लिए लोग",
                     "occupancy_default_day": "दिन में उपस्थित होने पर डिफ़ॉल्ट आर्मिंग स्थिति",
@@ -60,6 +61,15 @@
                             "notify_targets": "सूचित करने के लिए पतों या सूचना इकाइयों की सूची; Supernotify के लिए खाली छोड़ा जा सकता है"
                         }
                     },
+                    "assist_options": {
+                        "name": "वॉइस सहायक",
+                        "data": {
+                            "sentence_commands": "अंतर्निहित एजेंट वाक्य"
+                        },
+                        "data_description": {
+                            "sentence_commands": "Home Assistant के अंतर्निहित Assist एजेंट के लिए अंग्रेज़ी वाक्य, जैसे 'arm the alarm', 'disarm the alarm' और 'why is the alarm armed'। जो भी Assist से बात कर सकता है, वह अलार्म को डिसआर्म कर सकेगा।"
+                        }
+                    },
                     "sunrise_options": {
                         "name": "सूर्योदय प्रतिबंध",
                         "data": {
@@ -82,6 +92,9 @@
                             "sunset_latest": "सूर्यास्त इस समय के बाद नहीं"
                         }
                     }
+                },
+                "data_description": {
+                    "use_alarm_service": "स्थिति को सीधे सेट करने के बजाय alarm_control_panel की आर्म और डिसआर्म क्रियाएँ कॉल करें। Alarmo जैसे पैनल के लिए आवश्यक जो अपनी प्रक्रिया करते हैं, जैसे चाइल्ड क्षेत्रों को आर्म करना। पैनल को कोड की आवश्यकता नहीं होनी चाहिए।"
                 }
             }
         }

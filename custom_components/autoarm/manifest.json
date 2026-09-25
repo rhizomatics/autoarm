@@ -4,6 +4,7 @@
     "after_dependencies": [
         "mobile_app",
         "calendar",
+        "conversation",
         "local_calendar",
         "notify",
         "supernotify",
@@ -22,5 +23,5 @@
     "issue_tracker": "https://github.com/rhizomatics/autoarm/issues",
     "quality_scale": "silver",
     "requirements": [],
-    "version": "1.1.5"
+    "version": "1.2.0"
 }

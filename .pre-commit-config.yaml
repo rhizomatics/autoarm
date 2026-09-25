@@ -10,7 +10,7 @@ repos:
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.8
+    rev: v0.16.9
 
     hooks:
      # Run the linter.
@@ -50,6 +50,7 @@ repos:
           - types-python-slugify>=8.0.2.20240310
           - voluptuous-stubs>=0.1.1
           - pytest
+          - types-freezegun
           - types-PyYAML
           - types-aiofiles
           - pytest_unordered

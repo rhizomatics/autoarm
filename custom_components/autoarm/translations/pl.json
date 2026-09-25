@@ -31,6 +31,7 @@
                 "title": "Opcje Auto Arm",
                 "data": {
                     "alarm_panel": "Panel kontroli alarmu do zarządzania",
+                    "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
                     "calendar_entities": "Kalendarze używane do harmonogramów uzbrajania",
                     "person_entities": "Osoby do uzbrajania na podstawie obecności",
                     "occupancy_default_day": "Domyślny stan uzbrojenia przy obecności w ciągu dnia",
@@ -60,6 +61,15 @@
                             "notify_targets": "Lista adresów lub encji powiadomień do powiadomienia; można pozostawić puste dla Supernotify"
                         }
                     },
+                    "assist_options": {
+                        "name": "Asystent głosowy",
+                        "data": {
+                            "sentence_commands": "Zdania dla wbudowanego agenta"
+                        },
+                        "data_description": {
+                            "sentence_commands": "Angielskie zdania dla wbudowanego agenta Assist w Home Assistant, takie jak 'arm the alarm', 'disarm the alarm' i 'why is the alarm armed'. Każdy, kto może mówić do Assist, będzie mógł rozbroić alarm."
+                        }
+                    },
                     "sunrise_options": {
                         "name": "Ograniczenia wschodu słońca",
                         "data": {
@@ -82,6 +92,9 @@
                             "sunset_latest": "Zachód słońca nie później niż o tej godzinie"
                         }
                     }
+                },
+                "data_description": {
+                    "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Panel nie może wymagać kodu."
                 }
             }
         }

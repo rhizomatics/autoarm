@@ -31,6 +31,7 @@
                 "title": "Opções do Auto Arm",
                 "data": {
                     "alarm_panel": "Painel de controlo de alarme a gerir",
+                    "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
                     "calendar_entities": "Calendários a usar para os horários de armar",
                     "person_entities": "Pessoas para armar com base na ocupação",
                     "occupancy_default_day": "Estado de armar predefinido quando ocupado durante o dia",
@@ -60,6 +61,15 @@
                             "notify_targets": "Lista de endereços ou entidades de notificação a notificar; pode ficar em branco para Supernotify"
                         }
                     },
+                    "assist_options": {
+                        "name": "Assistente de voz",
+                        "data": {
+                            "sentence_commands": "Frases para o agente integrado"
+                        },
+                        "data_description": {
+                            "sentence_commands": "Frases em inglês para o agente Assist integrado do Home Assistant, como 'arm the alarm', 'disarm the alarm' e 'why is the alarm armed'. Qualquer pessoa que fale com o Assist poderá desarmar o alarme."
+                        }
+                    },
                     "sunrise_options": {
                         "name": "Restrições do nascer do sol",
                         "data": {
@@ -82,6 +92,9 @@
                             "sunset_latest": "Pôr do sol não depois desta hora"
                         }
                     }
+                },
+                "data_description": {
+                    "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. O painel não deve exigir código."
                 }
             }
         }
