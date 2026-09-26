@@ -64,11 +64,39 @@ async def test_arm_propagates_given_context(hass: HomeAssistant) -> None:
     assert changes[0].context is context
 
 
-async def test_no_cause_event_when_context_given(hass: HomeAssistant) -> None:
+async def test_no_cause_event_when_context_already_has_one(hass: HomeAssistant) -> None:
+    causes = _capture_causes(hass)
+    armer = _armer(hass, use_alarm_service=False)
+    context = Context(user_id=USER_ID)
+    # as when AutoArm's own action is called, which the logbook already shows as the cause
+    Event("call_service", {"domain": DOMAIN, "service": "reset_state"}, context=context)
+
+    await armer.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.ACTION, context=context)
+    await hass.async_block_till_done()
+
+    assert causes == []
+
+
+async def test_given_context_starts_with_cause_event(hass: HomeAssistant, panel_actions: list[ServiceCall]) -> None:
+    causes = _capture_causes(hass)
+    armer = _armer(hass, use_alarm_service=True)
+    moved = Context(user_id=USER_ID)
+    context = Context(user_id=USER_ID, parent_id=moved.id)
+
+    await armer.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.OCCUPANCY, context=context)
+    await hass.async_block_till_done()
+
+    assert causes[0].data["source"] == "occupancy"
+    # the logbook takes the first event fired with a context as its cause, not the panel action
+    assert context.origin_event is causes[0]
+    assert panel_actions[0].context is context
+
+
+async def test_no_cause_event_without_a_change(hass: HomeAssistant) -> None:
     causes = _capture_causes(hass)
     armer = _armer(hass, use_alarm_service=False)
 
-    await armer.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.BUTTON, context=Context(user_id=USER_ID))
+    await armer.arm(AlarmControlPanelState.DISARMED, source=ChangeSource.OCCUPANCY, context=Context())
     await hass.async_block_till_done()
 
     assert causes == []
