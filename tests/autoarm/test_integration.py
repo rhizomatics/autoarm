@@ -7,7 +7,7 @@ import pytest
 from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, AlarmControlPanelState
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_CONDITIONS, CONF_DELAY_TIME, CONF_ENTITY_ID
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import Context, Event, HomeAssistant, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import issue_registry as ir
@@ -118,6 +118,21 @@ async def test_reset_service(hass: HomeAssistant, mock_notify: Any) -> None:
     assert response is not None
     assert response["change"] == "armed_away"
     assert hass.states.get("sensor.autoarm_last_intervention").state == "action"  # type: ignore
+
+
+async def test_reset_service_propagates_context(hass: HomeAssistant, mock_notify: Any) -> None:
+    await _setup_entry(hass)
+    changes: list[Event] = []
+    hass.bus.async_listen(f"{DOMAIN}_change", changes.append)
+    hass.states.async_set("alarm_panel.testing", "pending")
+    await hass.async_block_till_done()
+    context = Context(user_id="user-1234")
+
+    await hass.services.async_call("autoarm", "reset_state", None, blocking=True, return_response=True, context=context)
+
+    assert changes[-1].data["new_state"] == "armed_away"
+    assert changes[-1].context is context
+    assert mock_notify.calls[-1].context is context
 
 
 async def test_reset_service_without_loaded_entry(hass: HomeAssistant, mock_notify: Any) -> None:

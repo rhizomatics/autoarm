@@ -15,7 +15,7 @@ from .const import DOMAIN, ConditionVariables
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from homeassistant.core import HomeAssistant
+    from homeassistant.core import Context, HomeAssistant
     from homeassistant.helpers.typing import ConfigType, TemplateVarsType
 
 
@@ -101,10 +101,10 @@ class HomeAssistantAPI:
             _LOGGER.error("AUTOARM Condition eval failed: %s", e)
             raise
 
-    def fire_event(self, event_name: str, event_data: dict[str, Any] | None = None) -> None:
+    def fire_event(self, event_name: str, event_data: dict[str, Any] | None = None, context: Context | None = None) -> None:
         if self._hass is not None:
             _LOGGER.debug("AUTOARM Firing %s event: %s", event_name, event_data)
-            self._hass.bus.async_fire(f"{DOMAIN}_{event_name}", event_data)
+            self._hass.bus.async_fire(f"{DOMAIN}_{event_name}", event_data, context=context)
 
 
 class ConditionErrorLoggingAdaptor(logging.LoggerAdapter["logging.Logger"]):

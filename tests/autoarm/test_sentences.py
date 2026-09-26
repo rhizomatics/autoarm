@@ -11,7 +11,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEvent
-from homeassistant.core import Context, HomeAssistant, ServiceCall
+from homeassistant.core import Context, Event, HomeAssistant, ServiceCall
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from conftest import TEST_PANEL
@@ -243,6 +243,8 @@ async def test_sentences_registered_and_answer(hass: HomeAssistant) -> None:
     assert {c["id"]: c["command"] for c in configs} == SENTENCES
     assert all(c["platform"] == "conversation" for c in configs)
 
+    changes: list[Event] = []
+    hass.bus.async_listen(f"{DOMAIN}_change", changes.append)
     action = initialize.call_args.args[2]
     result = await action({
         "trigger": {"id": "armed_night", "user_input": {"context": {"id": "abc", "user_id": USER_ID}}},
@@ -251,6 +253,8 @@ async def test_sentences_registered_and_answer(hass: HomeAssistant) -> None:
     panel = hass.states.get(TEST_PANEL)
     assert panel is not None
     assert panel.state == "armed_night"
+    assert changes[0].context.user_id == USER_ID
+    assert changes[0].context.parent_id == "abc"
 
     assert await hass.config_entries.async_unload(entry.entry_id)
     remove.assert_called_once()

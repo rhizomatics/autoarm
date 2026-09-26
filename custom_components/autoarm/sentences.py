@@ -119,7 +119,7 @@ async def async_respond(armer: AlarmArmer, command: str, context: HAContext) -> 
         return f"The alarm is already {_say(state)}"
     armer.record_intervention(source=ChangeSource.VOICE, state=state)
     new_state = await armer.arm(
-        state, source=ChangeSource.VOICE, change_context={"caller": "sentences", "user_id": context.user_id}
+        state, source=ChangeSource.VOICE, change_context={"caller": "sentences", "user_id": context.user_id}, context=context
     )
     if new_state is None:
         return f"Sorry, the alarm couldn't be {_say(state)}"

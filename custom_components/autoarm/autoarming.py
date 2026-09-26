@@ -25,6 +25,7 @@ from homeassistant.const import (
     Platform,
 )
 from homeassistant.core import (
+    Context,
     Event,
     EventStateChangedData,
     HomeAssistant,
@@ -117,6 +118,7 @@ from .helpers import (
     Limiter,
     alarm_state_as_enum,
     change_source_as_enum,
+    child_context,
     deobjectify,
     safe_state,
 )
@@ -254,13 +256,13 @@ async def async_setup(
         supports_response=SupportsResponse.ONLY,
     )
 
-    async def reset_service(_call: ServiceCall) -> ServiceResponse:
+    async def reset_service(call: ServiceCall) -> ServiceResponse:
         entries: list[AutoArmConfigEntry] = hass.config_entries.async_loaded_entries(DOMAIN)
         if not entries:
             raise ServiceValidationError(translation_domain=DOMAIN, translation_key="not_loaded")
         armer = entries[0].runtime_data
         new_state = await armer.reset_armed_state(
-            intervention=armer.record_intervention(source=ChangeSource.ACTION, state=None)
+            intervention=armer.record_intervention(source=ChangeSource.ACTION, state=None), context=call.context
         )
         return {"change": new_state or "NO_CHANGE"}
 
@@ -876,7 +878,9 @@ class AlarmArmer:
             new_attributes = new_obj.attributes
         return entity_id, old, new, new_attributes
 
-    async def pending_state(self, source: ChangeSource | None, change_context: dict[str, Any] | None = None) -> None:
+    async def pending_state(
+        self, source: ChangeSource | None, change_context: dict[str, Any] | None = None, context: Context | None = None
+    ) -> None:
         self.pre_pending_state = self.armed_state()
         change_context = change_context or {}
         change_context.update({
@@ -889,6 +893,7 @@ class AlarmArmer:
             AlarmControlPanelState.PENDING,
             source=source,
             change_context=change_context,
+            context=context,
         )
 
     @callback
@@ -901,7 +906,7 @@ class AlarmArmer:
         await self.reset_armed_state(**kwargs)
 
     async def reset_armed_state(
-        self, intervention: Intervention | None = None, source: ChangeSource | None = None
+        self, intervention: Intervention | None = None, source: ChangeSource | None = None, context: Context | None = None
     ) -> str | None:
         """Logic to automatically work out appropriate current armed state"""
         state: AlarmControlPanelState | None = None
@@ -954,6 +959,7 @@ class AlarmArmer:
                             "calendar_no_event_mode": self.calendar_no_event_mode,
                             "caller": "reset_armed_state",
                         },
+                        context=context,
                     )
                 if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
                     _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
@@ -984,7 +990,10 @@ class AlarmArmer:
             if state is not None and state != AlarmControlPanelState.PENDING and state != existing_state:
                 reset_decision = "change_state"
                 state = await self.arm(
-                    state, source=source, change_context={"reset_decision": reset_decision, "caller": "reset_armed_state"}
+                    state,
+                    source=source,
+                    change_context={"reset_decision": reset_decision, "caller": "reset_armed_state"},
+                    context=context,
                 )
 
         finally:
@@ -1051,6 +1060,7 @@ class AlarmArmer:
         arming_state: AlarmControlPanelState | None,
         source: ChangeSource | None = None,
         change_context: dict[str, Any] | None = None,
+        context: Context | None = None,
     ) -> AlarmControlPanelState | None:
         """Change alarm panel state
 
@@ -1059,6 +1069,7 @@ class AlarmArmer:
             arming_state (str, optional): _description_. Defaults to None.
             source (str,optional): Source of the change, for example 'calendar' or 'button'
             change_context (dict,optional): Detailed context for the reason arm triggered
+            context (Context,optional): Home Assistant context of whatever caused the change, new one if None
 
         Returns:
         -------
@@ -1076,6 +1087,8 @@ class AlarmArmer:
         if self.rate_limiter.triggered():
             _LOGGER.debug("AUTOARM Rate limit triggered by %s, skipping arm", source)
             return None
+        # one context for the panel change, notification and event, so they can be traced together
+        context = context or Context()
         try:
             self.arming_in_progress.set()
             existing_state: AlarmControlPanelState | None = self.armed_state()
@@ -1101,6 +1114,7 @@ class AlarmArmer:
                             service_name,
                             {"entity_id": self.alarm_panel},
                             blocking=True,
+                            context=context,
                         )
                     except Exception:
                         # Do NOT fall back to direct state set for Alarmo;
@@ -1151,11 +1165,12 @@ class AlarmArmer:
                         entity_id=self.alarm_panel,
                         new_state=str(arming_state),
                         attributes=attrs,
+                        context=context,
                     )
 
                 _LOGGER.info("AUTOARM Setting %s from %s to %s for %s", self.alarm_panel, existing_state, arming_state, source)
                 if self.notifier and source and arming_state:
-                    await self.notifier.notify(source=source, from_state=existing_state, to_state=arming_state)
+                    await self.notifier.notify(source=source, from_state=existing_state, to_state=arming_state, context=context)
 
                 self.last_change = StateChange(
                     created_at=dt_util.now(),
@@ -1178,6 +1193,7 @@ class AlarmArmer:
                         "night": self.is_night(),
                         "context": change_context or {},
                     },
+                    context=context,
                 )
                 return arming_state
             _LOGGER.debug("AUTOARM Skipping arm for %s, as %s already %s", source, self.alarm_panel, arming_state)
@@ -1195,17 +1211,24 @@ class AlarmArmer:
         state: AlarmControlPanelState | None,
         intervention: Intervention | None,
         source: ChangeSource | None = None,
+        context: Context | None = None,
     ) -> None:
         source = source or intervention.source if intervention else None
 
         job: Callable[[dt.datetime], Coroutine[Any, Any, None] | None]
         if state is None:
             _LOGGER.debug("AUTOARM Delayed reset, triggered at: %s, source%s", trigger_time, source)
-            job = partial(self.delayed_reset_armed_state, intervention=intervention, source=source, requested_at=dt_util.now())
+            job = partial(
+                self.delayed_reset_armed_state,
+                intervention=intervention,
+                source=source,
+                requested_at=dt_util.now(),
+                context=context,
+            )
         else:
             _LOGGER.debug("AUTOARM Delayed arm %s, triggered at: %s, source%s", state, trigger_time, source)
 
-            job = partial(self.delayed_arm, arming_state=state, source=source, requested_at=dt_util.now())
+            job = partial(self.delayed_arm, arming_state=state, source=source, requested_at=dt_util.now(), context=context)
 
         self.unsubscribes.append(
             async_track_point_in_time(
@@ -1283,6 +1306,7 @@ class AlarmArmer:
     async def on_mobile_action(self, event: Event) -> None:
         _LOGGER.debug("AUTOARM Mobile Action: %s", event)
         source: ChangeSource = ChangeSource.MOBILE
+        context: Context = child_context(event.context)
 
         match event.data.get("action"):
             case "ALARM_PANEL_DISARM":
@@ -1291,15 +1315,19 @@ class AlarmArmer:
                     AlarmControlPanelState.DISARMED,
                     source=source,
                     change_context={"caller": "on_mobile_action", "event_data": event.data, "event_type": event.event_type},
+                    context=context,
                 )
             case "ALARM_PANEL_RESET":
-                await self.reset_armed_state(intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None))
+                await self.reset_armed_state(
+                    intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None), context=context
+                )
             case "ALARM_PANEL_AWAY":
                 self.record_intervention(source=source, state=AlarmControlPanelState.ARMED_AWAY)
                 await self.arm(
                     AlarmControlPanelState.ARMED_AWAY,
                     source=source,
                     change_context={"caller": "on_mobile_action", "event_data": event.data, "event_type": event.event_type},
+                    context=context,
                 )
             case _:
                 _LOGGER.debug("AUTOARM Ignoring mobile action: %s", event.data)
@@ -1307,9 +1335,10 @@ class AlarmArmer:
     @callback
     async def on_alarm_state_button(self, state: AlarmControlPanelState, delay: dt.timedelta | None, event: Event) -> None:
         _LOGGER.debug("AUTOARM Alarm %s Button: %s", state, event)
+        context: Context = child_context(event.context)
         intervention = self.record_intervention(source=ChangeSource.BUTTON, state=state)
         if delay:
-            self.schedule_state(dt_util.now() + delay, state, intervention, source=ChangeSource.BUTTON)
+            self.schedule_state(dt_util.now() + delay, state, intervention, source=ChangeSource.BUTTON, context=context)
             if self.notifier:
                 await self.notifier.notify(
                     ChangeSource.BUTTON,
@@ -1317,6 +1346,7 @@ class AlarmArmer:
                     to_state=state,
                     message=f"Alarm will be set to {state} in {delay}",
                     title=f"Arm set to {state} process starting",
+                    context=context,
                 )
         else:
             await self.arm(
@@ -1328,22 +1358,27 @@ class AlarmArmer:
                     "delay": str(delay),
                     "event_type": event.event_type,
                 },
+                context=context,
             )
 
     @callback
     async def on_reset_button(self, delay: dt.timedelta | None, event: Event) -> None:
         _LOGGER.debug("AUTOARM Reset Button: %s", event)
+        context: Context = child_context(event.context)
         intervention = self.record_intervention(source=ChangeSource.BUTTON, state=None)
         if delay:
-            self.schedule_state(dt_util.now() + delay, None, intervention, ChangeSource.BUTTON)
+            self.schedule_state(dt_util.now() + delay, None, intervention, ChangeSource.BUTTON, context=context)
             if self.notifier:
                 await self.notifier.notify(
                     ChangeSource.BUTTON,
                     message=f"Alarm will be reset in {delay}",
                     title="Alarm reset wait initiated",
+                    context=context,
                 )
         else:
-            await self.reset_armed_state(intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None))
+            await self.reset_armed_state(
+                intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None), context=context
+            )
 
     @callback
     async def on_occupancy_change(self, event: Event[EventStateChangedData]) -> None:
@@ -1368,12 +1403,17 @@ class AlarmArmer:
         _LOGGER.debug(
             "AUTOARM Occupancy state Change: %s, state:%s->%s, event: %s, attrs:%s", entity_id, old, new, event, new_attributes
         )
+        context: Context = child_context(event.context)
         if new in self.occupied_delay:
             self.schedule_state(
-                dt_util.now() + self.occupied_delay[new], state=None, intervention=None, source=ChangeSource.OCCUPANCY
+                dt_util.now() + self.occupied_delay[new],
+                state=None,
+                intervention=None,
+                source=ChangeSource.OCCUPANCY,
+                context=context,
             )
         else:
-            await self.reset_armed_state(source=ChangeSource.OCCUPANCY)
+            await self.reset_armed_state(source=ChangeSource.OCCUPANCY, context=context)
 
     @callback
     async def on_panel_change(self, event: Event[EventStateChangedData]) -> None:
@@ -1411,12 +1451,13 @@ class AlarmArmer:
         )
         self.virtual_pending = False
         self.record_intervention(ChangeSource.ALARM_PANEL, new_state)
+        context: Context = child_context(event.context)
         if new in ZOMBIE_STATES:
             _LOGGER.warning("AUTOARM Dezombifying %s ...", new)
-            await self.reset_armed_state(source=ChangeSource.ZOMBIFICATION)
+            await self.reset_armed_state(source=ChangeSource.ZOMBIFICATION, context=context)
         elif new != old:
             if self.notifier:
-                await self.notifier.notify(ChangeSource.ALARM_PANEL, old_state, new_state)
+                await self.notifier.notify(ChangeSource.ALARM_PANEL, old_state, new_state, context=context)
         else:
             _LOGGER.debug("AUTOARM panel change leaves state unchanged at %s", new)
 

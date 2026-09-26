@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 import homeassistant.util.dt as dt_util
 from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
-from homeassistant.core import State
+from homeassistant.core import Context, State
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.json import ExtendedJSONEncoder
 
@@ -36,6 +36,13 @@ def change_source_as_enum(source_str: str | None) -> ChangeSource | None:
     except ValueError as e:
         _LOGGER.warning("AUTOARM Invalid change source: %s", e)
         return None
+
+
+def child_context(parent: Context | None) -> Context:
+    """Context for AutoArm's reaction to an event or action, linked back to what caused it"""
+    if parent is None:
+        return Context()
+    return Context(user_id=parent.user_id, parent_id=parent.id)
 
 
 def safe_state(state: State | None) -> str | None:

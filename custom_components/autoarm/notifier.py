@@ -3,7 +3,7 @@ from typing import Any
 
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import CONF_SERVICE, CONF_SOURCE, CONF_STATE, CONF_TARGET
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Context, HomeAssistant
 
 from custom_components.autoarm.const import (
     ALARM_STATES,
@@ -41,6 +41,7 @@ class Notifier:
         to_state: AlarmControlPanelState | None = None,
         message: str | None = None,
         title: str | None = None,
+        context: Context | None = None,
     ) -> None:
 
         try:
@@ -141,6 +142,7 @@ class Notifier:
                         action,
                         service_data=service_data,
                         target=target,
+                        context=context,
                     )
                 except Exception as e:
                     _LOGGER.error("AUTOARM notify failure, %s.%s: %s [%s]", domain, action, service_data, e)
