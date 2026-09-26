@@ -1089,7 +1089,7 @@ class AlarmArmer:
             _LOGGER.debug("AUTOARM Rate limit triggered by %s, skipping arm", source)
             return None
         # one context for the panel change, notification and event, so they can be traced together
-        context = context or self.cause(source, (change_context or {}).get("summary"))
+        context = self.cause(source, (change_context or {}).get("summary"), context)
         try:
             self.arming_in_progress.set()
             existing_state: AlarmControlPanelState | None = self.armed_state()
@@ -1239,9 +1239,16 @@ class AlarmArmer:
             )
         )
 
-    def cause(self, source: ChangeSource | None, summary: str | None = None) -> Context:
-        """New context for a change AutoArm makes on its own, fired as an event first so the logbook shows the cause"""
-        context = Context()
+    def cause(self, source: ChangeSource | None, summary: str | None = None, context: Context | None = None) -> Context:
+        """Context for a change AutoArm makes, starting with an event so the logbook shows the cause
+
+        A context passed in, such as one linked back to a button press, only gets the event if nothing has
+        been fired with it yet, as the logbook takes the first event as the cause, which would otherwise be
+        the panel action AutoArm calls
+        """
+        context = context or Context()
+        if context.origin_event is not None:
+            return context
         self.hass_api.fire_event(
             event_name="triggered",
             event_data={
@@ -1350,7 +1357,8 @@ class AlarmArmer:
     @callback
     async def on_alarm_state_button(self, state: AlarmControlPanelState, delay: dt.timedelta | None, event: Event) -> None:
         _LOGGER.debug("AUTOARM Alarm %s Button: %s", state, event)
-        context: Context = child_context(event.context)
+        # caused now, as a delayed press notifies before the change
+        context: Context = self.cause(ChangeSource.BUTTON, context=child_context(event.context))
         intervention = self.record_intervention(source=ChangeSource.BUTTON, state=state)
         if delay:
             self.schedule_state(dt_util.now() + delay, state, intervention, source=ChangeSource.BUTTON, context=context)
@@ -1379,7 +1387,8 @@ class AlarmArmer:
     @callback
     async def on_reset_button(self, delay: dt.timedelta | None, event: Event) -> None:
         _LOGGER.debug("AUTOARM Reset Button: %s", event)
-        context: Context = child_context(event.context)
+        # caused now, as a delayed press notifies before the change
+        context: Context = self.cause(ChangeSource.BUTTON, context=child_context(event.context))
         intervention = self.record_intervention(source=ChangeSource.BUTTON, state=None)
         if delay:
             self.schedule_state(dt_util.now() + delay, None, intervention, ChangeSource.BUTTON, context=context)

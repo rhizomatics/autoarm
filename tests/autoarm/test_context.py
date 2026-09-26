@@ -127,6 +127,7 @@ async def test_arm_via_alarm_service_propagates_context(hass: HomeAssistant, pan
 
 async def test_button_press_links_back_to_event(hass: HomeAssistant) -> None:
     changes = _capture_changes(hass)
+    causes = _capture_causes(hass)
     armer = _armer(hass, buttons={AlarmControlPanelState.ARMED_AWAY: {CONF_ENTITY_ID: ["binary_sensor.button"]}})
     armer.initialize_buttons()
     pressed = Context(user_id=USER_ID)
@@ -136,6 +137,9 @@ async def test_button_press_links_back_to_event(hass: HomeAssistant) -> None:
 
     assert changes[0].context.parent_id == pressed.id
     assert changes[0].context.user_id == USER_ID
+    # the cause event comes first, so the logbook shows the button rather than the panel action AutoArm calls
+    assert causes[0].data["source"] == "button"
+    assert causes[0].context is changes[0].context
     armer.shutdown()
 
 
