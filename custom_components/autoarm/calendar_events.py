@@ -144,6 +144,8 @@ class TrackedCalendarEvent:
                 )
                 overridden = True
 
+        # same context for the change and the status, as the calendar event caused both
+        context = self.armer.cause(ChangeSource.CALENDAR, self.event.summary)
         if overridden:
             _LOGGER.info("AUTOARM Calendar arming to %s overridden by occupancy", target_state)
         else:
@@ -158,6 +160,7 @@ class TrackedCalendarEvent:
                     "recurring": self.is_recurring(),
                     "overridable_event": overridable_event,
                 },
+                context=context,
             )
         self.armer.publish_status(
             "last_calendar_event",
@@ -172,6 +175,7 @@ class TrackedCalendarEvent:
                 "new_state": new_state,
                 "overridden": overridden,
             },
+            context=context,
         )
 
     async def on_calendar_event_end(self, ended_at: dt.datetime) -> None:

@@ -220,6 +220,41 @@ async def test_disarm_on_button(hass: HomeAssistant, mock_notify: Any) -> None:
     assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
 
 
+async def test_button_release_is_not_a_press(hass: HomeAssistant, mock_notify: Any) -> None:
+    armer = (await _setup_entry(hass)).runtime_data
+    hass.states.async_set("binary_sensor.button_middle", "on")
+    await hass.async_block_till_done()
+    presses = len(armer.interventions)
+
+    hass.states.async_set("binary_sensor.button_middle", "off")
+    await hass.async_block_till_done()
+
+    assert len(armer.interventions) == presses
+
+
+async def test_button_reconnecting_is_not_a_press(hass: HomeAssistant, mock_notify: Any) -> None:
+    hass.states.async_set("alarm_panel.testing", "armed_away")
+    hass.states.async_set("binary_sensor.button_middle", "unavailable")
+    await _setup_entry(hass)
+
+    hass.states.async_set("binary_sensor.button_middle", "on")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("alarm_panel.testing").state == "armed_away"  # type: ignore
+
+
+async def test_disarm_on_button_entity_press(hass: HomeAssistant, mock_notify: Any) -> None:
+    hass.states.async_set("alarm_panel.testing", "armed_away")
+    hass.states.async_set("button.disarm", "2026-09-26T20:00:00+00:00")
+    await _setup_entry(hass, yaml_config={CONF_BUTTONS: {AlarmControlPanelState.DISARMED: {CONF_ENTITY_ID: ["button.disarm"]}}})
+
+    # a button entity's state is the time it was last pressed
+    hass.states.async_set("button.disarm", "2026-09-26T21:37:55+00:00")
+    await hass.async_block_till_done()
+
+    assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
+
+
 async def test_disarm_on_mobile_action(hass: HomeAssistant, mock_notify: Any) -> None:
     hass.states.async_set("alarm_panel.testing", "armed_away")
     await _setup_entry(hass)

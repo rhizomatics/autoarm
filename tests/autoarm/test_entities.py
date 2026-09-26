@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, EntityCategory
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Context, HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -109,3 +109,14 @@ async def test_unload_leaves_no_live_state(hass: HomeAssistant, mock_notify: Any
     assert entry.state is ConfigEntryState.NOT_LOADED
     state = hass.states.get(entity_id)
     assert state is None or state.state == STATE_UNAVAILABLE
+
+
+async def test_states_carry_context_of_cause(hass: HomeAssistant, mock_notify: Any) -> None:
+    await _setup_entry(hass)
+    context = Context()
+
+    await hass.services.async_call(DOMAIN, "reset_state", None, blocking=True, return_response=True, context=context)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.autoarm_last_intervention").context.id == context.id  # type: ignore
+    assert hass.states.get("sensor.autoarm_last_calculation").context.id == context.id  # type: ignore

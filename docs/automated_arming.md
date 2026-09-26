@@ -48,6 +48,13 @@ Handy if you have a Zigbee, 433Mhz or similar button panel by the door - choose 
 [Button Integrations](https://www.home-assistant.io/integrations/?cat=button) entities
 for `DISARMED`,`ARMED_AWAY` etc, or a *Reset* button to set the panel by the default algorithm.
 
+Two kinds of entity work as buttons:
+
+- **Button entities**, such as `button` or `input_button`, whose state is the time of the last press, so each new time is a press
+- **Binary sensors**, such as a door-side remote, where turning `on` is a press, and turning back `off` is ignored
+
+A button going `unavailable`, `unknown` or coming back online isn't treated as a press, so a remote reconnecting won't change the alarm. On/off switches, where `off` should mean something of its own, aren't supported.
+
 A delay can be set, so if for example you have an *away* button next to the front door, you can give yourself a couple of minutes to exit the property before the alarm is set.
 
 See also the [Manual MQTT Alarm Control Panel](https://www.home-assistant.io/integrations/manual_mqtt/)

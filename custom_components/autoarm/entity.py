@@ -1,5 +1,6 @@
 """Base entity for the AutoArm status entities."""
 
+from homeassistant.core import Context, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity, EntityDescription
@@ -28,4 +29,11 @@ class AutoArmEntity(Entity):
         )
 
     async def async_added_to_hass(self) -> None:
-        self.async_on_remove(async_dispatcher_connect(self.hass, SIGNAL_STATUS_UPDATED, self.async_write_ha_state))
+        self.async_on_remove(async_dispatcher_connect(self.hass, SIGNAL_STATUS_UPDATED, self._on_status_updated))
+
+    @callback
+    def _on_status_updated(self, context: Context | None = None) -> None:
+        # so the state change can be traced back to what caused it
+        if context is not None:
+            self.async_set_context(context)
+        self.async_write_ha_state()

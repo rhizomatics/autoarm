@@ -16,6 +16,8 @@
   - When using actions, `pending` is kept within AutoArm rather than set on the panel, since panels have no action for it
   - `armed_custom_bypass` can now be set using the panel's actions
 - Fixed AutoArm mistaking its own change for a manual one, when using the panel's actions, when the change was triggered by another state change, such as a button press. This could send a panel changed notification, and hold off automatic changes as a manual intervention would
+- Buttons only act on a press, so a binary sensor button turning back `off`, or a button dropping out or coming back online, no longer counts as a manual intervention
+
 ## 1.2.0
 - Support for Alarm Control Panels, such as Alarmo, that require direct service calls to change state. Contributed by @tabascoz
   - Switched on by **Change state using the alarm panel's actions** in the options

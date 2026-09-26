@@ -23,6 +23,9 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STOP,
     SERVICE_RELOAD,
     STATE_HOME,
+    STATE_OFF,
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
     Platform,
 )
 from homeassistant.core import (
@@ -263,7 +266,8 @@ async def async_setup(
             raise ServiceValidationError(translation_domain=DOMAIN, translation_key="not_loaded")
         armer = entries[0].runtime_data
         new_state = await armer.reset_armed_state(
-            intervention=armer.record_intervention(source=ChangeSource.ACTION, state=None), context=call.context
+            intervention=armer.record_intervention(source=ChangeSource.ACTION, state=None, context=call.context),
+            context=call.context,
         )
         return {"change": new_state or "NO_CHANGE"}
 
@@ -1014,6 +1018,7 @@ class AlarmArmer:
                     "intervention": intervention.as_dict() if intervention else None,
                     "reset_decision": reset_decision,
                 },
+                context=context,
             )
 
         return state
@@ -1260,17 +1265,19 @@ class AlarmArmer:
         )
         return context
 
-    def record_intervention(self, source: ChangeSource, state: AlarmControlPanelState | None) -> Intervention:
+    def record_intervention(
+        self, source: ChangeSource, state: AlarmControlPanelState | None, context: Context | None = None
+    ) -> Intervention:
         intervention = Intervention(dt_util.now(), source, state)
         self.interventions.append(intervention)
-        self.publish_status("last_intervention", source, intervention.as_dict())
+        self.publish_status("last_intervention", source, intervention.as_dict(), context=context)
 
         return intervention
 
-    def publish_status(self, key: str, value: Any, attributes: dict[str, Any]) -> None:
-        """Record the latest value for a status entity, and let the entity know"""
+    def publish_status(self, key: str, value: Any, attributes: dict[str, Any], context: Context | None = None) -> None:
+        """Record the latest value for a status entity, and let the entity know, with the context of what caused it"""
         self.status[key] = StatusReport(value, attributes)
-        async_dispatcher_send(self.hass, SIGNAL_STATUS_UPDATED)
+        async_dispatcher_send(self.hass, SIGNAL_STATUS_UPDATED, context)
 
     def has_intervention_since(self, cutoff: dt.datetime) -> bool:
         """Has there been a manual intervention since the cutoff time"""
@@ -1332,7 +1339,7 @@ class AlarmArmer:
 
         match event.data.get("action"):
             case "ALARM_PANEL_DISARM":
-                self.record_intervention(source=source, state=AlarmControlPanelState.DISARMED)
+                self.record_intervention(source=source, state=AlarmControlPanelState.DISARMED, context=context)
                 await self.arm(
                     AlarmControlPanelState.DISARMED,
                     source=source,
@@ -1341,10 +1348,11 @@ class AlarmArmer:
                 )
             case "ALARM_PANEL_RESET":
                 await self.reset_armed_state(
-                    intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None), context=context
+                    intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None, context=context),
+                    context=context,
                 )
             case "ALARM_PANEL_AWAY":
-                self.record_intervention(source=source, state=AlarmControlPanelState.ARMED_AWAY)
+                self.record_intervention(source=source, state=AlarmControlPanelState.ARMED_AWAY, context=context)
                 await self.arm(
                     AlarmControlPanelState.ARMED_AWAY,
                     source=source,
@@ -1354,12 +1362,28 @@ class AlarmArmer:
             case _:
                 _LOGGER.debug("AUTOARM Ignoring mobile action: %s", event.data)
 
+    @staticmethod
+    def is_button_press(event: Event[EventStateChangedData]) -> bool:
+        """A press turns a binary sensor on, or sets a button entity's last pressed time
+
+        Not a binary sensor being released, or a button dropping out or coming back online
+        """
+        old_state: State | None = event.data["old_state"]
+        new_state: State | None = event.data["new_state"]
+        if new_state is None or new_state.state in (STATE_OFF, STATE_UNKNOWN, STATE_UNAVAILABLE):
+            return False
+        return old_state is None or old_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE)
+
     @callback
-    async def on_alarm_state_button(self, state: AlarmControlPanelState, delay: dt.timedelta | None, event: Event) -> None:
+    async def on_alarm_state_button(
+        self, state: AlarmControlPanelState, delay: dt.timedelta | None, event: Event[EventStateChangedData]
+    ) -> None:
         _LOGGER.debug("AUTOARM Alarm %s Button: %s", state, event)
+        if not self.is_button_press(event):
+            return
         # caused now, as a delayed press notifies before the change
         context: Context = self.cause(ChangeSource.BUTTON, context=child_context(event.context))
-        intervention = self.record_intervention(source=ChangeSource.BUTTON, state=state)
+        intervention = self.record_intervention(source=ChangeSource.BUTTON, state=state, context=context)
         if delay:
             self.schedule_state(dt_util.now() + delay, state, intervention, source=ChangeSource.BUTTON, context=context)
             if self.notifier:
@@ -1385,11 +1409,13 @@ class AlarmArmer:
             )
 
     @callback
-    async def on_reset_button(self, delay: dt.timedelta | None, event: Event) -> None:
+    async def on_reset_button(self, delay: dt.timedelta | None, event: Event[EventStateChangedData]) -> None:
         _LOGGER.debug("AUTOARM Reset Button: %s", event)
+        if not self.is_button_press(event):
+            return
         # caused now, as a delayed press notifies before the change
         context: Context = self.cause(ChangeSource.BUTTON, context=child_context(event.context))
-        intervention = self.record_intervention(source=ChangeSource.BUTTON, state=None)
+        intervention = self.record_intervention(source=ChangeSource.BUTTON, state=None, context=context)
         if delay:
             self.schedule_state(dt_util.now() + delay, None, intervention, ChangeSource.BUTTON, context=context)
             if self.notifier:
@@ -1401,7 +1427,7 @@ class AlarmArmer:
                 )
         else:
             await self.reset_armed_state(
-                intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None), context=context
+                intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None, context=context), context=context
             )
 
     @callback
@@ -1474,8 +1500,8 @@ class AlarmArmer:
             new,
         )
         self.virtual_pending = False
-        self.record_intervention(ChangeSource.ALARM_PANEL, new_state)
         context: Context = child_context(event.context)
+        self.record_intervention(ChangeSource.ALARM_PANEL, new_state, context=context)
         if new in ZOMBIE_STATES:
             _LOGGER.warning("AUTOARM Dezombifying %s ...", new)
             await self.reset_armed_state(source=ChangeSource.ZOMBIFICATION, context=context)

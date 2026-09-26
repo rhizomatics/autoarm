@@ -117,7 +117,7 @@ async def async_respond(armer: AlarmArmer, command: str, context: HAContext) -> 
         return f"AutoArm doesn't know the command {command}"
     if armer.armed_state() == state:
         return f"The alarm is already {_say(state)}"
-    armer.record_intervention(source=ChangeSource.VOICE, state=state)
+    armer.record_intervention(source=ChangeSource.VOICE, state=state, context=context)
     new_state = await armer.arm(
         state, source=ChangeSource.VOICE, change_context={"caller": "sentences", "user_id": context.user_id}, context=context
     )

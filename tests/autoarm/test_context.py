@@ -231,3 +231,20 @@ async def test_calendar_event_end_shares_context_for_pending_and_reset(hass: Hom
     armer.cause.assert_called_once_with(ChangeSource.CALENDAR, "Skiing")
     assert armer.pending_state.call_args.kwargs["context"] is armer.cause.return_value
     assert armer.reset_armed_state.call_args.kwargs["context"] is armer.cause.return_value
+
+
+async def test_calendar_event_start_shares_context_for_arm_and_status(hass: HomeAssistant) -> None:
+    armer = AsyncMock(spec=AlarmArmer)
+    armer.calendar_occupancy_override_states = []
+    armer.cause = Mock(return_value=Context())
+    armer.publish_status = Mock()
+    tracked = Mock(spec=TrackedCalendarEvent, armer=armer, arming_state=AlarmControlPanelState.ARMED_VACATION)
+    tracked.id = tracked.calendar_id = "calendar.test"
+    tracked.event = Mock(summary="Skiing")
+    tracked.is_recurring = Mock(return_value=False)
+
+    await TrackedCalendarEvent.on_calendar_event_start(tracked, dt_util.now())
+
+    armer.cause.assert_called_once_with(ChangeSource.CALENDAR, "Skiing")
+    assert armer.arm.call_args.kwargs["context"] is armer.cause.return_value
+    assert armer.publish_status.call_args.kwargs["context"] is armer.cause.return_value

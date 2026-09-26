@@ -1,6 +1,7 @@
 import asyncio
 import datetime as dt
 from collections.abc import AsyncGenerator
+from unittest.mock import ANY
 
 import homeassistant.util.dt as dt_util
 import pytest
@@ -72,6 +73,7 @@ async def test_calendar_finds_alarm_states(simple_tracked_calendar: TrackedCalen
             "recurring": False,
             "overridable_event": True,
         },
+        context=ANY,
     )
 
 
@@ -108,6 +110,7 @@ async def test_calendar_tracks_event(
             "recurring": False,
             "overridable_event": False,
         },
+        context=ANY,
     )
     calendar_with_holiday_event.shutdown()
     assert not calendar_with_holiday_event.has_active_event()
