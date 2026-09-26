@@ -9,7 +9,8 @@ on:
   pull_request:
     branches: [ "main" ]
   release:
-    types: [published]
+    # edited too, so the zip is rebuilt when a release is moved to a new tag
+    types: [published, edited]
 
 jobs:
   release-zip:
@@ -30,6 +31,8 @@ jobs:
       run: gh release upload "${{ github.event.release.tag_name }}" autoarm.zip --clobber
 
   build:
+    # an edited release only needs its zip rebuilt
+    if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     permissions:
       contents: write
