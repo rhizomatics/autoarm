@@ -1,0 +1,196 @@
+# Automated Arming
+
+Source: https://autoarm.rhizomatics.org.uk/automated_arming/
+
+Arming has several complementary modes of operation, that can be selected and mixed as you need.
+
+Mobile Actions, Buttons and Alarm Panel changes are classed as **Manual Interventions**, and won't be overridden back by Auto Arm unless there's an occupancy change or other manual intervention.
+
+## Alarm Panel Control
+
+Aut oArm listens for changes to the Alarm Control Panel from other sources, like the Home Assistant mobile companion app or other automations, with Auto Arm respecting the selected new state, and applying the same *Manual Intervention* controls for further state changes.
+
+### Voice Assistants
+
+The Home Assistant **Alarm Control Panel** can also be exposed to a Voice Assistant, so disarm or arm by talking to Alexa or similar. Use the *Settings*->*Voice Assistants* page in Home Assistant to do this.
+
+Alexa has additional controls to prevent unauthorized disarming ( otherwise burgulars could shout through the letterbox! ), see [Connect Your Home Security System to Echo Hub](https://www.amazon.co.uk/gp/help/customer/display.html?nodeId=T3hgRgU3Wx5DZxfZCB) on the Amazon documentation.
+
+### Built-in Agent Sentences
+
+Early Access
+
+Limited to English. Feedback, and suggested wording for other languages, is welcome on [GitHub issues](https://github.com/rhizomatics/autoarm/issues).
+
+Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agent, which doesn't use AI, matches fixed sentences. Auto Arm adds these sentences, which work by voice or in the chat. Arming and explaining are on unless **Arm and explain by voice** is switched off in the **Assist** section of the Auto Arm options. Disarming is off unless **Disarm by voice** is switched on.
+
+| Say                                  | Does                                            |
+| ------------------------------------ | ----------------------------------------------- |
+| "Arm the alarm"                      | Arms away                                       |
+| "Arm the alarm in *home* mode"       | Arms *home*, *away*, *night* or *vacation*      |
+| "Set the security system to *night*" | The same, "holiday" also works for vacation     |
+| "Disarm the alarm"                   | Disarms, only if **Disarm by voice** is on      |
+| "Why is the alarm armed?"            | Says who or what last changed it, when, and why |
+| "What changed the alarm?"            | The same                                        |
+
+"Alarm", "security system" and "burglar alarm" all work. These sentences take priority over Assist's own alarm sentences, so arming or disarming by voice goes through Auto Arm and counts as a *Manual Intervention*, like a button.
+
+Asking why gives the time of the change and what made it, such as a calendar event, sunset, a button or someone leaving. For changes worked out from who's home and the time of day, it also says whether anyone was home and whether it was night. Changes made directly on the alarm panel are reported as such. Auto Arm only knows about changes since Home Assistant last started.
+
+Disarming by voice
+
+With **Disarm by voice** on, anyone who can talk to Assist can disarm the alarm, and no code is asked for. Think about who can reach your voice satellites and chat before switching this on.
+
+## Physical Button Control
+
+Handy if you have a Zigbee, 433Mhz or similar button panel by the door - choose one of the [Button Integrations](https://www.home-assistant.io/integrations/?cat=button) entities for `DISARMED`,`ARMED_AWAY` etc, or a *Reset* button to set the panel by the default algorithm.
+
+Two kinds of entity work as buttons:
+
+- **Button entities**, such as `button` or `input_button`, whose state is the time of the last press, so each new time is a press
+- **Binary sensors**, such as a door-side remote, where turning `on` is a press, and turning back `off` is ignored
+
+A button going `unavailable`, `unknown` or coming back online isn't treated as a press, so a remote reconnecting won't change the alarm. On/off switches, where `off` should mean something of its own, aren't supported.
+
+A delay can be set, so if for example you have an *away* button next to the front door, you can give yourself a couple of minutes to exit the property before the alarm is set.
+
+See also the [Manual MQTT Alarm Control Panel](https://www.home-assistant.io/integrations/manual_mqtt/) for another way to integrate physical buttons to control state.
+
+Example Cheap 433Mhz Buttons Using RFLink
+
+## Mobile Action Control
+
+This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](https://autoarm.rhizomatics.org.uk/mobile_actions/index.md) for more information, and the [Contextual Mobile Actions Recipe](https://supernotify.rhizomatics.org.uk/recipes/contextual_mobile_actions/) for a nice way to do this in [Supernotify](https://supernotify.rhizomatics.org.uk) where only the appropriate actions are shown.
+
+These can be added to any notification, so for example noisy PIR alerts can be quickly squelched by disarming the alarm.
+
+## Home Assistant Action
+
+An action (aka "service") called `autoarm.reset_state` can be used to trigger a state reset. It will work the same way as other resets, such as at sunrise or sunset.
+
+## Calendar Control
+
+Configuration split
+
+Calendar entities and `no_event_mode` are configured via the Auto Arm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
+
+### Integrating a Calendar
+
+Use a Home Assistant [calendar integration](https://www.home-assistant.io/integrations/?cat=calendar) to define when and how to arm the control panel. If you don't have one, follow these [instructions](https://autoarm.rhizomatics.org.uk/configuration/create_calendar/index.md).
+
+Using a [Remote Calendar](https://www.home-assistant.io/integrations/remote_calendar/), [Google Calendar](https://www.home-assistant.io/integrations/google/) or similar also means that alarm scheduling can be done remotely, even if you have no remote access to Home Assistant.
+
+Multiple calendars, of different types, can be configured, and specific alarm states / match patterns per calendar. See the [example configuration](https://autoarm.rhizomatics.org.uk/configuration/examples/typical/index.md)
+
+### Recurring State
+
+Armed or disarmed state can be configured with an entry for that purpose, for example a recurring entry on a [Local Calendar](https://www.home-assistant.io/integrations/local_calendar/) dedicated to Auto Arm, or looking up an existing calendar to find vacations by pattern.
+
+If there's no calendar event live, then arming state can fall back to [Diurnal Control], or fixed at a default state, or left to manual control.
+
+## Diurnal Control
+
+This does three things to support \[Automated Transitions\]:
+
+1. Re-evaluate the alarm state at **sunrise**
+   - There's a `earliest` and `latest` cutoff option in the UI config to stop alarm being disarmed at 4am if you live far North, like Canada or Scotland.
+   - The cutoffs for sunrise can be set to the same time to override the `sun` integration altogeher for sunsrise
+1. Re-evaluate the alarm state at **sunset**
+   - There's a `earliest` and `latest` cutoff option in the UI config, which works identically to that for sunrise
+1. Provide a `day` and `night` value for conditions
+
+## Occupancy Control
+
+Configuration split
+
+Person entities and occupancy `default_state` are configured via the Auto Arm **Options** UI. The `delay_time` setting remains in YAML.
+
+The people who live at the property can be defined as [Person Integration](https://www.home-assistant.io/integrations/person/) entities Person Entities in the `occupancy` configuration, and used to derive an `occupied` value for [Automated Transitions]. This works best with the Companion App on a mobile phone, although other [Device Tracker Integrations](https://www.home-assistant.io/integrations/?cat=device-tracker) can work, such as a home network `device_tracker`.
+
+Tip
+
+Since the occupied check looks for entities that have a state `home`, it doesn't have to be `person` entities, and you can add a list of `device tracker` entities. The advantage of Person is that you can define multiple trackers for a single individual, and they are `home` if any of the trackers are `home`, even if some of them haven't kept up.
+
+See the [Presence Detection](https://www.home-assistant.io/getting-started/presence-detection/) guidance from Home Assistant on how to set this up, and the options for using it.
+
+If the house is occupied, and its daytime, some people like that to be `disarmed` and others prefer `armed_home`. You can control this via Calendar Control or use the `state_default` settings for day and/or night in the `occupancy` configuration.
+
+One problem with device trackers is that they can be noisy, for example if someone tracked by phone walks out of wifi range, or reboots their device. This tends to be a problem when building occupied, since its much less likely for a device tracker to intermittenly think the device is at home. A delay timer can be set, separately for `home` and `not_home`, to smooth this out, so alarm won't reset unless someone still out a few minutes later.
+
+In this configuration, there will be a three minute wait to make sure the device tracker stable for `home`->`not_home`, and zero delay when arriving home.
+
+```yaml
+  occupancy:
+    entity_id:
+      - person.house_owner
+      - person.tenant
+    default_state:
+      day: disarmed
+      night: armed_night
+    delay_time:
+      not_home: 180
+```
+
+Occupancy checks can override recurring calendar driven alarm states if desired. In the configuration screen, select the alarm states for which the calendar state should be overridden. This means you can have a simple repeating `disarmed` / `armed_night` calendar setup but still have the alarm automatically go to `armed_away` if everyone leaves home.
+
+## Automated Transitions
+
+YAML-only
+
+Transition conditions are configured entirely in YAML.
+
+If nothing else is configured ( occupancy, buttons, calendars ) then arming will still happen by the state of the sun. The rules for this, and how occupancy is used, are all defined as Home Assistant [Conditions](https://www.home-assistant.io/docs/scripts/conditions/) and can be overridden as you need.
+
+| Diurnal State | Occupancy State | Alarm State    |
+| ------------- | --------------- | -------------- |
+| day           | occupied        | ARMED_HOME(\*) |
+| day           | empty           | ARMED_AWAY     |
+| night         | occupied        | ARMED_NIGHT    |
+| night         | occupied        | ARMED_AWAY     |
+
+(\*) This can be overridden using `state_default` in the `occupancy` configuration, for example if you prefer to have the alarm set to `disarmed` when people are home and its daylight.
+
+Two other states, `armed_vacation` and `disarmed` can be set manually, by buttons, or calendar.
+
+If you need more predictability, especially for high latitudes where sunrise varies wildly through the year, set up a calendar and define exactly when you want disarming or arming to happen.
+
+### Algorithm Conditions
+
+The defaults below will be used if there is no transition defined ( you can override just one of them if you prefer, and the others will remain as default, leave `conditions` empty if you really want to disable the transition).
+
+```yaml
+autoarm:
+  transitions:
+    armed_home:
+        - "{{ autoarm.occupied and not autoarm.night }}"
+        - "{{ autoarm.computed and autoarm.occupied_daytime_state == 'armed_home'}}"
+    armed_away: "{{ not autoarm.occupied and autoarm.computed}}"
+    disarmed:
+        - "{{ autoarm.occupied and not autoarm.night }}"
+        -  "{{ autoarm.computed and autoarm.occupied_daytime_state == 'disarmed'}}"
+    armed_night: "{{ autoarm.occupied and autoarm.night and autoarm.computed}}"
+    armed_vacation: "{{ autoarm.vacation }}"
+```
+
+Conditions have an `autoarm` field added to the context, with these values. The examples above are all in the [shortcut template style](https://www.home-assistant.io/docs/scripts/conditions/#template-condition-shorthand-notation), though any other style of `condition` can be used, along with other Jinja2 features and Home Assistant extras, including AND/OR/NOT logic.
+
+| Field                      | Type                                                                                                                                                     | Usage                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| daytime                    | bool                                                                                                                                                     | The `sun` integration thinks it is daytime               |
+| night                      | bool                                                                                                                                                     | The `sun` integration thinks it is nighttime             |
+| occupied                   | bool                                                                                                                                                     | If any of the `person` entities have state `home`        |
+| at_home                    | list[str]                                                                                                                                                | List of occupancy entities at home                       |
+| not_home                   | list[str]                                                                                                                                                | List of occupancy entities not at home                   |
+| manual                     | bool                                                                                                                                                     | Alarm Panel is in vacation or 'custom bypass' mode       |
+| computed                   | bool                                                                                                                                                     | State is being computed by the algorithm                 |
+| vacation                   | bool                                                                                                                                                     | Shortcut for Alarm Panel state being ARMED_VACATION      |
+| bypass                     | bool                                                                                                                                                     | Shortcut for Alarm Panel state being ARMED_CUSTOM_BYPASS |
+| disarmed                   | bool                                                                                                                                                     | Shortcut for Alarm Panel state being DISARMED            |
+| state                      | str                                                                                                                                                      | Current alarm control panel state                        |
+| calendar_event             | [CalendarEvent](https://github.com/home-assistant/core/blob/56a71e6798ada65e9c99f92f64bd4168e98b935b/homeassistant/components/calendar/__init__.py#L364) | Most recent active Calendar Event                        |
+| calendar_event.start       | datetime                                                                                                                                                 | Event start date/time                                    |
+| calendar_event.end         | datetime                                                                                                                                                 | Event end date/time                                      |
+| calendar_event.summary     | str                                                                                                                                                      | Event summary                                            |
+| calendar_event.description | str                                                                                                                                                      | Event description                                        |
+| calendar_event.location    | str                                                                                                                                                      | Event location                                           |
+| occupied_daytime_state     | str                                                                                                                                                      | Default state for occupied in day time                   |

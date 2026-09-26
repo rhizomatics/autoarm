@@ -1,0 +1,799 @@
+# Home Assistant AutoArm
+
+> Automated alarm control panel arming and disarming for Home Assistant
+
+AutoArm is a Home Assistant custom integration that arms and disarms an Alarm Control Panel automatically, from who's home, sunrise and sunset, and calendar events, with physical buttons, mobile actionable notifications and Assist voice commands for manual changes. Core settings are made in the UI, and advanced ones such as transition conditions, buttons and notification profiles in YAML.
+
+# Start here
+
+# Alarm Auto Arming
+
+Source: https://autoarm.rhizomatics.org.uk/
+
+Automate the arming and disarming of the built-in Home Assistant [Alarm Control Panel Integrations](https://www.home-assistant.io/integrations/?search=alarm+control+panel), with additional support for calendar integration, occupancy-driven arming and disarming, manual override via remote control buttons, and mobile push actionable notifications.
+
+Calendar, occupancy and diurnal scheduling available with **zero YAML**, support for 11 languages, and everything configured from the Home Assistant settings. Advanced configuration for physical buttons, and fine-tuning for other scheduling, available from optional YAML configuration.
+
+Why use alarm control panels?
+
+A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful, even if there is no real alarm system, as a **single central state of the home**, and then use that to drive automations, notifications etc rather than littering notifications with checks for presence, time of day, vacations or similar.
+
+For example, it is likely that many things will change if `ARMED_VACATION` applies, and you may want to have all PIR alerts silenced if alarm state is `DISARMED`. This builds on how real alarm systems have worked for decades.
+
+One big obstacle to using Alarm Control Panel is having to remember to change the alarm panel state when people are in or out of the house, at night or when away on holiday. *Auto Arm* solves that problem, and makes the Alarm Control Panel essential for any well-automated home.
+
+## Setup
+
+Auto Arm is one of the default repositories on [HACS](https://hacs.xyz), so there's no need to register a custom repo.
+
+Notifications will work with any HomeAssistant notification implementation, with additional support for [Supernotify](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
+
+## Configuration
+
+Auto Arm is set up using the Home Assistant Integrations page, with additional advanced configuration available via YAML.
+
+### UI Setup
+
+1. Go to **Settings** > **Devices & Services** > **Add Integration** and search for **Auto Arm**.
+1. Select your **Alarm Control Panel** entity (any [Alarm Control Panel Integration](https://www.home-assistant.io/integrations/?search=alarm+control+panel) will work). If you don't have one, see [Create an Alarm Panel](https://autoarm.rhizomatics.org.uk/configuration/create_panel/index.md).
+1. Optionally select **Calendar** and **Person** entities.
+1. Adjust defaults in **Options** at any time (calendar entities, person entities, occupancy defaults, no-event mode).
+
+### YAML for Advanced Features
+
+Transitions, buttons, notifications, diurnal settings, rate limiting, and per-calendar overrides (state patterns, poll intervals) are configured in YAML. See [Typical Configuration](https://autoarm.rhizomatics.org.uk/configuration/examples/typical/index.md) for a full example.
+
+Migrating from YAML-only
+
+Existing YAML configurations are automatically migrated to a config entry on restart. See [Migration Guide](https://autoarm.rhizomatics.org.uk/configuration/migration/index.md) for details.
+
+## Automated Arming
+
+See [Automated Arming](https://autoarm.rhizomatics.org.uk/automated_arming/index.md) for the various mechanisms, options and how to configure.
+
+The full list of how alarm panel state can be set:
+
+| Source        | Description                                                               |
+| ------------- | ------------------------------------------------------------------------- |
+| calendar      | Calendar events (with optional override for selected events by occupancy) |
+| mobile        | Mobile action                                                             |
+| occupancy     | Occupancy calculation, e.g. automatically switching off `ARMED_AWAY`      |
+| alarm_panel   | Changes made to Alarm Control Panel outside of Auto Arm                   |
+| button        | A physical button push                                                    |
+| action        | A Home Assistant Action call (previously known as 'Service')              |
+| sunrise       | HomeAssistant `sun` integration event                                     |
+| sunset        | HomeAssistant `sun` integration event                                     |
+| startup       | Alarm changes made as part of Auto Arm startup                            |
+| zombification | Home Assistant alarm panel got itself into a 'zombie' state and was reset |
+
+## Throttling
+
+To guard against loops, or other reasons why arming might be triggered too often, rate limiting is applied around the arm call, limited to a set number of calls within the past so many seconds. Configured by `rate_limit` section in config.
+
+## Notifications
+
+Notifications is set up via the integration settings.
+
+Two notifications are sent:
+
+- Alarm status has changed, by any means
+- A button has been pressed, and the arm status will be actioned with a few seconds delay
+
+If [Supernotify](https://supernotify.rhizomatics.org.uk) is installed, its `supernotify.notify` action is offered first in the **Notification Action** list. It takes the same fields as the YAML `data` section, such as `priority`, and adds the [Mobile Actions](https://autoarm.rhizomatics.org.uk/mobile_actions/index.md) to disarm, reset or arm away from the notification. Leave the targets blank to let Supernotify choose who to notify. The action chosen here is used for every notification, unless a YAML profile sets its own `service`.
+
+### Advanced Notifications
+
+More control over notifications is available using YAML configuration,
+
+The alarm status message by default uses a `quiet` profile, and another one called `normal`, which can be overridden with as many profiles named as you like. Each profile is defined by the source of alarm change, optionally restricted by which alarm states are involved, and lets you change the priority, or any of the other message content (the ubiquitous Home Assistant `data` section).
+
+```yaml
+notify:
+    quiet:
+      scenario: nerdy
+      data:
+        priority: low
+    normal:
+      source:
+        - calendar
+      state:
+        - armed_vacation
+        - armed_away
+      data:
+        priority: medium
+```
+
+If you want to send to e-mail and mobile then this will fail with a notify group unless you use very basic messages, since additional fields, like the `actions` in the `data` field for Actionable Notifications aren't supported by other notification platforms. The best way to resolve that is with [Supernotify](https://supernotify.rhizomatics.org.uk) which will tune each message for the underlying transport ( mobile apps, and also e-mail, text, chime etc.) along with lots of other tuning options and automatic discovery.
+
+## Home Assistant Features Supported
+
+- [Alarm Control Panel Integrations](https://www.home-assistant.io/integrations/?search=alarm+control+panel)
+- [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/)
+- [Button Integration](https://www.home-assistant.io/integrations/button/)
+- [Calendar Integration](https://www.home-assistant.io/integrations/calendar/)
+- [Conditions](https://www.home-assistant.io/docs/scripts/conditions/)
+- [Conversation](https://www.home-assistant.io/integrations/conversation/)
+- [Device Tracker Integration](https://www.home-assistant.io/integrations/device_tracker/)
+- [Notifications](https://www.home-assistant.io/integrations/notify/)
+- [Person Integration](https://www.home-assistant.io/integrations/person/)
+- [Repairs](https://www.home-assistant.io/integrations/repairs/)
+  - Raises repairs for invalid transition configurations
+- [Sun Integration](https://www.home-assistant.io/integrations/sun/)
+- [Tools](https://www.home-assistant.io/docs/tools/dev-tools/)
+  - Configurable integration with UI config flow and options
+  - Reloadable from the *YAML* tab
+  - Exposes *entities* for its configuration and last calendar event.
+- [Voice Control](https://www.home-assistant.io/voice_control/)
+
+## References
+
+- [Home Assistant Calendar Integration](https://www.home-assistant.io/integrations/calendar/)
+- [Home Assistant Manual Control Panel docs](https://www.home-assistant.io/integrations/manual/) for more info.
+- Handy [Dashboard Alarm Panel](https://www.home-assistant.io/dashboards/alarm-panel/) widget to add to your Home Assistant dashboard.
+
+## Rhizomatics Open Source for Home Assistant
+
+### HACS
+
+- [Remote Logger](https://remote-logger.rhizomatics.org.uk) - OpenTelemetry (OTLP) and Syslog event capture for Home Assistant. Zero YAML install.
+- [Supernotify](https://supernotify.rhizomatics.org.uk) - Unified notification for easy multi-channel messaging, including powerful chime and security camera integration. Zero YAML install.
+
+### Python / Docker
+
+- [Anpr2MQTT](https://anpr2mqtt.rhizomatics.org.uk) - Integrate with ANPR/ALPR licence plate cameras via file system (NAS/FTP) to MQTT with optional image analysis and UK DVLA integration.
+- [Updates2MQTT](https://updates2mqtt.rhizomatics.org.uk) - Automatically notify via MQTT on Docker image updates, with advanced handling to extract versions and release notes from images, and option to remotely pull and restart containers from Home Assistant. Also available on [PyPI](https://pypi.org/project/updates2mqtt/)
+
+# Automated Arming
+
+Source: https://autoarm.rhizomatics.org.uk/automated_arming/
+
+Arming has several complementary modes of operation, that can be selected and mixed as you need.
+
+Mobile Actions, Buttons and Alarm Panel changes are classed as **Manual Interventions**, and won't be overridden back by Auto Arm unless there's an occupancy change or other manual intervention.
+
+## Alarm Panel Control
+
+Aut oArm listens for changes to the Alarm Control Panel from other sources, like the Home Assistant mobile companion app or other automations, with Auto Arm respecting the selected new state, and applying the same *Manual Intervention* controls for further state changes.
+
+### Voice Assistants
+
+The Home Assistant **Alarm Control Panel** can also be exposed to a Voice Assistant, so disarm or arm by talking to Alexa or similar. Use the *Settings*->*Voice Assistants* page in Home Assistant to do this.
+
+Alexa has additional controls to prevent unauthorized disarming ( otherwise burgulars could shout through the letterbox! ), see [Connect Your Home Security System to Echo Hub](https://www.amazon.co.uk/gp/help/customer/display.html?nodeId=T3hgRgU3Wx5DZxfZCB) on the Amazon documentation.
+
+### Built-in Agent Sentences
+
+Early Access
+
+Limited to English. Feedback, and suggested wording for other languages, is welcome on [GitHub issues](https://github.com/rhizomatics/autoarm/issues).
+
+Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agent, which doesn't use AI, matches fixed sentences. Auto Arm adds these sentences, which work by voice or in the chat. Arming and explaining are on unless **Arm and explain by voice** is switched off in the **Assist** section of the Auto Arm options. Disarming is off unless **Disarm by voice** is switched on.
+
+| Say                                  | Does                                            |
+| ------------------------------------ | ----------------------------------------------- |
+| "Arm the alarm"                      | Arms away                                       |
+| "Arm the alarm in *home* mode"       | Arms *home*, *away*, *night* or *vacation*      |
+| "Set the security system to *night*" | The same, "holiday" also works for vacation     |
+| "Disarm the alarm"                   | Disarms, only if **Disarm by voice** is on      |
+| "Why is the alarm armed?"            | Says who or what last changed it, when, and why |
+| "What changed the alarm?"            | The same                                        |
+
+"Alarm", "security system" and "burglar alarm" all work. These sentences take priority over Assist's own alarm sentences, so arming or disarming by voice goes through Auto Arm and counts as a *Manual Intervention*, like a button.
+
+Asking why gives the time of the change and what made it, such as a calendar event, sunset, a button or someone leaving. For changes worked out from who's home and the time of day, it also says whether anyone was home and whether it was night. Changes made directly on the alarm panel are reported as such. Auto Arm only knows about changes since Home Assistant last started.
+
+Disarming by voice
+
+With **Disarm by voice** on, anyone who can talk to Assist can disarm the alarm, and no code is asked for. Think about who can reach your voice satellites and chat before switching this on.
+
+## Physical Button Control
+
+Handy if you have a Zigbee, 433Mhz or similar button panel by the door - choose one of the [Button Integrations](https://www.home-assistant.io/integrations/?cat=button) entities for `DISARMED`,`ARMED_AWAY` etc, or a *Reset* button to set the panel by the default algorithm.
+
+Two kinds of entity work as buttons:
+
+- **Button entities**, such as `button` or `input_button`, whose state is the time of the last press, so each new time is a press
+- **Binary sensors**, such as a door-side remote, where turning `on` is a press, and turning back `off` is ignored
+
+A button going `unavailable`, `unknown` or coming back online isn't treated as a press, so a remote reconnecting won't change the alarm. On/off switches, where `off` should mean something of its own, aren't supported.
+
+A delay can be set, so if for example you have an *away* button next to the front door, you can give yourself a couple of minutes to exit the property before the alarm is set.
+
+See also the [Manual MQTT Alarm Control Panel](https://www.home-assistant.io/integrations/manual_mqtt/) for another way to integrate physical buttons to control state.
+
+Example Cheap 433Mhz Buttons Using RFLink
+
+## Mobile Action Control
+
+This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](https://autoarm.rhizomatics.org.uk/mobile_actions/index.md) for more information, and the [Contextual Mobile Actions Recipe](https://supernotify.rhizomatics.org.uk/recipes/contextual_mobile_actions/) for a nice way to do this in [Supernotify](https://supernotify.rhizomatics.org.uk) where only the appropriate actions are shown.
+
+These can be added to any notification, so for example noisy PIR alerts can be quickly squelched by disarming the alarm.
+
+## Home Assistant Action
+
+An action (aka "service") called `autoarm.reset_state` can be used to trigger a state reset. It will work the same way as other resets, such as at sunrise or sunset.
+
+## Calendar Control
+
+Configuration split
+
+Calendar entities and `no_event_mode` are configured via the Auto Arm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
+
+### Integrating a Calendar
+
+Use a Home Assistant [calendar integration](https://www.home-assistant.io/integrations/?cat=calendar) to define when and how to arm the control panel. If you don't have one, follow these [instructions](https://autoarm.rhizomatics.org.uk/configuration/create_calendar/index.md).
+
+Using a [Remote Calendar](https://www.home-assistant.io/integrations/remote_calendar/), [Google Calendar](https://www.home-assistant.io/integrations/google/) or similar also means that alarm scheduling can be done remotely, even if you have no remote access to Home Assistant.
+
+Multiple calendars, of different types, can be configured, and specific alarm states / match patterns per calendar. See the [example configuration](https://autoarm.rhizomatics.org.uk/configuration/examples/typical/index.md)
+
+### Recurring State
+
+Armed or disarmed state can be configured with an entry for that purpose, for example a recurring entry on a [Local Calendar](https://www.home-assistant.io/integrations/local_calendar/) dedicated to Auto Arm, or looking up an existing calendar to find vacations by pattern.
+
+If there's no calendar event live, then arming state can fall back to [Diurnal Control], or fixed at a default state, or left to manual control.
+
+## Diurnal Control
+
+This does three things to support \[Automated Transitions\]:
+
+1. Re-evaluate the alarm state at **sunrise**
+   - There's a `earliest` and `latest` cutoff option in the UI config to stop alarm being disarmed at 4am if you live far North, like Canada or Scotland.
+   - The cutoffs for sunrise can be set to the same time to override the `sun` integration altogeher for sunsrise
+1. Re-evaluate the alarm state at **sunset**
+   - There's a `earliest` and `latest` cutoff option in the UI config, which works identically to that for sunrise
+1. Provide a `day` and `night` value for conditions
+
+## Occupancy Control
+
+Configuration split
+
+Person entities and occupancy `default_state` are configured via the Auto Arm **Options** UI. The `delay_time` setting remains in YAML.
+
+The people who live at the property can be defined as [Person Integration](https://www.home-assistant.io/integrations/person/) entities Person Entities in the `occupancy` configuration, and used to derive an `occupied` value for [Automated Transitions]. This works best with the Companion App on a mobile phone, although other [Device Tracker Integrations](https://www.home-assistant.io/integrations/?cat=device-tracker) can work, such as a home network `device_tracker`.
+
+Tip
+
+Since the occupied check looks for entities that have a state `home`, it doesn't have to be `person` entities, and you can add a list of `device tracker` entities. The advantage of Person is that you can define multiple trackers for a single individual, and they are `home` if any of the trackers are `home`, even if some of them haven't kept up.
+
+See the [Presence Detection](https://www.home-assistant.io/getting-started/presence-detection/) guidance from Home Assistant on how to set this up, and the options for using it.
+
+If the house is occupied, and its daytime, some people like that to be `disarmed` and others prefer `armed_home`. You can control this via Calendar Control or use the `state_default` settings for day and/or night in the `occupancy` configuration.
+
+One problem with device trackers is that they can be noisy, for example if someone tracked by phone walks out of wifi range, or reboots their device. This tends to be a problem when building occupied, since its much less likely for a device tracker to intermittenly think the device is at home. A delay timer can be set, separately for `home` and `not_home`, to smooth this out, so alarm won't reset unless someone still out a few minutes later.
+
+In this configuration, there will be a three minute wait to make sure the device tracker stable for `home`->`not_home`, and zero delay when arriving home.
+
+```yaml
+  occupancy:
+    entity_id:
+      - person.house_owner
+      - person.tenant
+    default_state:
+      day: disarmed
+      night: armed_night
+    delay_time:
+      not_home: 180
+```
+
+Occupancy checks can override recurring calendar driven alarm states if desired. In the configuration screen, select the alarm states for which the calendar state should be overridden. This means you can have a simple repeating `disarmed` / `armed_night` calendar setup but still have the alarm automatically go to `armed_away` if everyone leaves home.
+
+## Automated Transitions
+
+YAML-only
+
+Transition conditions are configured entirely in YAML.
+
+If nothing else is configured ( occupancy, buttons, calendars ) then arming will still happen by the state of the sun. The rules for this, and how occupancy is used, are all defined as Home Assistant [Conditions](https://www.home-assistant.io/docs/scripts/conditions/) and can be overridden as you need.
+
+| Diurnal State | Occupancy State | Alarm State    |
+| ------------- | --------------- | -------------- |
+| day           | occupied        | ARMED_HOME(\*) |
+| day           | empty           | ARMED_AWAY     |
+| night         | occupied        | ARMED_NIGHT    |
+| night         | occupied        | ARMED_AWAY     |
+
+(\*) This can be overridden using `state_default` in the `occupancy` configuration, for example if you prefer to have the alarm set to `disarmed` when people are home and its daylight.
+
+Two other states, `armed_vacation` and `disarmed` can be set manually, by buttons, or calendar.
+
+If you need more predictability, especially for high latitudes where sunrise varies wildly through the year, set up a calendar and define exactly when you want disarming or arming to happen.
+
+### Algorithm Conditions
+
+The defaults below will be used if there is no transition defined ( you can override just one of them if you prefer, and the others will remain as default, leave `conditions` empty if you really want to disable the transition).
+
+```yaml
+autoarm:
+  transitions:
+    armed_home:
+        - "{{ autoarm.occupied and not autoarm.night }}"
+        - "{{ autoarm.computed and autoarm.occupied_daytime_state == 'armed_home'}}"
+    armed_away: "{{ not autoarm.occupied and autoarm.computed}}"
+    disarmed:
+        - "{{ autoarm.occupied and not autoarm.night }}"
+        -  "{{ autoarm.computed and autoarm.occupied_daytime_state == 'disarmed'}}"
+    armed_night: "{{ autoarm.occupied and autoarm.night and autoarm.computed}}"
+    armed_vacation: "{{ autoarm.vacation }}"
+```
+
+Conditions have an `autoarm` field added to the context, with these values. The examples above are all in the [shortcut template style](https://www.home-assistant.io/docs/scripts/conditions/#template-condition-shorthand-notation), though any other style of `condition` can be used, along with other Jinja2 features and Home Assistant extras, including AND/OR/NOT logic.
+
+| Field                      | Type                                                                                                                                                     | Usage                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| daytime                    | bool                                                                                                                                                     | The `sun` integration thinks it is daytime               |
+| night                      | bool                                                                                                                                                     | The `sun` integration thinks it is nighttime             |
+| occupied                   | bool                                                                                                                                                     | If any of the `person` entities have state `home`        |
+| at_home                    | list[str]                                                                                                                                                | List of occupancy entities at home                       |
+| not_home                   | list[str]                                                                                                                                                | List of occupancy entities not at home                   |
+| manual                     | bool                                                                                                                                                     | Alarm Panel is in vacation or 'custom bypass' mode       |
+| computed                   | bool                                                                                                                                                     | State is being computed by the algorithm                 |
+| vacation                   | bool                                                                                                                                                     | Shortcut for Alarm Panel state being ARMED_VACATION      |
+| bypass                     | bool                                                                                                                                                     | Shortcut for Alarm Panel state being ARMED_CUSTOM_BYPASS |
+| disarmed                   | bool                                                                                                                                                     | Shortcut for Alarm Panel state being DISARMED            |
+| state                      | str                                                                                                                                                      | Current alarm control panel state                        |
+| calendar_event             | [CalendarEvent](https://github.com/home-assistant/core/blob/56a71e6798ada65e9c99f92f64bd4168e98b935b/homeassistant/components/calendar/__init__.py#L364) | Most recent active Calendar Event                        |
+| calendar_event.start       | datetime                                                                                                                                                 | Event start date/time                                    |
+| calendar_event.end         | datetime                                                                                                                                                 | Event end date/time                                      |
+| calendar_event.summary     | str                                                                                                                                                      | Event summary                                            |
+| calendar_event.description | str                                                                                                                                                      | Event description                                        |
+| calendar_event.location    | str                                                                                                                                                      | Event location                                           |
+| occupied_daytime_state     | str                                                                                                                                                      | Default state for occupied in day time                   |
+# Configuration
+
+# Create a Calendar
+
+Source: https://autoarm.rhizomatics.org.uk/configuration/create_calendar/
+
+This *How To* will show you how to create a new calendar dedicated for controlling alarm control panel state. This is one way of using Auto Arm, you can choose to use [other types of calendars](https://www.home-assistant.io/integrations/?cat=calendar), reuse events from existing calendars, or mix-n-match.
+
+## Add a Local Calendar
+
+Use the button, or follow the manual steps:
+
+1. From the *Settings* | *Integration* screen, choose **Add Integration**.
+1. From this dialogue, choose **Local Calendar**
+1. Configure the integration by choosing its name
+
+## Configure Auto Arm
+
+UI and YAML split
+
+Calendar entities and `no_event_mode` are now configured via the Auto Arm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
+
+Select the calendar entity in **Settings** > **Devices & Services** > **Auto Arm** > **Configure**.
+
+Then add the per-calendar details in YAML, in this example `Alarm Control` is the name of the calendar:
+
+```yaml
+autoarm:
+    calendar_control:
+      calendars:
+        - entity_id: calendar.alarm_control
+          state_patterns:
+              disarmed: Disarmed
+```
+
+This calendar is going to be used very simply to disarm the alarm during set periods, and let Auto Arm automatically handle the other times.
+
+## Access the Calendar
+
+If you don't have a **Calendar** option in the Home Assistant side-bar, then go to the personal settings ( bottom left corner, with your name against it) and change the visibility as:
+
+## Setup a Disarm Schedule
+
+Now that you have access to the calendar screen, add a recurring event for disarming.
+
+## Changing your Mind
+
+Once the event is created, double-click on a day to change it. You get the choice of changing just that day or all the recurring entries. Similarly you can delete one day from a recurring entry without affecting all the other ones. This makes it easy to do some one-off tuning for some days.
+
+## Adding Vacations
+
+You may have vacation events already on another calendar integration ( like Remote or Google Calendar ), or may want to add them to this one.
+
+Here's how that might look:
+
+```yaml
+autoarm:
+    calendar_control:
+      - entity_id: calendar.alarm_control
+        state_patterns:
+            disarmed: Disarmed
+      - entity_id: calendar.family_happenings
+        state_patterns:
+            armed_vacation:
+              - Camping Trip.*
+              - .*Holidays.*
+            armed_away:
+              - Work Trip.*
+```
+
+## What to do when no event
+
+While a calendar could have events covering every minute of every day, its much less work to only define what is needed, such as what's the right time to arm at night, or when vacations start and end.
+
+`no_event_mode` allows control over what happens when there's no calendar event, and nothing else to determine alarm state. This is configurable via the Auto Arm **Options** UI. It can be:
+
+`auto` - Will make best guess, including checking what the alarm panel was before the event `manual` - No state changes made when calendar event ends `disarmed`,`armed_away` etc - Use any of the standard Alarm Control Panel states as a fixed default
+
+# Create an Alarm Panel
+
+Source: https://autoarm.rhizomatics.org.uk/configuration/create_panel/
+
+If you don't already have an alarm panel, set up a default manual as below, which creates the state machine for armed/disarmed status. This is all you need in the way of alarm support for Auto Arm to function.
+
+You can also choose whether a PIN code is needed or not to arm or disarm. Auto Arm has its own delay time handling for buttons, so recommended to keep the times at zero if not needed for any other purposes.
+
+```yaml
+alarm_control_panel:
+  - platform: manual
+    name: Home Alarm Control
+    code_arm_required: false
+    arming_time: 0
+    delay_time: 0
+    disarm_after_trigger: false
+    trigger_time: 0
+```
+
+## Selecting the Alarm Panel in Auto Arm
+
+The alarm panel entity is selected during the Auto Arm UI config flow. Go to **Settings** > **Devices & Services** > **Add Integration**, search for **Auto Arm**, and select your alarm panel entity in the first step.
+
+## How Auto Arm Changes the Panel
+
+Auto Arm changes the panel's state by calling its actions, `alarm_control_panel.alarm_arm_away`, `alarm_control_panel.alarm_disarm` and so on, just as a dashboard card or automation would. This works for a *manual* panel, and for integrations that do more than hold a state when armed or disarmed, such as [Alarmo](https://github.com/nielsfaber/alarmo), which arms its child areas when its master panel is armed.
+
+This is controlled by **Change state using the alarm panel's actions** in the Aut Arm options, which is on for new installs.
+
+- The panel mustn't need a code to arm or disarm, as Auto Arm doesn't have one to give it.
+- If the action fails, or doesn't change the state, Auto Arm leaves the panel alone rather than set the state behind the integration's back. A warning is logged.
+- An exit delay is fine: when the panel goes to `arming`, and then to the armed state, Auto Arm doesn't mistake that for someone changing it by hand.
+- Panels have no action for `pending`, so Auto Arm keeps that within itself rather than changing the panel, for example when moving on at the end of a calendar event.
+
+### Setting the State Directly
+
+With the option switched off, Auto Arm sets the panel's state directly instead. This was the default before 1.3.0, and installs from then keep it until the option is changed. It works with a *manual* panel, including one that needs a code, but not with integrations like Alarmo, which will overwrite the state or be left out of step.
+
+### Legacy YAML Reference
+
+Before the UI config flow, the alarm panel was specified in YAML. This is still supported for auto-migration, but new installations should use the UI.
+
+```yaml
+autoarm:
+  alarm_panel:
+    entity_id: alarm_panel.home_alarm_control
+```
+
+# Migration Guide
+
+Source: https://autoarm.rhizomatics.org.uk/configuration/migration/
+
+## What Changed
+
+Auto Arm now uses a hybrid configuration model. Core settings are managed through the Home Assistant UI via a config flow, while advanced features remain in YAML.
+
+Existing YAML-only installations are **automatically migrated** to a config entry on restart. No manual action is required.
+
+## What Moves Where
+
+| Setting                                       | Before | After                                                 |
+| --------------------------------------------- | ------ | ----------------------------------------------------- |
+| `alarm_panel.entity_id`                       | YAML   | UI (set during config flow setup)                     |
+| `calendar_control.calendars[].entity_id`      | YAML   | UI (Options)                                          |
+| `calendar_control.no_event_mode`              | YAML   | UI (Options)                                          |
+| `occupancy.entity_id`                         | YAML   | UI (Options)                                          |
+| `occupancy.default_state.day`                 | YAML   | UI (Options)                                          |
+| `occupancy.default_state.night`               | YAML   | UI (Options)                                          |
+| `diurnal`                                     | YAML   | UI (Options)                                          |
+| `calendar_control.calendars[].state_patterns` | YAML   | YAML (unchanged)                                      |
+| `calendar_control.calendars[].poll_interval`  | YAML   | YAML (unchanged)                                      |
+| `transitions`                                 | YAML   | YAML (unchanged)                                      |
+| `buttons`                                     | YAML   | YAML (unchanged)                                      |
+| `notify`                                      | YAML   | Profiles in YAML (unchanged), Service in UI (Options) |
+| `rate_limit`                                  | YAML   | YAML (unchanged)                                      |
+| `occupancy.delay_time`                        | YAML   | YAML (unchanged)                                      |
+
+## Auto-Migration
+
+On restart, if Auto Arm finds a YAML configuration without a matching config entry, it automatically:
+
+1. Creates a config entry with the alarm panel entity from YAML
+1. Populates options with calendar entities, person entities, occupancy defaults, and no-event mode from YAML
+1. Continues to read advanced settings (transitions, buttons, notification profiles, etc.) from YAML
+
+## Cleaning Up YAML After Migration
+
+After migration, the following YAML keys are read from the config entry and can be removed from your YAML configuration:
+
+- `alarm_panel.entity_id`
+- `occupancy.entity_id`
+- `occupancy.default_state`
+- `calendar_control.no_event_mode`
+- Calendar `entity_id` values (the entity list is managed in Options)
+
+The remaining YAML sections (`transitions`, `buttons`, `notify`, `rate_limit`, per-calendar `state_patterns` and `poll_interval`) should be kept.
+
+## Coexisting Configurations
+
+If both a YAML configuration and a config entry exist, Auto Arm raises a **repair issue** to alert you. The config entry takes precedence for the migrated settings, while YAML continues to provide advanced configuration.
+
+# Removing Auto Arm
+
+Source: https://autoarm.rhizomatics.org.uk/configuration/removal/
+
+## Remove the Integration Entry
+
+1. Go to **Settings** > **Devices & Services** and select **Auto Arm**
+1. Click the three-dot menu and select **Delete**
+
+This also removes the Auto Arm device and its entities.
+
+## Via HACS
+
+1. Open **HACS** in your Home Assistant instance
+1. Navigate to **Integrations**
+1. Find **Auto Arm** and click on it
+1. Click the three-dot menu and select **Remove**
+1. Restart Home Assistant
+
+## Manual Removal
+
+1. Delete the `custom_components/autoarm` directory
+1. Remove the `autoarm:` section from your `configuration.yaml` if present
+1. Restart Home Assistant
+
+## Cleaning Up
+
+After removal, you may also want to:
+
+- Delete any Auto Arm-related automations or scripts you created
+- Remove mobile notification actions configured for Auto Arm
+- Remove any calendar entities that were created solely for Auto Arm scheduling
+
+# Minimal Configuration
+
+Source: https://autoarm.rhizomatics.org.uk/configuration/examples/minimal/
+
+The simplest way to set up Auto Arm is through the UI: go to **Settings** > **Devices & Services** > **Add Integration**, search for **Auto Arm**, and select your alarm panel. No YAML is needed for a basic setup.
+
+## Legacy YAML Reference
+
+For reference, the equivalent YAML-only configuration lives inside `config.yaml` or an include file set up for the `autoarm` domain.
+
+```yaml
+
+```
+
+# Typical Configuration
+
+Source: https://autoarm.rhizomatics.org.uk/configuration/examples/typical/
+
+More extensive example configuration, using most of the features.
+
+## UI vs YAML Settings
+
+With the config flow, some settings are now managed in the UI:
+
+| Setting                                   | Where        | Notes                                                                                                                          |
+| ----------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Alarm panel entity                        | UI (setup)   | Selected when adding the integration                                                                                           |
+| Change state using panel actions          | UI (options) | On for new installs, see [Create Panel](https://autoarm.rhizomatics.org.uk/configuration/create_panel/index.md)                |
+| Arm and explain by voice, Disarm by voice | UI (options) | Voice and chat commands, see [Automated Arming](https://autoarm.rhizomatics.org.uk/automated_arming/#built-in-agent-sentences) |
+| Calendar entities                         | UI (options) | Which calendars to use                                                                                                         |
+| Person entities                           | UI (options) | Which persons to track for occupancy                                                                                           |
+| Occupancy day/night defaults              | UI (options) | Default alarm state when occupied                                                                                              |
+| No-event mode                             | UI (options) | Behaviour when no calendar event is active                                                                                     |
+| Diurnal                                   | UI (options) | Sunrise/sunset configuration                                                                                                   |
+| Per-calendar state patterns               | YAML         | Regex patterns matching calendar events to alarm states                                                                        |
+| Per-calendar poll interval                | YAML         | How often to check each calendar                                                                                               |
+| Transitions                               | YAML         | Condition templates for state transitions                                                                                      |
+| Buttons                                   | YAML         | Physical button entity mappings                                                                                                |
+| Notifications                             | UI (options) | Notification service and targets                                                                                               |
+| Notification Profiles                     | YAML         | Notification profile configuration                                                                                             |
+| Rate limit                                | YAML         | Throttling for arm calls                                                                                                       |
+
+## Full YAML Example
+
+```yaml
+autoarm:
+  # YAML: delay_time remains YAML-only
+  occupancy:
+    delay_time:
+      not_home: 180
+      home: 0 # the default
+  # YAML-only: transition conditions
+  transitions:
+    armed_home:
+      alias: Home with alarm active, such as home alone
+      conditions:
+        - "{{ autoarm.occupied and not autoarm.night }}"
+        - "{{ autoarm.computed and autoarm.occupied_daytime_state == 'armed_home'}}"
+    armed_away:
+      conditions: "{{ not autoarm.occupied and autoarm.computed}}"
+    disarmed:
+      conditions:
+       - "{{ autoarm.occupied and not autoarm.night }}"
+       - "{{ autoarm.computed and autoarm.occupied_daytime_state == 'disarmed'}}"
+    armed_night:
+      conditions: "{{ autoarm.occupied and autoarm.night and autoarm.computed }}"
+    pending:
+      conditions:
+  # UI: calendar entities and no_event_mode are configurable via Options
+  # YAML: per-calendar state_patterns and poll_interval remain here
+  calendar_control:
+    calendars:
+      - entity_id: calendar.alarm_control
+        alias: Local Calendar only used for autoarm
+        poll_interval: 60
+        state_patterns:
+          disarmed:
+            - Disarmed
+      - entity_id: calendar.family_events
+        poll_interval: 300
+        state_patterns:
+          armed_vacation:
+            - Holiday.*
+            - Camping Trip.*
+          armed_away:
+            - Working at Office
+
+  # YAML-only: button configuration
+  buttons:
+    reset:
+      entity_id: binary_sensor.button_right
+    armed_away:
+      delay_time: 180
+      entity_id:
+        - binary_sensor.button_right
+        - binary_sensor.back_door_away
+    disarmed:
+      entity_id: binary_sensor.button_middle
+
+  # YAML-only: rate limiting
+  rate_limit:
+    max_calls: 5
+    period: 60
+
+  # YAML-only: notification configuration
+  notify:
+    common:
+      data:
+        actions:
+          - action: ALARM_PANEL_DISARM
+            title: Disarm Alarm Panel
+            icon: sfsymbols:bell.slash
+          - action: ALARM_PANEL_RESET
+            title: Reset Alarm Panel
+            icon: sfsymbols:bell
+          - action: ALARM_PANEL_AWAY
+            title: Arm Alarm Panel for Going Away
+            icon: sfsymbols:airplane
+    quiet:
+      scenario: alarm_panel_quiet
+      data:
+        priority: low
+    normal:
+      scenario: alarm_panel
+      source:
+        - calendar
+      state:
+        - armed_away
+        - armed_vacation
+      data:
+        priority: medium
+```
+# Using AutoArm
+
+# Mobile Actions
+
+Source: https://autoarm.rhizomatics.org.uk/mobile_actions/
+
+Auto Arm listens out for the result of [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/) with the following `action` values:
+
+## Supported Actions
+
+| Action Key         |
+| ------------------ |
+| ALARM_PANEL_DISARM |
+| ALARM_PANEL_RESET  |
+| ALARM_PANEL_AWAY   |
+
+## Add Action to a Mobile Push Notification
+
+Here's how to send a notification to a mobile app, with a Disarm action:
+
+```yaml
+action: notify.mobile_app_<your_device_id_here>
+data:
+  message: "The noisy PIR has detected the kids again"
+  data:
+    actions:
+      - action: "ALARM_PANEL_DISARM" # The key you are sending for the event
+        title: "Disarm Alarm" # The button title
+        icon: sfsymbols:bell.slash
+```
+# Help
+
+# Troubleshooting
+
+Source: https://autoarm.rhizomatics.org.uk/troubleshooting/
+
+## Alarm State Not Changing
+
+**Check the initialized sensor**: Look at `binary_sensor.autoarm_initialized`, on the Auto Arm device in **Settings** > **Devices & Services**. If it's off, there is a configuration issue, and its attributes show which stage of setup failed. `sensor.autoarm_failures` counts setup and runtime errors.
+
+**Check the alarm panel's actions**: Auto Arm arms and disarms using the panel's actions. If the panel needs a code, or its integration rejects the action, a warning is logged and the panel is left alone. See [Create Panel](https://autoarm.rhizomatics.org.uk/configuration/create_panel/#how-autoarm-changes-the-panel).
+
+**Check the last calculation sensor**: `sensor.autoarm_last_calculation` shows when Auto Arm last worked out the state, with attributes for what it decided and why, such as `reset_decision`.
+
+**Check for manual intervention lock**: After a manual change (button press, mobile action, panel change), Auto Arm will not override the state until the next occupancy change. Use the `autoarm.reset_state` service to clear the lock.
+
+**Check transition conditions**: Open Settings > System > Repairs to see if any transition conditions have validation errors. Fix the conditions in your YAML configuration and reload.
+
+## Calendar Events Not Detected
+
+**Check poll interval**: Calendar events are detected by polling. If events are very short, increase the poll interval or ensure events span at least 15 minutes.
+
+**Check state patterns**: Verify that your calendar event summaries match the configured state patterns. The default patterns are `Away`, `Home`, `Night`, `Disarmed`, and `Vacation`/`Holiday`. Custom patterns use regex matching.
+
+**Check the last calendar event sensor**: Look at `sensor.autoarm_last_calendar_event`, on the Auto Arm device, for the most recently detected event.
+
+## Notifications Not Sending
+
+**Check notify profile configuration**: Notifications require at least one non-common profile to match. The `common` profile only provides base configuration (service, data) that is merged into matched profiles, with default `silent` and `normal` profiles created if no explicit ones given.
+
+**Check the service name**: Ensure the notify service exists. The `notify.` prefix is stripped automatically, so `notify.mobile_app` becomes a call to the `mobile_app` service in the `notify` domain.
+
+## Repair Issues
+
+Auto Arm uses the Home Assistant repair system to report configuration problems:
+
+- **Invalid Transition Condition**: A transition condition template failed validation. Check the condition syntax in your YAML.
+- **YAML core configuration is deprecated**: Core settings have been migrated to the UI config entry. Remove the migrated keys from YAML (see the [Migration Guide](https://autoarm.rhizomatics.org.uk/configuration/migration/index.md)).
+
+## Reload After YAML Changes
+
+After modifying YAML configuration (transitions, buttons, notify, etc.), call the `autoarm.reload` service or restart Home Assistant for changes to take effect.
+
+## Debug Logging
+
+Enable debug logging for Auto Arm to see detailed operation logs:
+
+```yaml
+logger:
+  logs:
+    custom_components.autoarm: debug
+```
+
+All Auto Arm log messages use the `AUTOARM` prefix for easy filtering.
+
+# Known Limitations
+
+Source: https://autoarm.rhizomatics.org.uk/known_limitations/
+
+## Single Alarm Panel
+
+Auto Arm supports only one alarm control panel per installation.
+
+## YAML for Advanced Features
+
+While core settings (alarm panel, calendars, persons, occupancy defaults) are managed via the UI config flow, advanced features require YAML configuration:
+
+- Transition conditions
+- Physical button mappings
+- Notification profiles
+- Rate limiting
+- Per-calendar state pattern overrides and poll intervals
+
+## Calendar Polling
+
+Calendar events are detected by polling, not real-time events. The default poll interval is 15 seconds per calendar. Very short calendar events (shorter than the poll interval) may be missed. This is a Home Assistant limitation, necessitated by the different styles of calendar supported, for example, Google Calendars.
+
+## Manual Intervention Lock
+
+When a manual intervention occurs (button press, mobile action, or alarm panel change), Auto Arm will not override the state until the next occupancy change or another manual intervention. This is by design, but can be surprising if you expect automatic state changes to resume immediately.
+
+## Alarm Panel Compatibility
+
+Auto Arm works with any entity that implements the `alarm_control_panel` domain. However, some panels may not support all alarm states (e.g., `armed_vacation` or `armed_custom_bypass`). When Auto Arm uses the panel's actions, as it does by default, an unsupported state is rejected by the panel, a warning is logged, and the panel is left as it was. Panels that need a code to arm or disarm can't be changed through their actions, since Auto Arm has no code to give.
