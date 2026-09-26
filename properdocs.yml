@@ -8,6 +8,7 @@ edit_uri: edit/main/docs/
 
 theme:
   name: materialx
+  custom_dir: docs/overrides
   highlightjs: true
   language: en
   logo: assets/images/autoarm-dark-256x256.png
@@ -41,6 +42,30 @@ plugins:
   - tags
   - htmlproofer:
       skip_downloads: True
+  - llmstxt:
+      base_url: https://autoarm.rhizomatics.org.uk/
+      preprocess: docgen/llms_preprocess.py
+      markdown_description: >-
+        AutoArm is a Home Assistant custom integration that arms and disarms an Alarm Control
+        Panel automatically, from who's home, sunrise and sunset, and calendar events, with
+        physical buttons, mobile actionable notifications and Assist voice commands for manual
+        changes. Core settings are made in the UI, and advanced ones such as transition
+        conditions, buttons and notification profiles in YAML.
+      full_output: llms-full.txt
+      sections:
+        Start here:
+          - index.md: Overview of what AutoArm does
+          - automated_arming.md: How the armed state is worked out, and the actions and voice commands
+        Configuration:
+          # fnmatch's * also matches /, so this picks up configuration/examples/ too
+          - configuration/*.md
+        Using AutoArm:
+          - mobile_actions.md: Arming and disarming from mobile actionable notifications
+        Help:
+          - troubleshooting.md: Diagnosing arming, calendar and notification problems
+          - known_limitations.md: What AutoArm doesn't do, or does with caveats
+        # changelog, roadmap and developer pages left out - old or planned behaviour an agent would
+        # take as current
   - minify:
       minify_html: true
   - git-revision-date-localized:
@@ -59,6 +84,13 @@ plugins:
             show_inheritance_diagram: false
             overloads_only: true
             show_if_no_docstring: false
+
+extra_javascript:
+  - javascripts/markdown_actions.js
+
+hooks:
+  # records the site directory for the llmstxt preprocess
+  - docgen/llms_preprocess.py
 
 watch:
   - custom_components/autoarm

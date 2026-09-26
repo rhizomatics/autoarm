@@ -60,7 +60,8 @@ repos:
     rev: v0.0.84
     hooks:
       - id: ty
-        args: [--isolated, --no-python-downloads]
+        # docs group for docgen's bs4
+        args: [--isolated, --no-python-downloads, --group, docs]
 
 ci:
     autofix_commit_msg: |
