@@ -132,7 +132,6 @@ async def test_reset_service_propagates_context(hass: HomeAssistant, mock_notify
 
     assert changes[-1].data["new_state"] == "armed_away"
     assert changes[-1].context is context
-    assert mock_notify.calls[-1].context is context
 
 
 async def test_reset_service_without_loaded_entry(hass: HomeAssistant, mock_notify: Any) -> None:

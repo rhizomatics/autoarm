@@ -9,6 +9,7 @@
     - The last calculation, intervention and calendar event sensors are `unknown` until there's something to show, rather than `unavailable`
   - The initialized and failures sensors are diagnostic, and the failures count keeps long term statistics
   - Entity names are translated
+  - Home Assistant Context is passed down to all actions and state changes
 - New installs change the alarm panel using its actions by default, rather than setting its state directly
   - Existing installs keep their current setting, and can switch with **Change state using the alarm panel's actions** in the options
   - When using actions, `pending` is kept within AutoArm rather than set on the panel, since panels have no action for it
