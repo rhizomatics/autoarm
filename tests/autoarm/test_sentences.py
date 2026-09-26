@@ -5,13 +5,15 @@ commands are called directly, and the trigger registration is checked with it pa
 """
 
 import datetime as dt
+import sys
 from typing import TYPE_CHECKING, Any
 from unittest.mock import AsyncMock, Mock, patch
 
 import homeassistant.util.dt as dt_util
+import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEvent
-from homeassistant.core import Context, Event, HomeAssistant, ServiceCall
+from homeassistant.core import Context, Event, HomeAssistant, ServiceCall, callback
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from conftest import TEST_PANEL
@@ -22,6 +24,9 @@ from custom_components.autoarm.sentences import SENTENCES, async_respond, explai
 
 if TYPE_CHECKING:
     from freezegun.api import FrozenDateTimeFactory
+
+# only supported on the current Home Assistant, which needs python 3.14.2 or later
+pytestmark = pytest.mark.skipif(sys.version_info < (3, 14, 2), reason="sentences need the current Home Assistant")
 
 USER_ID = "jey-user-id"
 
@@ -244,7 +249,7 @@ async def test_sentences_registered_and_answer(hass: HomeAssistant) -> None:
     assert all(c["platform"] == "conversation" for c in configs)
 
     changes: list[Event] = []
-    hass.bus.async_listen(f"{DOMAIN}_change", changes.append)
+    hass.bus.async_listen(f"{DOMAIN}_change", callback(lambda event: changes.append(event)))
     action = initialize.call_args.args[2]
     result = await action({
         "trigger": {"id": "armed_night", "user_input": {"context": {"id": "abc", "user_id": USER_ID}}},

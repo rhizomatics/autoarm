@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, Mock
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import CONF_ENTITY_ID
-from homeassistant.core import Context, Event, HomeAssistant, ServiceCall
+from homeassistant.core import Context, Event, HomeAssistant, ServiceCall, callback
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from conftest import TEST_PANEL
@@ -20,13 +20,13 @@ USER_ID = "user-1234"
 
 def _capture_changes(hass: HomeAssistant) -> list[Event]:
     events: list[Event] = []
-    hass.bus.async_listen(f"{DOMAIN}_change", events.append)
+    hass.bus.async_listen(f"{DOMAIN}_change", callback(lambda event: events.append(event)))
     return events
 
 
 def _capture_notifications(hass: HomeAssistant) -> list[ServiceCall]:
     calls: list[ServiceCall] = []
-    hass.services.async_register("notify", "test_service", calls.append)
+    hass.services.async_register("notify", "test_service", callback(lambda call: calls.append(call)))
     return calls
 
 
