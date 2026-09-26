@@ -1,6 +1,7 @@
 import asyncio
 import datetime as dt
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
@@ -15,11 +16,13 @@ if TYPE_CHECKING:
     from custom_components.autoarm.calendar_events import TrackedCalendarEvent
 
 
-async def test_arm_preserves_panel_attributes(autoarmer: AlarmArmer, hass: HomeAssistant) -> None:
+async def test_direct_arm_preserves_panel_attributes(hass: HomeAssistant) -> None:
     hass.states.async_set(entity_id=TEST_PANEL, new_state="disarmed", attributes={"icon": "mdi:alarm-panel"})
+    autoarmer = AlarmArmer(hass, TEST_PANEL, use_alarm_service=False)
     await autoarmer.arm(AlarmControlPanelState.ARMED_VACATION)
-    panel_attrs = hass.states.get(TEST_PANEL).attributes
-    assert panel_attrs.get("icon") == "mdi:alarm-panel"  # type:ignore[attr-defined]
+    panel = hass.states.get(TEST_PANEL)
+    assert panel is not None
+    assert panel.attributes.get("icon") == "mdi:alarm-panel"
 
 
 async def test_vacation_day_occupied(autoarmer: AlarmArmer, day: None, occupied: None) -> None:
@@ -219,8 +222,8 @@ async def test_startup_defers_to_sunset_earliest(hass: HomeAssistant, night: Non
     )
     # Override so the defer branch is taken regardless of the actual clock
     # hour (test may run in the AM, when _has_sunset_passed_today = False).
-    autoarmer._has_sunset_passed_today = lambda now: True  # type: ignore[method-assign]
-    await autoarmer.initialize()
+    with patch.object(autoarmer, "_has_sunset_passed_today", return_value=True):
+        await autoarmer.initialize()
     # Should not have armed immediately — deferred to sunset_earliest
     assert autoarmer.armed_state() == AlarmControlPanelState.DISARMED
     await asyncio.sleep(2)

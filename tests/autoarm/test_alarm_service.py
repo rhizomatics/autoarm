@@ -10,7 +10,7 @@ from homeassistant.exceptions import HomeAssistantError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from conftest import TEST_PANEL
-from custom_components.autoarm.autoarming import HASS_DATA_KEY, AlarmArmer
+from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.config_flow import CONF_USE_ALARM_SERVICE
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY, ChangeSource
 
@@ -40,14 +40,17 @@ async def service_armer(hass: HomeAssistant) -> AsyncGenerator[AlarmArmer]:
     uut.shutdown()
 
 
-async def test_direct_state_set_by_default(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
+async def test_direct_state_set_when_configured(hass: HomeAssistant) -> None:
     calls = _register_panel_actions(hass)
     hass.states.async_set(TEST_PANEL, "disarmed")
+    autoarmer = AlarmArmer(hass, TEST_PANEL, use_alarm_service=False)
 
     assert await autoarmer.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.BUTTON) == "armed_away"
 
     assert calls == []
-    assert hass.states.get(TEST_PANEL).attributes["changed_by"] == "autoarm.button"  # type: ignore[union-attr]
+    panel = hass.states.get(TEST_PANEL)
+    assert panel is not None
+    assert panel.attributes["changed_by"] == "autoarm.button"
 
 
 async def test_service_used_when_configured(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
@@ -66,12 +69,15 @@ async def test_service_used_when_configured(hass: HomeAssistant, service_armer: 
 
 
 async def test_service_failure_leaves_state_alone(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
+    hass.states.async_set(TEST_PANEL, "disarmed")
+    await hass.async_block_till_done()
+    last_change = service_armer.last_change
     _register_panel_actions(hass, fail=True)
 
     assert await service_armer.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.BUTTON) is None
 
     assert service_armer.armed_state() == AlarmControlPanelState.DISARMED
-    assert service_armer.last_change is None
+    assert service_armer.last_change is last_change
 
 
 async def test_service_without_state_change_is_not_forced(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
@@ -111,24 +117,80 @@ async def test_exit_delay_cancelled_is_an_intervention(hass: HomeAssistant, serv
     assert intervention.state == AlarmControlPanelState.DISARMED
 
 
-async def test_non_standard_state_still_set_directly(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
+async def test_pending_held_by_autoarm_not_panel(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
     calls = _register_panel_actions(hass)
+    panel_before = service_armer.panel_state()
 
     assert await service_armer.arm(AlarmControlPanelState.PENDING, source=ChangeSource.CALENDAR) == "pending"
 
     assert calls == []
+    assert service_armer.panel_state() == panel_before
+    assert service_armer.armed_state() == AlarmControlPanelState.PENDING
 
 
-@pytest.mark.parametrize("configured", [True, False])
-async def test_option_passed_from_config_entry(hass: HomeAssistant, mock_notify: Any, configured: bool) -> None:
+async def test_pending_cleared_when_autoarm_changes_state(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
+    _register_panel_actions(hass)
+    await service_armer.arm(AlarmControlPanelState.PENDING, source=ChangeSource.CALENDAR)
+
+    assert await service_armer.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.CALENDAR) == "armed_away"
+    await hass.async_block_till_done()
+
+    assert service_armer.armed_state() == AlarmControlPanelState.ARMED_AWAY
+    assert service_armer.interventions == []
+
+
+async def test_pending_cleared_by_panel_change(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
+    await service_armer.arm(AlarmControlPanelState.PENDING, source=ChangeSource.CALENDAR)
+
+    hass.states.async_set(TEST_PANEL, "armed_night")
+    await hass.async_block_till_done()
+
+    assert service_armer.armed_state() == AlarmControlPanelState.ARMED_NIGHT
+
+
+async def test_pending_forces_reset_like_direct_mode(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
+    """Calendar end moves via pending so the reset isn't held back by an earlier manual intervention"""
+    hass.states.async_set(TEST_PANEL, "armed_vacation")
+    await hass.async_block_till_done()
+    assert service_armer.last_state_intervention() is not None
+
+    await service_armer.pending_state(source=ChangeSource.CALENDAR)
+    await service_armer.reset_armed_state(source=ChangeSource.SUNRISE)
+
+    assert service_armer.pre_pending_state == AlarmControlPanelState.ARMED_VACATION
+    assert service_armer.armed_state() not in (AlarmControlPanelState.PENDING, AlarmControlPanelState.ARMED_VACATION)
+
+
+async def test_state_without_panel_action_left_unchanged(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
+    calls = _register_panel_actions(hass)
+    panel_before = service_armer.armed_state()
+
+    assert await service_armer.arm(AlarmControlPanelState.TRIGGERED, source=ChangeSource.CALENDAR) is None
+
+    assert calls == []
+    assert service_armer.armed_state() == panel_before
+
+
+@pytest.mark.parametrize(
+    ("options", "configured"),
+    [
+        ({CONF_USE_ALARM_SERVICE: True}, True),
+        ({CONF_USE_ALARM_SERVICE: False}, False),
+        # entries created before the option existed keep setting the state directly
+        ({}, False),
+    ],
+)
+async def test_option_passed_from_config_entry(
+    hass: HomeAssistant, mock_notify: Any, options: dict[str, Any], configured: bool
+) -> None:
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={CONF_ALARM_PANEL: TEST_PANEL},
-        options={CONF_USE_ALARM_SERVICE: configured},
+        options=options,
     )
     entry.add_to_hass(hass)
     hass.data[YAML_DATA_KEY] = {}
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
 
-    assert hass.data[HASS_DATA_KEY].armer.use_alarm_service is configured
+    assert entry.runtime_data.use_alarm_service is configured

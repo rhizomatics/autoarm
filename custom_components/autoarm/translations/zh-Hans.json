@@ -107,6 +107,20 @@
             "description": "重新加载 autoarm 配置。"
         }
     },
+    "entity": {
+        "binary_sensor": {
+            "initialized": { "name": "已初始化" }
+        },
+        "sensor": {
+            "failures": { "name": "故障" },
+            "last_calculation": { "name": "上次计算" },
+            "last_intervention": { "name": "上次干预" },
+            "last_calendar_event": { "name": "上次日历事件" }
+        }
+    },
+    "exceptions": {
+        "not_loaded": { "message": "AutoArm 未加载" }
+    },
     "issues": {
         "transition_condition": {
             "title": "无效的转换条件",

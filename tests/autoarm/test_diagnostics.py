@@ -9,6 +9,7 @@ from custom_components.autoarm.config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
+    CONF_USE_ALARM_SERVICE,
 )
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY
 from custom_components.autoarm.diagnostics import async_get_config_entry_diagnostics
@@ -26,6 +27,7 @@ async def _setup_entry(hass: HomeAssistant) -> MockConfigEntry:
             CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
             CONF_OCCUPANCY_DEFAULT_NIGHT: None,
             CONF_NO_EVENT_MODE: "auto",
+            CONF_USE_ALARM_SERVICE: True,
         },
     )
     entry.add_to_hass(hass)
@@ -57,7 +59,7 @@ async def test_diagnostics_without_armer(hass: HomeAssistant) -> None:
         domain=DOMAIN,
         title="Auto Arm",
         data={CONF_ALARM_PANEL: "alarm_panel.testing"},
-        options={},
+        options={CONF_USE_ALARM_SERVICE: True},
     )
 
     result = await async_get_config_entry_diagnostics(hass, entry)

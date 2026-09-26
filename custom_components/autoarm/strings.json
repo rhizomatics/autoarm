@@ -79,19 +79,19 @@
                             "sunrise_latest": "Latest"
                         },
                         "data_description": {
-                            "sunrise_earliest": "Earliest",
-                            "sunrise_latest": "Latest"
+                            "sunrise_earliest": "Sunrise no earlier than time",
+                            "sunrise_latest": "Sunrise no later than time"
                         }
                     },
                     "sunset_options": {
                         "name": "Sunset Constraints",
                         "data": {
-                            "sunset_earliest": "Earliest time for sunrise",
-                            "sunset_latest": "Latest time for sunrise"
+                            "sunset_earliest": "Earliest",
+                            "sunset_latest": "Latest"
                         },
                         "data_description": {
-                             "sunset_earliest": "Earliest time for sunset",
-                            "sunset_latest": "Latest time for sunset"
+                            "sunset_earliest": "Sunset no earlier than time",
+                            "sunset_latest": "Sunset no later than time"
                         }
                     }
                 },
@@ -106,6 +106,20 @@
             "name": "[%key:common::action::reload%]",
             "description": "Reloads autoarm configuration."
         }
+    },
+    "entity": {
+        "binary_sensor": {
+            "initialized": { "name": "Initialized" }
+        },
+        "sensor": {
+            "failures": { "name": "Failures" },
+            "last_calculation": { "name": "Last calculation" },
+            "last_intervention": { "name": "Last intervention" },
+            "last_calendar_event": { "name": "Last calendar event" }
+        }
+    },
+    "exceptions": {
+        "not_loaded": { "message": "AutoArm isn't loaded" }
     },
     "issues":{
         "transition_condition":{

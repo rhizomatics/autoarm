@@ -107,6 +107,20 @@
             "description": "Przeładowuje konfigurację autoarm."
         }
     },
+    "entity": {
+        "binary_sensor": {
+            "initialized": { "name": "Zainicjalizowano" }
+        },
+        "sensor": {
+            "failures": { "name": "Błędy" },
+            "last_calculation": { "name": "Ostatnie obliczenie" },
+            "last_intervention": { "name": "Ostatnia interwencja" },
+            "last_calendar_event": { "name": "Ostatnie wydarzenie w kalendarzu" }
+        }
+    },
+    "exceptions": {
+        "not_loaded": { "message": "AutoArm nie jest załadowany" }
+    },
     "issues": {
         "transition_condition": {
             "title": "Nieprawidłowy warunek przejścia",

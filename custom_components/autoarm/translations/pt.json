@@ -107,6 +107,20 @@
             "description": "Recarrega a configuração do autoarm."
         }
     },
+    "entity": {
+        "binary_sensor": {
+            "initialized": { "name": "Inicializado" }
+        },
+        "sensor": {
+            "failures": { "name": "Falhas" },
+            "last_calculation": { "name": "Último cálculo" },
+            "last_intervention": { "name": "Última intervenção" },
+            "last_calendar_event": { "name": "Último evento do calendário" }
+        }
+    },
+    "exceptions": {
+        "not_loaded": { "message": "O AutoArm não está carregado" }
+    },
     "issues": {
         "transition_condition": {
             "title": "Condição de transição inválida",

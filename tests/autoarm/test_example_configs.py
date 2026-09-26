@@ -1,5 +1,5 @@
 import pathlib
-from typing import Any
+from typing import Any, cast
 
 import pytest
 from homeassistant import config as hass_config
@@ -13,7 +13,7 @@ from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from conftest import MockAction
-from custom_components.autoarm.config_flow import CONF_PERSON_ENTITIES
+from custom_components.autoarm.config_flow import CONF_PERSON_ENTITIES, CONF_USE_ALARM_SERVICE
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN
 
 EXAMPLES_ROOT = pathlib.Path("examples")
@@ -26,6 +26,7 @@ def preconfigured_autoarm(hass: HomeAssistant) -> MockConfigEntry:
         domain=DOMAIN,
         title="Auto Arm",
         data={CONF_ALARM_PANEL: "alarm_control_panel.testing"},
+        options={CONF_USE_ALARM_SERVICE: True},
         unique_id=DOMAIN,
     )
     existing.add_to_hass(hass)
@@ -41,7 +42,7 @@ async def _reload_and_verify(hass: HomeAssistant, monkeypatch: pytest.MonkeyPatc
 
     autoarm_init = hass.states.get("binary_sensor.autoarm_initialized")
     assert autoarm_init is not None
-    assert autoarm_init.state == "valid"
+    assert autoarm_init.state == "on"
     assert hass.states.get("sensor.autoarm_failures").state == "0"  # type: ignore
 
 
@@ -63,7 +64,7 @@ async def test_empty_config_installed(
 
     autoarm_init = hass.states.get("binary_sensor.autoarm_initialized")
     assert autoarm_init is not None
-    assert autoarm_init.state == "valid"
+    assert autoarm_init.state == "on"
     assert hass.states.get("sensor.autoarm_failures").state == "0"  # type: ignore
 
     await _reload_and_verify(hass, monkeypatch)
@@ -88,7 +89,7 @@ async def test_supplemental_config_installed(
 
     autoarm_init = hass.states.get("binary_sensor.autoarm_initialized")
     assert autoarm_init is not None
-    assert autoarm_init.state == "valid"
+    assert autoarm_init.state == "on"
 
     hass.bus.async_fire("mobile_app_notification_action", {"action": "ALARM_PANEL_DISARM"})
     await hass.async_block_till_done()
@@ -96,8 +97,9 @@ async def test_supplemental_config_installed(
     assert hass.states.get("alarm_control_panel.testing").state == "disarmed"  # type: ignore
     assert hass.states.get("sensor.autoarm_failures").state == "0"  # type: ignore
 
-    enquire_config = await hass.services.async_call(
-        "autoarm", "enquire_configuration", None, blocking=True, return_response=True
+    enquire_config = cast(
+        "dict[str, Any]",
+        await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True),
     )
     assert enquire_config["notify"]["service"] == "notify.send_message"
     assert enquire_config["notify"]["profiles"]["quiet"]["source"] == ["alarm_panel", "button", "calendar", "sunrise", "sunset"]
@@ -127,7 +129,7 @@ async def test_legacy_config_installed(
 
     autoarm_init = hass.states.get("binary_sensor.autoarm_initialized")
     assert autoarm_init is not None
-    assert autoarm_init.state == "valid"
+    assert autoarm_init.state == "on"
 
     hass.bus.async_fire("mobile_app_notification_action", {"action": "ALARM_PANEL_DISARM"})
     await hass.async_block_till_done()
@@ -135,8 +137,9 @@ async def test_legacy_config_installed(
     assert hass.states.get("alarm_control_panel.testing").state == "disarmed"  # type: ignore
     assert hass.states.get("sensor.autoarm_failures").state == "0"  # type: ignore
 
-    enquire_config = await hass.services.async_call(
-        "autoarm", "enquire_configuration", None, blocking=True, return_response=True
+    enquire_config = cast(
+        "dict[str, Any]",
+        await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True),
     )
     assert enquire_config["notify"]["service"] == "notify.supernotify"
     assert enquire_config["notify"]["profiles"]["quiet"]["source"] == ["alarm_panel", "button", "calendar", "sunrise", "sunset"]
@@ -167,7 +170,7 @@ async def test_legacy_config_fresh_install(
 
     autoarm_init = hass.states.get("binary_sensor.autoarm_initialized")
     assert autoarm_init is not None
-    assert autoarm_init.state == "valid"
+    assert autoarm_init.state == "on"
 
     hass.bus.async_fire("mobile_app_notification_action", {"action": "ALARM_PANEL_DISARM"})
     await hass.async_block_till_done()
@@ -175,8 +178,9 @@ async def test_legacy_config_fresh_install(
     assert hass.states.get("alarm_control_panel.testing").state == "disarmed"  # type: ignore
     assert hass.states.get("sensor.autoarm_failures").state == "0"  # type: ignore
 
-    enquire_config = await hass.services.async_call(
-        "autoarm", "enquire_configuration", None, blocking=True, return_response=True
+    enquire_config = cast(
+        "dict[str, Any]",
+        await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True),
     )
     assert enquire_config["notify"]["service"] == "notify.supernotify"
     assert enquire_config["notify"]["profiles"]["quiet"]["source"] == ["alarm_panel", "button", "calendar", "sunrise", "sunset"]

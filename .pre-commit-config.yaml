@@ -56,6 +56,11 @@ repos:
           - pytest_unordered
           - pytest_mock
           - pytest-homeassistant-custom-component
+  - repo: https://github.com/astral-sh/ty-pre-commit
+    rev: v0.0.84
+    hooks:
+      - id: ty
+        args: [--isolated, --no-python-downloads]
 
 ci:
     autofix_commit_msg: |
@@ -69,4 +74,5 @@ ci:
     skip:
       - bandit
       - mypy
+      - ty
     submodules: false

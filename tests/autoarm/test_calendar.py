@@ -62,7 +62,7 @@ async def test_calendar_finds_alarm_states(simple_tracked_calendar: TrackedCalen
     assert simple_tracked_calendar.has_active_event()
     tracked_event: TrackedCalendarEvent = next(i for i in simple_tracked_calendar.tracked_events.values())
     simple_tracked_calendar.armer.arm.assert_called_once_with(
-        arming_state=AlarmControlPanelState.ARMED_AWAY,  # type: ignore
+        arming_state=AlarmControlPanelState.ARMED_AWAY,
         source=ChangeSource.CALENDAR,
         change_context={
             "caller": "calendar.on_calendar_event_start",
@@ -72,7 +72,7 @@ async def test_calendar_finds_alarm_states(simple_tracked_calendar: TrackedCalen
             "recurring": False,
             "overridable_event": True,
         },
-    )  # type: ignore
+    )
 
 
 async def test_calendar_bare_lifecycle(simple_tracked_calendar: TrackedCalendar) -> None:
@@ -108,7 +108,7 @@ async def test_calendar_tracks_event(
             "recurring": False,
             "overridable_event": False,
         },
-    )  # type: ignore
+    )
     calendar_with_holiday_event.shutdown()
     assert not calendar_with_holiday_event.has_active_event()
 
@@ -143,7 +143,7 @@ async def test_calendar_follows_event_name_change_no_longer_in_scope(
     local_calendar: CalendarEntity,
 ) -> None:
 
-    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event  # type: ignore
+    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
         {
@@ -161,7 +161,7 @@ async def test_calendar_follows_event_date_change_out_of_window(
     local_calendar: CalendarEntity,
 ) -> None:
 
-    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event  # type: ignore
+    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
         {
@@ -180,7 +180,7 @@ async def test_calendar_follows_event_date_change_within_window(
     local_calendar: CalendarEntity,
 ) -> None:
 
-    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event  # type: ignore
+    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
         {
@@ -200,7 +200,7 @@ async def test_calendar_terminates_early(
     local_calendar: CalendarEntity,
 ) -> None:
 
-    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event  # type: ignore
+    existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
         {

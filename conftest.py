@@ -1,19 +1,21 @@
 from collections.abc import AsyncGenerator, Generator
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import Mock, patch
 
 import pytest
+from homeassistant.components.alarm_control_panel import DATA_COMPONENT as ALARM_PANEL_DATA_COMPONENT
 from homeassistant.components.alarm_control_panel.const import DOMAIN as ALARM_PANEL_DOMAIN
 from homeassistant.components.calendar import CalendarEntity
 from homeassistant.components.local_calendar import CONF_CALENDAR_NAME, LocalCalendarStore  # type: ignore[attr-defined]
 from homeassistant.components.local_calendar.const import DOMAIN as LOCAL_CALENDAR_DOMAIN  # type: ignore[import-not-found]
 from homeassistant.components.notify.legacy import BaseNotificationService
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_NAME, Platform
-from homeassistant.core import HomeAssistant, SupportsResponse, callback
+from homeassistant.const import CONF_NAME, EVENT_COMPONENT_LOADED, Platform
+from homeassistant.core import Event, HomeAssistant, ServiceCall, SupportsResponse, callback
 from homeassistant.exceptions import DependencyError
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
-from homeassistant.setup import async_setup_component
+from homeassistant.setup import EventComponentLoaded, async_setup_component
 from homeassistant.util import slugify
 from pytest_homeassistant_custom_component.common import AsyncMock, MockConfigEntry
 
@@ -24,6 +26,7 @@ from custom_components.autoarm.config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
+    CONF_USE_ALARM_SERVICE,
     DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
 )
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY
@@ -41,6 +44,48 @@ TEST_PANEL = "alarm_control_panel.test_panel"
 def auto_enable_custom_integrations(enable_custom_integrations: Any) -> None:
     """Enable custom integrations in all tests."""
     return
+
+
+PANEL_ACTIONS = (
+    "alarm_arm_away",
+    "alarm_arm_home",
+    "alarm_arm_night",
+    "alarm_arm_vacation",
+    "alarm_arm_custom_bypass",
+    "alarm_disarm",
+)
+
+
+@pytest.fixture(autouse=True)
+def panel_actions(hass: HomeAssistant) -> list[ServiceCall]:
+    """Stand in for the alarm_control_panel actions, so AutoArm's default of using them works in tests.
+
+    Panels that are only states are moved to the requested state, real panel entities, such as
+    the manual one from the alarm_panel fixture, are asked to change as the real action would.
+    Installed again when the alarm_control_panel component loads, since it registers its own actions.
+    """
+    calls: list[ServiceCall] = []
+
+    async def handler(call: ServiceCall) -> None:
+        calls.append(call)
+        component = hass.data.get(ALARM_PANEL_DATA_COMPONENT)
+        for entity_id in cv.ensure_list(call.data["entity_id"]):
+            entity = component.get_entity(entity_id) if component else None
+            if entity is not None:
+                await getattr(entity, f"async_{call.service}")(code=None)
+            else:
+                requested = call.service.replace("alarm_arm_", "armed_").replace("alarm_disarm", "disarmed")
+                hass.states.async_set(entity_id, requested)
+
+    @callback
+    def install(event: Event[EventComponentLoaded] | None = None) -> None:
+        if event is None or event.data["component"] == ALARM_PANEL_DOMAIN:
+            for service in PANEL_ACTIONS:
+                hass.services.async_register(ALARM_PANEL_DOMAIN, service, handler)
+
+    install()
+    hass.bus.async_listen(EVENT_COMPONENT_LOADED, install)
+    return calls
 
 
 @pytest.fixture(name="skip_notifications")
@@ -79,13 +124,14 @@ async def local_calendar(
     await hass.config_entries.async_forward_entry_setups(config_entry, [Platform.CALENDAR])
     await hass.async_block_till_done()
 
-    calendar: CalendarEntity = calendar_platform.domain_entities[f"calendar.{slugify(name)}"]
-    return calendar
+    return cast("CalendarEntity", calendar_platform.domain_entities[f"calendar.{slugify(name)}"])
 
 
 @pytest.fixture
 async def alarm_panel(hass: HomeAssistant) -> Any:
-    alarm_config: ConfigType = {ALARM_PANEL_DOMAIN: {"platform": "manual", CONF_NAME: "Testing", "code_arm_required": False}}
+    alarm_config: ConfigType = {
+        ALARM_PANEL_DOMAIN: {"platform": "manual", CONF_NAME: "Testing", "code_arm_required": False, "arming_time": 0}
+    }
     assert await async_setup_component(hass, ALARM_PANEL_DOMAIN, alarm_config)
     return alarm_config[ALARM_PANEL_DOMAIN][CONF_NAME]
 
@@ -159,24 +205,17 @@ class MockAction(BaseNotificationService):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.calls: list[tuple[str, str | None, str | None, dict[str, Any]]] = []
+        self.calls: list[ServiceCall] = []
 
-    @callback
-    async def async_send_message(
-        self, message: str = "", title: str | None = None, target: str | None = None, **kwargs: dict[str, Any]
-    ) -> None:
-        self.calls.append((message, title, target, kwargs))
+    async def async_handle(self, call: ServiceCall) -> None:
+        self.calls.append(call)
 
 
 @pytest.fixture
 def mock_notify(hass: HomeAssistant) -> MockAction:
     mock_action: MockAction = MockAction()
-    hass.services.async_register(
-        "notify", "send_message", mock_action.async_send_message, supports_response=SupportsResponse.NONE
-    )
-    hass.services.async_register(
-        "notify", "supernotify", mock_action.async_send_message, supports_response=SupportsResponse.NONE
-    )
+    hass.services.async_register("notify", "send_message", mock_action.async_handle, supports_response=SupportsResponse.NONE)
+    hass.services.async_register("notify", "supernotify", mock_action.async_handle, supports_response=SupportsResponse.NONE)
 
     return mock_action
 
@@ -197,6 +236,7 @@ async def setup_autoarm(
             CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
             CONF_OCCUPANCY_DEFAULT_NIGHT: None,
             CONF_NO_EVENT_MODE: "auto",
+            CONF_USE_ALARM_SERVICE: True,
         },
     )
     entry.add_to_hass(hass)

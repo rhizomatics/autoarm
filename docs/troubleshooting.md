@@ -2,7 +2,11 @@
 
 ## Alarm State Not Changing
 
-**Check the initialized sensor**: Look at `binary_sensor.autoarm_initialized` in Developer Tools > States. If it shows anything other than `valid`, there is a configuration issue.
+**Check the initialized sensor**: Look at `binary_sensor.autoarm_initialized`, on the AutoArm device in **Settings** > **Devices & Services**. If it's off, there is a configuration issue, and its attributes show which stage of setup failed. `sensor.autoarm_failures` counts setup and runtime errors.
+
+**Check the alarm panel's actions**: AutoArm arms and disarms using the panel's actions. If the panel needs a code, or its integration rejects the action, a warning is logged and the panel is left alone. See [Create Panel](configuration/create_panel.md#how-autoarm-changes-the-panel).
+
+**Check the last calculation sensor**: `sensor.autoarm_last_calculation` shows when AutoArm last worked out the state, with attributes for what it decided and why, such as `reset_decision`.
 
 **Check for manual intervention lock**: After a manual change (button press, mobile action, panel change), AutoArm will not override the state until the next occupancy change. Use the `autoarm.reset_state` service to clear the lock.
 
@@ -10,11 +14,11 @@
 
 ## Calendar Events Not Detected
 
-**Check poll interval**: Calendar events are detected by polling. If events are very short, increase the poll interval or ensure events span at least 30 seconds.
+**Check poll interval**: Calendar events are detected by polling. If events are very short, increase the poll interval or ensure events span at least 15 minutes.
 
 **Check state patterns**: Verify that your calendar event summaries match the configured state patterns. The default patterns are `Away`, `Home`, `Night`, `Disarmed`, and `Vacation`/`Holiday`. Custom patterns use regex matching.
 
-**Check the last calendar event sensor**: Look at `sensor.autoarm_last_calendar_event` in Developer Tools > States for the most recently detected event.
+**Check the last calendar event sensor**: Look at `sensor.autoarm_last_calendar_event`, on the AutoArm device, for the most recently detected event.
 
 ## Notifications Not Sending
 

@@ -1,5 +1,12 @@
 # Removing AutoArm
 
+## Remove the Integration Entry
+
+1. Go to **Settings** > **Devices & Services** and select **AutoArm**
+2. Click the three-dot menu and select **Delete**
+
+This also removes the AutoArm device and its entities.
+
 ## Via HACS
 
 1. Open **HACS** in your Home Assistant instance

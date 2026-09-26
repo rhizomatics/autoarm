@@ -2,14 +2,13 @@
 
 from typing import Any
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .autoarming import HASS_DATA_KEY
+from .autoarming import AutoArmConfigEntry
 from .const import YAML_DATA_KEY
 
 
-async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, Any]:
+async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: AutoArmConfigEntry) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     yaml_config = hass.data.get(YAML_DATA_KEY, {})
     data: dict[str, Any] = {
@@ -18,8 +17,7 @@ async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigE
         "yaml_keys": list(yaml_config.keys()),
     }
 
-    if HASS_DATA_KEY in hass.data:
-        armer = hass.data[HASS_DATA_KEY].armer
+    if armer := getattr(entry, "runtime_data", None):
         data["armer"] = {
             "alarm_panel": armer.alarm_panel,
             "calendar_count": len(armer.calendars),

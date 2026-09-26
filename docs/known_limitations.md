@@ -25,4 +25,4 @@ When a manual intervention occurs (button press, mobile action, or alarm panel c
 
 ## Alarm Panel Compatibility
 
-AutoArm works with any entity that implements the `alarm_control_panel` domain. However, some panels may not support all alarm states (e.g., `armed_vacation` or `armed_custom_bypass`). AutoArm will attempt to set unsupported states, which may fail silently depending on the panel implementation.
+AutoArm works with any entity that implements the `alarm_control_panel` domain. However, some panels may not support all alarm states (e.g., `armed_vacation` or `armed_custom_bypass`). When AutoArm uses the panel's actions, as it does by default, an unsupported state is rejected by the panel, a warning is logged, and the panel is left as it was. Panels that need a code to arm or disarm can't be changed through their actions, since AutoArm has no code to give.

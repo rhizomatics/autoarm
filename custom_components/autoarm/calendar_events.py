@@ -22,7 +22,6 @@ from .const import (
     ALARM_STATES,
     CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_POLL_INTERVAL,
-    DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
     ChangeSource,
 )
@@ -160,10 +159,10 @@ class TrackedCalendarEvent:
                     "overridable_event": overridable_event,
                 },
             )
-        self.hass.states.async_set(
-            f"sensor.{DOMAIN}_last_calendar_event",
-            new_state=self.event.summary or str(self.id),
-            attributes={
+        self.armer.publish_status(
+            "last_calendar_event",
+            self.event.summary or str(self.id),
+            {
                 "calendar": self.calendar_id,
                 "start": self.event.start_datetime_local,
                 "end": self.event.end_datetime_local,
@@ -270,7 +269,7 @@ class TrackedCalendar:
         self.no_event_mode: str | None = no_event_mode
         self.alias: str = cast("str", calendar_config.get(CONF_ALIAS, ""))
         self.entity_id: str = cast("str", calendar_config.get(CONF_ENTITY_ID))
-        self.poll_interval: int = calendar_config.get(CONF_CALENDAR_POLL_INTERVAL, 30)
+        self.poll_interval: int = calendar_config.get(CONF_CALENDAR_POLL_INTERVAL, 15)
         self.state_mappings: dict[str, list[str]] = cast(
             "dict[str, list[str]]", calendar_config.get(CONF_CALENDAR_EVENT_STATES)
         )

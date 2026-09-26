@@ -107,6 +107,20 @@
             "description": "Recharge la configuration d'AutoArm."
         }
     },
+    "entity": {
+        "binary_sensor": {
+            "initialized": { "name": "Initialisé" }
+        },
+        "sensor": {
+            "failures": { "name": "Échecs" },
+            "last_calculation": { "name": "Dernier calcul" },
+            "last_intervention": { "name": "Dernière intervention" },
+            "last_calendar_event": { "name": "Dernier événement du calendrier" }
+        }
+    },
+    "exceptions": {
+        "not_loaded": { "message": "AutoArm n'est pas chargé" }
+    },
     "issues": {
         "transition_condition": {
             "title": "Condition de transition invalide",

@@ -22,6 +22,7 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STOP,
     SERVICE_RELOAD,
     STATE_HOME,
+    Platform,
 )
 from homeassistant.core import (
     Event,
@@ -33,10 +34,11 @@ from homeassistant.core import (
     SupportsResponse,
     callback,
 )
-from homeassistant.exceptions import ConditionError, ConfigEntryNotReady, HomeAssistantError
+from homeassistant.exceptions import ConditionError, ConfigEntryNotReady, HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import (
     async_track_point_in_time,
     async_track_state_change_event,
@@ -49,7 +51,6 @@ from homeassistant.helpers.reload import (
 )
 from homeassistant.helpers.service import async_register_admin_service
 from homeassistant.helpers.typing import ConfigType
-from homeassistant.util.hass_dict import HassKey
 
 from custom_components.autoarm.hass_api import HomeAssistantAPI
 from custom_components.autoarm.notifier import Notifier
@@ -105,6 +106,7 @@ from .const import (
     NO_CAL_EVENT_MODE_MANUAL,
     NOTIFY_COMMON,
     NOTIFY_SCHEMA,
+    SIGNAL_STATUS_UPDATED,
     YAML_DATA_KEY,
     ChangeSource,
     ConditionVariables,
@@ -136,9 +138,8 @@ EPHEMERAL_STATES = (
 )
 ZOMBIE_STATES = ("unknown", "unavailable")
 NS_MOBILE_ACTIONS = "mobile_actions"
-PLATFORMS = ["autoarm"]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR]
 
-HASS_DATA_KEY: HassKey["AutoArmData"] = HassKey(DOMAIN)
 
 # Map alarm states to alarm_control_panel service names.
 # Using the standard service ensures integrations like Alarmo propagate
@@ -149,14 +150,12 @@ _STATE_TO_ALARM_SERVICE: dict[AlarmControlPanelState, str] = {
     AlarmControlPanelState.ARMED_HOME: "alarm_arm_home",
     AlarmControlPanelState.ARMED_NIGHT: "alarm_arm_night",
     AlarmControlPanelState.ARMED_VACATION: "alarm_arm_vacation",
+    AlarmControlPanelState.ARMED_CUSTOM_BYPASS: "alarm_arm_custom_bypass",
     AlarmControlPanelState.DISARMED: "alarm_disarm",
 }
 
 
-@dataclass
-class AutoArmData:
-    armer: "AlarmArmer"
-    other_data: dict[str, str | dict[str, str] | list[str] | int | float | bool | None]
+type AutoArmConfigEntry = ConfigEntry["AlarmArmer"]
 
 
 async def async_setup(
@@ -255,18 +254,41 @@ async def async_setup(
         supports_response=SupportsResponse.ONLY,
     )
 
+    async def reset_service(_call: ServiceCall) -> ServiceResponse:
+        entries: list[AutoArmConfigEntry] = hass.config_entries.async_loaded_entries(DOMAIN)
+        if not entries:
+            raise ServiceValidationError(translation_domain=DOMAIN, translation_key="not_loaded")
+        armer = entries[0].runtime_data
+        new_state = await armer.reset_armed_state(
+            intervention=armer.record_intervention(source=ChangeSource.ACTION, state=None)
+        )
+        return {"change": new_state or "NO_CHANGE"}
+
+    hass.services.async_register(
+        DOMAIN,
+        "reset_state",
+        reset_service,
+        supports_response=SupportsResponse.OPTIONAL,
+    )
+
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: AutoArmConfigEntry) -> bool:
     """Set up Auto Arm from a config entry."""
     yaml_config: ConfigType = hass.data.get(YAML_DATA_KEY, {})
     try:
         armer = _build_armer_from_entry(hass, entry, yaml_config)
-        hass.data[HASS_DATA_KEY] = AutoArmData(armer, {})
-        await armer.initialize()
     except Exception as err:
         raise ConfigEntryNotReady(f"Failed to initialize Auto Arm: {err}") from err
+    entry.runtime_data = armer
+    try:
+        await armer.initialize()
+    except Exception as err:
+        # remove listeners set up before the failure, so the retry doesn't leave duplicates behind
+        armer.shutdown()
+        raise ConfigEntryNotReady(f"Failed to initialize Auto Arm: {err}") from err
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     if remove_sentences := await async_register_sentences(
         hass,
         armer,
@@ -278,12 +300,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: AutoArmConfigEntry) -> bool:
     """Unload Auto Arm config entry."""
-    if HASS_DATA_KEY in hass.data:
-        hass.data[HASS_DATA_KEY].armer.shutdown()
-        del hass.data[HASS_DATA_KEY]
-    return True
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    entry.runtime_data.shutdown()
+    return unload_ok
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -370,6 +391,7 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         calendar_occupancy_override_states=entry.options.get(
             CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
         ),
+        # entries from before the option existed keep setting the state directly
         use_alarm_service=entry.options.get(CONF_USE_ALARM_SERVICE, False),
     )
 
@@ -444,6 +466,14 @@ class StateChange:
 
 
 @dataclass
+class StatusReport:
+    """Latest value of one of the AutoArm status entities"""
+
+    value: Any
+    attributes: dict[str, Any]
+
+
+@dataclass
 class AlarmStateWithAttributes:
     state: AlarmControlPanelState
     source: ChangeSource
@@ -470,7 +500,7 @@ class AlarmArmer:
         calendar_config: ConfigType | None = None,
         transitions: dict[str, dict[str, list[ConfigType]]] | None = None,
         calendar_occupancy_override_states: list[str] | None = None,
-        use_alarm_service: bool = False,
+        use_alarm_service: bool = True,
     ) -> None:
         occupancy = occupancy or {}
         rate_limit = rate_limit or {}
@@ -515,9 +545,12 @@ class AlarmArmer:
         self.arming_in_progress: asyncio.Event = asyncio.Event()
         # change state with alarm_control_panel actions rather than setting it, for panels like Alarmo
         self.use_alarm_service: bool = use_alarm_service
-        self._arming_via_service: bool = False  # guard against feedback loop when calling the panel's actions
-        self._service_target: AlarmControlPanelState | None = None  # state the panel is still arming towards
+        # state the panel is being moved to by its actions, so the change isn't mistaken for a manual one
+        self._service_target: AlarmControlPanelState | None = None
+        # pending held by AutoArm, when using actions, since panels have no action to go to pending
+        self.virtual_pending: bool = False
         self.last_change: StateChange | None = None
+        self.stop_listener: Callable[[], None] | None = None
 
         self.rate_limiter: Limiter = Limiter(
             window=rate_limit.get(CONF_RATE_LIMIT_PERIOD, dt.timedelta(seconds=60)),
@@ -530,6 +563,7 @@ class AlarmArmer:
 
         self.interventions: list[Intervention] = []
         self.intervention_ttl: int = 60
+        self.status: dict[str, StatusReport] = {}
 
     async def initialize(self) -> None:
         """Async initialization"""
@@ -576,26 +610,10 @@ class AlarmArmer:
         _LOGGER.info("AUTOARM Initialized, state: %s", self.armed_state())
 
     def initialize_home_assistant(self) -> None:
-        self.stop_listener: Callable[[], None] | None = self.hass.bus.async_listen_once(
-            EVENT_HOMEASSISTANT_STOP, self.async_shutdown
-        )
+        self.stop_listener = self.hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, self.async_shutdown)
         self.app_health_tracker.app_initialized()
-        self.hass.states.async_set(f"sensor.{DOMAIN}_last_calculation", "unavailable", attributes={})
-
-        self.hass.services.async_register(
-            DOMAIN,
-            "reset_state",
-            self.reset_service,
-            supports_response=SupportsResponse.OPTIONAL,
-        )
-
-    async def reset_service(self, _call: ServiceCall) -> ServiceResponse:
-        new_state = await self.reset_armed_state(intervention=self.record_intervention(source=ChangeSource.ACTION, state=None))
-        return {"change": new_state or "NO_CHANGE"}
 
     def initialize_integration(self) -> None:
-        self.hass.states.async_set(f"sensor.{DOMAIN}_last_intervention", "unavailable", attributes={})
-
         self.unsubscribes.append(self.hass.bus.async_listen("mobile_app_notification_action", self.on_mobile_action))
 
     def initialize_alarm_panel(self) -> None:
@@ -677,7 +695,6 @@ class AlarmArmer:
     async def initialize_calendar(self) -> None:
         """Configure calendar polling (optional)"""
         stage: str = "calendar"
-        self.hass.states.async_set(f"sensor.{DOMAIN}_last_calendar_event", "unavailable", attributes={})
         if not self.calendar_configs:
             return
         try:
@@ -739,9 +756,9 @@ class AlarmArmer:
                 except ConditionError as ce:
                     _LOGGER.error(f"AUTOARM Transition {state_str} conditions fails Home Assistant condition check {ce}")
                     if hasattr(ce, "message"):
-                        error = ce.message  # type: ignore[attr-defined,unused-ignore]
+                        error = str(ce.message)  # type: ignore[attr-defined,unused-ignore]
                     elif hasattr(ce, "error") and hasattr(ce.error, "message"):  # type: ignore[attr-defined,unused-ignore]
-                        error = ce.error.message  # type: ignore[attr-defined,unused-ignore]
+                        error = str(ce.error.message)  # type: ignore[attr-defined,unused-ignore]
                     else:
                         error = str(ce)
                 except Exception as e:
@@ -819,6 +836,11 @@ class AlarmArmer:
         return now.hour < 12  # AM means today's sunrise is relevant
 
     def armed_state(self) -> AlarmControlPanelState:
+        if self.virtual_pending:
+            return AlarmControlPanelState.PENDING
+        return self.panel_state()
+
+    def panel_state(self) -> AlarmControlPanelState:
         raw_state: str | None = safe_state(self.hass.states.get(self.alarm_panel))
         alarm_state: AlarmControlPanelState | None = alarm_state_as_enum(raw_state)
         if alarm_state is None:
@@ -842,17 +864,16 @@ class AlarmArmer:
         )
 
     def _extract_event(self, event: Event[EventStateChangedData]) -> tuple[str | None, str | None, str | None, dict[str, str]]:
-        entity_id = old = new = None
+        old = new = None
         new_attributes: dict[str, str] = {}
-        if event and event.data:
-            entity_id = event.data.get("entity_id")
-            old_obj = event.data.get("old_state")
-            if old_obj:
-                old = old_obj.state
-            new_obj = event.data.get("new_state")
-            if new_obj:
-                new = new_obj.state
-                new_attributes = new_obj.attributes
+        entity_id = event.data.get("entity_id")
+        old_obj = event.data.get("old_state")
+        if old_obj:
+            old = old_obj.state
+        new_obj = event.data.get("new_state")
+        if new_obj:
+            new = new_obj.state
+            new_attributes = new_obj.attributes
         return entity_id, old, new, new_attributes
 
     async def pending_state(self, source: ChangeSource | None, change_context: dict[str, Any] | None = None) -> None:
@@ -967,10 +988,11 @@ class AlarmArmer:
                 )
 
         finally:
-            self.hass.states.async_set(
-                f"sensor.{DOMAIN}_last_calculation",
-                str(state is not None and state != existing_state),
-                attributes={
+            self.publish_status(
+                "last_calculation",
+                dt_util.now(),
+                {
+                    "changed": state is not None and state != existing_state,
                     "new_state": str(state),
                     "old_state": str(existing_state),
                     "source": str(source),
@@ -980,7 +1002,6 @@ class AlarmArmer:
                     "must_change_state": str(must_change_state),
                     "last_state_intervention": deobjectify(last_state_intervention),
                     "intervention": intervention.as_dict() if intervention else None,
-                    "time": dt_util.now().isoformat(),
                     "reset_decision": reset_decision,
                 },
             )
@@ -1072,8 +1093,8 @@ class AlarmArmer:
                     # Call the standard alarm_control_panel service so that
                     # integrations like Alarmo can propagate the arm command
                     # to child areas (master→area dispatch).
-                    self._service_target = None
-                    self._arming_via_service = True
+                    # the panel's state change may be seen after the action returns, so match on the state
+                    self._service_target = arming_state
                     try:
                         await self.hass.services.async_call(
                             "alarm_control_panel",
@@ -1086,6 +1107,7 @@ class AlarmArmer:
                         # bypassing alarmo leaves a stale state-machine entry
                         # on master_alarm that prevents Alarmo from re-registering
                         # the entity correctly on the next reload (causes _2 shadow).
+                        self._service_target = None
                         _LOGGER.warning(
                             "AUTOARM Alarm panel service %s failed for %s (source=%s);"
                             " NOT setting state directly to avoid breaking the panel integration",
@@ -1094,16 +1116,12 @@ class AlarmArmer:
                             source,
                         )
                         return None
-                    finally:
-                        self._arming_via_service = False
                     # If the service call didn't actually change the state
                     # (silent failure), skip. Direct state set on alarmo would
                     # leave stale state entries that break the entity registry on
                     # the next reload (see exception branch above).
-                    if self.armed_state() == AlarmControlPanelState.ARMING:
-                        # exit delay - the panel's own change to the armed state follows later
-                        self._service_target = arming_state
-                    elif self.armed_state() != arming_state:
+                    if self.panel_state() not in (arming_state, AlarmControlPanelState.ARMING):
+                        self._service_target = None
                         _LOGGER.warning(
                             "AUTOARM Alarm panel service %s did not change state for %s (source=%s); leaving the panel to handle state",
                             service_name,
@@ -1111,9 +1129,20 @@ class AlarmArmer:
                             source,
                         )
                         return None
+                    self.virtual_pending = False
+                elif self.use_alarm_service:
+                    if arming_state != AlarmControlPanelState.PENDING:
+                        _LOGGER.warning(
+                            "AUTOARM No alarm panel action for %s on %s (source=%s), leaving state unchanged",
+                            arming_state,
+                            self.alarm_panel,
+                            source,
+                        )
+                        return None
+                    # hold pending within AutoArm rather than setting a state the panel may not support
+                    self.virtual_pending = True
                 else:
-                    # Not using the service, or non-standard state (e.g. PENDING) —
-                    # set the state directly.
+                    # Not using the service, so set the state directly.
                     attrs: dict[str, Any] = {}
                     if panel_state:
                         attrs.update(panel_state.attributes)
@@ -1189,9 +1218,14 @@ class AlarmArmer:
     def record_intervention(self, source: ChangeSource, state: AlarmControlPanelState | None) -> Intervention:
         intervention = Intervention(dt_util.now(), source, state)
         self.interventions.append(intervention)
-        self.hass.states.async_set(f"sensor.{DOMAIN}_last_intervention", source, attributes=intervention.as_dict())
+        self.publish_status("last_intervention", source, intervention.as_dict())
 
         return intervention
+
+    def publish_status(self, key: str, value: Any, attributes: dict[str, Any]) -> None:
+        """Record the latest value for a status entity, and let the entity know"""
+        self.status[key] = StatusReport(value, attributes)
+        async_dispatcher_send(self.hass, SIGNAL_STATUS_UPDATED)
 
     def has_intervention_since(self, cutoff: dt.datetime) -> bool:
         """Has there been a manual intervention since the cutoff time"""
@@ -1345,19 +1379,14 @@ class AlarmArmer:
     async def on_panel_change(self, event: Event[EventStateChangedData]) -> None:
         """Alarm Control Panel has been changed outside of AutoArm"""
         entity_id, old, new, new_attributes = self._extract_event(event)
-        if self._arming_via_service:
-            _LOGGER.debug(
-                "AUTOARM Panel Change via service call (ignored): %s,%s: %s-->%s",
-                entity_id,
-                event.event_type,
-                old,
-                new,
-            )
-            return
         if self._service_target is not None:
+            if new == AlarmControlPanelState.ARMING:
+                # exit delay - the panel's own change to the armed state follows later
+                _LOGGER.debug("AUTOARM Panel Change arming via service (ignored): %s: %s-->%s", entity_id, old, new)
+                return
             target, self._service_target = self._service_target, None
             if new == target:
-                _LOGGER.debug("AUTOARM Panel Change completes arming via service (ignored): %s: %s-->%s", entity_id, old, new)
+                _LOGGER.debug("AUTOARM Panel Change via service (ignored): %s: %s-->%s", entity_id, old, new)
                 return
         if new_attributes:
             changed_by = new_attributes.get(ATTR_CHANGED_BY)
@@ -1380,6 +1409,7 @@ class AlarmArmer:
             old,
             new,
         )
+        self.virtual_pending = False
         self.record_intervention(ChangeSource.ALARM_PANEL, new_state)
         if new in ZOMBIE_STATES:
             _LOGGER.warning("AUTOARM Dezombifying %s ...", new)

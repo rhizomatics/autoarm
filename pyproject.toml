@@ -34,7 +34,7 @@ dev=[
 docs=[
     "mkdocs-minify-plugin",
     "pymdown-extensions",
-    "mkdocs-material[imaging]",
+    "mkdocs-materialx[imaging]",
     "mkdocs-autorefs",
     "mkdocs-coverage",
     "mkdocs-pagetree-plugin",

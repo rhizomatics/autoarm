@@ -230,7 +230,9 @@ async def test_options_flow_offers_supernotify_action(hass: HomeAssistant, setup
 
     result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
 
-    notify_section = result["data_schema"].schema["notify_options"].schema.schema
+    data_schema = result["data_schema"]
+    assert data_schema is not None
+    notify_section = data_schema.schema["notify_options"].schema.schema
     action_selector = next(v for k, v in notify_section.items() if k == CONF_NOTIFY_ACTION)
     assert action_selector.config["options"][0] == "supernotify.notify"
 
@@ -238,6 +240,8 @@ async def test_options_flow_offers_supernotify_action(hass: HomeAssistant, setup
 async def test_options_flow_without_supernotify_action(hass: HomeAssistant, setup_autoarm: MockConfigEntry) -> None:
     result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
 
-    notify_section = result["data_schema"].schema["notify_options"].schema.schema
+    data_schema = result["data_schema"]
+    assert data_schema is not None
+    notify_section = data_schema.schema["notify_options"].schema.schema
     action_selector = next(v for k, v in notify_section.items() if k == CONF_NOTIFY_ACTION)
     assert "supernotify.notify" not in action_selector.config["options"]

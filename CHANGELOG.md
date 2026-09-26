@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.3.0
+- Improved Home Assistant alignment
+  - AutoArm's sensors are now proper Home Assistant entities, on an **AutoArm** device, so they can be renamed, given an area, or disabled in the UI, and are removed with the integration
+  - Entity ids are unchanged, though some states are different:
+    - `binary_sensor.autoarm_initialized` is now `on` or `off` rather than `valid` or `invalid`
+    - `sensor.autoarm_last_calculation` is now the time of the last calculation, with whether it changed the state in the `changed` attribute, rather than `True` or `False`
+    - The last calculation, intervention and calendar event sensors are `unknown` until there's something to show, rather than `unavailable`
+  - The initialized and failures sensors are diagnostic, and the failures count keeps long term statistics
+  - Entity names are translated
+- New installs change the alarm panel using its actions by default, rather than setting its state directly
+  - Existing installs keep their current setting, and can switch with **Change state using the alarm panel's actions** in the options
+  - When using actions, `pending` is kept within AutoArm rather than set on the panel, since panels have no action for it
+  - `armed_custom_bypass` can now be set using the panel's actions
+- Fixed AutoArm mistaking its own change for a manual one, when using the panel's actions, when the change was triggered by another state change, such as a button press. This could send a panel changed notification, and hold off automatic changes as a manual intervention would
 ## 1.2.0
 - Support for Alarm Control Panels, such as Alarmo, that require direct service calls to change state. Contributed by @tabascoz
   - Switched on by **Change state using the alarm panel's actions** in the options

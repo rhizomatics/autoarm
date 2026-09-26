@@ -7,9 +7,10 @@ import homeassistant.util.dt as dt_util
 from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.core import State
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.json import ExtendedJSONEncoder
 
-from .const import DOMAIN, ChangeSource
+from .const import SIGNAL_STATUS_UPDATED, ChangeSource
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -87,28 +88,23 @@ def deobjectify(obj: object) -> dict[Any, Any] | str | int | float | bool | None
 class AppHealthTracker:
     def __init__(self, hass: HomeAssistant) -> None:
         self.hass = hass
+        self.initialized = False
         self.initialization_errors: dict[str, int] = {}
         self.failures = 0
 
     def app_initialized(self) -> None:
-        self.hass.states.async_set(
-            f"binary_sensor.{DOMAIN}_initialized",
-            "valid" if not self.initialization_errors else "invalid",
-            attributes=self.initialization_errors,
-        )
-        self.hass.states.async_set(f"sensor.{DOMAIN}_failures", str(self.failures))
+        self.initialized = True
+        async_dispatcher_send(self.hass, SIGNAL_STATUS_UPDATED)
 
     def record_initialization_error(self, stage: str) -> None:
         self.initialization_errors.setdefault(stage, 0)
         self.initialization_errors[stage] += 1
         self.failures += 1
-        self.hass.states.async_set(
-            f"sensor.{DOMAIN}_failures", str(self.failures), attributes={"initialization_errors": self.initialization_errors}
-        )
+        async_dispatcher_send(self.hass, SIGNAL_STATUS_UPDATED)
 
     def record_runtime_error(self) -> None:
         self.failures += 1
-        self.hass.states.async_set(f"sensor.{DOMAIN}_failures", str(self.failures))
+        async_dispatcher_send(self.hass, SIGNAL_STATUS_UPDATED)
 
 
 class ExtendedExtendedJSONEncoder(ExtendedJSONEncoder):

@@ -107,6 +107,20 @@
             "description": "Ricarica la configurazione di AutoArm."
         }
     },
+    "entity": {
+        "binary_sensor": {
+            "initialized": { "name": "Inizializzato" }
+        },
+        "sensor": {
+            "failures": { "name": "Errori" },
+            "last_calculation": { "name": "Ultimo calcolo" },
+            "last_intervention": { "name": "Ultimo intervento" },
+            "last_calendar_event": { "name": "Ultimo evento del calendario" }
+        }
+    },
+    "exceptions": {
+        "not_loaded": { "message": "AutoArm non è caricato" }
+    },
     "issues": {
         "transition_condition": {
             "title": "Condizione di transizione non valida",

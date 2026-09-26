@@ -107,6 +107,20 @@
             "description": "Lädt die AutoArm-Konfiguration neu."
         }
     },
+    "entity": {
+        "binary_sensor": {
+            "initialized": { "name": "Initialisiert" }
+        },
+        "sensor": {
+            "failures": { "name": "Fehler" },
+            "last_calculation": { "name": "Letzte Berechnung" },
+            "last_intervention": { "name": "Letzter Eingriff" },
+            "last_calendar_event": { "name": "Letztes Kalenderereignis" }
+        }
+    },
+    "exceptions": {
+        "not_loaded": { "message": "AutoArm ist nicht geladen" }
+    },
     "issues": {
         "transition_condition": {
             "title": "Ungültige Übergangsbedingung",

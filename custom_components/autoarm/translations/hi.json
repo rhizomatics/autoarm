@@ -107,6 +107,20 @@
             "description": "autoarm कॉन्फ़िगरेशन को पुनः लोड करता है।"
         }
     },
+    "entity": {
+        "binary_sensor": {
+            "initialized": { "name": "आरंभ किया गया" }
+        },
+        "sensor": {
+            "failures": { "name": "विफलताएँ" },
+            "last_calculation": { "name": "अंतिम गणना" },
+            "last_intervention": { "name": "अंतिम हस्तक्षेप" },
+            "last_calendar_event": { "name": "अंतिम कैलेंडर इवेंट" }
+        }
+    },
+    "exceptions": {
+        "not_loaded": { "message": "AutoArm लोड नहीं है" }
+    },
     "issues": {
         "transition_condition": {
             "title": "अमान्य ट्रांज़िशन शर्त",

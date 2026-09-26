@@ -107,6 +107,20 @@
             "description": "Herlaadt de autoarm-configuratie."
         }
     },
+    "entity": {
+        "binary_sensor": {
+            "initialized": { "name": "Geïnitialiseerd" }
+        },
+        "sensor": {
+            "failures": { "name": "Fouten" },
+            "last_calculation": { "name": "Laatste berekening" },
+            "last_intervention": { "name": "Laatste ingreep" },
+            "last_calendar_event": { "name": "Laatste agenda-afspraak" }
+        }
+    },
+    "exceptions": {
+        "not_loaded": { "message": "AutoArm is niet geladen" }
+    },
     "issues": {
         "transition_condition": {
             "title": "Ongeldige overgangsvoorwaarde",

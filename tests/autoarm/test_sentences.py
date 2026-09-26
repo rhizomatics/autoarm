@@ -16,7 +16,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer
-from custom_components.autoarm.config_flow import CONF_SENTENCE_ARM, CONF_SENTENCE_DISARM
+from custom_components.autoarm.config_flow import CONF_SENTENCE_ARM, CONF_SENTENCE_DISARM, CONF_USE_ALARM_SERVICE
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY, ChangeSource
 from custom_components.autoarm.sentences import SENTENCES, async_respond, explain
 
@@ -181,7 +181,9 @@ async def test_why_mentions_active_calendar_event(hass: HomeAssistant, autoarmer
 
 async def _setup(hass: HomeAssistant, options: dict[str, Any]) -> MockConfigEntry:
     hass.states.async_set(TEST_PANEL, "disarmed")
-    entry = MockConfigEntry(domain=DOMAIN, data={CONF_ALARM_PANEL: TEST_PANEL}, options=options)
+    entry = MockConfigEntry(
+        domain=DOMAIN, data={CONF_ALARM_PANEL: TEST_PANEL}, options={CONF_USE_ALARM_SERVICE: True, **options}
+    )
     entry.add_to_hass(hass)
     hass.data[YAML_DATA_KEY] = {}
     assert await hass.config_entries.async_setup(entry.entry_id)
@@ -246,7 +248,9 @@ async def test_sentences_registered_and_answer(hass: HomeAssistant) -> None:
         "trigger": {"id": "armed_night", "user_input": {"context": {"id": "abc", "user_id": USER_ID}}},
     })
     assert result.conversation_response == "The alarm is now armed for the night"
-    assert hass.states.get(TEST_PANEL).state == "armed_night"  # type: ignore[union-attr]
+    panel = hass.states.get(TEST_PANEL)
+    assert panel is not None
+    assert panel.state == "armed_night"
 
     assert await hass.config_entries.async_unload(entry.entry_id)
     remove.assert_called_once()

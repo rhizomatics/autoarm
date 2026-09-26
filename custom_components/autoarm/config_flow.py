@@ -82,7 +82,7 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_SUNRISE_LATEST: None,
     CONF_SUNSET_EARLIEST: None,
     CONF_SUNSET_LATEST: None,
-    CONF_USE_ALARM_SERVICE: False,
+    CONF_USE_ALARM_SERVICE: True,
     CONF_SENTENCE_ARM: True,
     CONF_SENTENCE_DISARM: False,
 }
@@ -146,7 +146,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_SUNRISE_LATEST: None,
                 CONF_SUNSET_EARLIEST: None,
                 CONF_SUNSET_LATEST: None,
-                CONF_USE_ALARM_SERVICE: False,
+                CONF_USE_ALARM_SERVICE: True,
                 CONF_SENTENCE_ARM: True,
                 CONF_SENTENCE_DISARM: False,
             }
@@ -203,7 +203,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_SUNRISE_LATEST: _time_to_str(sunrise_config.get(CONF_LATEST)),
             CONF_SUNSET_EARLIEST: _time_to_str(sunset_config.get(CONF_EARLIEST)),
             CONF_SUNSET_LATEST: _time_to_str(sunset_config.get(CONF_LATEST)),
-            CONF_USE_ALARM_SERVICE: False,
+            CONF_USE_ALARM_SERVICE: True,
             CONF_SENTENCE_ARM: True,
             CONF_SENTENCE_DISARM: False,
         }
@@ -256,7 +256,7 @@ class AutoArmOptionsFlow(OptionsFlow):
                 ): EntitySelector(EntitySelectorConfig(domain="alarm_control_panel")),
                 vol.Required(
                     CONF_USE_ALARM_SERVICE,
-                    default=options.get(CONF_USE_ALARM_SERVICE, False),
+                    default=options.get(CONF_USE_ALARM_SERVICE, True),
                 ): BooleanSelector(),
                 vol.Optional(
                     CONF_CALENDAR_ENTITIES,

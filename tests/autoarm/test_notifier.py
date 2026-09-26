@@ -5,8 +5,8 @@ from homeassistant.components.alarm_control_panel.const import AlarmControlPanel
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.autoarm.autoarming import HASS_DATA_KEY, AlarmArmer
-from custom_components.autoarm.config_flow import CONF_NOTIFY_ACTION, CONF_NOTIFY_ENABLED
+from custom_components.autoarm.autoarming import AlarmArmer
+from custom_components.autoarm.config_flow import CONF_NOTIFY_ACTION, CONF_NOTIFY_ENABLED, CONF_USE_ALARM_SERVICE
 from custom_components.autoarm.const import (
     CONF_ALARM_PANEL,
     DOMAIN,
@@ -717,7 +717,7 @@ async def test_notify_from_options_without_yaml(hass: HomeAssistant, mock_notify
     entry = MockConfigEntry(
         domain=DOMAIN,
         data={CONF_ALARM_PANEL: TEST_PANEL},
-        options={CONF_NOTIFY_ENABLED: True, CONF_NOTIFY_ACTION: "notify.supernotify"},
+        options={CONF_NOTIFY_ENABLED: True, CONF_NOTIFY_ACTION: "notify.supernotify", CONF_USE_ALARM_SERVICE: True},
     )
     entry.add_to_hass(hass)
     hass.data[YAML_DATA_KEY] = {}
@@ -725,7 +725,7 @@ async def test_notify_from_options_without_yaml(hass: HomeAssistant, mock_notify
     await hass.async_block_till_done()
     mock_notify.calls.clear()
 
-    notifier = hass.data[HASS_DATA_KEY].armer.notifier
+    notifier = entry.runtime_data.notifier
     assert notifier is not None
     await notifier.notify(ChangeSource.CALENDAR, AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_AWAY)
     await hass.async_block_till_done()

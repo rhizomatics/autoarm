@@ -15,6 +15,7 @@ from custom_components.autoarm.config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
+    CONF_USE_ALARM_SERVICE,
 )
 from custom_components.autoarm.const import (
     CONF_ALARM_PANEL,
@@ -55,6 +56,7 @@ ENTRY_OPTIONS: dict[str, Any] = {
     CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
     CONF_OCCUPANCY_DEFAULT_NIGHT: None,
     CONF_NO_EVENT_MODE: "auto",
+    CONF_USE_ALARM_SERVICE: True,
 }
 
 

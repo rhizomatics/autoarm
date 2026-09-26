@@ -3,10 +3,12 @@ import datetime as dt
 import json
 from typing import Any
 
+import pytest
 from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, AlarmControlPanelState
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_CONDITIONS, CONF_DELAY_TIME, CONF_ENTITY_ID
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
@@ -18,6 +20,7 @@ from custom_components.autoarm.config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
+    CONF_USE_ALARM_SERVICE,
 )
 from custom_components.autoarm.const import (
     ATTR_RESET,
@@ -60,17 +63,20 @@ ENTRY_OPTIONS: dict[str, Any] = {
     CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
     CONF_OCCUPANCY_DEFAULT_NIGHT: None,
     CONF_NO_EVENT_MODE: "auto",
+    CONF_USE_ALARM_SERVICE: True,
 }
 
 
-async def _setup_entry(hass: HomeAssistant, yaml_config: dict[str, Any] | None = None) -> MockConfigEntry:
+async def _setup_entry(
+    hass: HomeAssistant, yaml_config: dict[str, Any] | None = None, options: dict[str, Any] | None = None
+) -> MockConfigEntry:
     """Set up a config entry with optional YAML config."""
     hass.data[YAML_DATA_KEY] = yaml_config or YAML_CONFIG
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="Auto Arm",
         data=ENTRY_DATA,
-        options=ENTRY_OPTIONS,
+        options=options or ENTRY_OPTIONS,
     )
     entry.add_to_hass(hass)
     await hass.config_entries.async_setup(entry.entry_id)
@@ -90,7 +96,7 @@ async def test_exposed_entities(hass: HomeAssistant, mock_notify: Any) -> None:
 
     configuration = hass.states.get("binary_sensor.autoarm_initialized")
     assert configuration is not None
-    assert configuration.state == "valid"
+    assert configuration.state == "on"
 
     assert hass.states.get("sensor.autoarm_last_calendar_event") is not None
 
@@ -112,6 +118,15 @@ async def test_reset_service(hass: HomeAssistant, mock_notify: Any) -> None:
     assert response is not None
     assert response["change"] == "armed_away"
     assert hass.states.get("sensor.autoarm_last_intervention").state == "action"  # type: ignore
+
+
+async def test_reset_service_without_loaded_entry(hass: HomeAssistant, mock_notify: Any) -> None:
+    entry = await _setup_entry(hass)
+    assert await hass.config_entries.async_unload(entry.entry_id)
+
+    with pytest.raises(ServiceValidationError) as err:
+        await hass.services.async_call("autoarm", "reset_state", None, blocking=True, return_response=True)
+    assert err.value.translation_key == "not_loaded"
 
 
 async def test_broken_condition_raises_issue(
@@ -136,8 +151,25 @@ async def test_broken_condition_raises_issue(
     assert issue.severity == ir.IssueSeverity.ERROR
 
 
-async def test_on_panel_change_ignores_autoarm_generated_event(hass: HomeAssistant, mock_notify: Any) -> None:
+async def test_on_panel_change_ignores_autoarm_generated_event(
+    hass: HomeAssistant, mock_notify: Any, panel_actions: list[ServiceCall]
+) -> None:
     await _setup_entry(hass)
+
+    # the button is handled inside a state change listener, so the panel's change is seen after the action returns
+    hass.states.async_set("binary_sensor.button_middle", "on")
+    await hass.async_block_till_done()
+    assert panel_actions[-1].service == "alarm_disarm"
+    assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
+    assert hass.states.get("sensor.autoarm_last_intervention").state == "button"  # type: ignore
+
+    hass.states.async_set("alarm_panel.testing", "armed_vacation")
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.autoarm_last_intervention").state == "alarm_panel"  # type: ignore
+
+
+async def test_direct_on_panel_change_ignores_autoarm_generated_event(hass: HomeAssistant, mock_notify: Any) -> None:
+    await _setup_entry(hass, options={**ENTRY_OPTIONS, CONF_USE_ALARM_SERVICE: False})
 
     hass.states.async_set("binary_sensor.button_middle", "on")
     await hass.async_block_till_done()
@@ -237,6 +269,31 @@ async def test_setup_entry_raises_not_ready_on_failure(
         await hass.async_block_till_done()
 
     assert entry.state is ConfigEntryState.SETUP_RETRY
+
+
+async def test_setup_entry_shuts_down_armer_on_initialize_failure(hass: HomeAssistant, mock_notify: Any) -> None:
+    from unittest.mock import patch
+
+    hass.data[YAML_DATA_KEY] = YAML_CONFIG
+    entry = MockConfigEntry(domain=DOMAIN, title="Auto Arm", data=ENTRY_DATA, options=ENTRY_OPTIONS)
+    entry.add_to_hass(hass)
+
+    # fail after the panel, occupancy and button listeners are set up
+    with patch(
+        "custom_components.autoarm.autoarming.AlarmArmer.initialize_integration",
+        side_effect=Exception("boom"),
+    ):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert entry.state is ConfigEntryState.SETUP_RETRY
+    armer = entry.runtime_data
+    assert armer.unsubscribes == []
+    assert armer.stop_listener is None
+    # a panel change no longer reaches the failed armer
+    hass.states.async_set("alarm_panel.testing", "armed_vacation")
+    await hass.async_block_till_done()
+    assert armer.interventions == []
 
 
 async def test_arm_fires_autoarming_event(hass: HomeAssistant, mock_notify: Any) -> None:

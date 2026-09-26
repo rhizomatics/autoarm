@@ -107,6 +107,20 @@
             "description": "AutoArm の設定を再読み込みします。"
         }
     },
+    "entity": {
+        "binary_sensor": {
+            "initialized": { "name": "初期化済み" }
+        },
+        "sensor": {
+            "failures": { "name": "失敗" },
+            "last_calculation": { "name": "最終計算" },
+            "last_intervention": { "name": "最終介入" },
+            "last_calendar_event": { "name": "最終カレンダーイベント" }
+        }
+    },
+    "exceptions": {
+        "not_loaded": { "message": "AutoArm が読み込まれていません" }
+    },
     "issues": {
         "transition_condition": {
             "title": "無効なトランジション条件",

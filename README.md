@@ -160,8 +160,8 @@ notify:
 ##  Rhizomatics Open Source for Home Assistant
 
 ### HACS
-- [Remote Logger](https://remote-logger.rhizomatics.org.uk) - OpenTelemetry (OTLP) and Syslog event capture for Home Assistant
-- [Supernotify](https://supernotify.rhizomatics.org.uk) - Unified notification for easy multi-channel messaging, including powerful chime and security camera integration.
+- [Remote Logger](https://remote-logger.rhizomatics.org.uk) - OpenTelemetry (OTLP) and Syslog event capture for Home Assistant. Zero YAML install.
+- [Supernotify](https://supernotify.rhizomatics.org.uk) - Unified notification for easy multi-channel messaging, including powerful chime and security camera integration. Zero YAML install.
 
 
 ### Python / Docker
@@ -169,7 +169,7 @@ notify:
 - [Anpr2MQTT](https://anpr2mqtt.rhizomatics.org.uk) - Integrate with ANPR/ALPR licence plate cameras via file system (NAS/FTP) to MQTT with optional image analysis and UK DVLA integration.
 - [Updates2MQTT](https://updates2mqtt.rhizomatics.org.uk) - Automatically notify via MQTT on Docker image updates, with advanced handling to extract versions and release notes from images, and option to remotely pull and restart containers from Home Assistant. Also available on [PyPI](https://pypi.org/project/updates2mqtt/)
 
-[![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?style=for-the-badge&logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)
+[![Built with MaterialX for ProperDocs](https://img.shields.io/badge/MaterialX_for_ProperDocs-526CFE?style=for-the-badge&logo=MaterialForMkDocs&logoColor=white)](https://github.com/jaywhj/mkdocs-materialx)
 
 
 [hacs]: https://hacs.xyz
