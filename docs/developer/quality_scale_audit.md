@@ -1,6 +1,6 @@
 # Home Assistant Quality Scale Audit
 
-This document provides a comprehensive audit of the AutoArm integration against the [Home Assistant Integration Quality Scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/). The rule by rule status is kept in `custom_components/autoarm/quality_scale.yaml`.
+This document provides a comprehensive audit of the Auto Arm integration against the [Home Assistant Integration Quality Scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/). The rule by rule status is kept in `custom_components/autoarm/quality_scale.yaml`.
 
 **Audit Date:** September 2026
 **Integration Version:** 1.3.0
@@ -76,7 +76,7 @@ The Silver tier focuses on reliability and robustness.
 
 | Rule | Status | Reason |
 |------|--------|--------|
-| `entity-unavailable` | Exempt | Entities report AutoArm's own state, always available while loaded |
+| `entity-unavailable` | Exempt | Entities report Auto Arm's own state, always available while loaded |
 | `log-when-unavailable` | Exempt | No device or service connection of its own |
 | `reauthentication-flow` | Exempt | No authentication required |
 
@@ -90,7 +90,7 @@ The Gold tier represents best-in-class user experience.
 
 | Rule | Status | Notes |
 |------|--------|-------|
-| `devices` | Done | Entities belong to a single AutoArm service device |
+| `devices` | Done | Entities belong to a single Auto Arm service device |
 | `diagnostics` | Done | `diagnostics.py` exposes entry data, options, YAML keys, and armer state |
 | `docs-data-update` | Done | Update mechanisms documented (events, polling, manual triggers) |
 | `docs-examples` | Done | Example configs in `docs/configuration/examples/` |

@@ -1,7 +1,7 @@
 # Create a Calendar
 
 This *How To* will show you how to create a new calendar dedicated for controlling alarm control panel state.
-This is one way of using AutoArm, you can choose to use [other types of calendars](https://www.home-assistant.io/integrations/?cat=calendar), reuse events from existing calendars, or mix-n-match.
+This is one way of using Auto Arm, you can choose to use [other types of calendars](https://www.home-assistant.io/integrations/?cat=calendar), reuse events from existing calendars, or mix-n-match.
 
 ## Add a Local Calendar
 
@@ -17,12 +17,12 @@ Use the button, or follow the manual steps:
 3. Configure the integration by choosing its name
 ![Configure Integration](../assets/images/configure_calendar.png){width=480}
 
-## Configure AutoArm
+## Configure Auto Arm
 
 !!! note "UI and YAML split"
-    Calendar entities and `no_event_mode` are now configured via the AutoArm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
+    Calendar entities and `no_event_mode` are now configured via the Auto Arm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
 
-Select the calendar entity in **Settings** > **Devices & Services** > **AutoArm** > **Configure**.
+Select the calendar entity in **Settings** > **Devices & Services** > **Auto Arm** > **Configure**.
 
 Then add the per-calendar details in YAML, in this example `Alarm Control` is the name of the calendar:
 
@@ -35,8 +35,7 @@ autoarm:
               disarmed: Disarmed
 ```
 
-This calendar is going to be used very simply to disarm the alarm during set periods, and let AutoArm
-automatically handle the other times.
+This calendar is going to be used very simply to disarm the alarm during set periods, and let Auto Arm automatically handle the other times.
 
 ## Access the Calendar
 
@@ -84,7 +83,7 @@ day, its much less work to only define what is needed, such as what's
 the right time to arm at night, or when vacations start and end.
 
 `no_event_mode` allows control over what happens when there's no
-calendar event, and nothing else to determine alarm state. This is configurable via the AutoArm **Options** UI. It can be:
+calendar event, and nothing else to determine alarm state. This is configurable via the Auto Arm **Options** UI. It can be:
 
 `auto` - Will make best guess, including checking what the alarm panel was before the event
 `manual` - No state changes made when calendar event ends

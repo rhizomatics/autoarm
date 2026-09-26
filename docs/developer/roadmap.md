@@ -15,7 +15,7 @@ example is a tablet that is often left behind:
 - **Tablet home**: says nothing, since it's often left at home.
 
 These devices can't be attached to the `person` entity as device trackers, since the person would then
-show as home whenever the tablet is. So AutoArm needs its own link from each device to its owner.
+show as home whenever the tablet is. So Auto Arm needs its own link from each device to its owner.
 
 Mobile app devices get attached to a person automatically. When the Companion App registers, `mobile_app`
 creates a `device_tracker` and adds it to the person linked to the registering user. So the owner would
@@ -28,7 +28,7 @@ The config flow UI has no standard way to pair two entities, so these are the ch
 | Option | How the owner is found | UI | Covers |
 |---|---|---|---|
 | A. Mobile app registration | `user_id` saved with the device's registration, matched to `person.user_id` | One device picker, no pairing | Only Companion App devices |
-| B. Config subentries | Picked in an "Occupant" subentry: a person, plus their absence-only trackers | One subentry per person, each listed under the AutoArm entry | Any device tracker |
+| B. Config subentries | Picked in an "Occupant" subentry: a person, plus their absence-only trackers | One subentry per person, each listed under the Auto Arm entry | Any device tracker |
 | C. Object selector | Rows of *person* and *trackers* on the options page | One list in the Occupancy Tuning section | Any device tracker |
 | D. Multi-step options | Pick a person, then that person's trackers, repeat | Menu steps | Any device tracker |
 | E. YAML | `occupancy:` mapping of person to trackers | None | Any device tracker |
@@ -99,8 +99,7 @@ Start with A, adding a picker of Companion App devices to a collapsed **Occupanc
 
 ## Alarm Panel Codes
 
-AutoArm never passes a code when it changes the panel's state, so panels that need a code to arm or
-disarm, shown by the `code_format` and `code_arm_required` attributes, can't be driven by it. Support
+Auto Arm never passes a code when it changes the panel's state, so panels that need a code to arm or disarm, shown by the `code_format` and `code_arm_required` attributes, can't be driven by it. Support
 would mean:
 
 - Somewhere to keep the code, such as a password field in the options, or a secret in YAML.

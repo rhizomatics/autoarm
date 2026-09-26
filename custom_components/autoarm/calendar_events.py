@@ -9,7 +9,6 @@ from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.const import CONF_ALIAS, CONF_ENTITY_ID
-from homeassistant.core import Context
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.event import (
     async_track_point_in_time,
@@ -183,7 +182,7 @@ class TrackedCalendarEvent:
         if self.no_event_mode == NO_CAL_EVENT_MODE_AUTO:
             _LOGGER.info("AUTOARM Calendar event %s ended, and arming state", self.id)
             # same context for the move via pending and the reset, as both are the one change
-            context = Context()
+            context = self.armer.cause(ChangeSource.CALENDAR, self.event.summary)
             # avoid having state locked in vacation by state calculator by moving via 'Pending'
             await self.armer.pending_state(
                 source=ChangeSource.CALENDAR,

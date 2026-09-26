@@ -13,7 +13,7 @@ from pytest_homeassistant_custom_component.common import async_fire_time_changed
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.calendar_events import TrackedCalendarEvent
-from custom_components.autoarm.const import DOMAIN, NO_CAL_EVENT_MODE_AUTO, ChangeSource
+from custom_components.autoarm.const import DOMAIN, EVENT_TRIGGERED, NO_CAL_EVENT_MODE_AUTO, ChangeSource
 
 USER_ID = "user-1234"
 
@@ -21,6 +21,12 @@ USER_ID = "user-1234"
 def _capture_changes(hass: HomeAssistant) -> list[Event]:
     events: list[Event] = []
     hass.bus.async_listen(f"{DOMAIN}_change", callback(lambda event: events.append(event)))
+    return events
+
+
+def _capture_causes(hass: HomeAssistant) -> list[Event]:
+    events: list[Event] = []
+    hass.bus.async_listen(EVENT_TRIGGERED, callback(lambda event: events.append(event)))
     return events
 
 
@@ -58,6 +64,16 @@ async def test_arm_propagates_given_context(hass: HomeAssistant) -> None:
     assert changes[0].context is context
 
 
+async def test_no_cause_event_when_context_given(hass: HomeAssistant) -> None:
+    causes = _capture_causes(hass)
+    armer = _armer(hass, use_alarm_service=False)
+
+    await armer.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.BUTTON, context=Context(user_id=USER_ID))
+    await hass.async_block_till_done()
+
+    assert causes == []
+
+
 async def test_arm_without_context_shares_a_new_one(hass: HomeAssistant) -> None:
     changes = _capture_changes(hass)
     notifications = _capture_notifications(hass)
@@ -70,6 +86,31 @@ async def test_arm_without_context_shares_a_new_one(hass: HomeAssistant) -> None
     assert panel is not None
     assert notifications[0].context is panel.context
     assert changes[0].context is panel.context
+
+
+async def test_own_change_starts_with_cause_event(hass: HomeAssistant) -> None:
+    causes = _capture_causes(hass)
+    armer = _armer(hass, use_alarm_service=False)
+
+    await armer.arm(AlarmControlPanelState.ARMED_NIGHT, source=ChangeSource.SUNSET)
+    await hass.async_block_till_done()
+
+    panel = hass.states.get(TEST_PANEL)
+    assert panel is not None
+    assert causes[0].data == {"entity_id": TEST_PANEL, "source": "sunset", "summary": None}
+    # the logbook takes the first event fired with a context as its cause
+    assert panel.context.origin_event is causes[0]
+
+
+async def test_cause_event_names_calendar_event(hass: HomeAssistant, panel_actions: list[ServiceCall]) -> None:
+    causes = _capture_causes(hass)
+    armer = _armer(hass, use_alarm_service=True)
+
+    await armer.arm(AlarmControlPanelState.ARMED_VACATION, source=ChangeSource.CALENDAR, change_context={"summary": "Skiing"})
+    await hass.async_block_till_done()
+
+    assert causes[0].data["summary"] == "Skiing"
+    assert panel_actions[0].context is causes[0].context
 
 
 async def test_arm_via_alarm_service_propagates_context(hass: HomeAssistant, panel_actions: list[ServiceCall]) -> None:
@@ -148,11 +189,13 @@ async def test_reset_propagates_context(hass: HomeAssistant) -> None:
 async def test_calendar_event_end_shares_context_for_pending_and_reset(hass: HomeAssistant) -> None:
     armer = AsyncMock(spec=AlarmArmer)
     armer.has_active_calendar_event = Mock(return_value=False)
+    armer.cause = Mock(return_value=Context())
     tracked = Mock(spec=TrackedCalendarEvent, armer=armer, no_event_mode=NO_CAL_EVENT_MODE_AUTO)
     tracked.id = tracked.calendar_id = "calendar.test"
+    tracked.event = Mock(summary="Skiing")
 
     await TrackedCalendarEvent.on_calendar_event_end(tracked, dt_util.now())
 
-    context = armer.pending_state.call_args.kwargs["context"]
-    assert isinstance(context, Context)
-    assert armer.reset_armed_state.call_args.kwargs["context"] is context
+    armer.cause.assert_called_once_with(ChangeSource.CALENDAR, "Skiing")
+    assert armer.pending_state.call_args.kwargs["context"] is armer.cause.return_value
+    assert armer.reset_armed_state.call_args.kwargs["context"] is armer.cause.return_value

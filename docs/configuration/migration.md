@@ -2,7 +2,7 @@
 
 ## What Changed
 
-AutoArm now uses a hybrid configuration model. Core settings are managed through the Home Assistant UI via a config flow, while advanced features remain in YAML.
+Auto Arm now uses a hybrid configuration model. Core settings are managed through the Home Assistant UI via a config flow, while advanced features remain in YAML.
 
 Existing YAML-only installations are **automatically migrated** to a config entry on restart. No manual action is required.
 
@@ -27,7 +27,7 @@ Existing YAML-only installations are **automatically migrated** to a config entr
 
 ## Auto-Migration
 
-On restart, if AutoArm finds a YAML configuration without a matching config entry, it automatically:
+On restart, if Auto Arm finds a YAML configuration without a matching config entry, it automatically:
 
 1. Creates a config entry with the alarm panel entity from YAML
 2. Populates options with calendar entities, person entities, occupancy defaults, and no-event mode from YAML
@@ -47,4 +47,4 @@ The remaining YAML sections (`transitions`, `buttons`, `notify`, `rate_limit`, p
 
 ## Coexisting Configurations
 
-If both a YAML configuration and a config entry exist, AutoArm raises a **repair issue** to alert you. The config entry takes precedence for the migrated settings, while YAML continues to provide advanced configuration.
+If both a YAML configuration and a config entry exist, Auto Arm raises a **repair issue** to alert you. The config entry takes precedence for the migrated settings, while YAML continues to provide advanced configuration.

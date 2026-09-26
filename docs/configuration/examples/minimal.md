@@ -1,6 +1,6 @@
 # Minimal Configuration
 
-The simplest way to set up AutoArm is through the UI: go to **Settings** > **Devices & Services** > **Add Integration**, search for **AutoArm**, and select your alarm panel. No YAML is needed for a basic setup.
+The simplest way to set up Auto Arm is through the UI: go to **Settings** > **Devices & Services** > **Add Integration**, search for **Auto Arm**, and select your alarm panel. No YAML is needed for a basic setup.
 
 ## Legacy YAML Reference
 

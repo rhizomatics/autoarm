@@ -2,13 +2,13 @@
 
 ## Alarm State Not Changing
 
-**Check the initialized sensor**: Look at `binary_sensor.autoarm_initialized`, on the AutoArm device in **Settings** > **Devices & Services**. If it's off, there is a configuration issue, and its attributes show which stage of setup failed. `sensor.autoarm_failures` counts setup and runtime errors.
+**Check the initialized sensor**: Look at `binary_sensor.autoarm_initialized`, on the Auto Arm device in **Settings** > **Devices & Services**. If it's off, there is a configuration issue, and its attributes show which stage of setup failed. `sensor.autoarm_failures` counts setup and runtime errors.
 
-**Check the alarm panel's actions**: AutoArm arms and disarms using the panel's actions. If the panel needs a code, or its integration rejects the action, a warning is logged and the panel is left alone. See [Create Panel](configuration/create_panel.md#how-autoarm-changes-the-panel).
+**Check the alarm panel's actions**: Auto Arm arms and disarms using the panel's actions. If the panel needs a code, or its integration rejects the action, a warning is logged and the panel is left alone. See [Create Panel](configuration/create_panel.md#how-autoarm-changes-the-panel).
 
-**Check the last calculation sensor**: `sensor.autoarm_last_calculation` shows when AutoArm last worked out the state, with attributes for what it decided and why, such as `reset_decision`.
+**Check the last calculation sensor**: `sensor.autoarm_last_calculation` shows when Auto Arm last worked out the state, with attributes for what it decided and why, such as `reset_decision`.
 
-**Check for manual intervention lock**: After a manual change (button press, mobile action, panel change), AutoArm will not override the state until the next occupancy change. Use the `autoarm.reset_state` service to clear the lock.
+**Check for manual intervention lock**: After a manual change (button press, mobile action, panel change), Auto Arm will not override the state until the next occupancy change. Use the `autoarm.reset_state` service to clear the lock.
 
 **Check transition conditions**: Open Settings > System > Repairs to see if any transition conditions have validation errors. Fix the conditions in your YAML configuration and reload.
 
@@ -18,7 +18,7 @@
 
 **Check state patterns**: Verify that your calendar event summaries match the configured state patterns. The default patterns are `Away`, `Home`, `Night`, `Disarmed`, and `Vacation`/`Holiday`. Custom patterns use regex matching.
 
-**Check the last calendar event sensor**: Look at `sensor.autoarm_last_calendar_event`, on the AutoArm device, for the most recently detected event.
+**Check the last calendar event sensor**: Look at `sensor.autoarm_last_calendar_event`, on the Auto Arm device, for the most recently detected event.
 
 ## Notifications Not Sending
 
@@ -28,7 +28,7 @@
 
 ## Repair Issues
 
-AutoArm uses the Home Assistant repair system to report configuration problems:
+Auto Arm uses the Home Assistant repair system to report configuration problems:
 
 - **Invalid Transition Condition**: A transition condition template failed validation. Check the condition syntax in your YAML.
 - **YAML core configuration is deprecated**: Core settings have been migrated to the UI config entry. Remove the migrated keys from YAML (see the [Migration Guide](configuration/migration.md)).
@@ -39,7 +39,7 @@ After modifying YAML configuration (transitions, buttons, notify, etc.), call th
 
 ## Debug Logging
 
-Enable debug logging for AutoArm to see detailed operation logs:
+Enable debug logging for Auto Arm to see detailed operation logs:
 
 ```yaml
 logger:
@@ -47,4 +47,4 @@ logger:
     custom_components.autoarm: debug
 ```
 
-All AutoArm log messages use the `AUTOARM` prefix for easy filtering.
+All Auto Arm log messages use the `AUTOARM` prefix for easy filtering.

@@ -29,6 +29,8 @@ _LOGGER = logging.getLogger(__name__)
 DOMAIN = "autoarm"
 YAML_DATA_KEY: HassKey[ConfigType] = HassKey(f"{DOMAIN}_yaml")
 SIGNAL_STATUS_UPDATED = f"{DOMAIN}_status_updated"
+# fired when AutoArm acts on its own, so the logbook can show what caused its changes
+EVENT_TRIGGERED = f"{DOMAIN}_triggered"
 
 ATTR_ACTION = "action"
 ATTR_RESET = "reset"

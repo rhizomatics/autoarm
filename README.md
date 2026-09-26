@@ -1,5 +1,5 @@
 
-![AutoArm](assets/images/autoarm-dark-256x256.png){ align=left }
+![Auto Arm](assets/images/autoarm-dark-256x256.png){ align=left }
 
 
 # Alarm Auto Arming
@@ -32,22 +32,22 @@ Calendar, occupancy and diurnal scheduling available with **zero YAML**, support
 
     One big obstacle to using Alarm Control Panel is having to remember to change the
     alarm panel state when people are in or out of the house, at night or when away on holiday.
-    *AutoArm* solves that problem, and makes the Alarm Control Panel essential for any
+    *Auto Arm* solves that problem, and makes the Alarm Control Panel essential for any
     well-automated home.
 
 ## Setup
 
-AutoArm is one of the default repositories on [HACS][], so there's no need to register a custom repo.
+Auto Arm is one of the default repositories on [HACS][], so there's no need to register a custom repo.
 
 Notifications will work with any HomeAssistant notification implementation, with additional support for [Supernotify](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
 
 ## Configuration
 
-AutoArm is set up using the Home Assistant Integrations page, with additional advanced configuration available via YAML.
+Auto Arm is set up using the Home Assistant Integrations page, with additional advanced configuration available via YAML.
 
 ### UI Setup
 
-1. Go to **Settings** > **Devices & Services** > **Add Integration** and search for **AutoArm**.
+1. Go to **Settings** > **Devices & Services** > **Add Integration** and search for **Auto Arm**.
 2. Select your **Alarm Control Panel** entity (any [Alarm Control Panel Integration][Alarm Control Panel Integrations] will work). If you don't have one, see [Create an Alarm Panel](configuration/create_panel.md).
 3. Optionally select **Calendar** and **Person** entities.
 4. Adjust defaults in **Options** at any time (calendar entities, person entities, occupancy defaults, no-event mode).
@@ -72,12 +72,12 @@ The full list of how alarm panel state can be set:
 | calendar      | Calendar events (with optional override for selected events by occupancy) |
 | mobile        | Mobile action                                                             |
 | occupancy     | Occupancy calculation, e.g. automatically switching off `ARMED_AWAY`      |
-| alarm_panel   | Changes made to Alarm Control Panel outside of AutoArm                    |
+| alarm_panel   | Changes made to Alarm Control Panel outside of Auto Arm                    |
 | button        | A physical button push                                                    |
 | action        | A Home Assistant Action call (previously known as 'Service')              |
 | sunrise       | HomeAssistant `sun` integration event                                     |
 | sunset        | HomeAssistant `sun` integration event                                     |
-| startup       | Alarm changes made as part of AutoArm startup                             |
+| startup       | Alarm changes made as part of Auto Arm startup                             |
 | zombification | Home Assistant alarm panel got itself into a 'zombie' state and was reset |
 
 

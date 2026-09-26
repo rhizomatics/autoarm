@@ -1,6 +1,6 @@
 # Mobile Actions
 
-AutoArm listens out for the result of [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/) with the following `action` values:
+Auto Arm listens out for the result of [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/) with the following `action` values:
 
 ## Supported Actions
 

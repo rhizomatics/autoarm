@@ -15,6 +15,7 @@ from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
+    ATTR_ENTITY_ID,
     CONF_CONDITIONS,
     CONF_DELAY_TIME,
     CONF_ENTITY_ID,
@@ -1088,7 +1089,7 @@ class AlarmArmer:
             _LOGGER.debug("AUTOARM Rate limit triggered by %s, skipping arm", source)
             return None
         # one context for the panel change, notification and event, so they can be traced together
-        context = context or Context()
+        context = context or self.cause(source, (change_context or {}).get("summary"))
         try:
             self.arming_in_progress.set()
             existing_state: AlarmControlPanelState | None = self.armed_state()
@@ -1237,6 +1238,20 @@ class AlarmArmer:
                 trigger_time,
             )
         )
+
+    def cause(self, source: ChangeSource | None, summary: str | None = None) -> Context:
+        """New context for a change AutoArm makes on its own, fired as an event first so the logbook shows the cause"""
+        context = Context()
+        self.hass_api.fire_event(
+            event_name="triggered",
+            event_data={
+                ATTR_ENTITY_ID: self.alarm_panel,
+                "source": str(source or ChangeSource.UNKNOWN),
+                "summary": summary,
+            },
+            context=context,
+        )
+        return context
 
     def record_intervention(self, source: ChangeSource, state: AlarmControlPanelState | None) -> Intervention:
         intervention = Intervention(dt_util.now(), source, state)

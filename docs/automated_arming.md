@@ -3,12 +3,12 @@
 Arming has several complementary modes of operation, that can be selected and mixed as you need.
 
 Mobile Actions, Buttons and Alarm Panel changes are classed as **Manual Interventions**, and won't be overridden
-back by AutoArm unless there's an occupancy change or other manual intervention.
+back by Auto Arm unless there's an occupancy change or other manual intervention.
 
 ## Alarm Panel Control
 
-AutoArm listens for changes to the Alarm Control Panel from other sources, like the Home Assistant mobile companion
-app or other automations, with AutoArm respecting the selected new state, and applying the same *Manual Intervention*
+Aut oArm listens for changes to the Alarm Control Panel from other sources, like the Home Assistant mobile companion
+app or other automations, with Auto Arm respecting the selected new state, and applying the same *Manual Intervention*
 controls for further state changes.
 
 ### Voice Assistants
@@ -24,7 +24,7 @@ through the letterbox! ), see [Connect Your Home Security System to Echo Hub](ht
     Limited to English. Feedback, and suggested wording for other languages, is welcome on
     [GitHub issues](https://github.com/rhizomatics/autoarm/issues).
 
-Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agent, which doesn't use AI, matches fixed sentences. AutoArm adds these sentences, which work by voice or in the chat. Arming and explaining are on unless **Arm and explain by voice** is switched off in the **Assist** section of the AutoArm options. Disarming is off unless **Disarm by voice** is switched on.
+Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agent, which doesn't use AI, matches fixed sentences. Auto Arm adds these sentences, which work by voice or in the chat. Arming and explaining are on unless **Arm and explain by voice** is switched off in the **Assist** section of the Auto Arm options. Disarming is off unless **Disarm by voice** is switched on.
 
 | Say                                    | Does                                               |
 |----------------------------------------|----------------------------------------------------|
@@ -35,9 +35,9 @@ Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agen
 | "Why is the alarm armed?"              | Says who or what last changed it, when, and why    |
 | "What changed the alarm?"              | The same                                           |
 
-"Alarm", "security system" and "burglar alarm" all work. These sentences take priority over Assist's own alarm sentences, so arming or disarming by voice goes through AutoArm and counts as a *Manual Intervention*, like a button.
+"Alarm", "security system" and "burglar alarm" all work. These sentences take priority over Assist's own alarm sentences, so arming or disarming by voice goes through Auto Arm and counts as a *Manual Intervention*, like a button.
 
-Asking why gives the time of the change and what made it, such as a calendar event, sunset, a button or someone leaving. For changes worked out from who's home and the time of day, it also says whether anyone was home and whether it was night. Changes made directly on the alarm panel are reported as such. AutoArm only knows about changes since Home Assistant last started.
+Asking why gives the time of the change and what made it, such as a calendar event, sunset, a button or someone leaving. For changes worked out from who's home and the time of day, it also says whether anyone was home and whether it was night. Changes made directly on the alarm panel are reported as such. Auto Arm only knows about changes since Home Assistant last started.
 
 !!! danger "Disarming by voice"
     With **Disarm by voice** on, anyone who can talk to Assist can disarm the alarm, and no code is asked for. Think about who can reach your voice satellites and chat before switching this on.
@@ -72,7 +72,7 @@ the same way as other resets, such as at sunrise or sunset.
 ## Calendar Control
 
 !!! note "Configuration split"
-    Calendar entities and `no_event_mode` are configured via the AutoArm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
+    Calendar entities and `no_event_mode` are configured via the Auto Arm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
 
 ### Integrating a Calendar
 
@@ -85,7 +85,7 @@ Multiple calendars, of different types, can be configured, and specific alarm st
 
 ### Recurring State
 
-Armed or disarmed state can be configured with an entry for that purpose, for example a recurring entry on a [Local Calendar](https://www.home-assistant.io/integrations/local_calendar/) dedicated to AutoArm, or looking up an existing calendar to find vacations by pattern.
+Armed or disarmed state can be configured with an entry for that purpose, for example a recurring entry on a [Local Calendar](https://www.home-assistant.io/integrations/local_calendar/) dedicated to Auto Arm, or looking up an existing calendar to find vacations by pattern.
 
 If there's no calendar event live, then arming state can fall back to [Diurnal Control], or fixed at a default state, or left to manual control.
 
@@ -105,7 +105,7 @@ This does three things to support [Automated Transitions]:
 ## Occupancy Control
 
 !!! note "Configuration split"
-    Person entities and occupancy `default_state` are configured via the AutoArm **Options** UI. The `delay_time` setting remains in YAML.
+    Person entities and occupancy `default_state` are configured via the Auto Arm **Options** UI. The `delay_time` setting remains in YAML.
 
 The people who live at the property can be defined as [Person Integration][] entities
 [Person Entities]() in the `occupancy` configuration, and used to derive an `occupied`
