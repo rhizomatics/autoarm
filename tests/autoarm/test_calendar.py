@@ -15,7 +15,6 @@ from custom_components.autoarm.calendar_events import TrackedCalendar, TrackedCa
 from custom_components.autoarm.const import (
     CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_POLL_INTERVAL,
-    NO_CAL_EVENT_MODE_AUTO,
     ChangeSource,
 )
 
@@ -31,7 +30,6 @@ async def simple_tracked_calendar(
             CONF_CALENDAR_POLL_INTERVAL: 10,
             CONF_CALENDAR_EVENT_STATES: {"armed_away": ["Away"], "armed_vacation": ["Holiday.*"]},
         },
-        no_event_mode=NO_CAL_EVENT_MODE_AUTO,
         armer=mock_armer_real_hass,
         app_health_tracker=mock_armer_real_hass.app_health_tracker,
     )
@@ -220,7 +218,6 @@ async def test_calendar_event_end_auto_mode_calls_pending_and_reset(
     calendar_with_holiday_event: TrackedCalendar, local_calendar: CalendarEntity, autoarmer: AlarmArmer
 ) -> None:
     tracked_event: TrackedCalendarEvent = next(iter(calendar_with_holiday_event.tracked_events.values()))
-    tracked_event.no_event_mode = NO_CAL_EVENT_MODE_AUTO
     tracked_event.armer = autoarmer
 
     await local_calendar.async_update_event(

@@ -1,5 +1,5 @@
 {
-    "title":"AutoArm",
+    "title": "AutoArm",
     "config": {
         "step": {
             "user": {
@@ -31,12 +31,8 @@
                 "title": "Auto Arm Options",
                 "data": {
                     "alarm_panel": "Alarm Control Panel to manage",
-                    "use_alarm_service": "Change state using the alarm panel's actions",
                     "calendar_entities": "Calendars to use for arming schedules",
-                    "person_entities": "People for occupancy based arming",
-                    "occupancy_default_day": "Default arming state when occupied during day",
-                    "occupancy_default_night": "Default arming state when occupied at night",
-                    "no_event_mode": "Arming state when a calendar event ends"
+                    "person_entities": "People for occupancy based arming"
                 },
                 "sections": {
                     "calendar_options": {
@@ -48,28 +44,20 @@
                             "calendar_occupancy_override_states": "When a calendar event sets one of these states, occupancy changes (arrivals and departures) can still update the alarm state. For example, if the calendar says Disarmed but everyone leaves, it will switch to Armed Away."
                         }
                     },
-                    "notify_options": {
-                        "name": "Notifications",
+                    "trigger_options": {
+                        "name": "Triggers",
+                        "description": "What can start a re-evaluation of the alarm state. These change when the state is worked out, not how. Auto switches a trigger off on any day with a matching calendar event, and back on for days without calendar activity.",
                         "data": {
-                            "notify_enabled": "Notifications Enabled",
-                            "notify_action": "Notification Action",
-                            "notify_targets": "Notification Targets"
+                            "sunrise_trigger": "Sunrise",
+                            "sunset_trigger": "Sunset",
+                            "occupied_trigger": "Someone arrives home",
+                            "unoccupied_trigger": "Someone leaves home"
                         },
                         "data_description": {
-                            "notify_enabled": "Enable notifications for alarm state changes",
-                            "notify_action": "Home Assistant action (service) to use to notify",
-                            "notify_targets": "List of addresses or notify entities to notify, can be left blank for Supernotify"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Assist",
-                        "data": {
-                            "sentence_arm": "Arm and explain by voice",
-                            "sentence_disarm": "Disarm by voice"
-                        },
-                        "data_description": {
-                            "sentence_arm": "English sentences for Home Assistant's built-in Assist agent, such as 'arm the alarm', 'arm the alarm in night mode' and 'why is the alarm armed'.",
-                            "sentence_disarm": "Adds 'disarm the alarm'. Warning: no code is asked for, so anyone who can talk to Assist, on a voice satellite or in the chat, can disarm the alarm."
+                            "sunrise_trigger": "Re-evaluate the alarm state at sunrise",
+                            "sunset_trigger": "Re-evaluate the alarm state at sunset",
+                            "occupied_trigger": "Re-evaluate the alarm state when a person arrives home",
+                            "unoccupied_trigger": "Re-evaluate the alarm state when a person leaves home"
                         }
                     },
                     "sunrise_options": {
@@ -93,11 +81,71 @@
                             "sunset_earliest": "Sunset no earlier than time",
                             "sunset_latest": "Sunset no later than time"
                         }
+                    },
+                    "assist_options": {
+                        "name": "Assist",
+                        "data": {
+                            "sentence_arm": "Arm and explain by voice",
+                            "sentence_disarm": "Disarm by voice"
+                        },
+                        "data_description": {
+                            "sentence_arm": "English sentences for Home Assistant's built-in Assist agent, such as 'arm the alarm', 'arm the alarm in night mode' and 'why is the alarm armed'.",
+                            "sentence_disarm": "Adds 'disarm the alarm'. Warning: no code is asked for, so anyone who can talk to Assist, on a voice satellite or in the chat, can disarm the alarm."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Advanced",
+                        "data": {
+                            "use_alarm_service": "Change state using the alarm panel's actions",
+                            "occupancy_default_day": "Default arming state when occupied during day",
+                            "occupancy_default_night": "Default arming state when occupied at night",
+                            "calendar_armed_end_mode": "Arming state when an armed calendar event ends",
+                            "calendar_disarmed_end_mode": "Arming state when a disarmed calendar event ends"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. The panel must not require a code.",
+                            "calendar_armed_end_mode": "Auto (occupancy and diurnal) works the state out from who's home and whether it's day or night. Auto (occupancy) disarms, or arms away if everyone is out.",
+                            "calendar_disarmed_end_mode": "Auto (occupancy and diurnal) works the state out from who's home and whether it's day or night. Auto (occupancy) arms home, or away if everyone is out."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Notifications",
+                        "data": {
+                            "notify_enabled": "Notifications Enabled",
+                            "notify_action": "Notification Action",
+                            "notify_targets": "Notification Targets",
+                            "notify_data": "Extra Notification Data"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Enable notifications for alarm state changes",
+                            "notify_action": "Home Assistant action (service) to use to notify",
+                            "notify_targets": "List of addresses or notify entities to notify, can be left blank for Supernotify",
+                            "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
+                        }
                     }
-                },
-                "data_description": {
-                    "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. The panel must not require a code."
                 }
+            }
+        }
+    },
+    "selector": {
+        "sun_trigger": {
+            "options": {
+                "auto": "Auto (off on calendar days)",
+                "on": "On",
+                "off": "Off"
+            }
+        },
+        "calendar_end_mode": {
+            "options": {
+                "auto": "Auto (occupancy and diurnal)",
+                "auto_occupancy": "Auto (occupancy)",
+                "manual": "Manual (back to the state before the event)",
+                "disarmed": "Disarmed",
+                "armed_home": "Armed home",
+                "armed_away": "Armed away",
+                "armed_night": "Armed night",
+                "armed_vacation": "Armed vacation",
+                "armed_custom_bypass": "Armed custom bypass"
             }
         }
     },
@@ -109,22 +157,34 @@
     },
     "entity": {
         "binary_sensor": {
-            "initialized": { "name": "Initialized" }
+            "initialized": {
+                "name": "Initialized"
+            }
         },
         "sensor": {
-            "failures": { "name": "Failures" },
-            "last_calculation": { "name": "Last calculation" },
-            "last_intervention": { "name": "Last intervention" },
-            "last_calendar_event": { "name": "Last calendar event" }
+            "failures": {
+                "name": "Failures"
+            },
+            "last_calculation": {
+                "name": "Last calculation"
+            },
+            "last_intervention": {
+                "name": "Last intervention"
+            },
+            "last_calendar_event": {
+                "name": "Last calendar event"
+            }
         }
     },
     "exceptions": {
-        "not_loaded": { "message": "AutoArm isn't loaded" }
+        "not_loaded": {
+            "message": "AutoArm isn't loaded"
+        }
     },
-    "issues":{
-        "transition_condition":{
-            "title":"Invalid Transition Condition",
-            "description":"Transition condition for {state} failed to validate with an error ({error})"
+    "issues": {
+        "transition_condition": {
+            "title": "Invalid Transition Condition",
+            "description": "Transition condition for {state} failed to validate with an error ({error})"
         },
         "yaml_core_config_deprecated": {
             "title": "YAML core configuration is deprecated",

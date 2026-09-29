@@ -21,7 +21,7 @@ autoarm:
       conditions: "{{ autoarm.occupied and autoarm.night and autoarm.computed }}"
     pending:
       conditions:
-  # UI: calendar entities and no_event_mode are configurable via Options
+  # UI: calendar entities and calendar end modes are configurable via Options
   # YAML: per-calendar state_patterns and poll_interval remain here
   calendar_control:
     calendars:

@@ -62,21 +62,28 @@ from custom_components.autoarm.notifier import Notifier
 
 from .calendar_events import TrackedCalendar, TrackedCalendarEvent
 from .config_flow import (
+    CONF_CALENDAR_ARMED_END_MODE,
+    CONF_CALENDAR_DISARMED_END_MODE,
     CONF_CALENDAR_ENTITIES,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
+    CONF_NOTIFY_DATA,
     CONF_NOTIFY_ENABLED,
     CONF_NOTIFY_TARGETS,
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
+    CONF_OCCUPIED_TRIGGER,
     CONF_PERSON_ENTITIES,
     CONF_SENTENCE_ARM,
     CONF_SENTENCE_DISARM,
     CONF_SUNRISE_EARLIEST,
     CONF_SUNRISE_LATEST,
+    CONF_SUNRISE_TRIGGER,
     CONF_SUNSET_EARLIEST,
     CONF_SUNSET_LATEST,
+    CONF_SUNSET_TRIGGER,
+    CONF_UNOCCUPIED_TRIGGER,
     CONF_USE_ALARM_SERVICE,
     DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     DEFAULT_NOTIFY_ACTION,
@@ -85,9 +92,12 @@ from .const import (
     ATTR_RESET,
     CONF_ALARM_PANEL,
     CONF_BUTTONS,
+    CONF_CALENDAR_ARMED_END,
     CONF_CALENDAR_CONTROL,
+    CONF_CALENDAR_DISARMED_END,
     CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_NO_EVENT,
+    CONF_CALENDAR_NOTIFY_GRACE,
     CONF_CALENDAR_POLL_INTERVAL,
     CONF_CALENDARS,
     CONF_DAY,
@@ -105,13 +115,17 @@ from .const import (
     CONF_SUNSET,
     CONF_TRANSITIONS,
     CONFIG_SCHEMA,
+    DEFAULT_CALENDAR_NOTIFY_GRACE,
     DEFAULT_TRANSITIONS,
     DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
+    NO_CAL_EVENT_MODE_AUTO_OCCUPANCY,
     NO_CAL_EVENT_MODE_MANUAL,
     NOTIFY_COMMON,
     NOTIFY_SCHEMA,
     SIGNAL_STATUS_UPDATED,
+    TRIGGER_AUTO,
+    TRIGGER_OFF,
     YAML_DATA_KEY,
     ChangeSource,
     ConditionVariables,
@@ -242,6 +256,7 @@ async def async_setup(
                 CONF_SERVICE: entry.options.get(CONF_NOTIFY_ACTION)
                 or stashed_yaml.get(CONF_NOTIFY, {}).get(NOTIFY_COMMON, {}).get(CONF_SERVICE, DEFAULT_NOTIFY_ACTION),
                 "targets": entry.options.get(CONF_NOTIFY_TARGETS, []),
+                "data": entry.options.get(CONF_NOTIFY_DATA, {}),
                 "profiles": stashed_yaml.get(CONF_NOTIFY, {}),
                 "enabled": entry.options.get(CONF_NOTIFY_ENABLED, True),
             },
@@ -307,6 +322,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: AutoArmConfigEntry) -> b
     return True
 
 
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate options from older config entry versions."""
+    if entry.version > 1:
+        return False
+    if entry.minor_version < 2:
+        options = dict(entry.options)
+        no_event_mode = options.pop(CONF_NO_EVENT_MODE, NO_CAL_EVENT_MODE_AUTO)
+        options.setdefault(CONF_CALENDAR_ARMED_END_MODE, no_event_mode)
+        options.setdefault(CONF_CALENDAR_DISARMED_END_MODE, no_event_mode)
+        hass.config_entries.async_update_entry(entry, options=options, minor_version=2)
+        _LOGGER.info("AUTOARM Migrated config entry to 1.2, calendar end modes from %s", no_event_mode)
+    return True
+
+
 async def async_unload_entry(hass: HomeAssistant, entry: AutoArmConfigEntry) -> bool:
     """Unload Auto Arm config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
@@ -328,6 +357,7 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
     calendar_entities: list[str] = entry.options.get(CONF_CALENDAR_ENTITIES, [])
     occupancy_default_day: str = entry.options.get(CONF_OCCUPANCY_DEFAULT_DAY, "disarmed")
     occupancy_default_night: str | None = entry.options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")
+    # entries are migrated off no_event_mode, but entries built directly, as in tests, may still carry it
     no_event_mode: str = entry.options.get(CONF_NO_EVENT_MODE, NO_CAL_EVENT_MODE_AUTO)
 
     # Build occupancy config
@@ -361,8 +391,12 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
     calendar_config: ConfigType = {}
     if calendar_list:
         calendar_config = {
-            CONF_CALENDAR_NO_EVENT: no_event_mode,
+            CONF_CALENDAR_ARMED_END: entry.options.get(CONF_CALENDAR_ARMED_END_MODE, no_event_mode),
+            CONF_CALENDAR_DISARMED_END: entry.options.get(CONF_CALENDAR_DISARMED_END_MODE, no_event_mode),
             CONF_CALENDARS: calendar_list,
+            CONF_CALENDAR_NOTIFY_GRACE: yaml_calendar_control.get(CONF_CALENDAR_NOTIFY_GRACE, DEFAULT_CALENDAR_NOTIFY_GRACE)
+            if yaml_calendar_control
+            else DEFAULT_CALENDAR_NOTIFY_GRACE,
         }
 
     # Build notify config: service from options overrides YAML when explicitly set
@@ -386,12 +420,17 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         sunrise_latest=_parse_time(CONF_SUNRISE_LATEST, yaml_sunrise.get(CONF_LATEST)),
         sunset_earliest=_parse_time(CONF_SUNSET_EARLIEST, yaml_sunset.get(CONF_EARLIEST)),
         sunset_latest=_parse_time(CONF_SUNSET_LATEST, yaml_sunset.get(CONF_LATEST)),
+        sunrise_trigger=entry.options.get(CONF_SUNRISE_TRIGGER, TRIGGER_AUTO),
+        sunset_trigger=entry.options.get(CONF_SUNSET_TRIGGER, TRIGGER_AUTO),
+        occupied_trigger=entry.options.get(CONF_OCCUPIED_TRIGGER, True),
+        unoccupied_trigger=entry.options.get(CONF_UNOCCUPIED_TRIGGER, True),
         buttons=yaml_config.get(CONF_BUTTONS, {}),
         occupancy=occupancy,
         notify_profiles=notify_profiles,
         notify_enabled=entry.options.get(CONF_NOTIFY_ENABLED, False),
         notify_action=entry.options.get(CONF_NOTIFY_ACTION),
         notify_targets=entry.options.get(CONF_NOTIFY_TARGETS, []),
+        notify_data=entry.options.get(CONF_NOTIFY_DATA, {}),
         rate_limit=yaml_config.get(CONF_RATE_LIMIT, {}),
         calendar_config=calendar_config,
         transitions=yaml_config.get(CONF_TRANSITIONS),
@@ -498,11 +537,16 @@ class AlarmArmer:
         notify_enabled: bool = True,
         notify_action: str | None = None,
         notify_targets: list[str] | None = None,
+        notify_data: ConfigType | None = None,
         notify_profiles: ConfigType | None = None,
         sunrise_earliest: dt.time | None = None,
         sunrise_latest: dt.time | None = None,
         sunset_earliest: dt.time | None = None,
         sunset_latest: dt.time | None = None,
+        sunrise_trigger: str = TRIGGER_AUTO,
+        sunset_trigger: str = TRIGGER_AUTO,
+        occupied_trigger: bool = True,
+        unoccupied_trigger: bool = True,
         rate_limit: ConfigType | None = None,
         calendar_config: ConfigType | None = None,
         transitions: dict[str, dict[str, list[ConfigType]]] | None = None,
@@ -519,7 +563,7 @@ class AlarmArmer:
             notify_enabled = False
         if notify_enabled:
             self.notifier: Notifier | None = Notifier(
-                notify_profiles, hass, self.app_health_tracker, notify_action, notify_targets
+                notify_profiles, hass, self.app_health_tracker, notify_action, notify_targets, notify_data
             )
         else:
             self.notifier = None
@@ -527,7 +571,12 @@ class AlarmArmer:
         calendar_config = calendar_config or {}
         self.calendar_configs: list[ConfigType] = calendar_config.get(CONF_CALENDARS, []) or []
         self.calendars: list[TrackedCalendar] = []
-        self.calendar_no_event_mode: str | None = calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO)
+        no_event_mode: str = calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO)
+        self.calendar_armed_end_mode: str = calendar_config.get(CONF_CALENDAR_ARMED_END) or no_event_mode
+        self.calendar_disarmed_end_mode: str = calendar_config.get(CONF_CALENDAR_DISARMED_END) or no_event_mode
+        self.calendar_notify_grace_period: dt.timedelta = calendar_config.get(
+            CONF_CALENDAR_NOTIFY_GRACE, DEFAULT_CALENDAR_NOTIFY_GRACE
+        )
         self.calendar_occupancy_override_states: list[str] = (
             calendar_occupancy_override_states
             if calendar_occupancy_override_states is not None
@@ -538,6 +587,10 @@ class AlarmArmer:
         self.sunrise_latest: dt.time | None = sunrise_latest
         self.sunset_earliest: dt.time | None = sunset_earliest
         self.sunset_latest: dt.time | None = sunset_latest
+        self.sunrise_trigger: str = sunrise_trigger
+        self.sunset_trigger: str = sunset_trigger
+        self.occupied_trigger: bool = occupied_trigger
+        self.unoccupied_trigger: bool = unoccupied_trigger
         self.occupants: list[str] = occupancy.get(CONF_ENTITY_ID, [])
         self.occupied_defaults: dict[str, AlarmControlPanelState] = occupancy.get(
             CONF_OCCUPANCY_DEFAULT, {CONF_DAY: AlarmControlPanelState.ARMED_HOME}
@@ -558,6 +611,9 @@ class AlarmArmer:
         self.virtual_pending: bool = False
         self.last_change: StateChange | None = None
         self.stop_listener: Callable[[], None] | None = None
+        # coalesces calendar-triggered notifications that land within calendar_notify_grace_period of each other
+        self._calendar_notify_cancel: Callable[[], None] | None = None
+        self._calendar_notify_from_state: AlarmControlPanelState | None = None
 
         self.rate_limiter: Limiter = Limiter(
             window=rate_limit.get(CONF_RATE_LIMIT_PERIOD, dt.timedelta(seconds=60)),
@@ -717,9 +773,7 @@ class AlarmArmer:
             _LOGGER.exception("AUTOARM Unable to access calendar platform")
             return
         for calendar_config in self.calendar_configs:
-            tracked_calendar = TrackedCalendar(
-                self.hass, calendar_config, self.calendar_no_event_mode, self, self.app_health_tracker
-            )
+            tracked_calendar = TrackedCalendar(self.hass, calendar_config, self, self.app_health_tracker)
             await tracked_calendar.initialize(platform)
             self.calendars.append(tracked_calendar)
 
@@ -795,7 +849,40 @@ class AlarmArmer:
             unlisten(self.unsubscribes.pop())
         unlisten(self.stop_listener)
         self.stop_listener = None
+        unlisten(self._calendar_notify_cancel)
+        self._calendar_notify_cancel = None
         _LOGGER.info("AUTOARM shut down")
+
+    def _debounce_calendar_notification(
+        self, from_state: AlarmControlPanelState | None, to_state: AlarmControlPanelState, context: Context
+    ) -> None:
+        """Coalesce calendar-triggered notifications landing within calendar_notify_grace_period into one.
+
+        Holds the earliest 'from' state across the run so a quick end-of-one-event/start-of-another
+        pair, or several such changes in a row, is reported as a single net change - or silently
+        dropped if the run doesn't end up changing anything.
+        """
+        if self._calendar_notify_cancel:
+            unlisten(self._calendar_notify_cancel)
+            self._calendar_notify_cancel = None
+        else:
+            self._calendar_notify_from_state = from_state
+        held_from_state = self._calendar_notify_from_state
+
+        async def _fire(_now: dt.datetime) -> None:
+            self._calendar_notify_cancel = None
+            self._calendar_notify_from_state = None
+            if held_from_state == to_state:
+                _LOGGER.debug("AUTOARM Coalesced calendar notification is a net no-op, skipping")
+                return
+            if self.notifier:
+                await self.notifier.notify(
+                    source=ChangeSource.CALENDAR, from_state=held_from_state, to_state=to_state, context=context
+                )
+
+        self._calendar_notify_cancel = async_track_point_in_time(
+            self.hass, _fire, dt_util.now() + self.calendar_notify_grace_period
+        )
 
     def active_calendar_event(self) -> TrackedCalendarEvent | None:
         events: list[TrackedCalendarEvent] = []
@@ -808,6 +895,44 @@ class AlarmArmer:
 
     def has_active_calendar_event(self) -> bool:
         return any(cal.has_active_event() for cal in self.calendars)
+
+    async def has_calendar_event_today(self) -> bool:
+        """Is there a state-matching calendar event starting, ending or spanning today, on any configured calendar"""
+        today = dt_util.now().date()
+        for cal in self.calendars:
+            if await cal.has_event_on_day(today):
+                return True
+        return False
+
+    async def sun_trigger_active(self, trigger: str) -> bool:
+        """Should a sunrise or sunset, with this trigger setting, re-evaluate the armed state today"""
+        if trigger == TRIGGER_OFF:
+            return False
+        if trigger == TRIGGER_AUTO and self.calendars:
+            return not await self.has_calendar_event_today()
+        return True
+
+    def calendar_end_mode(self, ended_state: AlarmControlPanelState) -> str:
+        """What to do when a calendar event for this state ends, with no other event live"""
+        if ended_state == AlarmControlPanelState.DISARMED:
+            return self.calendar_disarmed_end_mode
+        return self.calendar_armed_end_mode
+
+    async def last_calendar_event_ended_today(self) -> AlarmControlPanelState | None:
+        """State of the matching calendar event that most recently ended today, across all calendars"""
+        latest: tuple[dt.datetime, AlarmControlPanelState] | None = None
+        for cal in self.calendars:
+            ended = await cal.last_event_ended_today()
+            if ended and (latest is None or ended[0] > latest[0]):
+                latest = ended
+        return latest[1] if latest else None
+
+    def occupancy_end_state(self, ended_state: AlarmControlPanelState) -> AlarmControlPanelState:
+        """State after a calendar event ends, from occupancy alone, ignoring whether it's day or night"""
+        unoccupied: bool | None = self.is_unoccupied()
+        if ended_state == AlarmControlPanelState.DISARMED:
+            return AlarmControlPanelState.ARMED_AWAY if unoccupied else AlarmControlPanelState.ARMED_HOME
+        return AlarmControlPanelState.ARMED_AWAY if unoccupied else AlarmControlPanelState.DISARMED
 
     def is_occupied(self) -> bool | None:
         """Ternary - true at least one person entity has state home, false none of them, null if no occupants defined"""
@@ -931,6 +1056,8 @@ class AlarmArmer:
         try:
             existing_state = self.armed_state()
             state = existing_state
+            # TODO: expose as config ( for manual disarm override ) and condition logic
+            must_change_state = existing_state is None or existing_state == AlarmControlPanelState.PENDING
             if self.calendars:
                 active_calendar_event = self.active_calendar_event()
                 if active_calendar_event:
@@ -942,37 +1069,55 @@ class AlarmArmer:
                         and str(cal_state) in self.calendar_occupancy_override_states
                     ):
                         _LOGGER.debug("AUTOARM Allowing occupancy reset for recurring overridable calendar event %s", cal_state)
-                    else:
+                    elif intervention is None and not must_change_state:
+                        # automatic resets leave the event's state, or a manual change made during it, alone
                         _LOGGER.debug("AUTOARM Ignoring reset while calendar event active")
                         reset_decision = "ignore_for_active_calendar_event"
                         return existing_state
-                if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_MANUAL:
-                    _LOGGER.debug(
-                        "AUTOARM Ignoring reset while calendar configured, no active event, and default mode is manual"
-                    )
-                    reset_decision = "ignore_for_calendar_manual_default"
-                    return existing_state
-                if self.calendar_no_event_mode in AlarmControlPanelState:
-                    # TODO: may be dupe logic with on_cal event
-                    _LOGGER.debug("AUTOARM Applying fixed reset on end of calendar event, %s", self.calendar_no_event_mode)
-                    reset_decision = "reset_on_calendar_event_end"
-                    return await self.arm(
-                        alarm_state_as_enum(self.calendar_no_event_mode),
-                        source=ChangeSource.CALENDAR,
-                        change_context={
-                            "reset_decision": reset_decision,
-                            "calendar_no_event_mode": self.calendar_no_event_mode,
-                            "caller": "reset_armed_state",
-                        },
-                        context=context,
-                    )
-                if self.calendar_no_event_mode == NO_CAL_EVENT_MODE_AUTO:
-                    _LOGGER.debug("AUTOARM Applying reset while calendar configured, no active event, and default mode is auto")
+                    else:
+                        reset_decision = "reset_to_active_calendar_event"
+                        state = await self.arm(
+                            cal_state,
+                            source=ChangeSource.CALENDAR,
+                            change_context={
+                                "reset_decision": reset_decision,
+                                "summary": active_calendar_event.event.summary,
+                                "caller": "reset_armed_state",
+                            },
+                            context=context,
+                        )
+                        return state
                 else:
-                    _LOGGER.warning("AUTOARM Unexpected state for calendar no event mode: %s", self.calendar_no_event_mode)
+                    ended_state: AlarmControlPanelState | None = await self.last_calendar_event_ended_today()
+                    if ended_state is None:
+                        _LOGGER.debug("AUTOARM No calendar event ended today, resetting as if there were no calendars")
+                    else:
+                        end_mode: str = self.calendar_end_mode(ended_state)
+                        target_state: AlarmControlPanelState | None = None
+                        if end_mode == NO_CAL_EVENT_MODE_MANUAL:
+                            _LOGGER.debug("AUTOARM Ignoring reset after a %s calendar event ended, in manual mode", ended_state)
+                            reset_decision = "ignore_for_calendar_manual_default"
+                            return existing_state
+                        if end_mode == NO_CAL_EVENT_MODE_AUTO_OCCUPANCY:
+                            target_state = self.occupancy_end_state(ended_state)
+                        elif end_mode in AlarmControlPanelState:
+                            target_state = alarm_state_as_enum(end_mode)
+                        if target_state is not None:
+                            _LOGGER.debug("AUTOARM Reset after a %s calendar event ended, %s", ended_state, end_mode)
+                            reset_decision = "reset_on_calendar_event_end"
+                            state = await self.arm(
+                                target_state,
+                                source=ChangeSource.CALENDAR,
+                                change_context={
+                                    "reset_decision": reset_decision,
+                                    "no_event_mode": end_mode,
+                                    "caller": "reset_armed_state",
+                                },
+                                context=context,
+                            )
+                            return state
+                        _LOGGER.debug("AUTOARM Reset after a %s calendar event ended, worked out automatically", ended_state)
 
-            # TODO: expose as config ( for manual disarm override ) and condition logic
-            must_change_state = existing_state is None or existing_state == AlarmControlPanelState.PENDING
             if (
                 intervention
                 or source in (ChangeSource.CALENDAR, ChangeSource.OCCUPANCY)
@@ -1175,8 +1320,27 @@ class AlarmArmer:
                     )
 
                 _LOGGER.info("AUTOARM Setting %s from %s to %s for %s", self.alarm_panel, existing_state, arming_state, source)
-                if self.notifier and source and arming_state:
-                    await self.notifier.notify(source=source, from_state=existing_state, to_state=arming_state, context=context)
+                # Pending is an internal transitional bookkeeping state, not something to surface to users:
+                # never notify about entering it, and when leaving it, report the change against the state
+                # before it started, so a pending round-trip that nets out unchanged stays silent.
+                notify_from_state: AlarmControlPanelState | None = (
+                    self.pre_pending_state if existing_state == AlarmControlPanelState.PENDING else existing_state
+                )
+                if (
+                    self.notifier
+                    and source
+                    and arming_state
+                    and arming_state != AlarmControlPanelState.PENDING
+                    and notify_from_state != arming_state
+                ):
+                    if source == ChangeSource.CALENDAR:
+                        # calendar changes often come in pairs, such as one event ending right as
+                        # another starts - coalesce those into a single net-change notification
+                        self._debounce_calendar_notification(notify_from_state, arming_state, context)
+                    else:
+                        await self.notifier.notify(
+                            source=source, from_state=notify_from_state, to_state=arming_state, context=context
+                        )
 
                 self.last_change = StateChange(
                     created_at=dt_util.now(),
@@ -1294,6 +1458,9 @@ class AlarmArmer:
     @callback
     async def on_sunrise(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunrise")
+        if not await self.sun_trigger_active(self.sunrise_trigger):
+            _LOGGER.debug("AUTOARM Sunrise ignored, sunrise trigger is %s", self.sunrise_trigger)
+            return
         now = dt_util.now()
         if not self.sunrise_earliest or now.time() >= self.sunrise_earliest:
             await self.reset_armed_state(source=ChangeSource.SUNRISE)
@@ -1309,11 +1476,17 @@ class AlarmArmer:
     @callback
     async def on_sunrise_latest(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunrise latest cutoff reached")
+        if not await self.sun_trigger_active(self.sunrise_trigger):
+            _LOGGER.debug("AUTOARM Sunrise latest ignored, sunrise trigger is %s", self.sunrise_trigger)
+            return
         await self.reset_armed_state(source=ChangeSource.SUNRISE)
 
     @callback
     async def on_sunset(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunset")
+        if not await self.sun_trigger_active(self.sunset_trigger):
+            _LOGGER.debug("AUTOARM Sunset ignored, sunset trigger is %s", self.sunset_trigger)
+            return
         now = dt_util.now()
         if not self.sunset_earliest or now.time() >= self.sunset_earliest:
             await self.reset_armed_state(source=ChangeSource.SUNSET)
@@ -1329,6 +1502,9 @@ class AlarmArmer:
     @callback
     async def on_sunset_latest(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunset latest cutoff reached")
+        if not await self.sun_trigger_active(self.sunset_trigger):
+            _LOGGER.debug("AUTOARM Sunset latest ignored, sunset trigger is %s", self.sunset_trigger)
+            return
         await self.reset_armed_state(source=ChangeSource.SUNSET)
 
     @callback
@@ -1453,6 +1629,11 @@ class AlarmArmer:
         _LOGGER.debug(
             "AUTOARM Occupancy state Change: %s, state:%s->%s, event: %s, attrs:%s", entity_id, old, new, event, new_attributes
         )
+        # every arrival or departure re-evaluates, as transitions can depend on who in particular is home
+        arrived: bool = new == STATE_HOME
+        if (arrived and not self.occupied_trigger) or (not arrived and not self.unoccupied_trigger):
+            _LOGGER.debug("AUTOARM Occupancy change ignored, %s trigger is off", "occupied" if arrived else "unoccupied")
+            return
         context: Context = child_context(event.context)
         if new in self.occupied_delay:
             self.schedule_state(

@@ -1,5 +1,6 @@
 """The Auto Arm integration"""
 
+import datetime as dt
 import logging
 from dataclasses import dataclass
 from enum import StrEnum, auto
@@ -42,9 +43,28 @@ CONF_ALARM_STATES = "alarm_states"
 ALARM_STATES = [k.lower() for k in AlarmControlPanelState.__members__]
 PUBLIC_ALARM_STATES = [s for s in ALARM_STATES if s not in ("pending", "triggered", "arming", "disarming")]
 
+# auto recalculates from occupancy and day/night, as before the occupancy-only option existed
 NO_CAL_EVENT_MODE_AUTO = "auto"
+NO_CAL_EVENT_MODE_AUTO_OCCUPANCY = "auto_occupancy"
 NO_CAL_EVENT_MODE_MANUAL = "manual"
-NO_CAL_EVENT_OPTIONS: list[str] = [NO_CAL_EVENT_MODE_AUTO, NO_CAL_EVENT_MODE_MANUAL, *ALARM_STATES]
+NO_CAL_EVENT_OPTIONS: list[str] = [
+    NO_CAL_EVENT_MODE_AUTO,
+    NO_CAL_EVENT_MODE_AUTO_OCCUPANCY,
+    NO_CAL_EVENT_MODE_MANUAL,
+    *ALARM_STATES,
+]
+CALENDAR_END_MODE_OPTIONS: list[str] = [
+    NO_CAL_EVENT_MODE_AUTO,
+    NO_CAL_EVENT_MODE_AUTO_OCCUPANCY,
+    NO_CAL_EVENT_MODE_MANUAL,
+    *PUBLIC_ALARM_STATES,
+]
+
+TRIGGER_ON = "on"
+TRIGGER_OFF = "off"
+# on, except on days with a matching calendar event
+TRIGGER_AUTO = "auto"
+SUN_TRIGGER_OPTIONS: list[str] = [TRIGGER_AUTO, TRIGGER_ON, TRIGGER_OFF]
 
 CONF_SUPERNOTIFY = "supernotify"
 CONF_SCENARIO = "scenario"
@@ -132,8 +152,12 @@ CONF_CALENDARS = "calendars"
 CONF_CALENDAR_POLL_INTERVAL = "poll_interval"
 CONF_CALENDAR_EVENT_STATES = "state_patterns"
 CONF_CALENDAR_NO_EVENT = "no_event_mode"
+CONF_CALENDAR_ARMED_END = "armed_end_mode"
+CONF_CALENDAR_DISARMED_END = "disarmed_end_mode"
 CONF_CALENDAR_ENTRY_NOTIFICATIONS = "entry_notifications"
 CONF_CALENDAR_REMINDER_NOTIFICATIONS = "reminders"
+CONF_CALENDAR_NOTIFY_GRACE = "notify_grace_period"
+DEFAULT_CALENDAR_NOTIFY_GRACE = dt.timedelta(seconds=60)
 
 CALENDAR_SCHEMA = vol.Schema({
     vol.Required(CONF_ENTITY_ID): cv.entity_id,
@@ -148,7 +172,13 @@ CALENDAR_SCHEMA = vol.Schema({
 })
 CALENDAR_CONTROL_SCHEMA = vol.Schema({
     vol.Optional(CONF_CALENDAR_NO_EVENT, default=NO_CAL_EVENT_MODE_AUTO): vol.All(vol.Lower, vol.In(NO_CAL_EVENT_OPTIONS)),
+    # override no_event_mode for events of one kind ending
+    vol.Optional(CONF_CALENDAR_ARMED_END): vol.All(vol.Lower, vol.In(NO_CAL_EVENT_OPTIONS)),
+    vol.Optional(CONF_CALENDAR_DISARMED_END): vol.All(vol.Lower, vol.In(NO_CAL_EVENT_OPTIONS)),
     vol.Optional(CONF_CALENDARS, default=[]): vol.All(cv.ensure_list, [CALENDAR_SCHEMA]),
+    vol.Optional(CONF_CALENDAR_NOTIFY_GRACE, default=DEFAULT_CALENDAR_NOTIFY_GRACE): vol.All(
+        cv.time_period, cv.positive_timedelta
+    ),
 })
 
 CONF_TRANSITIONS = "transitions"

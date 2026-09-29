@@ -28,7 +28,7 @@ Auto Arm changes the panel's state by calling its actions, `alarm_control_panel.
 a *manual* panel, and for integrations that do more than hold a state when armed or disarmed, such as
 [Alarmo](https://github.com/nielsfaber/alarmo), which arms its child areas when its master panel is armed.
 
-This is controlled by **Change state using the alarm panel's actions** in the Aut Arm options, which is on for new installs.
+This is controlled by **Change state using the alarm panel's actions** in the **Advanced** section of the Auto Arm options, which is on for new installs.
 
 - The panel mustn't need a code to arm or disarm, as Auto Arm doesn't have one to give it.
 - If the action fails, or doesn't change the state, Auto Arm leaves the panel alone rather than set the state behind the integration's back. A warning is logged.

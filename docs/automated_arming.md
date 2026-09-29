@@ -7,7 +7,7 @@ back by Auto Arm unless there's an occupancy change or other manual intervention
 
 ## Alarm Panel Control
 
-Aut oArm listens for changes to the Alarm Control Panel from other sources, like the Home Assistant mobile companion
+Auto Arm listens for changes to the Alarm Control Panel from other sources, like the Home Assistant mobile companion
 app or other automations, with Auto Arm respecting the selected new state, and applying the same *Manual Intervention*
 controls for further state changes.
 
@@ -79,7 +79,7 @@ the same way as other resets, such as at sunrise or sunset.
 ## Calendar Control
 
 !!! note "Configuration split"
-    Calendar entities and `no_event_mode` are configured via the Auto Arm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
+    Calendar entities are configured via the Auto Arm **Options** UI, and what happens when an event ends in its **Advanced** section. Per-calendar `state_patterns` and `poll_interval`, and the top-level `notify_grace_period`, remain in YAML.
 
 ### Integrating a Calendar
 
@@ -94,7 +94,71 @@ Multiple calendars, of different types, can be configured, and specific alarm st
 
 Armed or disarmed state can be configured with an entry for that purpose, for example a recurring entry on a [Local Calendar](https://www.home-assistant.io/integrations/local_calendar/) dedicated to Auto Arm, or looking up an existing calendar to find vacations by pattern.
 
-If there's no calendar event live, then arming state can fall back to [Diurnal Control], or fixed at a default state, or left to manual control.
+If there's no calendar event live, then arming state can be worked out automatically, fixed at a default state, or left to manual control.
+
+### When an Event Ends
+
+The **Advanced** section of the options has separate settings for an **armed** event ending (`armed_home`,
+`armed_away`, `armed_night`, `armed_vacation` or `armed_custom_bypass`) and a **disarmed** event ending,
+unless another event is still live. Each can be:
+
+| Setting | Armed event ends | Disarmed event ends |
+|---------|------------------|---------------------|
+| **Auto (occupancy and diurnal)**, the default | Worked out from who's home and whether it's day or night, the same as any other reset | The same |
+| **Auto (occupancy)** | Disarms, or arms away if everyone is out | Arms home, or away if everyone is out |
+| **Manual** | Goes back to the state before the event | The same |
+| A fixed state, such as `disarmed` | Goes to that state | The same |
+
+**Auto (occupancy)** ignores day and night. That matters when an event ends close to sunrise or sunset:
+an `armed_night` event ending at 06:45, before the sun is up, would be worked out as still night by
+**Auto (occupancy and diurnal)** and stay armed for the night, until sunrise disarms it a few minutes
+later. With **Auto (occupancy)** it disarms as the event ends.
+
+### Other Resets When Using Calendars
+
+Resets that don't come from an event starting or ending, such as sunrise, someone arriving or leaving, or
+the reset button, work out the state like this:
+
+1. While an event is live, a reset button or the `autoarm.reset_state` action returns to the event's state.
+   Automatic resets, such as sunrise, leave it alone, along with any manual change made during the event.
+2. Otherwise, if an event ended earlier today, the setting for that kind of event ending applies:
+   **Manual** leaves the state alone, **Auto (occupancy)** and fixed states reset as they would at the end
+   of the event, and **Auto (occupancy and diurnal)** works the state out as usual.
+3. With no calendar activity today, the state is worked out as if there were no calendars.
+
+### Notification Coalescing
+
+Calendar changes often arrive in pairs - one event ending right as another begins, or a burst of changes
+from re-matching after a calendar update. To avoid a flurry of notifications for what is really one change,
+calendar-sourced notifications wait for a grace period (`notify_grace_period` in YAML, default one minute)
+before sending. If another calendar-sourced change lands within that window, the wait restarts and only the
+net change - from the state before the first change to the state after the last - is notified. If that nets
+out to no change at all, nothing is sent.
+
+This only debounces the *notification*; the alarm panel's actual state still updates immediately as each
+calendar-driven change happens.
+
+## Triggers
+
+The **Triggers** section of the options decides what can start a re-evaluation of the alarm state. It
+changes *when* the state is worked out, not *how*, and only covers these triggers - a reset button, the
+`autoarm.reset_state` action or a calendar event ending still work out the state as usual.
+
+| Trigger | Choices | Default |
+|---------|---------|---------|
+| **Sunrise** | On, Off, Auto | Auto |
+| **Sunset** | On, Off, Auto | Auto |
+| **Someone arrives home** | On, Off | On |
+| **Someone leaves home** | On, Off | On |
+
+**Auto** switches the trigger off on any day with a matching [Calendar Control] event starting, ending or
+running that day, and back on for days without calendar activity. This suits a calendar that handles
+particular days, such as a night out or working from home, while sunrise and sunset take over on ordinary
+days.
+
+Every arrival or departure re-evaluates, not just the house becoming occupied or empty, since
+[Transition Conditions](#algorithm-conditions) can depend on who in particular is home. When that doesn't
+change the alarm state, nothing happens.
 
 ## Diurnal Control
 
@@ -106,6 +170,10 @@ This does three things to support [Automated Transitions]:
 2. Re-evaluate the alarm state at **sunset**
     - There's a `earliest` and `latest` cutoff option in the UI config, which works identically to that for sunrise
 3. Provide a `day` and `night` value for conditions
+
+Whether sunrise and sunset re-evaluate the alarm state at all is set in [Triggers]. Switching them off
+there doesn't change the `day` and `night` values, so these still choose between armed states whenever the
+state is worked out for some other reason.
 
 ![Diurnal Overrides in Configuration](./assets/images/config_flow_options_diurnal.png)
 
@@ -203,8 +271,7 @@ autoarm:
 ```
 
 Conditions have an `autoarm` field added to the context, with these values. The examples above are all
-in the [shortcut template style](https://www.home-assistant.io/docs/scripts/conditions/#template-condition-shorthand-notation), though any other style of `condition` can be used, along
-with other Jinja2 features and Home Assistant extras, including AND/OR/NOT logic.
+in the [shortcut template style](https://www.home-assistant.io/docs/scripts/conditions/#template-condition-shorthand-notation), though any other style of `condition` can be used, along with other Jinja2 features and Home Assistant extras, including AND/OR/NOT logic.
 
 | Field                      | Type            | Usage                                                    |
 |----------------------------|-----------------|----------------------------------------------------------|

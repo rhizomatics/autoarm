@@ -38,6 +38,7 @@ def _leaf_values(obj: object, prefix: str = "") -> dict[str, Any]:
 GLOBAL_UNTRANSLATED_PATHS = {"title"}
 LOCALE_COGNATE_PATHS: dict[str, set[str]] = {
     "fr": {"options.step.init.sections.notify_options.name"},
+    "nl": {"options.step.init.sections.trigger_options.name"},
 }
 
 

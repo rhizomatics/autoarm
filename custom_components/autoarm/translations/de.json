@@ -31,12 +31,8 @@
                 "title": "AutoArm-Optionen",
                 "data": {
                     "alarm_panel": "Zu verwaltende Alarmzentrale",
-                    "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                     "calendar_entities": "Kalender für die Scharf-Zeitplanung",
-                    "person_entities": "Personen für die belegungsbasierte Scharfschaltung",
-                    "occupancy_default_day": "Standard-Scharmodus bei Belegung tagsüber",
-                    "occupancy_default_night": "Standard-Scharmodus bei Belegung nachts",
-                    "no_event_mode": "Scharmodus nach Ende eines Kalenderereignisses"
+                    "person_entities": "Personen für die belegungsbasierte Scharfschaltung"
                 },
                 "sections": {
                     "calendar_options": {
@@ -48,28 +44,20 @@
                             "calendar_occupancy_override_states": "Wenn ein Kalenderereignis einen dieser Zustände setzt, können Belegungsänderungen (Ankünfte und Abfahrten) den Alarmzustand noch aktualisieren. Wenn der Kalender zum Beispiel 'Deaktiviert' angibt, aber alle das Haus verlassen, wechselt er zu 'Scharf Abwesend'."
                         }
                     },
-                    "notify_options": {
-                        "name": "Benachrichtigungen",
+                    "trigger_options": {
+                        "name": "Auslöser",
+                        "description": "Was eine Neubewertung des Alarmzustands auslösen kann. Diese ändern, wann der Zustand ermittelt wird, nicht wie. Automatisch schaltet einen Auslöser an jedem Tag mit passendem Kalendereintrag aus und an Tagen ohne Kalenderaktivität wieder ein.",
                         "data": {
-                            "notify_enabled": "Benachrichtigungen aktiviert",
-                            "notify_action": "Benachrichtigungsaktion",
-                            "notify_targets": "Benachrichtigungsempfänger"
+                            "sunrise_trigger": "Sonnenaufgang",
+                            "sunset_trigger": "Sonnenuntergang",
+                            "occupied_trigger": "Jemand kommt nach Hause",
+                            "unoccupied_trigger": "Jemand verlässt das Haus"
                         },
                         "data_description": {
-                            "notify_enabled": "Benachrichtigungen für Alarmzustandsänderungen aktivieren",
-                            "notify_action": "Home Assistant-Aktion (Dienst) zum Senden von Benachrichtigungen",
-                            "notify_targets": "Liste von Adressen oder Notify-Entitäten; kann für Supernotify leer gelassen werden"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Sprachassistent",
-                        "data": {
-                            "sentence_arm": "Scharfschalten und erklären per Sprache",
-                            "sentence_disarm": "Unscharf schalten per Sprache"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Englische Sätze für den eingebauten Assist-Agenten von Home Assistant, z. B. 'arm the alarm', 'arm the alarm in night mode' und 'why is the alarm armed'.",
-                            "sentence_disarm": "Fügt 'disarm the alarm' hinzu. Warnung: Es wird kein Code abgefragt, daher kann jeder, der mit Assist sprechen kann, über einen Sprachsatelliten oder im Chat, die Alarmanlage unscharf schalten."
+                            "sunrise_trigger": "Alarmzustand bei Sonnenaufgang neu bewerten",
+                            "sunset_trigger": "Alarmzustand bei Sonnenuntergang neu bewerten",
+                            "occupied_trigger": "Alarmzustand neu bewerten, wenn eine Person nach Hause kommt",
+                            "unoccupied_trigger": "Alarmzustand neu bewerten, wenn eine Person das Haus verlässt"
                         }
                     },
                     "sunrise_options": {
@@ -93,11 +81,71 @@
                             "sunset_earliest": "Sonnenuntergang nicht früher als diese Uhrzeit",
                             "sunset_latest": "Sonnenuntergang nicht später als diese Uhrzeit"
                         }
+                    },
+                    "assist_options": {
+                        "name": "Sprachassistent",
+                        "data": {
+                            "sentence_arm": "Scharfschalten und erklären per Sprache",
+                            "sentence_disarm": "Unscharf schalten per Sprache"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Englische Sätze für den eingebauten Assist-Agenten von Home Assistant, z. B. 'arm the alarm', 'arm the alarm in night mode' und 'why is the alarm armed'.",
+                            "sentence_disarm": "Fügt 'disarm the alarm' hinzu. Warnung: Es wird kein Code abgefragt, daher kann jeder, der mit Assist sprechen kann, über einen Sprachsatelliten oder im Chat, die Alarmanlage unscharf schalten."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Erweitert",
+                        "data": {
+                            "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
+                            "occupancy_default_day": "Standard-Scharmodus bei Belegung tagsüber",
+                            "occupancy_default_night": "Standard-Scharmodus bei Belegung nachts",
+                            "calendar_armed_end_mode": "Alarmzustand, wenn ein scharfer Kalendereintrag endet",
+                            "calendar_disarmed_end_mode": "Alarmzustand, wenn ein unscharfer Kalendereintrag endet"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Die Zentrale darf keinen Code verlangen.",
+                            "calendar_armed_end_mode": "Automatisch (Anwesenheit und Tageszeit) ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Automatisch (Anwesenheit) schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
+                            "calendar_disarmed_end_mode": "Automatisch (Anwesenheit und Tageszeit) ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Automatisch (Anwesenheit) schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Benachrichtigungen",
+                        "data": {
+                            "notify_enabled": "Benachrichtigungen aktiviert",
+                            "notify_action": "Benachrichtigungsaktion",
+                            "notify_targets": "Benachrichtigungsempfänger",
+                            "notify_data": "Zusätzliche Benachrichtigungsdaten"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Benachrichtigungen für Alarmzustandsänderungen aktivieren",
+                            "notify_action": "Home Assistant-Aktion (Dienst) zum Senden von Benachrichtigungen",
+                            "notify_targets": "Liste von Adressen oder Notify-Entitäten; kann für Supernotify leer gelassen werden",
+                            "notify_data": "Zusätzliche Daten, die an die Benachrichtigungsaktion übergeben werden, z. B. Aktionen oder ein Kanal für eine mobile App-Benachrichtigung. Werte hier werden durch einen passenden Schlüssel in einem YAML-Benachrichtigungsprofil überschrieben."
+                        }
                     }
-                },
-                "data_description": {
-                    "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Die Zentrale darf keinen Code verlangen."
                 }
+            }
+        }
+    },
+    "selector": {
+        "sun_trigger": {
+            "options": {
+                "auto": "Automatisch (aus an Kalendertagen)",
+                "on": "Ein",
+                "off": "Aus"
+            }
+        },
+        "calendar_end_mode": {
+            "options": {
+                "auto": "Automatisch (Anwesenheit und Tageszeit)",
+                "auto_occupancy": "Automatisch (Anwesenheit)",
+                "manual": "Manuell (zurück zum Zustand vor dem Eintrag)",
+                "disarmed": "Unscharf",
+                "armed_home": "Scharf zu Hause",
+                "armed_away": "Scharf abwesend",
+                "armed_night": "Scharf Nacht",
+                "armed_vacation": "Scharf Urlaub",
+                "armed_custom_bypass": "Scharf benutzerdefiniert"
             }
         }
     },
@@ -109,17 +157,29 @@
     },
     "entity": {
         "binary_sensor": {
-            "initialized": { "name": "Initialisiert" }
+            "initialized": {
+                "name": "Initialisiert"
+            }
         },
         "sensor": {
-            "failures": { "name": "Fehler" },
-            "last_calculation": { "name": "Letzte Berechnung" },
-            "last_intervention": { "name": "Letzter Eingriff" },
-            "last_calendar_event": { "name": "Letztes Kalenderereignis" }
+            "failures": {
+                "name": "Fehler"
+            },
+            "last_calculation": {
+                "name": "Letzte Berechnung"
+            },
+            "last_intervention": {
+                "name": "Letzter Eingriff"
+            },
+            "last_calendar_event": {
+                "name": "Letztes Kalenderereignis"
+            }
         }
     },
     "exceptions": {
-        "not_loaded": { "message": "AutoArm ist nicht geladen" }
+        "not_loaded": {
+            "message": "AutoArm ist nicht geladen"
+        }
     },
     "issues": {
         "transition_condition": {

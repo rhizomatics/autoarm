@@ -1,7 +1,7 @@
 import asyncio
 import datetime as dt
 from typing import TYPE_CHECKING
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
@@ -10,7 +10,8 @@ from homeassistant.core import HomeAssistant
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer, Intervention
-from custom_components.autoarm.const import ChangeSource
+from custom_components.autoarm.const import TRIGGER_OFF, ChangeSource
+from custom_components.autoarm.notifier import Notifier
 
 if TYPE_CHECKING:
     from custom_components.autoarm.calendar_events import TrackedCalendarEvent
@@ -23,6 +24,75 @@ async def test_direct_arm_preserves_panel_attributes(hass: HomeAssistant) -> Non
     panel = hass.states.get(TEST_PANEL)
     assert panel is not None
     assert panel.attributes.get("icon") == "mdi:alarm-panel"
+
+
+async def test_pending_round_trip_is_never_notified(hass: HomeAssistant) -> None:
+    """A pending state is internal bookkeeping - it, and any no-op round trip through it, stay silent.
+
+    Uses sunrise rather than calendar as the source, since calendar-sourced notifications are
+    coalesced over a grace period (see test_calendar_notification_coalescing) - unrelated here.
+    """
+    hass.states.async_set(entity_id=TEST_PANEL, new_state="armed_night")
+    autoarmer = AlarmArmer(hass, TEST_PANEL, use_alarm_service=False)
+    autoarmer.notifier = AsyncMock(spec=Notifier)
+
+    await autoarmer.pending_state(source=ChangeSource.SUNRISE)
+    autoarmer.notifier.notify.assert_not_called()
+
+    # recomputes the same state - a no-op from the user's perspective
+    await autoarmer.arm(AlarmControlPanelState.ARMED_NIGHT, source=ChangeSource.SUNRISE)
+    autoarmer.notifier.notify.assert_not_called()
+
+    # a genuine change after pending is reported against the state before pending, not "pending"
+    await autoarmer.pending_state(source=ChangeSource.SUNRISE)
+    await autoarmer.arm(AlarmControlPanelState.DISARMED, source=ChangeSource.SUNRISE)
+    autoarmer.notifier.notify.assert_called_once_with(
+        source=ChangeSource.SUNRISE,
+        from_state=AlarmControlPanelState.ARMED_NIGHT,
+        to_state=AlarmControlPanelState.DISARMED,
+        context=autoarmer.notifier.notify.call_args.kwargs["context"],
+    )
+
+
+async def test_calendar_notification_coalescing(hass: HomeAssistant) -> None:
+    """Calendar changes landing within the grace period, such as one event ending as another starts,
+
+    are coalesced into a single net-change notification rather than two.
+    """
+    hass.states.async_set(entity_id=TEST_PANEL, new_state="armed_night")
+    autoarmer = AlarmArmer(hass, TEST_PANEL, use_alarm_service=False)
+    autoarmer.notifier = AsyncMock(spec=Notifier)
+    autoarmer.calendar_notify_grace_period = dt.timedelta(milliseconds=50)
+
+    await autoarmer.arm(AlarmControlPanelState.DISARMED, source=ChangeSource.CALENDAR)
+    await autoarmer.arm(AlarmControlPanelState.ARMED_HOME, source=ChangeSource.CALENDAR)
+    autoarmer.notifier.notify.assert_not_called()
+
+    await asyncio.sleep(0.1)
+
+    autoarmer.notifier.notify.assert_called_once_with(
+        source=ChangeSource.CALENDAR,
+        from_state=AlarmControlPanelState.ARMED_NIGHT,
+        to_state=AlarmControlPanelState.ARMED_HOME,
+        context=autoarmer.notifier.notify.call_args.kwargs["context"],
+    )
+    autoarmer.shutdown()
+
+
+async def test_calendar_notification_coalescing_net_noop_is_silent(hass: HomeAssistant) -> None:
+    """If the coalesced run ends up back where it started, no notification is sent at all."""
+    hass.states.async_set(entity_id=TEST_PANEL, new_state="armed_night")
+    autoarmer = AlarmArmer(hass, TEST_PANEL, use_alarm_service=False)
+    autoarmer.notifier = AsyncMock(spec=Notifier)
+    autoarmer.calendar_notify_grace_period = dt.timedelta(milliseconds=50)
+
+    await autoarmer.arm(AlarmControlPanelState.DISARMED, source=ChangeSource.CALENDAR)
+    await autoarmer.arm(AlarmControlPanelState.ARMED_NIGHT, source=ChangeSource.CALENDAR)
+
+    await asyncio.sleep(0.1)
+
+    autoarmer.notifier.notify.assert_not_called()
+    autoarmer.shutdown()
 
 
 async def test_vacation_day_occupied(autoarmer: AlarmArmer, day: None, occupied: None) -> None:
@@ -112,6 +182,54 @@ async def test_on_sunrise(autoarmer: AlarmArmer) -> None:
     assert autoarmer.armed_state() == AlarmControlPanelState.PENDING
     await autoarmer.on_sunrise()
     assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
+
+
+async def test_on_sunrise_ignored_when_sunrise_trigger_off(autoarmer: AlarmArmer) -> None:
+    autoarmer.sunrise_trigger = TRIGGER_OFF
+    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    await autoarmer.on_sunrise()
+    assert autoarmer.armed_state() == AlarmControlPanelState.PENDING
+
+
+async def test_on_sunset_ignored_when_sunset_trigger_off(autoarmer: AlarmArmer) -> None:
+    autoarmer.sunset_trigger = TRIGGER_OFF
+    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    await autoarmer.on_sunset()
+    assert autoarmer.armed_state() == AlarmControlPanelState.PENDING
+
+
+async def test_sun_triggers_are_independent(autoarmer: AlarmArmer) -> None:
+    autoarmer.sunset_trigger = TRIGGER_OFF
+    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    await autoarmer.on_sunrise()
+    assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
+
+
+async def test_leaving_ignored_when_unoccupied_trigger_off(hass: HomeAssistant, autoarmer: AlarmArmer, day: None) -> None:
+    hass.states.async_set("person.tester_bob", "home")
+    await hass.async_block_till_done()
+    settled = autoarmer.armed_state()
+    autoarmer.unoccupied_trigger = False
+
+    hass.states.async_set("person.tester_bob", "not_home")
+    await hass.async_block_till_done()
+
+    assert autoarmer.armed_state() == settled
+    assert settled != AlarmControlPanelState.ARMED_AWAY
+
+
+async def test_arriving_ignored_when_occupied_trigger_off(hass: HomeAssistant, autoarmer: AlarmArmer, day: None) -> None:
+    hass.states.async_set("person.tester_bob", "not_home")
+    await hass.async_block_till_done()
+    autoarmer.interventions = []
+    await autoarmer.reset_armed_state(source=ChangeSource.OCCUPANCY)
+    assert autoarmer.armed_state() == AlarmControlPanelState.ARMED_AWAY
+    autoarmer.occupied_trigger = False
+
+    hass.states.async_set("person.tester_bob", "home")
+    await hass.async_block_till_done()
+
+    assert autoarmer.armed_state() == AlarmControlPanelState.ARMED_AWAY
 
 
 async def test_on_sunrise_with_earliest_active_no_interventions(
@@ -276,3 +394,20 @@ async def test_housekeeping_prunes_old_interventions(hass: HomeAssistant) -> Non
 
     await autoarmer.housekeeping(dt_util.now())
     assert len(autoarmer.interventions) == 0
+
+
+async def test_each_person_change_reevaluates(hass: HomeAssistant, day: None) -> None:
+    """Transitions can depend on who in particular is home, so every arrival or departure re-evaluates."""
+    hass.states.async_set("person.alice", "home")
+    hass.states.async_set("person.bob", "home")
+    armer = AlarmArmer(hass, TEST_PANEL, occupancy={"entity_id": ["person.alice", "person.bob"]})
+    armer.initialize_occupancy()
+
+    with patch.object(armer, "reset_armed_state", new=AsyncMock()) as reset:
+        hass.states.async_set("person.bob", "not_home")
+        await hass.async_block_till_done()
+        hass.states.async_set("person.alice", "not_home")
+        await hass.async_block_till_done()
+
+        assert reset.call_count == 2
+    armer.shutdown()

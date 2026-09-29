@@ -31,12 +31,8 @@
                 "title": "Options AutoArm",
                 "data": {
                     "alarm_panel": "Panneau de contrôle d'alarme à gérer",
-                    "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
                     "calendar_entities": "Calendriers à utiliser pour les planifications d'armement",
-                    "person_entities": "Personnes pour l'armement basé sur l'occupation",
-                    "occupancy_default_day": "État d'armement par défaut lorsqu'occupé pendant la journée",
-                    "occupancy_default_night": "État d'armement par défaut lorsqu'occupé la nuit",
-                    "no_event_mode": "État d'armement à la fin d'un événement calendrier"
+                    "person_entities": "Personnes pour l'armement basé sur l'occupation"
                 },
                 "sections": {
                     "calendar_options": {
@@ -48,28 +44,20 @@
                             "calendar_occupancy_override_states": "Quand un événement calendrier définit l'un de ces états, les changements d'occupation (arrivées et départs) peuvent encore mettre à jour l'état de l'alarme. Par exemple, si le calendrier indique Désarmé mais que tout le monde part, il passera à Armé Absent."
                         }
                     },
-                    "notify_options": {
-                        "name": "Notifications",
+                    "trigger_options": {
+                        "name": "Déclencheurs",
+                        "description": "Ce qui peut lancer une réévaluation de l'état de l'alarme. Ils changent quand l'état est calculé, pas comment. Automatique désactive un déclencheur les jours avec un événement de calendrier correspondant, et le réactive les jours sans activité de calendrier.",
                         "data": {
-                            "notify_enabled": "Notifications activées",
-                            "notify_action": "Action de notification",
-                            "notify_targets": "Destinataires de notification"
+                            "sunrise_trigger": "Lever du soleil",
+                            "sunset_trigger": "Coucher du soleil",
+                            "occupied_trigger": "Quelqu'un rentre à la maison",
+                            "unoccupied_trigger": "Quelqu'un quitte la maison"
                         },
                         "data_description": {
-                            "notify_enabled": "Activer les notifications pour les changements d'état de l'alarme",
-                            "notify_action": "Action (service) Home Assistant à utiliser pour notifier",
-                            "notify_targets": "Liste d'adresses ou d'entités notify à notifier, peut être laissée vide pour Supernotify"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Assistant vocal",
-                        "data": {
-                            "sentence_arm": "Armer et expliquer par la voix",
-                            "sentence_disarm": "Désarmer par la voix"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Phrases en anglais pour l'agent Assist intégré de Home Assistant, comme 'arm the alarm', 'arm the alarm in night mode' et 'why is the alarm armed'.",
-                            "sentence_disarm": "Ajoute 'disarm the alarm'. Attention : aucun code n'est demandé, donc toute personne pouvant parler à Assist, sur un satellite vocal ou dans le chat, pourra désarmer l'alarme."
+                            "sunrise_trigger": "Réévaluer l'état de l'alarme au lever du soleil",
+                            "sunset_trigger": "Réévaluer l'état de l'alarme au coucher du soleil",
+                            "occupied_trigger": "Réévaluer l'état de l'alarme quand une personne rentre",
+                            "unoccupied_trigger": "Réévaluer l'état de l'alarme quand une personne part"
                         }
                     },
                     "sunrise_options": {
@@ -93,11 +81,71 @@
                             "sunset_earliest": "Coucher du soleil au plus tôt à cette heure",
                             "sunset_latest": "Coucher du soleil au plus tard à cette heure"
                         }
+                    },
+                    "assist_options": {
+                        "name": "Assistant vocal",
+                        "data": {
+                            "sentence_arm": "Armer et expliquer par la voix",
+                            "sentence_disarm": "Désarmer par la voix"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Phrases en anglais pour l'agent Assist intégré de Home Assistant, comme 'arm the alarm', 'arm the alarm in night mode' et 'why is the alarm armed'.",
+                            "sentence_disarm": "Ajoute 'disarm the alarm'. Attention : aucun code n'est demandé, donc toute personne pouvant parler à Assist, sur un satellite vocal ou dans le chat, pourra désarmer l'alarme."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Avancé",
+                        "data": {
+                            "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
+                            "occupancy_default_day": "État d'armement par défaut lorsqu'occupé pendant la journée",
+                            "occupancy_default_night": "État d'armement par défaut lorsqu'occupé la nuit",
+                            "calendar_armed_end_mode": "État d'armement à la fin d'un événement de calendrier armé",
+                            "calendar_disarmed_end_mode": "État d'armement à la fin d'un événement de calendrier désarmé"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code.",
+                            "calendar_armed_end_mode": "Automatique (occupation et diurne) détermine l'état selon qui est présent et s'il fait jour ou nuit. Automatique (occupation) désarme, ou arme en absence si personne n'est là.",
+                            "calendar_disarmed_end_mode": "Automatique (occupation et diurne) détermine l'état selon qui est présent et s'il fait jour ou nuit. Automatique (occupation) arme en présence, ou en absence si personne n'est là."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Notifications",
+                        "data": {
+                            "notify_enabled": "Notifications activées",
+                            "notify_action": "Action de notification",
+                            "notify_targets": "Destinataires de notification",
+                            "notify_data": "Données de notification supplémentaires"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Activer les notifications pour les changements d'état de l'alarme",
+                            "notify_action": "Action (service) Home Assistant à utiliser pour notifier",
+                            "notify_targets": "Liste d'adresses ou d'entités notify à notifier, peut être laissée vide pour Supernotify",
+                            "notify_data": "Données supplémentaires transmises à l'action de notification, telles que des actions ou un canal pour une notification d'application mobile. Toute valeur définie ici est remplacée par une clé correspondante dans un profil de notification YAML."
+                        }
                     }
-                },
-                "data_description": {
-                    "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code."
                 }
+            }
+        }
+    },
+    "selector": {
+        "sun_trigger": {
+            "options": {
+                "auto": "Automatique (désactivé les jours de calendrier)",
+                "on": "Activé",
+                "off": "Désactivé"
+            }
+        },
+        "calendar_end_mode": {
+            "options": {
+                "auto": "Automatique (occupation et diurne)",
+                "auto_occupancy": "Automatique (occupation)",
+                "manual": "Manuel (retour à l'état avant l'événement)",
+                "disarmed": "Désarmé",
+                "armed_home": "Armé présence",
+                "armed_away": "Armé absence",
+                "armed_night": "Armé nuit",
+                "armed_vacation": "Armé vacances",
+                "armed_custom_bypass": "Armé personnalisé"
             }
         }
     },
@@ -109,17 +157,29 @@
     },
     "entity": {
         "binary_sensor": {
-            "initialized": { "name": "Initialisé" }
+            "initialized": {
+                "name": "Initialisé"
+            }
         },
         "sensor": {
-            "failures": { "name": "Échecs" },
-            "last_calculation": { "name": "Dernier calcul" },
-            "last_intervention": { "name": "Dernière intervention" },
-            "last_calendar_event": { "name": "Dernier événement du calendrier" }
+            "failures": {
+                "name": "Échecs"
+            },
+            "last_calculation": {
+                "name": "Dernier calcul"
+            },
+            "last_intervention": {
+                "name": "Dernière intervention"
+            },
+            "last_calendar_event": {
+                "name": "Dernier événement du calendrier"
+            }
         }
     },
     "exceptions": {
-        "not_loaded": { "message": "AutoArm n'est pas chargé" }
+        "not_loaded": {
+            "message": "AutoArm n'est pas chargé"
+        }
     },
     "issues": {
         "transition_condition": {

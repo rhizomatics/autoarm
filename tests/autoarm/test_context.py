@@ -139,6 +139,7 @@ async def test_cause_event_names_calendar_event(hass: HomeAssistant, panel_actio
 
     assert causes[0].data["summary"] == "Skiing"
     assert panel_actions[0].context is causes[0].context
+    armer.shutdown()
 
 
 async def test_arm_via_alarm_service_propagates_context(hass: HomeAssistant, panel_actions: list[ServiceCall]) -> None:
@@ -222,9 +223,11 @@ async def test_calendar_event_end_shares_context_for_pending_and_reset(hass: Hom
     armer = AsyncMock(spec=AlarmArmer)
     armer.has_active_calendar_event = Mock(return_value=False)
     armer.cause = Mock(return_value=Context())
-    tracked = Mock(spec=TrackedCalendarEvent, armer=armer, no_event_mode=NO_CAL_EVENT_MODE_AUTO)
+    armer.calendar_end_mode = Mock(return_value=NO_CAL_EVENT_MODE_AUTO)
+    tracked = Mock(spec=TrackedCalendarEvent, armer=armer)
     tracked.id = tracked.calendar_id = "calendar.test"
     tracked.event = Mock(summary="Skiing")
+    tracked.arming_state = AlarmControlPanelState.ARMED_VACATION
 
     await TrackedCalendarEvent.on_calendar_event_end(tracked, dt_util.now())
 

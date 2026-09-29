@@ -31,12 +31,8 @@
                 "title": "Opcje Auto Arm",
                 "data": {
                     "alarm_panel": "Panel kontroli alarmu do zarządzania",
-                    "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
                     "calendar_entities": "Kalendarze używane do harmonogramów uzbrajania",
-                    "person_entities": "Osoby do uzbrajania na podstawie obecności",
-                    "occupancy_default_day": "Domyślny stan uzbrojenia przy obecności w ciągu dnia",
-                    "occupancy_default_night": "Domyślny stan uzbrojenia przy obecności w nocy",
-                    "no_event_mode": "Stan uzbrojenia po zakończeniu wydarzenia w kalendarzu"
+                    "person_entities": "Osoby do uzbrajania na podstawie obecności"
                 },
                 "sections": {
                     "calendar_options": {
@@ -48,28 +44,20 @@
                             "calendar_occupancy_override_states": "Gdy wydarzenie w kalendarzu ustawia jeden z tych stanów, zmiany obecności (przyjazdy i wyjazdy) nadal mogą aktualizować stan alarmu. Na przykład, jeśli kalendarz wskazuje Rozbrojony, ale wszyscy wyjdą, stan zmieni się na Uzbrojony poza domem."
                         }
                     },
-                    "notify_options": {
-                        "name": "Powiadomienia",
+                    "trigger_options": {
+                        "name": "Wyzwalacze",
+                        "description": "Co może rozpocząć ponowną ocenę stanu alarmu. Zmieniają one, kiedy stan jest ustalany, a nie jak. Automatyczny wyłącza wyzwalacz w każdy dzień z pasującym wydarzeniem w kalendarzu i włącza go ponownie w dni bez aktywności w kalendarzu.",
                         "data": {
-                            "notify_enabled": "Powiadomienia włączone",
-                            "notify_action": "Akcja powiadomienia",
-                            "notify_targets": "Odbiorcy powiadomień"
+                            "sunrise_trigger": "Wschód słońca",
+                            "sunset_trigger": "Zachód słońca",
+                            "occupied_trigger": "Ktoś wraca do domu",
+                            "unoccupied_trigger": "Ktoś wychodzi z domu"
                         },
                         "data_description": {
-                            "notify_enabled": "Włącz powiadomienia o zmianach stanu alarmu",
-                            "notify_action": "Akcja (usługa) Home Assistant używana do powiadamiania",
-                            "notify_targets": "Lista adresów lub encji powiadomień do powiadomienia; można pozostawić puste dla Supernotify"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Asystent głosowy",
-                        "data": {
-                            "sentence_arm": "Uzbrajanie i wyjaśnianie głosem",
-                            "sentence_disarm": "Rozbrajanie głosem"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Angielskie zdania dla wbudowanego agenta Assist w Home Assistant, takie jak 'arm the alarm', 'arm the alarm in night mode' i 'why is the alarm armed'.",
-                            "sentence_disarm": "Dodaje 'disarm the alarm'. Uwaga: kod nie jest wymagany, więc każdy, kto może mówić do Assist, przez satelitę głosowego lub na czacie, będzie mógł rozbroić alarm."
+                            "sunrise_trigger": "Ponownie oceń stan alarmu o wschodzie słońca",
+                            "sunset_trigger": "Ponownie oceń stan alarmu o zachodzie słońca",
+                            "occupied_trigger": "Ponownie oceń stan alarmu, gdy ktoś wraca do domu",
+                            "unoccupied_trigger": "Ponownie oceń stan alarmu, gdy ktoś wychodzi z domu"
                         }
                     },
                     "sunrise_options": {
@@ -93,11 +81,71 @@
                             "sunset_earliest": "Zachód słońca nie wcześniej niż o tej godzinie",
                             "sunset_latest": "Zachód słońca nie później niż o tej godzinie"
                         }
+                    },
+                    "assist_options": {
+                        "name": "Asystent głosowy",
+                        "data": {
+                            "sentence_arm": "Uzbrajanie i wyjaśnianie głosem",
+                            "sentence_disarm": "Rozbrajanie głosem"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Angielskie zdania dla wbudowanego agenta Assist w Home Assistant, takie jak 'arm the alarm', 'arm the alarm in night mode' i 'why is the alarm armed'.",
+                            "sentence_disarm": "Dodaje 'disarm the alarm'. Uwaga: kod nie jest wymagany, więc każdy, kto może mówić do Assist, przez satelitę głosowego lub na czacie, będzie mógł rozbroić alarm."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Zaawansowane",
+                        "data": {
+                            "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
+                            "occupancy_default_day": "Domyślny stan uzbrojenia przy obecności w ciągu dnia",
+                            "occupancy_default_night": "Domyślny stan uzbrojenia przy obecności w nocy",
+                            "calendar_armed_end_mode": "Stan alarmu po zakończeniu uzbrojonego wydarzenia w kalendarzu",
+                            "calendar_disarmed_end_mode": "Stan alarmu po zakończeniu rozbrojonego wydarzenia w kalendarzu"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Panel nie może wymagać kodu.",
+                            "calendar_armed_end_mode": "Automatyczny (obecność i pora dnia) ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Automatyczny (obecność) rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
+                            "calendar_disarmed_end_mode": "Automatyczny (obecność i pora dnia) ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Automatyczny (obecność) uzbraja w domu lub poza domem, gdy nikogo nie ma."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Powiadomienia",
+                        "data": {
+                            "notify_enabled": "Powiadomienia włączone",
+                            "notify_action": "Akcja powiadomienia",
+                            "notify_targets": "Odbiorcy powiadomień",
+                            "notify_data": "Dodatkowe dane powiadomienia"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Włącz powiadomienia o zmianach stanu alarmu",
+                            "notify_action": "Akcja (usługa) Home Assistant używana do powiadamiania",
+                            "notify_targets": "Lista adresów lub encji powiadomień do powiadomienia; można pozostawić puste dla Supernotify",
+                            "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML."
+                        }
                     }
-                },
-                "data_description": {
-                    "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Panel nie może wymagać kodu."
                 }
+            }
+        }
+    },
+    "selector": {
+        "sun_trigger": {
+            "options": {
+                "auto": "Automatyczny (wyłączony w dni kalendarza)",
+                "on": "Włączony",
+                "off": "Wyłączony"
+            }
+        },
+        "calendar_end_mode": {
+            "options": {
+                "auto": "Automatyczny (obecność i pora dnia)",
+                "auto_occupancy": "Automatyczny (obecność)",
+                "manual": "Ręczny (powrót do stanu sprzed wydarzenia)",
+                "disarmed": "Rozbrojony",
+                "armed_home": "Uzbrojony w domu",
+                "armed_away": "Uzbrojony poza domem",
+                "armed_night": "Uzbrojony na noc",
+                "armed_vacation": "Uzbrojony na urlop",
+                "armed_custom_bypass": "Uzbrojony niestandardowo"
             }
         }
     },
@@ -109,17 +157,29 @@
     },
     "entity": {
         "binary_sensor": {
-            "initialized": { "name": "Zainicjalizowano" }
+            "initialized": {
+                "name": "Zainicjalizowano"
+            }
         },
         "sensor": {
-            "failures": { "name": "Błędy" },
-            "last_calculation": { "name": "Ostatnie obliczenie" },
-            "last_intervention": { "name": "Ostatnia interwencja" },
-            "last_calendar_event": { "name": "Ostatnie wydarzenie w kalendarzu" }
+            "failures": {
+                "name": "Błędy"
+            },
+            "last_calculation": {
+                "name": "Ostatnie obliczenie"
+            },
+            "last_intervention": {
+                "name": "Ostatnia interwencja"
+            },
+            "last_calendar_event": {
+                "name": "Ostatnie wydarzenie w kalendarzu"
+            }
         }
     },
     "exceptions": {
-        "not_loaded": { "message": "AutoArm nie jest załadowany" }
+        "not_loaded": {
+            "message": "AutoArm nie jest załadowany"
+        }
     },
     "issues": {
         "transition_condition": {

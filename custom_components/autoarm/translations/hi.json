@@ -31,12 +31,8 @@
                 "title": "Auto Arm विकल्प",
                 "data": {
                     "alarm_panel": "प्रबंधित करने के लिए अलार्म कंट्रोल पैनल",
-                    "use_alarm_service": "अलार्म पैनल की क्रियाओं से स्थिति बदलें",
                     "calendar_entities": "आर्मिंग शेड्यूल के लिए उपयोग किए जाने वाले कैलेंडर",
-                    "person_entities": "उपस्थिति आधारित आर्मिंग के लिए लोग",
-                    "occupancy_default_day": "दिन में उपस्थित होने पर डिफ़ॉल्ट आर्मिंग स्थिति",
-                    "occupancy_default_night": "रात में उपस्थित होने पर डिफ़ॉल्ट आर्मिंग स्थिति",
-                    "no_event_mode": "कैलेंडर इवेंट समाप्त होने पर आर्मिंग स्थिति"
+                    "person_entities": "उपस्थिति आधारित आर्मिंग के लिए लोग"
                 },
                 "sections": {
                     "calendar_options": {
@@ -48,28 +44,20 @@
                             "calendar_occupancy_override_states": "जब कोई कैलेंडर इवेंट इनमें से कोई स्थिति सेट करता है, तो उपस्थिति में बदलाव (आगमन और प्रस्थान) फिर भी अलार्म की स्थिति को अपडेट कर सकते हैं। उदाहरण के लिए, यदि कैलेंडर Disarmed दिखाता है लेकिन सभी चले जाते हैं, तो यह Armed Away में बदल जाएगा।"
                         }
                     },
-                    "notify_options": {
-                        "name": "सूचनाएं",
+                    "trigger_options": {
+                        "name": "ट्रिगर",
+                        "description": "अलार्म स्थिति का पुनर्मूल्यांकन क्या शुरू कर सकता है। ये बदलते हैं कि स्थिति कब तय होती है, कैसे नहीं। स्वचालित, मेल खाते कैलेंडर इवेंट वाले दिन ट्रिगर बंद कर देता है, और बिना कैलेंडर गतिविधि वाले दिनों में फिर चालू कर देता है।",
                         "data": {
-                            "notify_enabled": "सूचनाएं सक्षम",
-                            "notify_action": "सूचना क्रिया",
-                            "notify_targets": "सूचना लक्ष्य"
+                            "sunrise_trigger": "सूर्योदय",
+                            "sunset_trigger": "सूर्यास्त",
+                            "occupied_trigger": "कोई घर आता है",
+                            "unoccupied_trigger": "कोई घर से जाता है"
                         },
                         "data_description": {
-                            "notify_enabled": "अलार्म स्थिति परिवर्तन के लिए सूचनाएं सक्षम करें",
-                            "notify_action": "सूचित करने के लिए उपयोग की जाने वाली Home Assistant क्रिया (सेवा)",
-                            "notify_targets": "सूचित करने के लिए पतों या सूचना इकाइयों की सूची; Supernotify के लिए खाली छोड़ा जा सकता है"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "वॉइस सहायक",
-                        "data": {
-                            "sentence_arm": "आवाज़ से आर्म करें और कारण बताएं",
-                            "sentence_disarm": "आवाज़ से डिसआर्म करें"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Home Assistant के अंतर्निहित Assist एजेंट के लिए अंग्रेज़ी वाक्य, जैसे 'arm the alarm', 'arm the alarm in night mode' और 'why is the alarm armed'।",
-                            "sentence_disarm": "'disarm the alarm' जोड़ता है। चेतावनी: कोई कोड नहीं पूछा जाता, इसलिए जो भी Assist से बात कर सकता है, वॉइस सैटेलाइट पर या चैट में, वह अलार्म को डिसआर्म कर सकेगा।"
+                            "sunrise_trigger": "सूर्योदय पर अलार्म स्थिति का पुनर्मूल्यांकन करें",
+                            "sunset_trigger": "सूर्यास्त पर अलार्म स्थिति का पुनर्मूल्यांकन करें",
+                            "occupied_trigger": "किसी व्यक्ति के घर आने पर अलार्म स्थिति का पुनर्मूल्यांकन करें",
+                            "unoccupied_trigger": "किसी व्यक्ति के घर से जाने पर अलार्म स्थिति का पुनर्मूल्यांकन करें"
                         }
                     },
                     "sunrise_options": {
@@ -93,11 +81,71 @@
                             "sunset_earliest": "सूर्यास्त इस समय से पहले नहीं",
                             "sunset_latest": "सूर्यास्त इस समय के बाद नहीं"
                         }
+                    },
+                    "assist_options": {
+                        "name": "वॉइस सहायक",
+                        "data": {
+                            "sentence_arm": "आवाज़ से आर्म करें और कारण बताएं",
+                            "sentence_disarm": "आवाज़ से डिसआर्म करें"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Home Assistant के अंतर्निहित Assist एजेंट के लिए अंग्रेज़ी वाक्य, जैसे 'arm the alarm', 'arm the alarm in night mode' और 'why is the alarm armed'।",
+                            "sentence_disarm": "'disarm the alarm' जोड़ता है। चेतावनी: कोई कोड नहीं पूछा जाता, इसलिए जो भी Assist से बात कर सकता है, वॉइस सैटेलाइट पर या चैट में, वह अलार्म को डिसआर्म कर सकेगा।"
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "उन्नत",
+                        "data": {
+                            "use_alarm_service": "अलार्म पैनल की क्रियाओं से स्थिति बदलें",
+                            "occupancy_default_day": "दिन में उपस्थित होने पर डिफ़ॉल्ट आर्मिंग स्थिति",
+                            "occupancy_default_night": "रात में उपस्थित होने पर डिफ़ॉल्ट आर्मिंग स्थिति",
+                            "calendar_armed_end_mode": "सशस्त्र कैलेंडर इवेंट समाप्त होने पर अलार्म स्थिति",
+                            "calendar_disarmed_end_mode": "निःशस्त्र कैलेंडर इवेंट समाप्त होने पर अलार्म स्थिति"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "स्थिति को सीधे सेट करने के बजाय alarm_control_panel की आर्म और डिसआर्म क्रियाएँ कॉल करें। Alarmo जैसे पैनल के लिए आवश्यक जो अपनी प्रक्रिया करते हैं, जैसे चाइल्ड क्षेत्रों को आर्म करना। पैनल को कोड की आवश्यकता नहीं होनी चाहिए।",
+                            "calendar_armed_end_mode": "स्वचालित (उपस्थिति और दिन-रात) यह देखकर स्थिति तय करता है कि कौन घर पर है और दिन है या रात। स्वचालित (उपस्थिति) निःशस्त्र करता है, या सब बाहर हों तो दूर सशस्त्र करता है।",
+                            "calendar_disarmed_end_mode": "स्वचालित (उपस्थिति और दिन-रात) यह देखकर स्थिति तय करता है कि कौन घर पर है और दिन है या रात। स्वचालित (उपस्थिति) घर सशस्त्र करता है, या सब बाहर हों तो दूर।"
+                        }
+                    },
+                    "notify_options": {
+                        "name": "सूचनाएं",
+                        "data": {
+                            "notify_enabled": "सूचनाएं सक्षम",
+                            "notify_action": "सूचना क्रिया",
+                            "notify_targets": "सूचना लक्ष्य",
+                            "notify_data": "अतिरिक्त सूचना डेटा"
+                        },
+                        "data_description": {
+                            "notify_enabled": "अलार्म स्थिति परिवर्तन के लिए सूचनाएं सक्षम करें",
+                            "notify_action": "सूचित करने के लिए उपयोग की जाने वाली Home Assistant क्रिया (सेवा)",
+                            "notify_targets": "सूचित करने के लिए पतों या सूचना इकाइयों की सूची; Supernotify के लिए खाली छोड़ा जा सकता है",
+                            "notify_data": "सूचना क्रिया को भेजा गया अतिरिक्त डेटा, जैसे मोबाइल ऐप सूचना के लिए क्रियाएं या चैनल। यहां सेट किया गया कोई भी मान YAML सूचना प्रोफ़ाइल में मेल खाती कुंजी द्वारा अधिलेखित कर दिया जाता है।"
+                        }
                     }
-                },
-                "data_description": {
-                    "use_alarm_service": "स्थिति को सीधे सेट करने के बजाय alarm_control_panel की आर्म और डिसआर्म क्रियाएँ कॉल करें। Alarmo जैसे पैनल के लिए आवश्यक जो अपनी प्रक्रिया करते हैं, जैसे चाइल्ड क्षेत्रों को आर्म करना। पैनल को कोड की आवश्यकता नहीं होनी चाहिए।"
                 }
+            }
+        }
+    },
+    "selector": {
+        "sun_trigger": {
+            "options": {
+                "auto": "स्वचालित (कैलेंडर दिनों में बंद)",
+                "on": "चालू",
+                "off": "बंद"
+            }
+        },
+        "calendar_end_mode": {
+            "options": {
+                "auto": "स्वचालित (उपस्थिति और दिन-रात)",
+                "auto_occupancy": "स्वचालित (उपस्थिति)",
+                "manual": "मैनुअल (इवेंट से पहले की स्थिति पर वापस)",
+                "disarmed": "निःशस्त्र",
+                "armed_home": "घर सशस्त्र",
+                "armed_away": "दूर सशस्त्र",
+                "armed_night": "रात सशस्त्र",
+                "armed_vacation": "छुट्टी सशस्त्र",
+                "armed_custom_bypass": "कस्टम सशस्त्र"
             }
         }
     },
@@ -109,17 +157,29 @@
     },
     "entity": {
         "binary_sensor": {
-            "initialized": { "name": "आरंभ किया गया" }
+            "initialized": {
+                "name": "आरंभ किया गया"
+            }
         },
         "sensor": {
-            "failures": { "name": "विफलताएँ" },
-            "last_calculation": { "name": "अंतिम गणना" },
-            "last_intervention": { "name": "अंतिम हस्तक्षेप" },
-            "last_calendar_event": { "name": "अंतिम कैलेंडर इवेंट" }
+            "failures": {
+                "name": "विफलताएँ"
+            },
+            "last_calculation": {
+                "name": "अंतिम गणना"
+            },
+            "last_intervention": {
+                "name": "अंतिम हस्तक्षेप"
+            },
+            "last_calendar_event": {
+                "name": "अंतिम कैलेंडर इवेंट"
+            }
         }
     },
     "exceptions": {
-        "not_loaded": { "message": "AutoArm लोड नहीं है" }
+        "not_loaded": {
+            "message": "AutoArm लोड नहीं है"
+        }
     },
     "issues": {
         "transition_condition": {

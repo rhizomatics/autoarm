@@ -31,12 +31,8 @@
                 "title": "Opções do Auto Arm",
                 "data": {
                     "alarm_panel": "Painel de controlo de alarme a gerir",
-                    "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
                     "calendar_entities": "Calendários a usar para os horários de armar",
-                    "person_entities": "Pessoas para armar com base na ocupação",
-                    "occupancy_default_day": "Estado de armar predefinido quando ocupado durante o dia",
-                    "occupancy_default_night": "Estado de armar predefinido quando ocupado durante a noite",
-                    "no_event_mode": "Estado de armar quando um evento do calendário termina"
+                    "person_entities": "Pessoas para armar com base na ocupação"
                 },
                 "sections": {
                     "calendar_options": {
@@ -48,28 +44,20 @@
                             "calendar_occupancy_override_states": "Quando um evento do calendário define um destes estados, as alterações de ocupação (chegadas e saídas) ainda podem atualizar o estado do alarme. Por exemplo, se o calendário indicar Desarmado mas todos saírem, mudará para Armado Fora."
                         }
                     },
-                    "notify_options": {
-                        "name": "Notificações",
+                    "trigger_options": {
+                        "name": "Acionadores",
+                        "description": "O que pode iniciar uma reavaliação do estado do alarme. Mudam quando o estado é calculado, não como. Automático desliga um acionador em qualquer dia com um evento de calendário correspondente e volta a ligá-lo nos dias sem atividade de calendário.",
                         "data": {
-                            "notify_enabled": "Notificações ativadas",
-                            "notify_action": "Ação de notificação",
-                            "notify_targets": "Destinos da notificação"
+                            "sunrise_trigger": "Nascer do sol",
+                            "sunset_trigger": "Pôr do sol",
+                            "occupied_trigger": "Alguém chega a casa",
+                            "unoccupied_trigger": "Alguém sai de casa"
                         },
                         "data_description": {
-                            "notify_enabled": "Ativar notificações para alterações do estado do alarme",
-                            "notify_action": "Ação (serviço) do Home Assistant a usar para notificar",
-                            "notify_targets": "Lista de endereços ou entidades de notificação a notificar; pode ficar em branco para Supernotify"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Assistente de voz",
-                        "data": {
-                            "sentence_arm": "Armar e explicar por voz",
-                            "sentence_disarm": "Desarmar por voz"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Frases em inglês para o agente Assist integrado do Home Assistant, como 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
-                            "sentence_disarm": "Adiciona 'disarm the alarm'. Aviso: nenhum código é pedido, por isso qualquer pessoa que fale com o Assist, num satélite de voz ou no chat, poderá desarmar o alarme."
+                            "sunrise_trigger": "Reavaliar o estado do alarme ao nascer do sol",
+                            "sunset_trigger": "Reavaliar o estado do alarme ao pôr do sol",
+                            "occupied_trigger": "Reavaliar o estado do alarme quando alguém chega a casa",
+                            "unoccupied_trigger": "Reavaliar o estado do alarme quando alguém sai de casa"
                         }
                     },
                     "sunrise_options": {
@@ -93,11 +81,71 @@
                             "sunset_earliest": "Pôr do sol não antes desta hora",
                             "sunset_latest": "Pôr do sol não depois desta hora"
                         }
+                    },
+                    "assist_options": {
+                        "name": "Assistente de voz",
+                        "data": {
+                            "sentence_arm": "Armar e explicar por voz",
+                            "sentence_disarm": "Desarmar por voz"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Frases em inglês para o agente Assist integrado do Home Assistant, como 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
+                            "sentence_disarm": "Adiciona 'disarm the alarm'. Aviso: nenhum código é pedido, por isso qualquer pessoa que fale com o Assist, num satélite de voz ou no chat, poderá desarmar o alarme."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Avançado",
+                        "data": {
+                            "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
+                            "occupancy_default_day": "Estado de armar predefinido quando ocupado durante o dia",
+                            "occupancy_default_night": "Estado de armar predefinido quando ocupado durante a noite",
+                            "calendar_armed_end_mode": "Estado do alarme quando termina um evento de calendário armado",
+                            "calendar_disarmed_end_mode": "Estado do alarme quando termina um evento de calendário desarmado"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. O painel não deve exigir código.",
+                            "calendar_armed_end_mode": "Automático (ocupação e diurno) calcula o estado a partir de quem está em casa e se é dia ou noite. Automático (ocupação) desarma, ou arma ausente se não estiver ninguém.",
+                            "calendar_disarmed_end_mode": "Automático (ocupação e diurno) calcula o estado a partir de quem está em casa e se é dia ou noite. Automático (ocupação) arma em casa, ou ausente se não estiver ninguém."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Notificações",
+                        "data": {
+                            "notify_enabled": "Notificações ativadas",
+                            "notify_action": "Ação de notificação",
+                            "notify_targets": "Destinos da notificação",
+                            "notify_data": "Dados extra de notificação"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Ativar notificações para alterações do estado do alarme",
+                            "notify_action": "Ação (serviço) do Home Assistant a usar para notificar",
+                            "notify_targets": "Lista de endereços ou entidades de notificação a notificar; pode ficar em branco para Supernotify",
+                            "notify_data": "Dados extra passados para a ação de notificação, como ações ou um canal para uma notificação da app móvel. Qualquer valor definido aqui é substituído por uma chave correspondente num perfil de notificação YAML."
+                        }
                     }
-                },
-                "data_description": {
-                    "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. O painel não deve exigir código."
                 }
+            }
+        }
+    },
+    "selector": {
+        "sun_trigger": {
+            "options": {
+                "auto": "Automático (desligado em dias de calendário)",
+                "on": "Ligado",
+                "off": "Desligado"
+            }
+        },
+        "calendar_end_mode": {
+            "options": {
+                "auto": "Automático (ocupação e diurno)",
+                "auto_occupancy": "Automático (ocupação)",
+                "manual": "Manual (voltar ao estado anterior ao evento)",
+                "disarmed": "Desarmado",
+                "armed_home": "Armado em casa",
+                "armed_away": "Armado ausente",
+                "armed_night": "Armado noite",
+                "armed_vacation": "Armado férias",
+                "armed_custom_bypass": "Armado personalizado"
             }
         }
     },
@@ -109,17 +157,29 @@
     },
     "entity": {
         "binary_sensor": {
-            "initialized": { "name": "Inicializado" }
+            "initialized": {
+                "name": "Inicializado"
+            }
         },
         "sensor": {
-            "failures": { "name": "Falhas" },
-            "last_calculation": { "name": "Último cálculo" },
-            "last_intervention": { "name": "Última intervenção" },
-            "last_calendar_event": { "name": "Último evento do calendário" }
+            "failures": {
+                "name": "Falhas"
+            },
+            "last_calculation": {
+                "name": "Último cálculo"
+            },
+            "last_intervention": {
+                "name": "Última intervenção"
+            },
+            "last_calendar_event": {
+                "name": "Último evento do calendário"
+            }
         }
     },
     "exceptions": {
-        "not_loaded": { "message": "O AutoArm não está carregado" }
+        "not_loaded": {
+            "message": "O AutoArm não está carregado"
+        }
     },
     "issues": {
         "transition_condition": {

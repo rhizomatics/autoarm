@@ -9,13 +9,14 @@ With the config flow, some settings are now managed in the UI:
 | Setting | Where | Notes |
 |---------|-------|-------|
 | Alarm panel entity | UI (setup) | Selected when adding the integration |
-| Change state using panel actions | UI (options) | On for new installs, see [Create Panel](../create_panel.md) |
+| Change state using panel actions | UI (options, Advanced) | On for new installs, see [Create Panel](../create_panel.md) |
 | Arm and explain by voice, Disarm by voice | UI (options) | Voice and chat commands, see [Automated Arming](../../automated_arming.md#built-in-agent-sentences) |
 | Calendar entities | UI (options) | Which calendars to use |
 | Person entities | UI (options) | Which persons to track for occupancy |
-| Occupancy day/night defaults | UI (options) | Default alarm state when occupied |
-| No-event mode | UI (options) | Behaviour when no calendar event is active |
-| Diurnal | UI (options) | Sunrise/sunset configuration |
+| Occupancy day/night defaults | UI (options, Advanced) | Default alarm state when occupied |
+| Calendar end modes | UI (options, Advanced) | What happens when an armed or disarmed calendar event ends |
+| Triggers | UI (options) | Whether sunrise, sunset and people arriving or leaving re-evaluate the state |
+| Sunrise and sunset | UI (options) | Earliest and latest times |
 | Per-calendar state patterns | YAML | Regex patterns matching calendar events to alarm states |
 | Per-calendar poll interval | YAML | How often to check each calendar |
 | Transitions | YAML | Condition templates for state transitions |

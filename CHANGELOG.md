@@ -1,8 +1,23 @@
 # Changelog
 
+## 1.4.0
+- New **Triggers** section in the options, to choose what starts a re-evaluation of the alarm state
+  - **Sunrise** and **Sunset** can each be on, off, or auto, where auto switches the trigger off on days with calendar activity and back on for days without
+  - **Someone arrives home** and **Someone leaves home** can each be switched off
+  - Triggers only change when the state is worked out, not how - a reset button, action or calendar event ending still work it out as usual, with day and night still choosing between armed states
+- The single **Arming state when a calendar event ends** is split into separate settings for an armed and a disarmed event ending, with a new **Auto (occupancy)** choice alongside **Auto (occupancy and diurnal)**, which is the previous `auto`
+  - **Auto (occupancy)** ignores day and night: an armed event ending disarms, or arms away if everyone is out, and a disarmed event ending arms home, or away if everyone is out
+  - Existing settings carry over to both
+  - Other resets, such as sunrise or the reset button, now return to the live event's state, or follow the setting for the kind of event that last ended today, or with no calendar activity today, work as if there were no calendars. Before, the no-event setting applied to them on any day
+- New **Advanced** section in the options, holding **Change state using the alarm panel's actions**, the occupied day and night defaults, and the calendar end settings
+- Fixed spurious notifications for the internal `pending` bookkeeping state, such as when a calendar event ends and the state is recalculated - only genuine, net state changes are now notified
+- Calendar-triggered notifications landing close together, such as one event ending as another begins, are now coalesced into a single net-change notification instead of two, with a configurable `notify_grace_period` (YAML, default one minute)
+- The **Notifications** section in the options is now last, matching where actions sit at the bottom of an automation
+- Added **Extra Notification Data** to the options, for extra service data such as mobile app notification actions or a channel, without needing YAML
+
 ## 1.3.0
 - Improved Home Assistant alignment
-  - AutoArm's sensors are now proper Home Assistant entities, on an **AutoArm** device, so they can be renamed, given an area, or disabled in the UI, and are removed with the integration
+  - Auto Arm's sensors are now proper Home Assistant entities, on an **Auto Arm** device, so they can be renamed, given an area, or disabled in the UI, and are removed with the integration
   - Entity ids are unchanged, though some states are different:
     - `binary_sensor.autoarm_initialized` is now `on` or `off` rather than `valid` or `invalid`
     - `sensor.autoarm_last_calculation` is now the time of the last calculation, with whether it changed the state in the `changed` attribute, rather than `True` or `False`
@@ -13,9 +28,9 @@
   - Changes Auto Arm makes show what caused them in the logbook, from a new `autoarm_triggered` event, rather than the alarm panel action Auto Arm called, whether from its own schedule or calendar, or a button, mobile action, occupancy change or voice command, which the event links back to
 - New installs change the alarm panel using its actions by default, rather than setting its state directly
   - Existing installs keep their current setting, and can switch with **Change state using the alarm panel's actions** in the options
-  - When using actions, `pending` is kept within AutoArm rather than set on the panel, since panels have no action for it
+  - When using actions, `pending` is kept within Auto Arm rather than set on the panel, since panels have no action for it
   - `armed_custom_bypass` can now be set using the panel's actions
-- Fixed AutoArm mistaking its own change for a manual one, when using the panel's actions, when the change was triggered by another state change, such as a button press. This could send a panel changed notification, and hold off automatic changes as a manual intervention would
+- Fixed Auto Arm mistaking its own change for a manual one, when using the panel's actions, when the change was triggered by another state change, such as a button press. This could send a panel changed notification, and hold off automatic changes as a manual intervention would
 - Buttons only act on a press, so a binary sensor button turning back `off`, or a button dropping out or coming back online, no longer counts as a manual intervention
 
 ## 1.2.0

@@ -20,7 +20,7 @@ Use the button, or follow the manual steps:
 ## Configure Auto Arm
 
 !!! note "UI and YAML split"
-    Calendar entities and `no_event_mode` are now configured via the Auto Arm **Options** UI. Per-calendar `state_patterns` and `poll_interval` remain in YAML.
+    Calendar entities, and what happens when an event ends, are now configured via the Auto Arm **Options** UI. Per-calendar `state_patterns` and `poll_interval`, and the top-level `notify_grace_period`, remain in YAML.
 
 Select the calendar entity in **Settings** > **Devices & Services** > **Auto Arm** > **Configure**.
 
@@ -78,13 +78,7 @@ autoarm:
 
 ## What to do when no event
 
-While a calendar could have events covering every minute of every
-day, its much less work to only define what is needed, such as what's
-the right time to arm at night, or when vacations start and end.
+While a calendar could have events covering every minute of every day, its much less work to only define what is needed, such as what's the right time to arm at night, or when vacations start and end.
 
-`no_event_mode` allows control over what happens when there's no
-calendar event, and nothing else to determine alarm state. This is configurable via the Auto Arm **Options** UI. It can be:
-
-`auto` - Will make best guess, including checking what the alarm panel was before the event
-`manual` - No state changes made when calendar event ends
-`disarmed`,`armed_away` etc - Use any of the standard Alarm Control Panel states as a fixed default
+What happens when an event ends, and there's no other event live, is set in the **Advanced** section of
+the Auto Arm **Options**, separately for armed and disarmed events. See [When an Event Ends](../automated_arming.md#when-an-event-ends) for the choices.

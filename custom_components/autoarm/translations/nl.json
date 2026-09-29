@@ -31,12 +31,8 @@
                 "title": "Auto Arm-opties",
                 "data": {
                     "alarm_panel": "Te beheren alarmcentrale",
-                    "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
                     "calendar_entities": "Agenda's om te gebruiken voor inschakelschema's",
-                    "person_entities": "Personen voor aanwezigheid-gebaseerd inschakelen",
-                    "occupancy_default_day": "Standaard inschakelstatus bij aanwezigheid overdag",
-                    "occupancy_default_night": "Standaard inschakelstatus bij aanwezigheid 's nachts",
-                    "no_event_mode": "Inschakelstatus wanneer een agenda-item eindigt"
+                    "person_entities": "Personen voor aanwezigheid-gebaseerd inschakelen"
                 },
                 "sections": {
                     "calendar_options": {
@@ -48,28 +44,20 @@
                             "calendar_occupancy_override_states": "Wanneer een agenda-item een van deze statussen instelt, kunnen aanwezigheidswijzigingen (aankomsten en vertrekken) de alarmstatus nog steeds bijwerken. Als de agenda bijvoorbeeld Uitgeschakeld aangeeft maar iedereen vertrekt, schakelt het over naar Ingeschakeld Afwezig."
                         }
                     },
-                    "notify_options": {
-                        "name": "Meldingen",
+                    "trigger_options": {
+                        "name": "Triggers",
+                        "description": "Wat een herbeoordeling van de alarmstatus kan starten. Deze bepalen wanneer de status wordt berekend, niet hoe. Automatisch zet een trigger uit op elke dag met een overeenkomende agenda-afspraak, en weer aan op dagen zonder agenda-activiteit.",
                         "data": {
-                            "notify_enabled": "Meldingen ingeschakeld",
-                            "notify_action": "Meldingsactie",
-                            "notify_targets": "Meldingsdoelen"
+                            "sunrise_trigger": "Zonsopgang",
+                            "sunset_trigger": "Zonsondergang",
+                            "occupied_trigger": "Iemand komt thuis",
+                            "unoccupied_trigger": "Iemand vertrekt"
                         },
                         "data_description": {
-                            "notify_enabled": "Meldingen inschakelen bij wijzigingen van de alarmstatus",
-                            "notify_action": "Home Assistant-actie (service) om mee te melden",
-                            "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden; kan leeg blijven voor Supernotify"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Spraakassistent",
-                        "data": {
-                            "sentence_arm": "Inschakelen en uitleggen met spraak",
-                            "sentence_disarm": "Uitschakelen met spraak"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Engelse zinnen voor de ingebouwde Assist-agent van Home Assistant, zoals 'arm the alarm', 'arm the alarm in night mode' en 'why is the alarm armed'.",
-                            "sentence_disarm": "Voegt 'disarm the alarm' toe. Waarschuwing: er wordt geen code gevraagd, dus iedereen die met Assist kan praten, via een spraaksatelliet of in de chat, kan het alarm uitschakelen."
+                            "sunrise_trigger": "Alarmstatus herbeoordelen bij zonsopgang",
+                            "sunset_trigger": "Alarmstatus herbeoordelen bij zonsondergang",
+                            "occupied_trigger": "Alarmstatus herbeoordelen wanneer iemand thuiskomt",
+                            "unoccupied_trigger": "Alarmstatus herbeoordelen wanneer iemand vertrekt"
                         }
                     },
                     "sunrise_options": {
@@ -93,11 +81,71 @@
                             "sunset_earliest": "Zonsondergang niet eerder dan dit tijdstip",
                             "sunset_latest": "Zonsondergang niet later dan dit tijdstip"
                         }
+                    },
+                    "assist_options": {
+                        "name": "Spraakassistent",
+                        "data": {
+                            "sentence_arm": "Inschakelen en uitleggen met spraak",
+                            "sentence_disarm": "Uitschakelen met spraak"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Engelse zinnen voor de ingebouwde Assist-agent van Home Assistant, zoals 'arm the alarm', 'arm the alarm in night mode' en 'why is the alarm armed'.",
+                            "sentence_disarm": "Voegt 'disarm the alarm' toe. Waarschuwing: er wordt geen code gevraagd, dus iedereen die met Assist kan praten, via een spraaksatelliet of in de chat, kan het alarm uitschakelen."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Geavanceerd",
+                        "data": {
+                            "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
+                            "occupancy_default_day": "Standaard inschakelstatus bij aanwezigheid overdag",
+                            "occupancy_default_night": "Standaard inschakelstatus bij aanwezigheid 's nachts",
+                            "calendar_armed_end_mode": "Alarmstatus wanneer een ingeschakelde agenda-afspraak eindigt",
+                            "calendar_disarmed_end_mode": "Alarmstatus wanneer een uitgeschakelde agenda-afspraak eindigt"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Het paneel mag geen code vereisen.",
+                            "calendar_armed_end_mode": "Automatisch (aanwezigheid en dag/nacht) bepaalt de status uit wie er thuis is en of het dag of nacht is. Automatisch (aanwezigheid) schakelt uit, of afwezig in als niemand thuis is.",
+                            "calendar_disarmed_end_mode": "Automatisch (aanwezigheid en dag/nacht) bepaalt de status uit wie er thuis is en of het dag of nacht is. Automatisch (aanwezigheid) schakelt thuis in, of afwezig als niemand thuis is."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Meldingen",
+                        "data": {
+                            "notify_enabled": "Meldingen ingeschakeld",
+                            "notify_action": "Meldingsactie",
+                            "notify_targets": "Meldingsdoelen",
+                            "notify_data": "Extra meldingsgegevens"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Meldingen inschakelen bij wijzigingen van de alarmstatus",
+                            "notify_action": "Home Assistant-actie (service) om mee te melden",
+                            "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden; kan leeg blijven voor Supernotify",
+                            "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
+                        }
                     }
-                },
-                "data_description": {
-                    "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Het paneel mag geen code vereisen."
                 }
+            }
+        }
+    },
+    "selector": {
+        "sun_trigger": {
+            "options": {
+                "auto": "Automatisch (uit op agendadagen)",
+                "on": "Aan",
+                "off": "Uit"
+            }
+        },
+        "calendar_end_mode": {
+            "options": {
+                "auto": "Automatisch (aanwezigheid en dag/nacht)",
+                "auto_occupancy": "Automatisch (aanwezigheid)",
+                "manual": "Handmatig (terug naar de status voor de afspraak)",
+                "disarmed": "Uitgeschakeld",
+                "armed_home": "Ingeschakeld thuis",
+                "armed_away": "Ingeschakeld afwezig",
+                "armed_night": "Ingeschakeld nacht",
+                "armed_vacation": "Ingeschakeld vakantie",
+                "armed_custom_bypass": "Ingeschakeld aangepast"
             }
         }
     },
@@ -109,17 +157,29 @@
     },
     "entity": {
         "binary_sensor": {
-            "initialized": { "name": "Geïnitialiseerd" }
+            "initialized": {
+                "name": "Geïnitialiseerd"
+            }
         },
         "sensor": {
-            "failures": { "name": "Fouten" },
-            "last_calculation": { "name": "Laatste berekening" },
-            "last_intervention": { "name": "Laatste ingreep" },
-            "last_calendar_event": { "name": "Laatste agenda-afspraak" }
+            "failures": {
+                "name": "Fouten"
+            },
+            "last_calculation": {
+                "name": "Laatste berekening"
+            },
+            "last_intervention": {
+                "name": "Laatste ingreep"
+            },
+            "last_calendar_event": {
+                "name": "Laatste agenda-afspraak"
+            }
         }
     },
     "exceptions": {
-        "not_loaded": { "message": "AutoArm is niet geladen" }
+        "not_loaded": {
+            "message": "AutoArm is niet geladen"
+        }
     },
     "issues": {
         "transition_condition": {

@@ -31,12 +31,8 @@
                 "title": "Opzioni AutoArm",
                 "data": {
                     "alarm_panel": "Pannello di controllo allarme da gestire",
-                    "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                     "calendar_entities": "Calendari da usare per la pianificazione dell'inserimento",
-                    "person_entities": "Persone per l'inserimento basato sulla presenza",
-                    "occupancy_default_day": "Stato di inserimento predefinito quando occupato di giorno",
-                    "occupancy_default_night": "Stato di inserimento predefinito quando occupato di notte",
-                    "no_event_mode": "Stato di inserimento al termine di un evento del calendario"
+                    "person_entities": "Persone per l'inserimento basato sulla presenza"
                 },
                 "sections": {
                     "calendar_options": {
@@ -48,28 +44,20 @@
                             "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa."
                         }
                     },
-                    "notify_options": {
-                        "name": "Notifiche",
+                    "trigger_options": {
+                        "name": "Attivatori",
+                        "description": "Cosa può avviare una rivalutazione dello stato dell'allarme. Cambiano quando lo stato viene calcolato, non come. Automatico disattiva un attivatore nei giorni con un evento di calendario corrispondente e lo riattiva nei giorni senza attività di calendario.",
                         "data": {
-                            "notify_enabled": "Notifiche abilitate",
-                            "notify_action": "Azione di notifica",
-                            "notify_targets": "Destinatari notifica"
+                            "sunrise_trigger": "Alba",
+                            "sunset_trigger": "Tramonto",
+                            "occupied_trigger": "Qualcuno arriva a casa",
+                            "unoccupied_trigger": "Qualcuno esce di casa"
                         },
                         "data_description": {
-                            "notify_enabled": "Abilita le notifiche per i cambiamenti di stato dell'allarme",
-                            "notify_action": "Azione (servizio) di Home Assistant da usare per notificare",
-                            "notify_targets": "Elenco di indirizzi o entità notify da notificare, può essere lasciato vuoto per Supernotify"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Assistente vocale",
-                        "data": {
-                            "sentence_arm": "Inserire e spiegare a voce",
-                            "sentence_disarm": "Disinserire a voce"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Frasi in inglese per l'agente Assist integrato di Home Assistant, come 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
-                            "sentence_disarm": "Aggiunge 'disarm the alarm'. Attenzione: non viene chiesto alcun codice, quindi chiunque possa parlare con Assist, da un satellite vocale o nella chat, potrà disinserire l'allarme."
+                            "sunrise_trigger": "Rivalutare lo stato dell'allarme all'alba",
+                            "sunset_trigger": "Rivalutare lo stato dell'allarme al tramonto",
+                            "occupied_trigger": "Rivalutare lo stato dell'allarme quando una persona arriva a casa",
+                            "unoccupied_trigger": "Rivalutare lo stato dell'allarme quando una persona esce di casa"
                         }
                     },
                     "sunrise_options": {
@@ -93,11 +81,71 @@
                             "sunset_earliest": "Tramonto non prima di questa ora",
                             "sunset_latest": "Tramonto non dopo questa ora"
                         }
+                    },
+                    "assist_options": {
+                        "name": "Assistente vocale",
+                        "data": {
+                            "sentence_arm": "Inserire e spiegare a voce",
+                            "sentence_disarm": "Disinserire a voce"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Frasi in inglese per l'agente Assist integrato di Home Assistant, come 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
+                            "sentence_disarm": "Aggiunge 'disarm the alarm'. Attenzione: non viene chiesto alcun codice, quindi chiunque possa parlare con Assist, da un satellite vocale o nella chat, potrà disinserire l'allarme."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Avanzate",
+                        "data": {
+                            "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
+                            "occupancy_default_day": "Stato di inserimento predefinito quando occupato di giorno",
+                            "occupancy_default_night": "Stato di inserimento predefinito quando occupato di notte",
+                            "calendar_armed_end_mode": "Stato di inserimento al termine di un evento di calendario inserito",
+                            "calendar_disarmed_end_mode": "Stato di inserimento al termine di un evento di calendario disinserito"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. La centrale non deve richiedere un codice.",
+                            "calendar_armed_end_mode": "Automatico (presenza e diurno) calcola lo stato da chi è in casa e se è giorno o notte. Automatico (presenza) disinserisce, o inserisce fuori casa se non c'è nessuno.",
+                            "calendar_disarmed_end_mode": "Automatico (presenza e diurno) calcola lo stato da chi è in casa e se è giorno o notte. Automatico (presenza) inserisce in casa, o fuori casa se non c'è nessuno."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Notifiche",
+                        "data": {
+                            "notify_enabled": "Notifiche abilitate",
+                            "notify_action": "Azione di notifica",
+                            "notify_targets": "Destinatari notifica",
+                            "notify_data": "Dati di notifica aggiuntivi"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Abilita le notifiche per i cambiamenti di stato dell'allarme",
+                            "notify_action": "Azione (servizio) di Home Assistant da usare per notificare",
+                            "notify_targets": "Elenco di indirizzi o entità notify da notificare, può essere lasciato vuoto per Supernotify",
+                            "notify_data": "Dati aggiuntivi passati all'azione di notifica, come azioni o un canale per una notifica dell'app mobile. Qualsiasi valore impostato qui viene sovrascritto da una chiave corrispondente in un profilo di notifica YAML."
+                        }
                     }
-                },
-                "data_description": {
-                    "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. La centrale non deve richiedere un codice."
                 }
+            }
+        }
+    },
+    "selector": {
+        "sun_trigger": {
+            "options": {
+                "auto": "Automatico (disattivato nei giorni di calendario)",
+                "on": "Attivo",
+                "off": "Disattivo"
+            }
+        },
+        "calendar_end_mode": {
+            "options": {
+                "auto": "Automatico (presenza e diurno)",
+                "auto_occupancy": "Automatico (presenza)",
+                "manual": "Manuale (torna allo stato prima dell'evento)",
+                "disarmed": "Disinserito",
+                "armed_home": "Inserito in casa",
+                "armed_away": "Inserito fuori casa",
+                "armed_night": "Inserito notte",
+                "armed_vacation": "Inserito vacanza",
+                "armed_custom_bypass": "Inserito personalizzato"
             }
         }
     },
@@ -109,17 +157,29 @@
     },
     "entity": {
         "binary_sensor": {
-            "initialized": { "name": "Inizializzato" }
+            "initialized": {
+                "name": "Inizializzato"
+            }
         },
         "sensor": {
-            "failures": { "name": "Errori" },
-            "last_calculation": { "name": "Ultimo calcolo" },
-            "last_intervention": { "name": "Ultimo intervento" },
-            "last_calendar_event": { "name": "Ultimo evento del calendario" }
+            "failures": {
+                "name": "Errori"
+            },
+            "last_calculation": {
+                "name": "Ultimo calcolo"
+            },
+            "last_intervention": {
+                "name": "Ultimo intervento"
+            },
+            "last_calendar_event": {
+                "name": "Ultimo evento del calendario"
+            }
         }
     },
     "exceptions": {
-        "not_loaded": { "message": "AutoArm non è caricato" }
+        "not_loaded": {
+            "message": "AutoArm non è caricato"
+        }
     },
     "issues": {
         "transition_condition": {

@@ -98,6 +98,36 @@ async def test_notify_profile_merging(hass: HomeAssistant) -> None:
     assert calls[0]["data"]["data"]["sound"] == "none"
 
 
+async def test_notify_data_from_options_is_included_but_overridden_by_yaml(hass: HomeAssistant) -> None:
+    """Extra data configured via the options UI's ObjectSelector is included, but a YAML profile's data wins."""
+    notify_config: ConfigType = {
+        "common": {"data": {"priority": "urgent"}},
+        "backstop": {},
+    }
+    armer = AlarmArmer(
+        hass,
+        TEST_PANEL,
+        notify_enabled=True,
+        notify_action="notify.test_service",
+        notify_profiles=notify_config,
+        notify_data={"priority": "low", "channel": "alarm"},
+    )
+    calls: list[dict[str, Any]] = []
+
+    @callback
+    def mock_handler(call: ServiceCall) -> None:
+        calls.append({"service": call.service, "data": dict(call.data)})
+
+    hass.services.async_register("notify", "test_service", mock_handler)
+    assert armer.notifier is not None
+    await armer.notifier.notify(ChangeSource.BUTTON, message="Test message")
+
+    assert len(calls) == 1
+    assert calls[0]["data"]["data"]["channel"] == "alarm"
+    # the YAML common profile's own "priority" wins over the options-configured default
+    assert calls[0]["data"]["data"]["priority"] == "urgent"
+
+
 async def test_notify_source_replacement(hass: HomeAssistant) -> None:
     """Test that source is set in data when data['source'] is None."""
     notify_config: ConfigType = {

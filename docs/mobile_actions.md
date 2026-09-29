@@ -24,3 +24,20 @@ data:
         title: "Disarm Alarm" # The button title
         icon: sfsymbols:bell.slash
 ```
+
+## Adding Actions to Auto Arm's Own Notifications
+
+Auto Arm's own state-change notifications, sent from the **Notifications** section of the Options UI, can carry the
+same kind of actions. Set **Extra Notification Data** to include an `actions` list, and every notification Auto Arm
+sends gets those buttons:
+
+```yaml
+actions:
+  - action: "ALARM_PANEL_DISARM"
+    title: "Disarm Alarm"
+    icon: sfsymbols:bell.slash
+```
+
+This is a plain data block, not a template or script - it's merged into every notification's `data` as-is. A YAML
+[notify profile](configuration/examples/typical.md) can still override individual keys per state or source if you
+need different actions for different situations.

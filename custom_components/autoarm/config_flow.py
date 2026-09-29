@@ -11,6 +11,7 @@ from homeassistant.helpers.selector import (
     BooleanSelector,
     EntitySelector,
     EntitySelectorConfig,
+    ObjectSelector,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
@@ -20,8 +21,11 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
+    CALENDAR_END_MODE_OPTIONS,
     CONF_ALARM_PANEL,
+    CONF_CALENDAR_ARMED_END,
     CONF_CALENDAR_CONTROL,
+    CONF_CALENDAR_DISARMED_END,
     CONF_CALENDAR_NO_EVENT,
     CONF_CALENDARS,
     CONF_DAY,
@@ -35,21 +39,31 @@ from .const import (
     CONF_SUNRISE,
     CONF_SUNSET,
     DOMAIN,
-    NO_CAL_EVENT_OPTIONS,
+    NO_CAL_EVENT_MODE_AUTO,
     NOTIFY_COMMON,
     PUBLIC_ALARM_STATES,
+    SUN_TRIGGER_OPTIONS,
     SUPERNOTIFY_ACTION,
+    TRIGGER_AUTO,
 )
 
 CONF_CALENDAR_ENTITIES = "calendar_entities"
 CONF_PERSON_ENTITIES = "person_entities"
 CONF_OCCUPANCY_DEFAULT_DAY = "occupancy_default_day"
 CONF_OCCUPANCY_DEFAULT_NIGHT = "occupancy_default_night"
+# replaced by the armed and disarmed end modes, kept to migrate entries and read YAML
 CONF_NO_EVENT_MODE = "no_event_mode"
+CONF_CALENDAR_ARMED_END_MODE = "calendar_armed_end_mode"
+CONF_CALENDAR_DISARMED_END_MODE = "calendar_disarmed_end_mode"
 CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES = "calendar_occupancy_override_states"
 CONF_NOTIFY_ACTION = "notify_action"
 CONF_NOTIFY_TARGETS = "notify_targets"
+CONF_NOTIFY_DATA = "notify_data"
 CONF_NOTIFY_ENABLED = "notify_enabled"
+CONF_SUNRISE_TRIGGER = "sunrise_trigger"
+CONF_SUNSET_TRIGGER = "sunset_trigger"
+CONF_OCCUPIED_TRIGGER = "occupied_trigger"
+CONF_UNOCCUPIED_TRIGGER = "unoccupied_trigger"
 CONF_SUNRISE_EARLIEST = "sunrise_earliest"
 CONF_SUNRISE_LATEST = "sunrise_latest"
 CONF_SUNSET_EARLIEST = "sunset_earliest"
@@ -73,11 +87,17 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_PERSON_ENTITIES: [],
     CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
     CONF_OCCUPANCY_DEFAULT_NIGHT: None,
-    CONF_NO_EVENT_MODE: "auto",
+    CONF_CALENDAR_ARMED_END_MODE: NO_CAL_EVENT_MODE_AUTO,
+    CONF_CALENDAR_DISARMED_END_MODE: NO_CAL_EVENT_MODE_AUTO,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_NOTIFY_ENABLED: True,
     CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
     CONF_NOTIFY_TARGETS: [],
+    CONF_NOTIFY_DATA: {},
+    CONF_SUNRISE_TRIGGER: TRIGGER_AUTO,
+    CONF_SUNSET_TRIGGER: TRIGGER_AUTO,
+    CONF_OCCUPIED_TRIGGER: True,
+    CONF_UNOCCUPIED_TRIGGER: True,
     CONF_SUNRISE_EARLIEST: None,
     CONF_SUNRISE_LATEST: None,
     CONF_SUNSET_EARLIEST: None,
@@ -92,6 +112,8 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Auto Arm."""
 
     VERSION = 1
+    # 2 split no_event_mode into armed and disarmed end modes
+    MINOR_VERSION = 2
 
     def __init__(self) -> None:
         """Initialize the config flow."""
@@ -137,11 +159,17 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_PERSON_ENTITIES: user_input.get(CONF_PERSON_ENTITIES, []),
                 CONF_OCCUPANCY_DEFAULT_DAY: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_DAY],
                 CONF_OCCUPANCY_DEFAULT_NIGHT: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_NIGHT],
-                CONF_NO_EVENT_MODE: DEFAULT_OPTIONS[CONF_NO_EVENT_MODE],
+                CONF_CALENDAR_ARMED_END_MODE: DEFAULT_OPTIONS[CONF_CALENDAR_ARMED_END_MODE],
+                CONF_CALENDAR_DISARMED_END_MODE: DEFAULT_OPTIONS[CONF_CALENDAR_DISARMED_END_MODE],
                 CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
                 CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
                 CONF_NOTIFY_ENABLED: True,
                 CONF_NOTIFY_TARGETS: [],
+                CONF_NOTIFY_DATA: {},
+                CONF_SUNRISE_TRIGGER: TRIGGER_AUTO,
+                CONF_SUNSET_TRIGGER: TRIGGER_AUTO,
+                CONF_OCCUPIED_TRIGGER: True,
+                CONF_UNOCCUPIED_TRIGGER: True,
                 CONF_SUNRISE_EARLIEST: None,
                 CONF_SUNRISE_LATEST: None,
                 CONF_SUNSET_EARLIEST: None,
@@ -180,7 +208,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
 
         calendar_config = import_data.get(CONF_CALENDAR_CONTROL, {})
         calendar_entities = [cal[CONF_ENTITY_ID] for cal in calendar_config.get(CONF_CALENDARS, []) if CONF_ENTITY_ID in cal]
-        no_event_mode = calendar_config.get(CONF_CALENDAR_NO_EVENT, DEFAULT_OPTIONS[CONF_NO_EVENT_MODE])
+        no_event_mode = calendar_config.get(CONF_CALENDAR_NO_EVENT, NO_CAL_EVENT_MODE_AUTO)
 
         notify_config = import_data.get(CONF_NOTIFY, {})
         notify_action = notify_config.get(NOTIFY_COMMON, {}).get(CONF_SERVICE, DEFAULT_NOTIFY_ACTION)
@@ -195,10 +223,16 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_PERSON_ENTITIES: person_entities,
             CONF_OCCUPANCY_DEFAULT_DAY: occupancy_defaults.get(CONF_DAY, DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_DAY]),
             CONF_OCCUPANCY_DEFAULT_NIGHT: occupancy_defaults.get(CONF_NIGHT),
-            CONF_NO_EVENT_MODE: no_event_mode,
+            CONF_CALENDAR_ARMED_END_MODE: calendar_config.get(CONF_CALENDAR_ARMED_END, no_event_mode),
+            CONF_CALENDAR_DISARMED_END_MODE: calendar_config.get(CONF_CALENDAR_DISARMED_END, no_event_mode),
             CONF_NOTIFY_ENABLED: notify_enabled,
             CONF_NOTIFY_ACTION: notify_action,
             CONF_NOTIFY_TARGETS: [],
+            CONF_NOTIFY_DATA: {},
+            CONF_SUNRISE_TRIGGER: TRIGGER_AUTO,
+            CONF_SUNSET_TRIGGER: TRIGGER_AUTO,
+            CONF_OCCUPIED_TRIGGER: True,
+            CONF_UNOCCUPIED_TRIGGER: True,
             CONF_SUNRISE_EARLIEST: _time_to_str(sunrise_config.get(CONF_EARLIEST)),
             CONF_SUNRISE_LATEST: _time_to_str(sunrise_config.get(CONF_LATEST)),
             CONF_SUNSET_EARLIEST: _time_to_str(sunset_config.get(CONF_EARLIEST)),
@@ -254,10 +288,6 @@ class AutoArmOptionsFlow(OptionsFlow):
                     CONF_ALARM_PANEL,
                     default=self.config_entry.data.get(CONF_ALARM_PANEL, ""),
                 ): EntitySelector(EntitySelectorConfig(domain="alarm_control_panel")),
-                vol.Required(
-                    CONF_USE_ALARM_SERVICE,
-                    default=options.get(CONF_USE_ALARM_SERVICE, True),
-                ): BooleanSelector(),
                 vol.Optional(
                     CONF_CALENDAR_ENTITIES,
                     default=options.get(CONF_CALENDAR_ENTITIES, []),
@@ -266,33 +296,6 @@ class AutoArmOptionsFlow(OptionsFlow):
                     CONF_PERSON_ENTITIES,
                     default=options.get(CONF_PERSON_ENTITIES, []),
                 ): EntitySelector(EntitySelectorConfig(domain="person", multiple=True)),
-                vol.Optional(
-                    CONF_OCCUPANCY_DEFAULT_DAY,
-                    default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "armed_home"),
-                ): SelectSelector(
-                    SelectSelectorConfig(
-                        options=PUBLIC_ALARM_STATES,
-                        mode=SelectSelectorMode.DROPDOWN,
-                    )
-                ),
-                vol.Optional(
-                    CONF_OCCUPANCY_DEFAULT_NIGHT,
-                    description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")},
-                ): SelectSelector(
-                    SelectSelectorConfig(
-                        options=PUBLIC_ALARM_STATES,
-                        mode=SelectSelectorMode.DROPDOWN,
-                    )
-                ),
-                vol.Optional(
-                    CONF_NO_EVENT_MODE,
-                    default=options.get(CONF_NO_EVENT_MODE, "auto"),
-                ): SelectSelector(
-                    SelectSelectorConfig(
-                        options=NO_CAL_EVENT_OPTIONS,
-                        mode=SelectSelectorMode.DROPDOWN,
-                    )
-                ),
                 vol.Required("calendar_options"): section(
                     vol.Schema({
                         vol.Optional(
@@ -310,38 +313,23 @@ class AutoArmOptionsFlow(OptionsFlow):
                     }),
                     {"collapsed": True},
                 ),
-                vol.Required("notify_options"): section(
+                vol.Required("trigger_options"): section(
                     vol.Schema({
                         vol.Required(
-                            CONF_NOTIFY_ENABLED,
-                            default=options.get(CONF_NOTIFY_ENABLED, True),
-                        ): BooleanSelector(),
-                        vol.Optional(
-                            CONF_NOTIFY_ACTION,
-                            default=options.get(CONF_NOTIFY_ACTION, DEFAULT_NOTIFY_ACTION),
-                        ): SelectSelector(
-                            SelectSelectorConfig(
-                                options=notify_services,
-                                multiple=False,
-                                mode=SelectSelectorMode.DROPDOWN,
-                            )
-                        ),
-                        vol.Optional(
-                            CONF_NOTIFY_TARGETS,
-                            default=options.get(CONF_NOTIFY_TARGETS, []),
-                        ): TextSelector(TextSelectorConfig(multiple=True)),
-                    }),
-                    {"collapsed": True},
-                ),
-                vol.Required("assist_options"): section(
-                    vol.Schema({
+                            CONF_SUNRISE_TRIGGER,
+                            default=options.get(CONF_SUNRISE_TRIGGER, TRIGGER_AUTO),
+                        ): _sun_trigger_selector(),
                         vol.Required(
-                            CONF_SENTENCE_ARM,
-                            default=options.get(CONF_SENTENCE_ARM, True),
+                            CONF_SUNSET_TRIGGER,
+                            default=options.get(CONF_SUNSET_TRIGGER, TRIGGER_AUTO),
+                        ): _sun_trigger_selector(),
+                        vol.Required(
+                            CONF_OCCUPIED_TRIGGER,
+                            default=options.get(CONF_OCCUPIED_TRIGGER, True),
                         ): BooleanSelector(),
                         vol.Required(
-                            CONF_SENTENCE_DISARM,
-                            default=options.get(CONF_SENTENCE_DISARM, False),
+                            CONF_UNOCCUPIED_TRIGGER,
+                            default=options.get(CONF_UNOCCUPIED_TRIGGER, True),
                         ): BooleanSelector(),
                     }),
                     {"collapsed": True},
@@ -372,5 +360,95 @@ class AutoArmOptionsFlow(OptionsFlow):
                     }),
                     {"collapsed": True},
                 ),
+                vol.Required("assist_options"): section(
+                    vol.Schema({
+                        vol.Required(
+                            CONF_SENTENCE_ARM,
+                            default=options.get(CONF_SENTENCE_ARM, True),
+                        ): BooleanSelector(),
+                        vol.Required(
+                            CONF_SENTENCE_DISARM,
+                            default=options.get(CONF_SENTENCE_DISARM, False),
+                        ): BooleanSelector(),
+                    }),
+                    {"collapsed": True},
+                ),
+                vol.Required("advanced_options"): section(
+                    vol.Schema({
+                        vol.Required(
+                            CONF_USE_ALARM_SERVICE,
+                            default=options.get(CONF_USE_ALARM_SERVICE, True),
+                        ): BooleanSelector(),
+                        vol.Optional(
+                            CONF_OCCUPANCY_DEFAULT_DAY,
+                            default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "armed_home"),
+                        ): SelectSelector(
+                            SelectSelectorConfig(
+                                options=PUBLIC_ALARM_STATES,
+                                mode=SelectSelectorMode.DROPDOWN,
+                            )
+                        ),
+                        vol.Optional(
+                            CONF_OCCUPANCY_DEFAULT_NIGHT,
+                            description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")},
+                        ): SelectSelector(
+                            SelectSelectorConfig(
+                                options=PUBLIC_ALARM_STATES,
+                                mode=SelectSelectorMode.DROPDOWN,
+                            )
+                        ),
+                        vol.Required(
+                            CONF_CALENDAR_ARMED_END_MODE,
+                            default=options.get(CONF_CALENDAR_ARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
+                        ): _calendar_end_mode_selector(),
+                        vol.Required(
+                            CONF_CALENDAR_DISARMED_END_MODE,
+                            default=options.get(CONF_CALENDAR_DISARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
+                        ): _calendar_end_mode_selector(),
+                    }),
+                    {"collapsed": True},
+                ),
+                # last, like the "then do" actions at the bottom of an automation
+                vol.Required("notify_options"): section(
+                    vol.Schema({
+                        vol.Required(
+                            CONF_NOTIFY_ENABLED,
+                            default=options.get(CONF_NOTIFY_ENABLED, True),
+                        ): BooleanSelector(),
+                        vol.Optional(
+                            CONF_NOTIFY_ACTION,
+                            default=options.get(CONF_NOTIFY_ACTION, DEFAULT_NOTIFY_ACTION),
+                        ): SelectSelector(
+                            SelectSelectorConfig(
+                                options=notify_services,
+                                multiple=False,
+                                mode=SelectSelectorMode.DROPDOWN,
+                            )
+                        ),
+                        vol.Optional(
+                            CONF_NOTIFY_TARGETS,
+                            default=options.get(CONF_NOTIFY_TARGETS, []),
+                        ): TextSelector(TextSelectorConfig(multiple=True)),
+                        vol.Optional(
+                            CONF_NOTIFY_DATA,
+                            default=options.get(CONF_NOTIFY_DATA, {}),
+                        ): ObjectSelector(),
+                    }),
+                    {"collapsed": True},
+                ),
             }),
         )
+
+
+def _sun_trigger_selector() -> SelectSelector:
+    return SelectSelector(
+        SelectSelectorConfig(options=SUN_TRIGGER_OPTIONS, mode=SelectSelectorMode.DROPDOWN, translation_key="sun_trigger")
+    )
+
+
+def _calendar_end_mode_selector() -> SelectSelector:
+    return SelectSelector(
+        SelectSelectorConfig(
+            options=CALENDAR_END_MODE_OPTIONS, mode=SelectSelectorMode.DROPDOWN, translation_key="calendar_end_mode"
+        )
+    )

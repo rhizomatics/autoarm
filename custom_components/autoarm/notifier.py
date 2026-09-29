@@ -27,12 +27,16 @@ class Notifier:
         app_health_tracker: AppHealthTracker,
         notify_action: str | None,
         notify_targets: list[str] | None = None,
+        notify_data: dict[str, Any] | None = None,
     ) -> None:
         self.notify_profiles: dict[str, dict[str, Any]] = notify_profiles or {}
         self.hass: HomeAssistant = hass
         self.app_health_tracker: AppHealthTracker = app_health_tracker
         self.notify_action: str | None = notify_action
         self.notify_targets: list[str] = notify_targets or []
+        # extra service data configured via the options UI's ObjectSelector, lowest priority so
+        # YAML profile data (common or per-profile) can still override individual keys
+        self.notify_data: dict[str, Any] = notify_data or {}
 
     async def notify(
         self,
@@ -79,7 +83,9 @@ class Notifier:
             base_profile = self.notify_profiles.get(NOTIFY_COMMON, {})
             base_profile_data = base_profile.get("data", {})
             merged_profile = dict(base_profile)
-            merged_profile_data = dict(base_profile_data)
+            # options-configured data is the lowest priority layer, YAML profiles can override any key
+            merged_profile_data = dict(self.notify_data)
+            merged_profile_data.update(base_profile_data)
             if selected_profile is not None:
                 selected_profile_data: dict[str, Any] = selected_profile.get("data", {})
                 merged_profile.update(selected_profile)

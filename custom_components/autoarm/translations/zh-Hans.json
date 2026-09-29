@@ -31,12 +31,8 @@
                 "title": "Auto Arm 选项",
                 "data": {
                     "alarm_panel": "要管理的警报控制面板",
-                    "use_alarm_service": "使用报警面板的操作更改状态",
                     "calendar_entities": "用于布防计划的日历",
-                    "person_entities": "用于基于在家状态布防的人员",
-                    "occupancy_default_day": "白天有人在家时的默认布防状态",
-                    "occupancy_default_night": "夜间有人在家时的默认布防状态",
-                    "no_event_mode": "日历事件结束时的布防状态"
+                    "person_entities": "用于基于在家状态布防的人员"
                 },
                 "sections": {
                     "calendar_options": {
@@ -48,28 +44,20 @@
                             "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。"
                         }
                     },
-                    "notify_options": {
-                        "name": "通知",
+                    "trigger_options": {
+                        "name": "触发器",
+                        "description": "哪些事件可以触发重新计算警报状态。它们改变的是何时计算状态，而不是如何计算。自动模式在有匹配日历事件的日子关闭触发器，在没有日历活动的日子重新开启。",
                         "data": {
-                            "notify_enabled": "启用通知",
-                            "notify_action": "通知操作",
-                            "notify_targets": "通知目标"
+                            "sunrise_trigger": "日出",
+                            "sunset_trigger": "日落",
+                            "occupied_trigger": "有人回家",
+                            "unoccupied_trigger": "有人离家"
                         },
                         "data_description": {
-                            "notify_enabled": "在警报状态发生变化时启用通知",
-                            "notify_action": "用于发送通知的 Home Assistant 操作（服务）",
-                            "notify_targets": "要通知的地址或通知实体列表；如使用 Supernotify 可留空"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "语音助手",
-                        "data": {
-                            "sentence_arm": "语音布防和解释",
-                            "sentence_disarm": "语音撤防"
-                        },
-                        "data_description": {
-                            "sentence_arm": "用于 Home Assistant 内置 Assist 代理的英语语句，例如 'arm the alarm'、'arm the alarm in night mode' 和 'why is the alarm armed'。",
-                            "sentence_disarm": "添加 'disarm the alarm'。警告：不会要求输入密码，因此任何能通过语音卫星或聊天与 Assist 对话的人都可以撤防警报。"
+                            "sunrise_trigger": "在日出时重新计算警报状态",
+                            "sunset_trigger": "在日落时重新计算警报状态",
+                            "occupied_trigger": "有人回家时重新计算警报状态",
+                            "unoccupied_trigger": "有人离家时重新计算警报状态"
                         }
                     },
                     "sunrise_options": {
@@ -93,11 +81,71 @@
                             "sunset_earliest": "日落不早于此时间",
                             "sunset_latest": "日落不晚于此时间"
                         }
+                    },
+                    "assist_options": {
+                        "name": "语音助手",
+                        "data": {
+                            "sentence_arm": "语音布防和解释",
+                            "sentence_disarm": "语音撤防"
+                        },
+                        "data_description": {
+                            "sentence_arm": "用于 Home Assistant 内置 Assist 代理的英语语句，例如 'arm the alarm'、'arm the alarm in night mode' 和 'why is the alarm armed'。",
+                            "sentence_disarm": "添加 'disarm the alarm'。警告：不会要求输入密码，因此任何能通过语音卫星或聊天与 Assist 对话的人都可以撤防警报。"
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "高级",
+                        "data": {
+                            "use_alarm_service": "使用报警面板的操作更改状态",
+                            "occupancy_default_day": "白天有人在家时的默认布防状态",
+                            "occupancy_default_night": "夜间有人在家时的默认布防状态",
+                            "calendar_armed_end_mode": "布防日历事件结束时的警报状态",
+                            "calendar_disarmed_end_mode": "撤防日历事件结束时的警报状态"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。面板不得要求密码。",
+                            "calendar_armed_end_mode": "自动（在家情况和昼夜）根据谁在家以及白天还是夜晚计算状态。自动（在家情况）撤防，如果无人在家则离家布防。",
+                            "calendar_disarmed_end_mode": "自动（在家情况和昼夜）根据谁在家以及白天还是夜晚计算状态。自动（在家情况）在家布防，如果无人在家则离家布防。"
+                        }
+                    },
+                    "notify_options": {
+                        "name": "通知",
+                        "data": {
+                            "notify_enabled": "启用通知",
+                            "notify_action": "通知操作",
+                            "notify_targets": "通知目标",
+                            "notify_data": "额外通知数据"
+                        },
+                        "data_description": {
+                            "notify_enabled": "在警报状态发生变化时启用通知",
+                            "notify_action": "用于发送通知的 Home Assistant 操作（服务）",
+                            "notify_targets": "要通知的地址或通知实体列表；如使用 Supernotify 可留空",
+                            "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
+                        }
                     }
-                },
-                "data_description": {
-                    "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。面板不得要求密码。"
                 }
+            }
+        }
+    },
+    "selector": {
+        "sun_trigger": {
+            "options": {
+                "auto": "自动（日历日关闭）",
+                "on": "开启",
+                "off": "关闭"
+            }
+        },
+        "calendar_end_mode": {
+            "options": {
+                "auto": "自动（在家情况和昼夜）",
+                "auto_occupancy": "自动（在家情况）",
+                "manual": "手动（恢复到事件前的状态）",
+                "disarmed": "撤防",
+                "armed_home": "在家布防",
+                "armed_away": "离家布防",
+                "armed_night": "夜间布防",
+                "armed_vacation": "度假布防",
+                "armed_custom_bypass": "自定义布防"
             }
         }
     },
@@ -109,17 +157,29 @@
     },
     "entity": {
         "binary_sensor": {
-            "initialized": { "name": "已初始化" }
+            "initialized": {
+                "name": "已初始化"
+            }
         },
         "sensor": {
-            "failures": { "name": "故障" },
-            "last_calculation": { "name": "上次计算" },
-            "last_intervention": { "name": "上次干预" },
-            "last_calendar_event": { "name": "上次日历事件" }
+            "failures": {
+                "name": "故障"
+            },
+            "last_calculation": {
+                "name": "上次计算"
+            },
+            "last_intervention": {
+                "name": "上次干预"
+            },
+            "last_calendar_event": {
+                "name": "上次日历事件"
+            }
         }
     },
     "exceptions": {
-        "not_loaded": { "message": "AutoArm 未加载" }
+        "not_loaded": {
+            "message": "AutoArm 未加载"
+        }
     },
     "issues": {
         "transition_condition": {

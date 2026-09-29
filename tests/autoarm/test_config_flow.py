@@ -9,6 +9,8 @@ from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.autoarm.config_flow import (
+    CONF_CALENDAR_ARMED_END_MODE,
+    CONF_CALENDAR_DISARMED_END_MODE,
     CONF_CALENDAR_ENTITIES,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_NO_EVENT_MODE,
@@ -16,10 +18,14 @@ from custom_components.autoarm.config_flow import (
     CONF_NOTIFY_TARGETS,
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
+    CONF_OCCUPIED_TRIGGER,
     CONF_PERSON_ENTITIES,
     CONF_SENTENCE_ARM,
     CONF_SENTENCE_DISARM,
     CONF_SUNRISE_EARLIEST,
+    CONF_SUNRISE_TRIGGER,
+    CONF_SUNSET_TRIGGER,
+    CONF_UNOCCUPIED_TRIGGER,
     CONF_USE_ALARM_SERVICE,
 )
 from custom_components.autoarm.const import (
@@ -67,7 +73,8 @@ async def test_user_flow_complete(hass: HomeAssistant, mock_notify: Any) -> None
     assert result["options"][CONF_CALENDAR_ENTITIES] == ["calendar.family", "calendar.work"]
     assert result["options"][CONF_PERSON_ENTITIES] == ["person.alice", "person.bob"]
     assert result["options"][CONF_OCCUPANCY_DEFAULT_DAY] == "armed_home"
-    assert result["options"][CONF_NO_EVENT_MODE] == "auto"
+    assert result["options"][CONF_CALENDAR_ARMED_END_MODE] == "auto"
+    assert result["options"][CONF_CALENDAR_DISARMED_END_MODE] == "auto"
 
 
 async def test_user_flow_minimal(hass: HomeAssistant, mock_notify: Any) -> None:
@@ -151,7 +158,8 @@ async def test_import_flow(hass: HomeAssistant, mock_notify: Any) -> None:
     assert result["options"][CONF_CALENDAR_ENTITIES] == ["calendar.family"]
     assert result["options"][CONF_OCCUPANCY_DEFAULT_DAY] == "disarmed"
     assert result["options"][CONF_OCCUPANCY_DEFAULT_NIGHT] == "armed_night"
-    assert result["options"][CONF_NO_EVENT_MODE] == "manual"
+    assert result["options"][CONF_CALENDAR_ARMED_END_MODE] == "manual"
+    assert result["options"][CONF_CALENDAR_DISARMED_END_MODE] == "manual"
 
 
 async def test_import_flow_already_configured(hass: HomeAssistant, mock_notify: Any) -> None:
@@ -188,12 +196,8 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
         result["flow_id"],
         {
             CONF_ALARM_PANEL: "alarm_control_panel.new_panel",
-            CONF_USE_ALARM_SERVICE: True,
             CONF_CALENDAR_ENTITIES: ["calendar.holidays"],
             CONF_PERSON_ENTITIES: ["person.new_person"],
-            CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
-            CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_night",
-            CONF_NO_EVENT_MODE: "manual",
             "calendar_options": {
                 CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: ["armed_home", "disarmed"],
             },
@@ -202,8 +206,16 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
                 CONF_NOTIFY_TARGETS: ["mobile_app_phone"],
             },
             "assist_options": {CONF_SENTENCE_ARM: False, CONF_SENTENCE_DISARM: True},
+            "trigger_options": {CONF_SUNSET_TRIGGER: "off", CONF_UNOCCUPIED_TRIGGER: False},
             "sunrise_options": {CONF_SUNRISE_EARLIEST: "05:30:00"},
             "sunset_options": {},
+            "advanced_options": {
+                CONF_USE_ALARM_SERVICE: True,
+                CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
+                CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_night",
+                CONF_CALENDAR_ARMED_END_MODE: "auto_occupancy",
+                CONF_CALENDAR_DISARMED_END_MODE: "manual",
+            },
         },
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
@@ -217,7 +229,12 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     assert entry.options[CONF_PERSON_ENTITIES] == ["person.new_person"]
     assert entry.options[CONF_OCCUPANCY_DEFAULT_DAY] == "disarmed"
     assert entry.options[CONF_OCCUPANCY_DEFAULT_NIGHT] == "armed_night"
-    assert entry.options[CONF_NO_EVENT_MODE] == "manual"
+    assert entry.options[CONF_CALENDAR_ARMED_END_MODE] == "auto_occupancy"
+    assert entry.options[CONF_CALENDAR_DISARMED_END_MODE] == "manual"
+    assert entry.options[CONF_SUNRISE_TRIGGER] == "auto"
+    assert entry.options[CONF_SUNSET_TRIGGER] == "off"
+    assert entry.options[CONF_OCCUPIED_TRIGGER] is True
+    assert entry.options[CONF_UNOCCUPIED_TRIGGER] is False
     assert entry.options[CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES] == ["armed_home", "disarmed"]
     assert entry.options[CONF_NOTIFY_ACTION] == "notify.supernotify"
     assert entry.options[CONF_NOTIFY_TARGETS] == ["mobile_app_phone"]
@@ -245,3 +262,24 @@ async def test_options_flow_without_supernotify_action(hass: HomeAssistant, setu
     notify_section = data_schema.schema["notify_options"].schema.schema
     action_selector = next(v for k, v in notify_section.items() if k == CONF_NOTIFY_ACTION)
     assert "supernotify.notify" not in action_selector.config["options"]
+
+
+async def test_migrate_no_event_mode_to_end_modes(hass: HomeAssistant, mock_notify: Any) -> None:
+    """Entries from before the split carry their no_event_mode over to both armed and disarmed end modes."""
+    hass.data[YAML_DATA_KEY] = {}
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        version=1,
+        minor_version=1,
+        data={CONF_ALARM_PANEL: "alarm_control_panel.test_panel"},
+        options={CONF_NO_EVENT_MODE: "manual"},
+    )
+    entry.add_to_hass(hass)
+
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert entry.minor_version == 2
+    assert CONF_NO_EVENT_MODE not in entry.options
+    assert entry.options[CONF_CALENDAR_ARMED_END_MODE] == "manual"
+    assert entry.options[CONF_CALENDAR_DISARMED_END_MODE] == "manual"
