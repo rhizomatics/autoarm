@@ -1,3 +1,4 @@
+import asyncio
 import datetime as dt
 import logging
 import re
@@ -9,9 +10,11 @@ from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.const import CONF_ALIAS, CONF_ENTITY_ID
+from homeassistant.core import Event, EventStateChangedData
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.event import (
     async_track_point_in_time,
+    async_track_state_change_event,
     async_track_utc_time_change,
 )
 from homeassistant.helpers.typing import ConfigType
@@ -77,7 +80,6 @@ class TrackedCalendarEvent:
             )
         else:
             await self.on_calendar_event_start(dt_util.now())
-            self.track_status = "started"
         if self.event.end_datetime_local > self.tracked_at:
             self.end_listener = async_track_point_in_time(
                 self.hass,
@@ -88,6 +90,9 @@ class TrackedCalendarEvent:
 
     async def end(self, event_time: dt.datetime) -> None:
         """Handle an event that has reached its finish date and time"""
+        if self.track_status == "ended":
+            # already handled, e.g. by end listener before pruning
+            return
         _LOGGER.debug("AUTOARM Calendar event %s ended, event_time: %s", self.id, event_time)
         self.track_status = "ended"
         await self.on_calendar_event_end(dt_util.now())
@@ -106,9 +111,11 @@ class TrackedCalendarEvent:
             await self.end(dt_util.now())
         else:
             self.track_status = "ended"
+            self.shutdown()
 
     async def on_calendar_event_start(self, triggered_at: dt.datetime) -> None:
         _LOGGER.debug("AUTOARM on_calendar_event_start(%s,%s)", self.id, triggered_at)
+        self.track_status = "started"
         target_state: AlarmControlPanelState = self.arming_state
         new_state: AlarmControlPanelState | None = None
         overridden: bool = False
@@ -264,6 +271,8 @@ class TrackedCalendar:
         # self.notify_on_change: str = calendar_config.get(CONF_CALENDAR_ENTRY_NOTIFICATIONS, ENTRY_NOTIFICATION_MATCHED)
         self.tracked_events: dict[str, TrackedCalendarEvent] = {}
         self.poller_listener: CALLBACK_TYPE | None = None
+        self.state_listener: CALLBACK_TYPE | None = None
+        self.poll_lock: asyncio.Lock = asyncio.Lock()
 
     async def initialize(self, calendar_platform: entity_platform.EntityPlatform) -> None:
         try:
@@ -292,6 +301,8 @@ class TrackedCalendar:
                 self.enabled = True
                 # force an initial poll
                 await self.match_events()
+                # calendar state changes on edits affecting current or next event, so poll then too
+                self.state_listener = async_track_state_change_event(self.hass, [self.entity_id], self.on_calendar_state_change)
 
         except Exception as _e:
             self.app_health_tracker.record_runtime_error()
@@ -300,6 +311,8 @@ class TrackedCalendar:
     def shutdown(self) -> None:
         unlisten(self.poller_listener)
         self.poller_listener = None
+        unlisten(self.state_listener)
+        self.state_listener = None
         for tracked_event in self.tracked_events.values():
             tracked_event.shutdown()
         self.enabled = False
@@ -308,8 +321,15 @@ class TrackedCalendar:
     async def on_timed_poll(self, _called_time: dt.datetime) -> None:
         """Check for new and dead events, entry point for the timed calendar tracker listener"""
         _LOGGER.debug("AUTOARM Calendar Poll")
-        await self.match_events()
-        await self.prune_events()
+        # timed and state change polls can coincide at event start/end
+        async with self.poll_lock:
+            await self.match_events()
+            await self.prune_events()
+
+    async def on_calendar_state_change(self, _event: Event[EventStateChangedData]) -> None:
+        """Poll immediately when calendar entity changes, e.g. on an edit, rather than wait for timed poll"""
+        _LOGGER.debug("AUTOARM Calendar %s state changed, polling", self.entity_id)
+        await self.on_timed_poll(dt_util.now())
 
     def has_active_event(self) -> bool:
         """Is there any event matching a state pattern that is currently open"""
@@ -438,7 +458,7 @@ class TrackedCalendar:
 
     async def prune_events(self) -> None:
         """Remove past events"""
-        to_remove: list[str] = []
+        to_remove: set[str] = set()
         min_start: dt.datetime | None = None
         max_end: dt.datetime | None = None
         for event_id, tevent in self.tracked_events.items():
@@ -448,7 +468,7 @@ class TrackedCalendar:
                 max_end = tevent.event.end_datetime_local
             if not tevent.is_current() and not tevent.is_future():
                 _LOGGER.debug("AUTOARM Pruning expire calendar event: %s", tevent.event.uid)
-                to_remove.append(event_id)
+                to_remove.add(event_id)
                 await tevent.end(dt_util.now())
 
         if min_start and max_end:
@@ -459,6 +479,6 @@ class TrackedCalendar:
                 if tevent.event.uid not in live_event_ids:
                     _LOGGER.debug("AUTOARM Pruning dead calendar event: %s", tevent.event.uid)
                     await tevent.remove()
-                    to_remove.append(tevent.id)
+                    to_remove.add(tevent.id)
         for event_id in to_remove:
             del self.tracked_events[event_id]

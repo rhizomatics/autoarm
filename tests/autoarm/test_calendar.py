@@ -1,7 +1,8 @@
 import asyncio
 import datetime as dt
 from collections.abc import AsyncGenerator
-from unittest.mock import ANY
+from typing import Any
+from unittest.mock import ANY, patch
 
 import homeassistant.util.dt as dt_util
 import pytest
@@ -242,3 +243,94 @@ async def test_calendar_follows_event_deleted(
     await local_calendar.async_delete_event(uid)
     await calendar_with_holiday_event.on_timed_poll(dt_util.now())
     assert not calendar_with_holiday_event.has_active_event()
+
+
+async def test_calendar_event_end_handled_once(
+    simple_tracked_calendar: TrackedCalendar, local_calendar: CalendarEntity
+) -> None:
+    await local_calendar.async_create_event(
+        dtstart=dt_util.now() - dt.timedelta(minutes=2),
+        dtend=dt_util.now() + dt.timedelta(seconds=1),
+        summary="Holiday stopover",
+    )
+    await simple_tracked_calendar.on_timed_poll(dt_util.now())
+    tracked_event: TrackedCalendarEvent = next(iter(simple_tracked_calendar.tracked_events.values()))
+    with patch.object(tracked_event, "on_calendar_event_end") as mock_end:
+        await asyncio.sleep(2)
+        await simple_tracked_calendar.prune_events()
+    mock_end.assert_awaited_once()
+    assert not simple_tracked_calendar.tracked_events
+
+
+async def test_calendar_deleted_event_started_by_listener_is_ended(
+    simple_tracked_calendar: TrackedCalendar, local_calendar: CalendarEntity
+) -> None:
+    await local_calendar.async_create_event(
+        dtstart=dt_util.now() + dt.timedelta(seconds=1),
+        dtend=dt_util.now() + dt.timedelta(minutes=5),
+        summary="Holiday stopover",
+    )
+    await simple_tracked_calendar.on_timed_poll(dt_util.now())
+    tracked_event: TrackedCalendarEvent = next(iter(simple_tracked_calendar.tracked_events.values()))
+    with patch.object(tracked_event, "on_calendar_event_end") as mock_end:
+        await asyncio.sleep(2)
+        assert tracked_event.is_current()
+        await local_calendar.async_delete_event(tracked_event.event.uid)  # type: ignore
+        await simple_tracked_calendar.on_timed_poll(dt_util.now())
+    mock_end.assert_awaited_once()
+    assert not simple_tracked_calendar.has_active_event()
+
+
+async def test_calendar_prunes_ended_event_deleted_from_calendar(
+    simple_tracked_calendar: TrackedCalendar, local_calendar: CalendarEntity
+) -> None:
+    await local_calendar.async_create_event(
+        dtstart=dt_util.now() - dt.timedelta(minutes=2),
+        dtend=dt_util.now() + dt.timedelta(seconds=1),
+        summary="Holiday stopover",
+    )
+    await simple_tracked_calendar.on_timed_poll(dt_util.now())
+    tracked_event: TrackedCalendarEvent = next(iter(simple_tracked_calendar.tracked_events.values()))
+    await asyncio.sleep(2)
+    await local_calendar.async_delete_event(tracked_event.event.uid)  # type: ignore
+    await simple_tracked_calendar.prune_events()
+    assert not simple_tracked_calendar.tracked_events
+
+
+async def test_calendar_polls_on_calendar_state_change(
+    simple_tracked_calendar: TrackedCalendar, local_calendar: CalendarEntity, mock_armer_real_hass: AlarmArmer
+) -> None:
+    # no explicit poll - creating an in-progress event changes the calendar entity state
+    await local_calendar.async_create_event(
+        dtstart=dt_util.now() - dt.timedelta(minutes=2),
+        dtend=dt_util.now() + dt.timedelta(minutes=2),
+        summary="Holidays in Bahamas!!",
+    )
+    await mock_armer_real_hass.hass.async_block_till_done()
+    assert simple_tracked_calendar.has_active_event()
+    mock_armer_real_hass.arm.assert_called_once()  # type: ignore
+
+
+async def test_calendar_overlapping_polls_prune_event_once(
+    simple_tracked_calendar: TrackedCalendar, local_calendar: CalendarEntity
+) -> None:
+    await local_calendar.async_create_event(
+        dtstart=dt_util.now() - dt.timedelta(minutes=2),
+        dtend=dt_util.now() + dt.timedelta(seconds=1),
+        summary="Holiday stopover",
+    )
+    await simple_tracked_calendar.on_timed_poll(dt_util.now())
+    await asyncio.sleep(2)
+    real_get_events = local_calendar.async_get_events
+
+    async def slow_get_events(*args: Any) -> list[CalendarEvent]:
+        # yield like a network calendar would, so both polls interleave
+        events = await real_get_events(*args)
+        await asyncio.sleep(0.1)
+        return events
+
+    local_calendar.async_get_events = slow_get_events  # type: ignore
+    await asyncio.gather(
+        simple_tracked_calendar.on_timed_poll(dt_util.now()), simple_tracked_calendar.on_timed_poll(dt_util.now())
+    )
+    assert not simple_tracked_calendar.tracked_events

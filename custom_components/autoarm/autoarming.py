@@ -1705,5 +1705,6 @@ class AlarmArmer:
         now = dt_util.now()
         self.interventions = [i for i in self.interventions if now < i.created_at + dt.timedelta(minutes=self.intervention_ttl)]
         for cal in self.calendars:
-            await cal.prune_events()
+            async with cal.poll_lock:
+                await cal.prune_events()
         _LOGGER.debug("AUTOARM Housekeeping finished")

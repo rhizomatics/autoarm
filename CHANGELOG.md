@@ -1,6 +1,8 @@
 # Changelog
 
 ## 1.4.0
+- New and changed calendar events can now be picked up faster than the usual Home Assistant 15 minute poll interval, when the current or next event changed
+  - Internally, it subscribes to the calendar entity state, which is changed by Home Assistant when a calendar is edited
 - New **Triggers** section in the options, to choose what starts a re-evaluation of the alarm state
   - **Sunrise** and **Sunset** can each be on, off, or auto, where auto switches the trigger off on days with calendar activity and back on for days without
   - **Someone arrives home** and **Someone leaves home** can each be switched off
