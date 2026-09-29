@@ -29,6 +29,7 @@ from custom_components.autoarm.const import (
     CONF_CALENDARS,
     DOMAIN,
     TRIGGER_OFF,
+    TRIGGER_ON,
     YAML_DATA_KEY,
     ChangeSource,
 )
@@ -177,11 +178,52 @@ async def test_calendar_event_ending_shortly(local_calendar: CalendarEntity, has
         summary="Holidays in Bahamas!!",
     )
     hass.states.async_set("alarm_panel.testing", "armed_away")
-    await _setup_entry(hass)
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_ARMED_END_MODE] = "auto_sun"
+    await _setup_entry(hass, options=local_options)
     assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
     await asyncio.sleep(3)
 
     assert panel_state(hass) in (AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
+
+
+async def test_auto_event_ending_by_occupancy_when_sun_triggers_inactive(
+    local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any
+) -> None:
+    """Sun triggers default to off on calendar days, so auto ignores night and disarms."""
+    hass.states.async_set("person.tenant", "home")
+    hass.states.async_set("sun.sun", "below_horizon")
+    start: dt.datetime = dt_util.start_of_local_day()
+    end: dt.datetime = dt_util.now() + dt.timedelta(seconds=2)
+    await local_calendar.async_create_event(dtstart=start, dtend=end, summary="Holidays in Bahamas!!")
+    hass.states.async_set("alarm_panel.testing", "armed_away")
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_ARMED_END_MODE] = "auto"
+    await _setup_entry(hass, options=local_options)
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
+    await asyncio.sleep(3)
+
+    assert panel_state(hass) == AlarmControlPanelState.DISARMED
+
+
+async def test_auto_event_ending_by_occupancy_and_sun_when_sun_trigger_active(
+    local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any
+) -> None:
+    """With the sunrise trigger on, auto works the state out from day and night too, so arms for the night."""
+    hass.states.async_set("person.tenant", "home")
+    hass.states.async_set("sun.sun", "below_horizon")
+    start: dt.datetime = dt_util.start_of_local_day()
+    end: dt.datetime = dt_util.now() + dt.timedelta(seconds=2)
+    await local_calendar.async_create_event(dtstart=start, dtend=end, summary="Holidays in Bahamas!!")
+    hass.states.async_set("alarm_panel.testing", "armed_away")
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_ARMED_END_MODE] = "auto"
+    local_options[CONF_SUNRISE_TRIGGER] = TRIGGER_ON
+    await _setup_entry(hass, options=local_options)
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
+    await asyncio.sleep(3)
+
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_NIGHT
 
 
 async def test_armed_event_ending_by_occupancy_disarms(

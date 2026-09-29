@@ -99,20 +99,23 @@ If there's no calendar event live, then arming state can be worked out automatic
 ### When an Event Ends
 
 The **Advanced** section of the options has separate settings for an **armed** event ending (`armed_home`,
-`armed_away`, `armed_night`, `armed_vacation` or `armed_custom_bypass`) and a **disarmed** event ending,
-unless another event is still live. Each can be:
+`armed_away`, `armed_night`, `armed_vacation` or `armed_custom_bypass`) and a **disarmed** event ending, unless another event is still live. Each can be:
 
 | Setting | Armed event ends | Disarmed event ends |
 |---------|------------------|---------------------|
-| **Auto (occupancy and diurnal)**, the default | Worked out from who's home and whether it's day or night, the same as any other reset | The same |
-| **Auto (occupancy)** | Disarms, or arms away if everyone is out | Arms home, or away if everyone is out |
+| **Auto**, the default | **By occupancy and sun** if the sunrise or sunset [trigger](#triggers) is active that day, otherwise **By occupancy** | The same |
+| **By occupancy and sun** | Worked out from who's home and whether it's day or night, the same as any other reset | The same |
+| **By occupancy** | Disarms, or arms away if everyone is out | Arms home, or away if everyone is out |
 | **Manual** | Goes back to the state before the event | The same |
 | A fixed state, such as `disarmed` | Goes to that state | The same |
 
-**Auto (occupancy)** ignores day and night. That matters when an event ends close to sunrise or sunset:
-an `armed_night` event ending at 06:45, before the sun is up, would be worked out as still night by
-**Auto (occupancy and diurnal)** and stay armed for the night, until sunrise disarms it a few minutes
-later. With **Auto (occupancy)** it disarms as the event ends.
+**By occupancy** ignores day and night. That matters when an event ends close to sunrise or sunset:
+
+An `armed_night` event ending at 06:45, before the sun is up, would be worked out as still night by **By occupancy and sun** and stay armed for the night, until sunrise disarms it a few minutes later. With **By occupancy** it disarms as the event ends.
+
+**Auto** only takes day and night into account when sunrise or sunset will re-evaluate the state that day. With the sunrise and sunset triggers left at their default of **Auto**, they're off on any day with a calendar event, so an event ending goes by occupancy alone.
+
+In YAML, these are `auto`, `auto_sun` and `auto_occupancy` for `no_event_mode`, `armed_end_mode` and `disarmed_end_mode`.
 
 ### Other Resets When Using Calendars
 
@@ -135,14 +138,11 @@ before sending. If another calendar-sourced change lands within that window, the
 net change - from the state before the first change to the state after the last - is notified. If that nets
 out to no change at all, nothing is sent.
 
-This only debounces the *notification*; the alarm panel's actual state still updates immediately as each
-calendar-driven change happens.
+This only debounces the *notification*; the alarm panel's actual state still updates immediately as each calendar-driven change happens.
 
 ## Triggers
 
-The **Triggers** section of the options decides what can start a re-evaluation of the alarm state. It
-changes *when* the state is worked out, not *how*, and only covers these triggers - a reset button, the
-`autoarm.reset_state` action or a calendar event ending still work out the state as usual.
+The **Triggers** section of the options decides what can start a re-evaluation of the alarm state. It changes *when* the state is worked out, not *how*, and only covers these triggers - a reset button, the `autoarm.reset_state` action or a calendar event ending still work out the state as usual.
 
 | Trigger | Choices | Default |
 |---------|---------|---------|
@@ -151,14 +151,10 @@ changes *when* the state is worked out, not *how*, and only covers these trigger
 | **Someone arrives home** | On, Off | On |
 | **Someone leaves home** | On, Off | On |
 
-**Auto** switches the trigger off on any day with a matching [Calendar Control] event starting, ending or
-running that day, and back on for days without calendar activity. This suits a calendar that handles
-particular days, such as a night out or working from home, while sunrise and sunset take over on ordinary
+**Auto** switches the trigger off on any day with a matching [Calendar Control] event starting, ending or running that day, and back on for days without calendar activity. This suits a calendar that handles particular days, such as a night out or working from home, while sunrise and sunset take over on ordinary
 days.
 
-Every arrival or departure re-evaluates, not just the house becoming occupied or empty, since
-[Transition Conditions](#algorithm-conditions) can depend on who in particular is home. When that doesn't
-change the alarm state, nothing happens.
+Every arrival or departure re-evaluates, not just the house becoming occupied or empty, since [Transition Conditions](#algorithm-conditions) can depend on who in particular is home. When that doesn't change the alarm state, nothing happens.
 
 ## Diurnal Control
 
@@ -171,8 +167,7 @@ This does three things to support [Automated Transitions]:
     - There's a `earliest` and `latest` cutoff option in the UI config, which works identically to that for sunrise
 3. Provide a `day` and `night` value for conditions
 
-Whether sunrise and sunset re-evaluate the alarm state at all is set in [Triggers]. Switching them off
-there doesn't change the `day` and `night` values, so these still choose between armed states whenever the
+Whether sunrise and sunset re-evaluate the alarm state at all is set in [Triggers]. Switching them off there doesn't change the `day` and `night` values, so these still choose between armed states whenever the
 state is worked out for some other reason.
 
 ![Diurnal Overrides in Configuration](./assets/images/config_flow_options_diurnal.png)
@@ -182,32 +177,20 @@ state is worked out for some other reason.
 !!! note "Configuration split"
     Person entities and occupancy `default_state` are configured via the Auto Arm **Options** UI. The `delay_time` setting remains in YAML.
 
-The people who live at the property can be defined as [Person Integration][] entities
-[Person Entities]() in the `occupancy` configuration, and used to derive an `occupied`
-value for [Automated Transitions]. This works best with the Companion App on a mobile
-phone, although other [Device Tracker Integrations](https://www.home-assistant.io/integrations/?cat=device-tracker)
+The people who live at the property can be defined as [Person Integration][] entities [Person Entities]() in the `occupancy` configuration, and used to derive an `occupied` value for [Automated Transitions]. This works best with the Companion App on a mobile phone, although other [Device Tracker Integrations](https://www.home-assistant.io/integrations/?cat=device-tracker)
 can work, such as a home network `device_tracker`.
 
 !!! tip
-    Since the occupied check looks for entities that have a state `home`, it doesn't
-    have to be `person` entities, and you can add a list of `device tracker` entities.
+    Since the occupied check looks for entities that have a state `home`, it doesn't have to be `person` entities, and you can add a list of `device tracker` entities.
     The advantage of Person is that you can define multiple trackers for a single individual, and they are `home` if any of the trackers are `home`, even if some of them haven't kept up.
 
-See the [Presence Detection](https://www.home-assistant.io/getting-started/presence-detection/)
-guidance from Home Assistant on how to set this up, and the options for using it.
+See the [Presence Detection](https://www.home-assistant.io/getting-started/presence-detection/) guidance from Home Assistant on how to set this up, and the options for using it.
 
-If the house is occupied, and its daytime, some people like that to be `disarmed` and
-others prefer `armed_home`. You can control this via [Calendar Control][] or use the
-`state_default` settings for day and/or night in the `occupancy` configuration.
+If the house is occupied, and its daytime, some people like that to be `disarmed` and others prefer `armed_home`. You can control this via [Calendar Control][] or use the `state_default` settings for day and/or night in the `occupancy` configuration.
 
-One problem with device trackers is that they can be noisy, for example if someone tracked
-by phone walks out of wifi range, or reboots their device. This tends to be a problem when
-building occupied, since its much less likely for a device tracker to intermittenly think
-the device is at home. A delay timer can be set, separately for `home` and `not_home`, to
-smooth this out, so alarm won't reset unless someone still out a few minutes later.
+One problem with device trackers is that they can be noisy, for example if someone tracked by phone walks out of wifi range, or reboots their device. This tends to be a problem when building occupied, since its much less likely for a device tracker to intermittenly think the device is at home. A delay timer can be set, separately for `home` and `not_home`, to smooth this out, so alarm won't reset unless someone still out a few minutes later.
 
-In this configuration, there will be a three minute wait to make sure the device tracker
-stable for `home`->`not_home`, and zero delay when arriving home.
+In this configuration, there will be a three minute wait to make sure the device tracker stable for `home`->`not_home`, and zero delay when arriving home.
 
 ```yaml
   occupancy:
@@ -231,9 +214,7 @@ alarm states for which the calendar state should be overridden. This means you c
 !!! note "YAML-only"
     Transition conditions are configured entirely in YAML.
 
-If nothing else is configured ( occupancy, buttons, calendars ) then arming will still
-happen by the state of the sun. The rules for this, and how occupancy is used,
-are all defined as Home Assistant [Conditions] and can be overridden as you need.
+If nothing else is configured ( occupancy, buttons, calendars ) then arming will still happen by the state of the sun. The rules for this, and how occupancy is used, are all defined as Home Assistant [Conditions] and can be overridden as you need.
 
 | Diurnal State | Occupancy State | Alarm State   |
 |---------------|-----------------|---------------|
@@ -242,8 +223,7 @@ are all defined as Home Assistant [Conditions] and can be overridden as you need
 | night         | occupied        | ARMED_NIGHT   |
 | night         | occupied        | ARMED_AWAY    |
 
-(*) This can be overridden using `state_default` in the `occupancy` configuration, for example
-if you prefer to have the alarm set to `disarmed` when people are home and its daylight.
+(*) This can be overridden using `state_default` in the `occupancy` configuration, for example if you prefer to have the alarm set to `disarmed` when people are home and its daylight.
 
 Two other states, `armed_vacation` and `disarmed` can be set manually, by buttons, or calendar.
 

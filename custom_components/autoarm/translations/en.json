@@ -104,8 +104,8 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. The panel must not require a code.",
-                            "calendar_armed_end_mode": "Auto (occupancy and diurnal) works the state out from who's home and whether it's day or night. Auto (occupancy) disarms, or arms away if everyone is out.",
-                            "calendar_disarmed_end_mode": "Auto (occupancy and diurnal) works the state out from who's home and whether it's day or night. Auto (occupancy) arms home, or away if everyone is out."
+                            "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
+                            "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out."
                         }
                     },
                     "notify_options": {
@@ -137,8 +137,9 @@
         },
         "calendar_end_mode": {
             "options": {
-                "auto": "Auto (occupancy and diurnal)",
-                "auto_occupancy": "Auto (occupancy)",
+                "auto": "Auto",
+                "auto_sun": "By occupancy and sun",
+                "auto_occupancy": "By occupancy",
                 "manual": "Manual (back to the state before the event)",
                 "disarmed": "Disarmed",
                 "armed_home": "Armed home",

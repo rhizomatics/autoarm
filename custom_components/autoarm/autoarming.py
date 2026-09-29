@@ -120,6 +120,7 @@ from .const import (
     DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
     NO_CAL_EVENT_MODE_AUTO_OCCUPANCY,
+    NO_CAL_EVENT_MODE_AUTO_SUN,
     NO_CAL_EVENT_MODE_MANUAL,
     NOTIFY_COMMON,
     NOTIFY_SCHEMA,
@@ -912,11 +913,17 @@ class AlarmArmer:
             return not await self.has_calendar_event_today()
         return True
 
-    def calendar_end_mode(self, ended_state: AlarmControlPanelState) -> str:
-        """What to do when a calendar event for this state ends, with no other event live"""
+    async def calendar_end_mode(self, ended_state: AlarmControlPanelState) -> str:
+        """What to do when a calendar event for this state ends, with no other event live, auto resolved"""
         if ended_state == AlarmControlPanelState.DISARMED:
-            return self.calendar_disarmed_end_mode
-        return self.calendar_armed_end_mode
+            end_mode = self.calendar_disarmed_end_mode
+        else:
+            end_mode = self.calendar_armed_end_mode
+        if end_mode == NO_CAL_EVENT_MODE_AUTO:
+            if await self.sun_trigger_active(self.sunrise_trigger) or await self.sun_trigger_active(self.sunset_trigger):
+                return NO_CAL_EVENT_MODE_AUTO_SUN
+            return NO_CAL_EVENT_MODE_AUTO_OCCUPANCY
+        return end_mode
 
     async def last_calendar_event_ended_today(self) -> AlarmControlPanelState | None:
         """State of the matching calendar event that most recently ended today, across all calendars"""
@@ -1092,7 +1099,7 @@ class AlarmArmer:
                     if ended_state is None:
                         _LOGGER.debug("AUTOARM No calendar event ended today, resetting as if there were no calendars")
                     else:
-                        end_mode: str = self.calendar_end_mode(ended_state)
+                        end_mode: str = await self.calendar_end_mode(ended_state)
                         target_state: AlarmControlPanelState | None = None
                         if end_mode == NO_CAL_EVENT_MODE_MANUAL:
                             _LOGGER.debug("AUTOARM Ignoring reset after a %s calendar event ended, in manual mode", ended_state)

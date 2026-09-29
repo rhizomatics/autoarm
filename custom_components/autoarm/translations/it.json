@@ -104,8 +104,8 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. La centrale non deve richiedere un codice.",
-                            "calendar_armed_end_mode": "Automatico (presenza e diurno) calcola lo stato da chi è in casa e se è giorno o notte. Automatico (presenza) disinserisce, o inserisce fuori casa se non c'è nessuno.",
-                            "calendar_disarmed_end_mode": "Automatico (presenza e diurno) calcola lo stato da chi è in casa e se è giorno o notte. Automatico (presenza) inserisce in casa, o fuori casa se non c'è nessuno."
+                            "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
+                            "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno."
                         }
                     },
                     "notify_options": {
@@ -137,8 +137,9 @@
         },
         "calendar_end_mode": {
             "options": {
-                "auto": "Automatico (presenza e diurno)",
-                "auto_occupancy": "Automatico (presenza)",
+                "auto": "Automatico",
+                "auto_sun": "In base a presenza e sole",
+                "auto_occupancy": "In base a presenza",
                 "manual": "Manuale (torna allo stato prima dell'evento)",
                 "disarmed": "Disinserito",
                 "armed_home": "Inserito in casa",

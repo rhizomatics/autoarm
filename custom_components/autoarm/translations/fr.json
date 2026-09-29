@@ -104,8 +104,8 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code.",
-                            "calendar_armed_end_mode": "Automatique (occupation et diurne) détermine l'état selon qui est présent et s'il fait jour ou nuit. Automatique (occupation) désarme, ou arme en absence si personne n'est là.",
-                            "calendar_disarmed_end_mode": "Automatique (occupation et diurne) détermine l'état selon qui est présent et s'il fait jour ou nuit. Automatique (occupation) arme en présence, ou en absence si personne n'est là."
+                            "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
+                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
                         }
                     },
                     "notify_options": {
@@ -137,8 +137,9 @@
         },
         "calendar_end_mode": {
             "options": {
-                "auto": "Automatique (occupation et diurne)",
-                "auto_occupancy": "Automatique (occupation)",
+                "auto": "Automatique",
+                "auto_sun": "Selon l'occupation et le soleil",
+                "auto_occupancy": "Selon l'occupation",
                 "manual": "Manuel (retour à l'état avant l'événement)",
                 "disarmed": "Désarmé",
                 "armed_home": "Armé présence",

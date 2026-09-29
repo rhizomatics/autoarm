@@ -104,8 +104,8 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Die Zentrale darf keinen Code verlangen.",
-                            "calendar_armed_end_mode": "Automatisch (Anwesenheit und Tageszeit) ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Automatisch (Anwesenheit) schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
-                            "calendar_disarmed_end_mode": "Automatisch (Anwesenheit und Tageszeit) ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Automatisch (Anwesenheit) schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist."
+                            "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
+                            "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist."
                         }
                     },
                     "notify_options": {
@@ -137,8 +137,9 @@
         },
         "calendar_end_mode": {
             "options": {
-                "auto": "Automatisch (Anwesenheit und Tageszeit)",
-                "auto_occupancy": "Automatisch (Anwesenheit)",
+                "auto": "Automatisch",
+                "auto_sun": "Nach Anwesenheit und Sonne",
+                "auto_occupancy": "Nach Anwesenheit",
                 "manual": "Manuell (zurück zum Zustand vor dem Eintrag)",
                 "disarmed": "Unscharf",
                 "armed_home": "Scharf zu Hause",

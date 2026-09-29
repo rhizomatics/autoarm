@@ -104,8 +104,8 @@
                         },
                         "data_description": {
                             "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。面板不得要求密码。",
-                            "calendar_armed_end_mode": "自动（在家情况和昼夜）根据谁在家以及白天还是夜晚计算状态。自动（在家情况）撤防，如果无人在家则离家布防。",
-                            "calendar_disarmed_end_mode": "自动（在家情况和昼夜）根据谁在家以及白天还是夜晚计算状态。自动（在家情况）在家布防，如果无人在家则离家布防。"
+                            "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
+                            "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。"
                         }
                     },
                     "notify_options": {
@@ -137,8 +137,9 @@
         },
         "calendar_end_mode": {
             "options": {
-                "auto": "自动（在家情况和昼夜）",
-                "auto_occupancy": "自动（在家情况）",
+                "auto": "自动",
+                "auto_sun": "按在家情况和日出日落",
+                "auto_occupancy": "按在家情况",
                 "manual": "手动（恢复到事件前的状态）",
                 "disarmed": "撤防",
                 "armed_home": "在家布防",

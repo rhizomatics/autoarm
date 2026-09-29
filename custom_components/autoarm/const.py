@@ -43,18 +43,22 @@ CONF_ALARM_STATES = "alarm_states"
 ALARM_STATES = [k.lower() for k in AlarmControlPanelState.__members__]
 PUBLIC_ALARM_STATES = [s for s in ALARM_STATES if s not in ("pending", "triggered", "arming", "disarming")]
 
-# auto recalculates from occupancy and day/night, as before the occupancy-only option existed
+# auto is auto_sun if a sunrise or sunset trigger is active today, otherwise auto_occupancy
 NO_CAL_EVENT_MODE_AUTO = "auto"
+# recalculates from occupancy and day/night
+NO_CAL_EVENT_MODE_AUTO_SUN = "auto_sun"
 NO_CAL_EVENT_MODE_AUTO_OCCUPANCY = "auto_occupancy"
 NO_CAL_EVENT_MODE_MANUAL = "manual"
 NO_CAL_EVENT_OPTIONS: list[str] = [
     NO_CAL_EVENT_MODE_AUTO,
+    NO_CAL_EVENT_MODE_AUTO_SUN,
     NO_CAL_EVENT_MODE_AUTO_OCCUPANCY,
     NO_CAL_EVENT_MODE_MANUAL,
     *ALARM_STATES,
 ]
 CALENDAR_END_MODE_OPTIONS: list[str] = [
     NO_CAL_EVENT_MODE_AUTO,
+    NO_CAL_EVENT_MODE_AUTO_SUN,
     NO_CAL_EVENT_MODE_AUTO_OCCUPANCY,
     NO_CAL_EVENT_MODE_MANUAL,
     *PUBLIC_ALARM_STATES,

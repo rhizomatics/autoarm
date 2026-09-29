@@ -13,7 +13,7 @@ from pytest_homeassistant_custom_component.common import async_fire_time_changed
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.calendar_events import TrackedCalendarEvent
-from custom_components.autoarm.const import DOMAIN, EVENT_TRIGGERED, NO_CAL_EVENT_MODE_AUTO, ChangeSource
+from custom_components.autoarm.const import DOMAIN, EVENT_TRIGGERED, NO_CAL_EVENT_MODE_AUTO_SUN, ChangeSource
 
 USER_ID = "user-1234"
 
@@ -223,7 +223,7 @@ async def test_calendar_event_end_shares_context_for_pending_and_reset(hass: Hom
     armer = AsyncMock(spec=AlarmArmer)
     armer.has_active_calendar_event = Mock(return_value=False)
     armer.cause = Mock(return_value=Context())
-    armer.calendar_end_mode = Mock(return_value=NO_CAL_EVENT_MODE_AUTO)
+    armer.calendar_end_mode = AsyncMock(return_value=NO_CAL_EVENT_MODE_AUTO_SUN)
     tracked = Mock(spec=TrackedCalendarEvent, armer=armer)
     tracked.id = tracked.calendar_id = "calendar.test"
     tracked.event = Mock(summary="Skiing")

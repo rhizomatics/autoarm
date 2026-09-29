@@ -104,8 +104,8 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. O painel não deve exigir código.",
-                            "calendar_armed_end_mode": "Automático (ocupação e diurno) calcula o estado a partir de quem está em casa e se é dia ou noite. Automático (ocupação) desarma, ou arma ausente se não estiver ninguém.",
-                            "calendar_disarmed_end_mode": "Automático (ocupação e diurno) calcula o estado a partir de quem está em casa e se é dia ou noite. Automático (ocupação) arma em casa, ou ausente se não estiver ninguém."
+                            "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
+                            "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém."
                         }
                     },
                     "notify_options": {
@@ -137,8 +137,9 @@
         },
         "calendar_end_mode": {
             "options": {
-                "auto": "Automático (ocupação e diurno)",
-                "auto_occupancy": "Automático (ocupação)",
+                "auto": "Automático",
+                "auto_sun": "Por ocupação e sol",
+                "auto_occupancy": "Por ocupação",
                 "manual": "Manual (voltar ao estado anterior ao evento)",
                 "disarmed": "Desarmado",
                 "armed_home": "Armado em casa",

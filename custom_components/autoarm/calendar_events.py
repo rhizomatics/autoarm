@@ -22,8 +22,8 @@ from .const import (
     ALARM_STATES,
     CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_POLL_INTERVAL,
-    NO_CAL_EVENT_MODE_AUTO,
     NO_CAL_EVENT_MODE_AUTO_OCCUPANCY,
+    NO_CAL_EVENT_MODE_AUTO_SUN,
     ChangeSource,
 )
 
@@ -182,14 +182,14 @@ class TrackedCalendarEvent:
         if self.armer.has_active_calendar_event():
             _LOGGER.debug("AUTOARM No action on event end since other cal event active")
             return
-        end_mode: str = self.armer.calendar_end_mode(self.arming_state)
+        end_mode: str = await self.armer.calendar_end_mode(self.arming_state)
         change_context: dict[str, Any] = {
             "caller": "calendar.on_calendar_event_end",
             "calendar_id": self.calendar_id,
             "event_id": self.id,
             "no_event_mode": end_mode,
         }
-        if end_mode == NO_CAL_EVENT_MODE_AUTO:
+        if end_mode == NO_CAL_EVENT_MODE_AUTO_SUN:
             _LOGGER.info("AUTOARM Calendar event %s ended, and arming state", self.id)
             # same context for the move via pending and the reset, as both are the one change
             context = self.armer.cause(ChangeSource.CALENDAR, self.event.summary)
