@@ -1,23 +1,34 @@
-# Changelog
+# What's Changed
 
 ## 1.4.0
+
+### ✨ Enhancements
+
+#### Calendar Triggers
 - New and changed calendar events can now be picked up faster than the usual Home Assistant 15 minute poll interval, when the current or next event changed
   - Internally, it subscribes to the calendar entity state, which is changed by Home Assistant when a calendar is edited
+- Calendar-triggered notifications landing close together, such as one event ending as another begins, are now coalesced into a single net-change notification instead of two, with a configurable `notify_grace_period` (YAML, default one minute)
+- Calendar Events can suppress sunrise/sunset (diurnal events) so that if you have an ARMED_NIGHT calendar event, the alarm will go to a daytime state when that event ends, rather than being immediately overridden by state of `sun`
+  - Previously alarm state could flap between armed/disarmed in the morning, especially where sunrise differs hugely across the year
+  - The single **Arming state when a calendar event ends** is split into separate settings for an armed and a disarmed event ending, with new **By occupancy** and **By occupancy and sun** choices, and a changed **Auto** as the default
+    - **By occupancy** ignores day and night: an armed event ending disarms, or arms away if everyone is out, and a disarmed event ending arms home, or away if everyone is out
+    - **By occupancy and sun** works the state out from occupancy and day or night, as `auto` did before, and is `auto_sun` in YAML
+    - **Auto** is now **By occupancy and sun** only if the sunrise or sunset trigger is active that day, otherwise **By occupancy**, so with the default triggers an event ending goes by occupancy alone
+    - Existing settings carry over to both, so an existing `auto` takes on the new **Auto** behaviour - choose **By occupancy and sun** to keep the old one
+    - Other resets, such as sunrise or the reset button, now return to the live event's state, or follow the setting for the kind of event that last ended today, or with no calendar activity today, work as if there were no calendars. Before, the no-event setting applied to them on any day
+#### Trigger Control
 - New **Triggers** section in the options, to choose what starts a re-evaluation of the alarm state
   - **Sunrise** and **Sunset** can each be on, off, or auto, where auto switches the trigger off on days with calendar activity and back on for days without
   - **Someone arrives home** and **Someone leaves home** can each be switched off
   - Triggers only change when the state is worked out, not how - a reset button, action or calendar event ending still work it out as usual, with day and night still choosing between armed states
-- The single **Arming state when a calendar event ends** is split into separate settings for an armed and a disarmed event ending, with new **By occupancy** and **By occupancy and sun** choices, and a changed **Auto** as the default
-  - **By occupancy** ignores day and night: an armed event ending disarms, or arms away if everyone is out, and a disarmed event ending arms home, or away if everyone is out
-  - **By occupancy and sun** works the state out from occupancy and day or night, as `auto` did before, and is `auto_sun` in YAML
-  - **Auto** is now **By occupancy and sun** only if the sunrise or sunset trigger is active that day, otherwise **By occupancy**, so with the default triggers an event ending goes by occupancy alone
-  - Existing settings carry over to both, so an existing `auto` takes on the new **Auto** behaviour - choose **By occupancy and sun** to keep the old one
-  - Other resets, such as sunrise or the reset button, now return to the live event's state, or follow the setting for the kind of event that last ended today, or with no calendar activity today, work as if there were no calendars. Before, the no-event setting applied to them on any day
+#### Simplified Settings Panel
 - New **Advanced** section in the options, holding **Change state using the alarm panel's actions**, the occupied day and night defaults, and the calendar end settings
-- Fixed spurious notifications for the internal `pending` bookkeeping state, such as when a calendar event ends and the state is recalculated - only genuine, net state changes are now notified
-- Calendar-triggered notifications landing close together, such as one event ending as another begins, are now coalesced into a single net-change notification instead of two, with a configurable `notify_grace_period` (YAML, default one minute)
+#### Notifications
 - The **Notifications** section in the options is now last, matching where actions sit at the bottom of an automation
 - Added **Extra Notification Data** to the options, for extra service data such as mobile app notification actions or a channel, without needing YAML
+### 🐛 Bug fixes
+
+- Fixed spurious notifications for the internal `pending` bookkeeping state, such as when a calendar event ends and the state is recalculated - only genuine, net state changes are now notified
 
 ## 1.3.0
 - Improved Home Assistant alignment
