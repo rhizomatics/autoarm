@@ -167,7 +167,7 @@ notify:
 ### Python / Docker
 
 - [Anpr2MQTT](https://anpr2mqtt.rhizomatics.org.uk) - Integrate with ANPR/ALPR licence plate cameras via file system (NAS/FTP) to MQTT with optional image analysis and UK DVLA integration.
-- [Dev Shell](https://dev_shell.rhizomatics.org.uk) - Python REPL for Home Assistant development and data exploration
+- [Dev Shell](https://devshell.rhizomatics.org.uk) - Python REPL for Home Assistant development and data exploration
 - [Updates2MQTT](https://updates2mqtt.rhizomatics.org.uk) - Automatically notify via MQTT on Docker image updates, with advanced handling to extract versions and release notes from images, and option to remotely pull and restart containers from Home Assistant. Also available on [PyPI](https://pypi.org/project/updates2mqtt/)
 
 [![Built with MaterialX for ProperDocs](https://img.shields.io/badge/MaterialX_for_ProperDocs-526CFE?style=for-the-badge&logo=MaterialForMkDocs&logoColor=white)](https://github.com/jaywhj/mkdocs-materialx)
