@@ -1,0 +1,29 @@
+# Home Assistant AutoArm
+
+> Automated alarm control panel arming and disarming for Home Assistant
+
+AutoArm is a Home Assistant custom integration that arms and disarms an Alarm Control Panel automatically, from who's home, sunrise and sunset, and calendar events, with physical buttons, mobile actionable notifications and Assist voice commands for manual changes. Core settings are made in the UI, and advanced ones such as transition conditions, buttons and notification profiles in YAML.
+
+## Start here
+
+- [Auto Arm for HomeAssistant](https://autoarm.rhizomatics.org.uk/index.md): Overview of what AutoArm does
+- [Automated Arming](https://autoarm.rhizomatics.org.uk/automated_arming/index.md): How the armed state is worked out, and the actions and voice commands
+
+## Configuration
+
+- [Create a Calendar](https://autoarm.rhizomatics.org.uk/configuration/create_calendar/index.md)
+- [Create an Alarm Panel](https://autoarm.rhizomatics.org.uk/configuration/create_panel/index.md)
+- [Migration Guide](https://autoarm.rhizomatics.org.uk/configuration/migration/index.md)
+- [Removing Auto Arm](https://autoarm.rhizomatics.org.uk/configuration/removal/index.md)
+- [Minimal Configuration](https://autoarm.rhizomatics.org.uk/configuration/examples/minimal/index.md)
+- [Typical Configuration](https://autoarm.rhizomatics.org.uk/configuration/examples/typical/index.md)
+
+## Using AutoArm
+
+- [Mobile Actions](https://autoarm.rhizomatics.org.uk/mobile_actions/index.md): Arming and disarming from mobile actionable notifications
+
+## Help
+
+- [Troubleshooting](https://autoarm.rhizomatics.org.uk/troubleshooting/index.md): Diagnosing arming, calendar and notification problems
+- [Known Limitations](https://autoarm.rhizomatics.org.uk/known_limitations/index.md): What AutoArm doesn't do, or does with caveats
+
