@@ -20,7 +20,7 @@ Here is a quick reminder of how Home Assistant intends armed states to be used, 
 
 (There are also some other ephemeral or problem states needed for dealing with real alarm systems).
 
-## Alarm Panel Control
+## Alarm Panel Control
 
 Auto Arm listens for changes to the Alarm Control Panel from other sources, like the Home Assistant mobile companion
 app or other automations, with Auto Arm respecting the selected new state, and applying the same *Manual Intervention* controls for further state changes.
