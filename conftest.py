@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import Mock, patch
 
 import pytest
-from homeassistant.components.alarm_control_panel.const import DATA_COMPONENT as ALARM_PANEL_DATA_COMPONENT
 from homeassistant.components.alarm_control_panel.const import DOMAIN as ALARM_PANEL_DOMAIN
 from homeassistant.components.calendar import CalendarEntity
 from homeassistant.components.local_calendar import CONF_CALENDAR_NAME, LocalCalendarStore  # type: ignore[attr-defined]
@@ -68,7 +67,8 @@ def panel_actions(hass: HomeAssistant) -> list[ServiceCall]:
 
     async def handler(call: ServiceCall) -> None:
         calls.append(call)
-        component = hass.data.get(ALARM_PANEL_DATA_COMPONENT)
+        # DATA_COMPONENT is HassKey(DOMAIN), but only importable from const since HA 2026.3, use directly once py3.13 dropped
+        component = hass.data.get(ALARM_PANEL_DOMAIN)
         for entity_id in cv.ensure_list(call.data["entity_id"]):
             entity = component.get_entity(entity_id) if component else None
             if entity is not None:

@@ -151,6 +151,11 @@ disallow_any_generics = true
 module = "pytest_homeassistant_custom_component.*"
 ignore_missing_imports = true
 
+# TODO: remove when py3.13 support is dropped, probatio only arrives with HA 2026.10
+[[tool.mypy.overrides]]
+module = "probatio.*"
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = [
