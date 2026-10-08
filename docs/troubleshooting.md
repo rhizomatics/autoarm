@@ -4,7 +4,7 @@
 
 **Check the initialized sensor**: Look at `binary_sensor.autoarm_initialized`, on the Auto Arm device in **Settings** > **Devices & Services**. If it's off, there is a configuration issue, and its attributes show which stage of setup failed. `sensor.autoarm_failures` counts setup and runtime errors.
 
-**Check the alarm panel's actions**: Auto Arm arms and disarms using the panel's actions. If the panel needs a code, or its integration rejects the action, a warning is logged and the panel is left alone. See [Create Panel](configuration/create_panel.md#how-autoarm-changes-the-panel).
+**Check the alarm panel's actions**: Auto Arm arms and disarms using the panel's actions. If the panel needs a code, or its integration rejects the action, a warning is logged and the panel is left alone. See [Create Panel](configuration/create_panel.md#how-auto-arm-changes-the-panel).
 
 **Check the last calculation sensor**: `sensor.autoarm_last_calculation` shows when Auto Arm last worked out the state, with attributes for what it decided and why, such as `reset_decision`.
 
