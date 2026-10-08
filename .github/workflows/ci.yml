@@ -64,7 +64,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.13", "3.14"]
+        include:
+          - python-version: "3.14"
+            ha-version: "2026.4"
+            ha-override: "2026.4.*"
+          - python-version: "3.14"
+            ha-version: "2026.10"
+          - python-version: "3.13"
 
     steps:
       - uses: actions/checkout@v7.0.1

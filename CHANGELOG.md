@@ -22,6 +22,7 @@
 
 ## 📝 Other changes
 - Built and tested against Home Assistant 2026.10.0
+- Compatibility added for the Voluptuous->Probatio change in recent versions of Home Assistant while maintaining backward compatibility
 
 ## 1.4.0
 

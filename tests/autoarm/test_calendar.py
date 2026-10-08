@@ -1,5 +1,6 @@
 import asyncio
 import datetime as dt
+import sys
 from collections.abc import AsyncGenerator
 from typing import Any
 from unittest.mock import ANY, patch
@@ -279,6 +280,9 @@ async def test_calendar_deleted_event_started_by_listener_is_ended(
         await simple_tracked_calendar.on_timed_poll(dt_util.now())
     mock_end.assert_awaited_once()
     assert not simple_tracked_calendar.has_active_event()
+
+
+pytest.mark.skipif(sys.version_info < (3, 14, 2), reason="flaky with old home assistant")
 
 
 async def test_calendar_prunes_ended_event_deleted_from_calendar(

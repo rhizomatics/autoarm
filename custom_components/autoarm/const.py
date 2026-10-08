@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from enum import StrEnum, auto
 from typing import Any
 
-import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEvent
 from homeassistant.const import (
@@ -24,6 +23,8 @@ from homeassistant.const import (
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.util.hass_dict import HassKey
+
+from .compat import vol
 
 _LOGGER = logging.getLogger(__name__)
 

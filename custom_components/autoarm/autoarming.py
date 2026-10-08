@@ -9,7 +9,6 @@ from functools import partial
 from typing import TYPE_CHECKING, Any, cast
 
 import homeassistant.util.dt as dt_util
-import voluptuous as vol
 from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, AlarmControlPanelState
 from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
@@ -61,6 +60,7 @@ from custom_components.autoarm.hass_api import HomeAssistantAPI
 from custom_components.autoarm.notifier import Notifier
 
 from .calendar_events import TrackedCalendar, TrackedCalendarEvent
+from .compat import vol
 from .config_flow import (
     CONF_CALENDAR_ARMED_END_MODE,
     CONF_CALENDAR_DISARMED_END_MODE,

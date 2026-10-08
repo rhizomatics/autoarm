@@ -126,7 +126,7 @@ preview = true
 
 [tool.uv]
 exclude-newer = "5 days"
-exclude-newer-package = { ruff="2 days" }
+exclude-newer-package = { ruff="2 days", homeassistant=false, homeassistant-stubs=false, pytest-homeassistant-custom-component=false, aiohttp=false, uv=false }
 add-bounds = "major"
 # Skip the 3.14.0-3.14.1 gap: HA 2026.3+ requires >=3.14.2, so those patch
 # versions are unusable regardless.

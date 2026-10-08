@@ -3,7 +3,6 @@
 import datetime as dt
 from typing import Any
 
-import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_SERVICE
 from homeassistant.data_entry_flow import section
@@ -20,6 +19,7 @@ from homeassistant.helpers.selector import (
     TimeSelector,
 )
 
+from .compat import vol
 from .const import (
     CALENDAR_END_MODE_OPTIONS,
     CONF_ALARM_PANEL,
