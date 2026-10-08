@@ -2,10 +2,9 @@ import logging
 from collections.abc import Callable
 from typing import Any
 
-from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import STATE_ON
-from homeassistant.core import Context, Event, EventStateChangedData, State
+from homeassistant.core import Context, Event, EventStateChangedData, HomeAssistant, State
 from homeassistant.helpers.event import async_track_state_change_event
 
 from .const import NO_CAL_EVENT_MODE_AUTO, NO_CAL_EVENT_MODE_AUTO_OCCUPANCY, NO_CAL_EVENT_MODE_AUTO_SUN, ChangeSource

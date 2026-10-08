@@ -6,11 +6,10 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, cast
 
 import homeassistant.util.dt as dt_util
-from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.const import CONF_ALIAS, CONF_ENTITY_ID
-from homeassistant.core import Event, EventStateChangedData
+from homeassistant.core import Event, EventStateChangedData, HomeAssistant
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.event import (
     async_track_point_in_time,

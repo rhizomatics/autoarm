@@ -8,7 +8,8 @@ from unittest.mock import ANY, patch
 import homeassistant.util.dt as dt_util
 import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
-from homeassistant.components.calendar import EVENT_END, EVENT_START, CalendarEntity, CalendarEvent
+from homeassistant.components.calendar import CalendarEntity, CalendarEvent
+from homeassistant.components.calendar.const import EVENT_END, EVENT_START
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.helpers.entity_platform import EntityPlatform
 
@@ -90,7 +91,6 @@ async def test_calendar_tracks_event(
     calendar_with_holiday_event: TrackedCalendar,
     mock_armer_real_hass: AlarmArmer,
 ) -> None:
-
     assert calendar_with_holiday_event.has_active_event()
     assert len(calendar_with_holiday_event.tracked_events) == 1
     tracked_event: TrackedCalendarEvent = next(i for i in calendar_with_holiday_event.tracked_events.values())
@@ -120,7 +120,6 @@ async def test_calendar_prunes_events(
     simple_tracked_calendar: TrackedCalendar,
     local_calendar: CalendarEntity,
 ) -> None:
-
     await local_calendar.async_create_event(
         dtstart=dt_util.now() - dt.timedelta(minutes=20),
         dtend=dt_util.now() + dt.timedelta(seconds=2),
@@ -145,7 +144,6 @@ async def test_calendar_follows_event_name_change_no_longer_in_scope(
     calendar_with_holiday_event: TrackedCalendar,
     local_calendar: CalendarEntity,
 ) -> None:
-
     existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
@@ -163,7 +161,6 @@ async def test_calendar_follows_event_date_change_out_of_window(
     calendar_with_holiday_event: TrackedCalendar,
     local_calendar: CalendarEntity,
 ) -> None:
-
     existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
@@ -182,7 +179,6 @@ async def test_calendar_follows_event_date_change_within_window(
     calendar_with_holiday_event: TrackedCalendar,
     local_calendar: CalendarEntity,
 ) -> None:
-
     existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore
@@ -202,7 +198,6 @@ async def test_calendar_terminates_early(
     calendar_with_holiday_event: TrackedCalendar,
     local_calendar: CalendarEntity,
 ) -> None:
-
     existing_event: CalendarEvent = calendar_with_holiday_event.active_events()[0].event
     await local_calendar.async_update_event(
         existing_event.uid,  # type: ignore

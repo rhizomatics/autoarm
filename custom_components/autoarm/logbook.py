@@ -3,12 +3,12 @@
 from collections.abc import Callable
 from typing import Any
 
-from homeassistant.components.logbook import (
+from homeassistant.components.logbook import LazyEventPartialState  # type: ignore[attr-defined]
+from homeassistant.components.logbook.const import (
     LOGBOOK_ENTRY_ENTITY_ID,
     LOGBOOK_ENTRY_MESSAGE,
     LOGBOOK_ENTRY_NAME,
     LOGBOOK_ENTRY_SOURCE,
-    LazyEventPartialState,
 )
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant, callback

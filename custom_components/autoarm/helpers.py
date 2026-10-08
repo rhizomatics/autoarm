@@ -4,9 +4,8 @@ import re
 from typing import TYPE_CHECKING, Any
 
 import homeassistant.util.dt as dt_util
-from homeassistant.auth import HomeAssistant
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
-from homeassistant.core import Context, State
+from homeassistant.core import Context, HomeAssistant, State
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.json import ExtendedJSONEncoder
 

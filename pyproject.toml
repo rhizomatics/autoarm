@@ -49,6 +49,7 @@ docs=[
     "mkdocs-minify-plugin",
     "mkdocs-material-extensions",
     "mkdocs-llmstxt>=0.5.0,<0.6.0",
+    "bs4" # llmsgen doc hook
 ]
 
 [tool.codespell]

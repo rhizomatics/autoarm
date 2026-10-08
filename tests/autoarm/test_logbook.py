@@ -19,7 +19,7 @@ def _describer(hass: HomeAssistant) -> Callable[[Any], dict[str, Any]]:
     async_describe_events(hass, describe_event)
     domain, describer = registered[EVENT_TRIGGERED]
     assert domain == DOMAIN
-    return describer
+    return describer  # type: ignore[no-any-return]
 
 
 async def test_describes_source(hass: HomeAssistant) -> None:

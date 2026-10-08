@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import Mock, patch
 
 import pytest
-from homeassistant.components.alarm_control_panel import DATA_COMPONENT as ALARM_PANEL_DATA_COMPONENT
+from homeassistant.components.alarm_control_panel.const import DATA_COMPONENT as ALARM_PANEL_DATA_COMPONENT
 from homeassistant.components.alarm_control_panel.const import DOMAIN as ALARM_PANEL_DOMAIN
 from homeassistant.components.calendar import CalendarEntity
 from homeassistant.components.local_calendar import CONF_CALENDAR_NAME, LocalCalendarStore  # type: ignore[attr-defined]
-from homeassistant.components.local_calendar.const import DOMAIN as LOCAL_CALENDAR_DOMAIN  # type: ignore[import-not-found]
+from homeassistant.components.local_calendar.const import DOMAIN as LOCAL_CALENDAR_DOMAIN
 from homeassistant.components.notify.legacy import BaseNotificationService
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_NAME, EVENT_COMPONENT_LOADED, Platform
