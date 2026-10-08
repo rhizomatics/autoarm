@@ -1,5 +1,11 @@
 # What's Changed
 
+!!! note
+    Python 3.13 support, and support for Home Assistant versions from
+    2026.3 and earlier will end in November 2026 when HA 2026.11 is
+    released. Newer releases may work on older installations, but there
+    will no longer be the automated testing to assure it.
+
 ## 1.5.0
 
 ### ✨ Enhancements
@@ -10,7 +16,12 @@
   - While a sensor is on it holds its state against sunrise and sunset, or `armed_away` if everyone is out, and when it turns off or becomes unavailable the calendar event end settings apply, with **Auto** always going by occupancy
   - A live calendar event takes priority, so a bedtime sensor can be left running through a vacation in the calendar
   - Changes have a new `tod` source, included in the default `quiet` notification profile, and are linked in the logbook to the sensor's state change
-  - See the new [Bedtime recipe](configuration/examples/bedtime.md) for a complete set up that handles day/night, leaving home and extended vacations.
+
+## 📚 Documentation
+  - New [Recommended Recipe](configuration/examples/recommended_recipe.md) for a complete set up that handles day/night, leaving home and extended vacations.
+
+## 📝 Other changes
+- Built and tested against Home Assistant 2026.10.0
 
 ## 1.4.0
 

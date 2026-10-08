@@ -1,6 +1,6 @@
-# Bedtime Recipe
+# Recommended Recipe
 
-A simple setup for a home that's lived in most days, with no YAML:
+A simple standard setup for a home that's lived in most days, with no YAML:
 
 - **Armed night** for a fixed bedtime every day, from a [Time of Day](https://www.home-assistant.io/integrations/tod/) sensor
 - **Armed home** from sunset until bedtime, when sunset comes first

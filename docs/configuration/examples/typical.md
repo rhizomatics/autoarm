@@ -14,7 +14,7 @@ With the config flow, some settings are now managed in the UI:
 | Calendar entities | UI (options) | Which calendars to use |
 | Person entities | UI (options) | Which persons to track for occupancy |
 | Occupancy day/night defaults | UI (options, Advanced) | Default alarm state when occupied |
-| Time of Day sensors | UI (options) | Sensors that set an alarm state while on, see [Bedtime Recipe](bedtime.md) |
+| Time of Day sensors | UI (options) | Sensors that set an alarm state while on, see [Recommended Recipe](recommended_recipe.md) |
 | Calendar end modes | UI (options, Advanced) | What happens when an armed or disarmed calendar event ends |
 | Triggers | UI (options) | Whether sunrise, sunset and people arriving or leaving re-evaluate the state |
 | Sunrise and sunset | UI (options) | Earliest and latest times |

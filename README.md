@@ -56,7 +56,7 @@ Auto Arm is set up using the Home Assistant Integrations page, with additional a
 
 ### Typical Day / Night
 
-There's a recommended [recipe](docs/configuration/examples/bedtime.md) to follow for a classic alarm setup:
+There's a recommended [recipe](docs/configuration/examples/recommended_recipe.md) to follow for a classic alarm setup:
 
 - `ARMED_NIGHT` at bedtime
 - `DISARMED` during the day
