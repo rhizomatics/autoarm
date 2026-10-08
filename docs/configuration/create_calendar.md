@@ -3,6 +3,8 @@
 This *How To* will show you how to create a new calendar dedicated for controlling alarm control panel state.
 This is one way of using Auto Arm, you can choose to use [other types of calendars](https://www.home-assistant.io/integrations/?cat=calendar), reuse events from existing calendars, or mix-n-match.
 
+Calendar entries allow you to arm the alarm at night geared towards your own lifestyle, for example, when you usually go to bed during the week, or at weekends, rather than being driven by the state of the sun (which can be wildly different at extreme latitudes). They also mean you can plan ahead to make sure alarms are set for vacation or away mode well ahead of time.
+
 ## Add a Local Calendar
 
 Use the button, or follow the manual steps:

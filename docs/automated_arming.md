@@ -5,11 +5,25 @@ Arming has several complementary modes of operation, that can be selected and mi
 Mobile Actions, Buttons and Alarm Panel changes are classed as **Manual Interventions**, and won't be overridden
 back by Auto Arm unless there's an occupancy change or other manual intervention.
 
+## Context
+
+Here is a quick reminder of how Home Assistant intends armed states to be used, taken from the [Alarm Control Panel Documentation](https://www.home-assistant.io/integrations/alarm_control_panel/):
+
+| State                 | Use                                                                                                                                                      |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `armed_home`          | Perimeter protection while you are inside. Doors and windows are monitored, but interior motion sensors are ignored so you move freely around the house. |
+| `armed_away`          | Full protection for when nobody is home. All sensors (perimeter and interior) are active.                                                                |
+| `armed_night`         | Similar to home mode, but tuned for sleeping. Typically covers perimeter sensors and selected interior zones while leaving bedroom areas free.           |
+| `armed_vacation`      | Extended away protection for longer trips. Some systems enable additional monitoring or alerts in this mode.                                             |
+| `armed_custom_bypass` | rmed with one or more zones deliberately skipped. Useful when you want to leave a specific door or window open while arming the rest of the system.      |
+| `disarmed`            | The alarm is off. Sensors are not being monitored.                                                                                                       |
+
+(There are also some other ephemeral or problem states needed for dealing with real alarm systems).
+
 ## Alarm Panel Control
 
 Auto Arm listens for changes to the Alarm Control Panel from other sources, like the Home Assistant mobile companion
-app or other automations, with Auto Arm respecting the selected new state, and applying the same *Manual Intervention*
-controls for further state changes.
+app or other automations, with Auto Arm respecting the selected new state, and applying the same *Manual Intervention* controls for further state changes.
 
 ### Voice Assistants
 
@@ -26,14 +40,14 @@ through the letterbox! ), see [Connect Your Home Security System to Echo Hub](ht
 
 Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agent, which doesn't use AI, matches fixed sentences. Auto Arm adds these sentences, which work by voice or in the chat. Arming and explaining are on unless **Arm and explain by voice** is switched off in the **Assist** section of the Auto Arm options. Disarming is off unless **Disarm by voice** is switched on.
 
-| Say                                    | Does                                               |
-|----------------------------------------|----------------------------------------------------|
-| "Arm the alarm"                        | Arms away                                          |
-| "Arm the alarm in *home* mode"         | Arms *home*, *away*, *night* or *vacation*         |
-| "Set the security system to *night*"   | The same, "holiday" also works for vacation        |
-| "Disarm the alarm"                     | Disarms, only if **Disarm by voice** is on         |
-| "Why is the alarm armed?"              | Says who or what last changed it, when, and why    |
-| "What changed the alarm?"              | The same                                           |
+| Say                                  | Does                                            |
+|--------------------------------------|-------------------------------------------------|
+| "Arm the alarm"                      | Arms away                                       |
+| "Arm the alarm in *home* mode"       | Arms *home*, *away*, *night* or *vacation*      |
+| "Set the security system to *night*" | The same, "holiday" also works for vacation     |
+| "Disarm the alarm"                   | Disarms, only if **Disarm by voice** is on      |
+| "Why is the alarm armed?"            | Says who or what last changed it, when, and why |
+| "What changed the alarm?"            | The same                                        |
 
 "Alarm", "security system" and "burglar alarm" all work. These sentences take priority over Assist's own alarm sentences, so arming or disarming by voice goes through Auto Arm and counts as a *Manual Intervention*, like a button.
 
@@ -101,13 +115,13 @@ If there's no calendar event live, then arming state can be worked out automatic
 The **Advanced** section of the options has separate settings for an **armed** event ending (`armed_home`,
 `armed_away`, `armed_night`, `armed_vacation` or `armed_custom_bypass`) and a **disarmed** event ending, unless another event is still live. Each can be:
 
-| Setting | Armed event ends | Disarmed event ends |
-|---------|------------------|---------------------|
-| **Auto**, the default | **By occupancy and sun** if the sunrise or sunset [trigger](#triggers) is active that day, otherwise **By occupancy** | The same |
-| **By occupancy and sun** | Worked out from who's home and whether it's day or night, the same as any other reset | The same |
-| **By occupancy** | Disarms, or arms away if everyone is out | Arms home, or away if everyone is out |
-| **Manual** | Goes back to the state before the event | The same |
-| A fixed state, such as `disarmed` | Goes to that state | The same |
+| Setting                           | Armed event ends                                                                                                      | Disarmed event ends                   |
+|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------|---------------------------------------|
+| **Auto**, the default             | **By occupancy and sun** if the sunrise or sunset [trigger](#triggers) is active that day, otherwise **By occupancy** | The same                              |
+| **By occupancy and sun**          | Worked out from who's home and whether it's day or night, the same as any other reset                                 | The same                              |
+| **By occupancy**                  | Disarms, or arms away if everyone is out                                                                              | Arms home, or away if everyone is out |
+| **Manual**                        | Goes back to the state before the event                                                                               | The same                              |
+| A fixed state, such as `disarmed` | Goes to that state                                                                                                    | The same                              |
 
 **By occupancy** ignores day and night. That matters when an event ends close to sunrise or sunset:
 
@@ -144,12 +158,12 @@ This only debounces the *notification*; the alarm panel's actual state still upd
 
 The **Triggers** section of the options decides what can start a re-evaluation of the alarm state. It changes *when* the state is worked out, not *how*, and only covers these triggers - a reset button, the `autoarm.reset_state` action or a calendar event ending still work out the state as usual.
 
-| Trigger | Choices | Default |
-|---------|---------|---------|
-| **Sunrise** | On, Off, Auto | Auto |
-| **Sunset** | On, Off, Auto | Auto |
-| **Someone arrives home** | On, Off | On |
-| **Someone leaves home** | On, Off | On |
+| Trigger                  | Choices       | Default |
+|--------------------------|---------------|---------|
+| **Sunrise**              | On, Off, Auto | Auto    |
+| **Sunset**               | On, Off, Auto | Auto    |
+| **Someone arrives home** | On, Off       | On      |
+| **Someone leaves home**  | On, Off       | On      |
 
 **Auto** switches the trigger off on any day with a matching [Calendar Control] event starting, ending or running that day, and back on for days without calendar activity. This suits a calendar that handles particular days, such as a night out or working from home, while sunrise and sunset take over on ordinary
 days.
