@@ -484,12 +484,13 @@ async def test_calendar_occupancy_override_allowed(local_calendar: CalendarEntit
     hass.states.async_set("person.house_owner", "home", {"friendly_name": "Bob"})
     await hass.async_block_till_done()
 
-    # The reset was NOT blocked — action is "no_change" (proceeded but determine_state returned None
+    # The reset was NOT blocked — reset_decision is "no_change" (proceeded but determine_state returned None
     # since default transitions require autoarm.computed which is False during a calendar event),
     # not "ignore_for_active_calendar_event".
     last_calc = hass.states.get("sensor.autoarm_last_calculation")
     assert last_calc is not None
-    assert last_calc.attributes.get("action") != "ignore_for_active_calendar_event"
+    assert last_calc.attributes["source"] == "occupancy"
+    assert last_calc.attributes["reset_decision"] == "no_change"
 
 
 async def test_calendar_manual_mode_blocks_occupancy_reset(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:

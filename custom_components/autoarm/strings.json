@@ -44,6 +44,17 @@
                             "calendar_occupancy_override_states": "When a calendar event sets one of these states, occupancy changes (arrivals and departures) can still update the alarm state. For example, if the calendar says Disarmed but everyone leaves, it will switch to Armed Away."
                         }
                     },
+                    "time_of_day_options": {
+                        "name": "Time of Day",
+                        "description": "Time of Day sensors that set an alarm state while they're on, as an alternative to calendar events, for example a daily bedtime for Armed night. When a sensor turns off, the calendar event end settings under Advanced apply.",
+                        "data": {
+                            "time_of_day_disarmed": "Disarmed",
+                            "time_of_day_armed_home": "Armed home",
+                            "time_of_day_armed_away": "Armed away",
+                            "time_of_day_armed_night": "Armed night",
+                            "time_of_day_armed_custom_bypass": "Armed custom bypass"
+                        }
+                    },
                     "trigger_options": {
                         "name": "Triggers",
                         "description": "What can start a re-evaluation of the alarm state. These change when the state is worked out, not how. Auto switches a trigger off on any day with a matching calendar event, and back on for days without calendar activity.",

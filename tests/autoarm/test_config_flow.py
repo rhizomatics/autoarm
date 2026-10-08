@@ -201,6 +201,7 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
             "calendar_options": {
                 CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: ["armed_home", "disarmed"],
             },
+            "time_of_day_options": {"time_of_day_armed_night": ["binary_sensor.bedtime"]},
             "notify_options": {
                 CONF_NOTIFY_ACTION: "notify.supernotify",
                 CONF_NOTIFY_TARGETS: ["mobile_app_phone"],
@@ -236,6 +237,9 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     assert entry.options[CONF_OCCUPIED_TRIGGER] is True
     assert entry.options[CONF_UNOCCUPIED_TRIGGER] is False
     assert entry.options[CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES] == ["armed_home", "disarmed"]
+    assert entry.options["time_of_day_armed_night"] == ["binary_sensor.bedtime"]
+    assert entry.options["time_of_day_disarmed"] == []
+    assert "time_of_day_armed_vacation" not in entry.options
     assert entry.options[CONF_NOTIFY_ACTION] == "notify.supernotify"
     assert entry.options[CONF_NOTIFY_TARGETS] == ["mobile_app_phone"]
     assert entry.options[CONF_SUNRISE_EARLIEST] == "05:30:00"

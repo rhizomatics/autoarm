@@ -8,7 +8,8 @@
         "local_calendar",
         "notify",
         "supernotify",
-        "sun"
+        "sun",
+        "tod"
     ],
     "codeowners": [
         "@jeyrb"
@@ -23,5 +24,5 @@
     "issue_tracker": "https://github.com/rhizomatics/autoarm/issues",
     "quality_scale": "silver",
     "requirements": [],
-    "version": "1.4.0"
+    "version": "1.5.0"
 }

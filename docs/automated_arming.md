@@ -154,6 +154,26 @@ out to no change at all, nothing is sent.
 
 This only debounces the *notification*; the alarm panel's actual state still updates immediately as each calendar-driven change happens.
 
+## Time of Day Control
+
+A [Time of Day](https://www.home-assistant.io/integrations/tod/) sensor can set an alarm state for the same period every day, without needing a recurring calendar event. For example, a **Bedtime** sensor that is on from 23:00 to 07:00 holds the alarm at `armed_night`, whatever time the sun sets or rises. See the [Bedtime recipe](configuration/examples/bedtime.md) for a complete setup with sunset and a vacation calendar.
+
+1. Create the sensor in **Settings** > **Devices & Services** > **Helpers** > **Create Helper** > **Times of the Day**, giving the times it turns on and off.
+2. In **Settings** > **Devices & Services** > **Auto Arm** > **Configure**, open the **Time of Day** section and choose the sensor for the alarm state it should set. More than one sensor can be chosen for a state. There's no choice for `armed_vacation`, as a daily period doesn't suit it.
+
+While the sensor is on:
+
+- The alarm goes to the sensor's state when it turns on, including when Home Assistant starts part way through the period.
+- Automatic resets, such as sunrise or sunset, leave the state alone, along with any manual change made meanwhile. A reset button or the `autoarm.reset_state` action returns to the sensor's state.
+- If everyone is out, the alarm is `armed_away` instead, and goes to the sensor's state when someone comes home, and back to `armed_away` if they all leave again. This applies to the states chosen under **Calendar Occupancy Override** in the options, which by default is all but `armed_custom_bypass`.
+- A live calendar event takes priority. The sensor turning on or off during the event changes nothing, and if the sensor is still on when the event ends, the alarm goes to the sensor's state. So there's no need to switch a bedtime sensor off for a vacation that's in the calendar.
+
+When the sensor turns off, becomes unavailable or is removed, the period ends and the [calendar event end settings](#when-an-event-ends) decide the new state. **Auto** here always means **By occupancy**, so a bedtime ending before sunrise still disarms, or arms away if everyone is out.
+
+Unlike a calendar event, a Time of Day sensor doesn't switch off sunrise and sunset [triggers](#triggers) that are set to **Auto**, so sunset still arms on an ordinary evening before bedtime starts.
+
+Changes made by a Time of Day sensor have the `tod` source, for notification profiles and in the logbook, and are linked to the sensor's own state change.
+
 ## Triggers
 
 The **Triggers** section of the options decides what can start a re-evaluation of the alarm state. It changes *when* the state is worked out, not *how*, and only covers these triggers - a reset button, the `autoarm.reset_state` action or a calendar event ending still work out the state as usual.

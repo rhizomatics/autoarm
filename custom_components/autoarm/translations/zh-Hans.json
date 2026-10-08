@@ -44,6 +44,17 @@
                             "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。"
                         }
                     },
+                    "time_of_day_options": {
+                        "name": "时段",
+                        "description": "时段传感器在开启期间设置报警状态，可替代日历事件，例如用每天的就寝时间设置夜间布防。传感器关闭时，将应用高级中的日历事件结束设置。",
+                        "data": {
+                            "time_of_day_disarmed": "撤防",
+                            "time_of_day_armed_home": "在家布防",
+                            "time_of_day_armed_away": "离家布防",
+                            "time_of_day_armed_night": "夜间布防",
+                            "time_of_day_armed_custom_bypass": "自定义布防"
+                        }
+                    },
                     "trigger_options": {
                         "name": "触发器",
                         "description": "哪些事件可以触发重新计算警报状态。它们改变的是何时计算状态，而不是如何计算。自动模式在有匹配日历事件的日子关闭触发器，在没有日历活动的日子重新开启。",

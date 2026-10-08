@@ -1,5 +1,17 @@
 # What's Changed
 
+## 1.5.0
+
+### ✨ Enhancements
+
+#### Time of Day Sensors
+- [Time of Day](https://www.home-assistant.io/integrations/tod/) sensors can now set the alarm state, as an alternative to a recurring calendar event, for example a daily bedtime for `armed_night`
+  - Choose the sensors for each alarm state in the new **Time of Day** section of the options
+  - While a sensor is on it holds its state against sunrise and sunset, or `armed_away` if everyone is out, and when it turns off or becomes unavailable the calendar event end settings apply, with **Auto** always going by occupancy
+  - A live calendar event takes priority, so a bedtime sensor can be left running through a vacation in the calendar
+  - Changes have a new `tod` source, included in the default `quiet` notification profile, and are linked in the logbook to the sensor's state change
+  - See the new [Bedtime recipe](configuration/examples/bedtime.md) for a complete set up that handles day/night, leaving home and extended vacations.
+
 ## 1.4.0
 
 ### ✨ Enhancements

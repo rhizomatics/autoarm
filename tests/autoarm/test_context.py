@@ -222,6 +222,7 @@ async def test_reset_propagates_context(hass: HomeAssistant) -> None:
 async def test_calendar_event_end_shares_context_for_pending_and_reset(hass: HomeAssistant) -> None:
     armer = AsyncMock(spec=AlarmArmer)
     armer.has_active_calendar_event = Mock(return_value=False)
+    armer.resume_time_of_day = AsyncMock(return_value=False)
     armer.cause = Mock(return_value=Context())
     armer.calendar_end_mode = AsyncMock(return_value=NO_CAL_EVENT_MODE_AUTO_SUN)
     tracked = Mock(spec=TrackedCalendarEvent, armer=armer)

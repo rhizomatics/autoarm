@@ -189,6 +189,9 @@ class TrackedCalendarEvent:
         if self.armer.has_active_calendar_event():
             _LOGGER.debug("AUTOARM No action on event end since other cal event active")
             return
+        if await self.armer.resume_time_of_day():
+            _LOGGER.debug("AUTOARM Calendar event %s ended, back to live time of day sensor", self.id)
+            return
         end_mode: str = await self.armer.calendar_end_mode(self.arming_state)
         change_context: dict[str, Any] = {
             "caller": "calendar.on_calendar_event_end",

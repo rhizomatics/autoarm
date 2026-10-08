@@ -102,7 +102,14 @@ async def test_supplemental_config_installed(
         await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True),
     )
     assert enquire_config["notify"]["service"] == "notify.send_message"
-    assert enquire_config["notify"]["profiles"]["quiet"]["source"] == ["alarm_panel", "button", "calendar", "sunrise", "sunset"]
+    assert enquire_config["notify"]["profiles"]["quiet"]["source"] == [
+        "alarm_panel",
+        "button",
+        "calendar",
+        "tod",
+        "sunrise",
+        "sunset",
+    ]
     assert enquire_config["notify"]["profiles"]["normal"]["source"] == ["calendar"]
     assert enquire_config["rate_limit"]["period"] == "60 seconds"
 
@@ -142,7 +149,14 @@ async def test_legacy_config_installed(
         await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True),
     )
     assert enquire_config["notify"]["service"] == "notify.supernotify"
-    assert enquire_config["notify"]["profiles"]["quiet"]["source"] == ["alarm_panel", "button", "calendar", "sunrise", "sunset"]
+    assert enquire_config["notify"]["profiles"]["quiet"]["source"] == [
+        "alarm_panel",
+        "button",
+        "calendar",
+        "tod",
+        "sunrise",
+        "sunset",
+    ]
     assert enquire_config["notify"]["profiles"]["normal"]["source"] == ["calendar"]
     assert enquire_config["notify"]["profiles"]["common"]["supernotify"]
     assert enquire_config["rate_limit"]["period"] == "60 seconds"
@@ -183,7 +197,14 @@ async def test_legacy_config_fresh_install(
         await hass.services.async_call("autoarm", "enquire_configuration", None, blocking=True, return_response=True),
     )
     assert enquire_config["notify"]["service"] == "notify.supernotify"
-    assert enquire_config["notify"]["profiles"]["quiet"]["source"] == ["alarm_panel", "button", "calendar", "sunrise", "sunset"]
+    assert enquire_config["notify"]["profiles"]["quiet"]["source"] == [
+        "alarm_panel",
+        "button",
+        "calendar",
+        "tod",
+        "sunrise",
+        "sunset",
+    ]
     assert enquire_config["notify"]["profiles"]["normal"]["source"] == ["calendar"]
     assert enquire_config["notify"]["profiles"]["common"]["supernotify"]
     assert enquire_config["rate_limit"]["period"] == "60 seconds"

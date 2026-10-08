@@ -50,9 +50,21 @@ Auto Arm is set up using the Home Assistant Integrations page, with additional a
 1. Go to **Settings** > **Devices & Services** > **Add Integration** and search for **Auto Arm**.
 2. Select your **Alarm Control Panel** entity (any [Alarm Control Panel Integration][Alarm Control Panel Integrations] will work). If you don't have one, see [Create an Alarm Panel](configuration/create_panel.md).
 3. Optionally select **Calendar** and **Person** entities.
-4. Adjust defaults in **Options** at any time (calendar entities, person entities, triggers, occupancy defaults, calendar end modes).
+4. Adjust defaults in **Options** at any time (calendar entities, person entities, time of day sensors, triggers, occupancy defaults, calendar end modes).
 
 ![Configuration Options](./assets/images/config_flow_options.png)
+
+### Typical Day / Night
+
+There's a recommended [recipe](docs/configuration/examples/bedtime.md) to follow for a classic alarm setup:
+
+- `ARMED_NIGHT` at bedtime
+- `DISARMED` during the day
+- `ARMED_HOME` between sunset and bedtime.
+- `ARMED_AWAY` if nobody home
+- `ARMED_VACATION` if away on holidays
+
+If that's not quite how you like, its still a good starting place for an easy to configure, zero YAML, low maintenance setup.
 
 ### YAML for Advanced Features
 
@@ -70,6 +82,7 @@ The full list of how alarm panel state can be set:
 | Source        | Description                                                               |
 |---------------|---------------------------------------------------------------------------|
 | calendar      | Calendar events (with optional override for selected events by occupancy) |
+| tod           | A Time of Day sensor turning on or off, such as a daily bedtime           |
 | mobile        | Mobile action                                                             |
 | occupancy     | Occupancy calculation, e.g. automatically switching off `ARMED_AWAY`      |
 | alarm_panel   | Changes made to Alarm Control Panel outside of Auto Arm                    |

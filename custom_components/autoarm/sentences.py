@@ -56,6 +56,7 @@ SPOKEN_STATES: dict[AlarmControlPanelState, str] = {
 
 SPOKEN_SOURCES: dict[ChangeSource, str] = {
     ChangeSource.CALENDAR: "from the calendar",
+    ChangeSource.TOD: "by a time of day sensor",
     ChangeSource.MOBILE: "from a mobile notification action",
     ChangeSource.OCCUPANCY: "after a change in who's home",
     ChangeSource.BUTTON: "when a button was pressed",
@@ -179,6 +180,8 @@ def _reason(change: StateChange) -> str:
             return f"for the calendar event {change.context['summary']}"
         if change.context.get("no_event_mode"):
             return "because the calendar event ended"
+    if change.source == ChangeSource.TOD and change.context.get("summary"):
+        return f"by the time of day sensor {change.context['summary']}"
     return SPOKEN_SOURCES.get(change.source, "") if change.source else ""
 
 

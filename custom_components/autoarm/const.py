@@ -116,6 +116,7 @@ def _apply_notify_defaults(config: dict[str, Any]) -> dict[str, Any]:
                     ChangeSource.ALARM_PANEL,
                     ChangeSource.BUTTON,
                     ChangeSource.CALENDAR,
+                    ChangeSource.TOD,
                     ChangeSource.SUNRISE,
                     ChangeSource.SUNSET,
                 ]
@@ -316,6 +317,7 @@ class ChangeSource(StrEnum):
     """Enumeration of all the known ways to trigger a state change"""
 
     CALENDAR = auto()
+    TOD = auto()
     MOBILE = auto()
     OCCUPANCY = auto()
     ALARM_PANEL = auto()

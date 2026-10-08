@@ -87,6 +87,7 @@ from .config_flow import (
     CONF_USE_ALARM_SERVICE,
     DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     DEFAULT_NOTIFY_ACTION,
+    TIME_OF_DAY_OPTIONS,
 )
 from .const import (
     ATTR_RESET,
@@ -142,6 +143,7 @@ from .helpers import (
     safe_state,
 )
 from .sentences import async_register_sentences
+from .time_of_day import TrackedTimeOfDay
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -389,8 +391,11 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         }
         calendar_list.append(cal_config)
 
+    time_of_day: dict[str, list[str]] = {state: entry.options.get(option, []) for option, state in TIME_OF_DAY_OPTIONS.items()}
+
     calendar_config: ConfigType = {}
-    if calendar_list:
+    # Time of Day sensors share the calendar end modes
+    if calendar_list or any(time_of_day.values()):
         calendar_config = {
             CONF_CALENDAR_ARMED_END: entry.options.get(CONF_CALENDAR_ARMED_END_MODE, no_event_mode),
             CONF_CALENDAR_DISARMED_END: entry.options.get(CONF_CALENDAR_DISARMED_END_MODE, no_event_mode),
@@ -434,6 +439,7 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         notify_data=entry.options.get(CONF_NOTIFY_DATA, {}),
         rate_limit=yaml_config.get(CONF_RATE_LIMIT, {}),
         calendar_config=calendar_config,
+        time_of_day=time_of_day,
         transitions=yaml_config.get(CONF_TRANSITIONS),
         calendar_occupancy_override_states=entry.options.get(
             CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
@@ -550,6 +556,7 @@ class AlarmArmer:
         unoccupied_trigger: bool = True,
         rate_limit: ConfigType | None = None,
         calendar_config: ConfigType | None = None,
+        time_of_day: dict[str, list[str]] | None = None,
         transitions: dict[str, dict[str, list[ConfigType]]] | None = None,
         calendar_occupancy_override_states: list[str] | None = None,
         use_alarm_service: bool = True,
@@ -583,6 +590,9 @@ class AlarmArmer:
             if calendar_occupancy_override_states is not None
             else DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
         )
+        # Time of Day sensor entity ids by the alarm state they set while on
+        self.time_of_day_config: dict[str, list[str]] = time_of_day or {}
+        self.time_of_day: list[TrackedTimeOfDay] = []
         self.alarm_panel: str = alarm_panel
         self.sunrise_earliest: dt.time | None = sunrise_earliest
         self.sunrise_latest: dt.time | None = sunrise_latest
@@ -635,6 +645,7 @@ class AlarmArmer:
 
         self.initialize_alarm_panel()
         await self.initialize_calendar()
+        await self.initialize_time_of_day()
         await self.initialize_logic()
         self.initialize_diurnal()
         self.initialize_occupancy()
@@ -778,6 +789,14 @@ class AlarmArmer:
             await tracked_calendar.initialize(platform)
             self.calendars.append(tracked_calendar)
 
+    async def initialize_time_of_day(self) -> None:
+        """Configure Time of Day sensors (optional), an alternative to calendar events"""
+        for state_str, entity_ids in self.time_of_day_config.items():
+            for entity_id in entity_ids:
+                tracked = TrackedTimeOfDay(entity_id, AlarmControlPanelState(state_str), self, self.hass)
+                self.time_of_day.append(tracked)
+                await tracked.initialize()
+
     async def initialize_logic(self) -> None:
         stage: str = "logic"
         for state_str, raw_condition in DEFAULT_TRANSITIONS.items():
@@ -846,6 +865,8 @@ class AlarmArmer:
         _LOGGER.info("AUTOARM shutting down")
         for calendar in self.calendars:
             calendar.shutdown()
+        for tracked in self.time_of_day:
+            tracked.shutdown()
         while self.unsubscribes:
             unlisten(self.unsubscribes.pop())
         unlisten(self.stop_listener)
@@ -896,6 +917,28 @@ class AlarmArmer:
 
     def has_active_calendar_event(self) -> bool:
         return any(cal.has_active_event() for cal in self.calendars)
+
+    def active_time_of_day(self) -> TrackedTimeOfDay | None:
+        return next((tod for tod in self.time_of_day if tod.active), None)
+
+    def time_of_day_state(self, tod: TrackedTimeOfDay) -> AlarmControlPanelState:
+        """State for a live Time of Day sensor, armed away instead if everyone is out and occupancy can override it"""
+        if self.is_unoccupied() and str(tod.arming_state) in self.calendar_occupancy_override_states:
+            return AlarmControlPanelState.ARMED_AWAY
+        return tod.arming_state
+
+    async def resume_time_of_day(self, context: Context | None = None) -> bool:
+        """Go to the state of a live Time of Day sensor, once whatever took priority over it has ended"""
+        tod: TrackedTimeOfDay | None = self.active_time_of_day()
+        if tod is None:
+            return False
+        await self.arm(
+            self.time_of_day_state(tod),
+            source=ChangeSource.TOD,
+            change_context={"caller": "resume_time_of_day", "entity_id": tod.entity_id, "summary": tod.name},
+            context=context,
+        )
+        return True
 
     async def has_calendar_event_today(self) -> bool:
         """Is there a state-matching calendar event starting, ending or spanning today, on any configured calendar"""
@@ -1094,7 +1137,7 @@ class AlarmArmer:
                             context=context,
                         )
                         return state
-                else:
+                elif not self.active_time_of_day():
                     ended_state: AlarmControlPanelState | None = await self.last_calendar_event_ended_today()
                     if ended_state is None:
                         _LOGGER.debug("AUTOARM No calendar event ended today, resetting as if there were no calendars")
@@ -1125,9 +1168,29 @@ class AlarmArmer:
                             return state
                         _LOGGER.debug("AUTOARM Reset after a %s calendar event ended, worked out automatically", ended_state)
 
+            active_time_of_day: TrackedTimeOfDay | None = None if active_calendar_event else self.active_time_of_day()
+            if active_time_of_day:
+                if intervention is None and source != ChangeSource.OCCUPANCY and not must_change_state:
+                    # automatic resets leave the sensor's state, or a manual change made while it's on, alone
+                    _LOGGER.debug("AUTOARM Ignoring reset while time of day sensor on")
+                    reset_decision = "ignore_for_active_time_of_day"
+                    return existing_state
+                reset_decision = "reset_to_active_time_of_day"
+                state = await self.arm(
+                    self.time_of_day_state(active_time_of_day),
+                    source=ChangeSource.TOD,
+                    change_context={
+                        "reset_decision": reset_decision,
+                        "summary": active_time_of_day.name,
+                        "caller": "reset_armed_state",
+                    },
+                    context=context,
+                )
+                return state
+
             if (
                 intervention
-                or source in (ChangeSource.CALENDAR, ChangeSource.OCCUPANCY)
+                or source in (ChangeSource.CALENDAR, ChangeSource.TOD, ChangeSource.OCCUPANCY)
                 or must_change_state
                 or (self.is_unoccupied() and state in (AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_HOME))
             ):

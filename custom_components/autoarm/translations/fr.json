@@ -44,6 +44,17 @@
                             "calendar_occupancy_override_states": "Quand un événement calendrier définit l'un de ces états, les changements d'occupation (arrivées et départs) peuvent encore mettre à jour l'état de l'alarme. Par exemple, si le calendrier indique Désarmé mais que tout le monde part, il passera à Armé Absent."
                         }
                     },
+                    "time_of_day_options": {
+                        "name": "Moment de la journée",
+                        "description": "Capteurs de moment de la journée qui définissent un état d'alarme tant qu'ils sont actifs, comme alternative aux événements de calendrier, par exemple une heure de coucher quotidienne pour Armé nuit. Lorsqu'un capteur se désactive, les réglages de fin d'événement de calendrier de la section Avancé s'appliquent.",
+                        "data": {
+                            "time_of_day_disarmed": "Désarmé",
+                            "time_of_day_armed_home": "Armé présence",
+                            "time_of_day_armed_away": "Armé absence",
+                            "time_of_day_armed_night": "Armé nuit",
+                            "time_of_day_armed_custom_bypass": "Armé personnalisé"
+                        }
+                    },
                     "trigger_options": {
                         "name": "Déclencheurs",
                         "description": "Ce qui peut lancer une réévaluation de l'état de l'alarme. Ils changent quand l'état est calculé, pas comment. Automatique désactive un déclencheur les jours avec un événement de calendrier correspondant, et le réactive les jours sans activité de calendrier.",

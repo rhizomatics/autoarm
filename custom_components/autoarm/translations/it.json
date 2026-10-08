@@ -44,6 +44,17 @@
                             "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa."
                         }
                     },
+                    "time_of_day_options": {
+                        "name": "Ora del giorno",
+                        "description": "Sensori ora del giorno che impostano uno stato di allarme mentre sono attivi, in alternativa agli eventi del calendario, ad esempio un orario quotidiano per andare a dormire per Inserito notte. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate.",
+                        "data": {
+                            "time_of_day_disarmed": "Disinserito",
+                            "time_of_day_armed_home": "Inserito in casa",
+                            "time_of_day_armed_away": "Inserito fuori casa",
+                            "time_of_day_armed_night": "Inserito notte",
+                            "time_of_day_armed_custom_bypass": "Inserito personalizzato"
+                        }
+                    },
                     "trigger_options": {
                         "name": "Attivatori",
                         "description": "Cosa può avviare una rivalutazione dello stato dell'allarme. Cambiano quando lo stato viene calcolato, non come. Automatico disattiva un attivatore nei giorni con un evento di calendario corrispondente e lo riattiva nei giorni senza attività di calendario.",

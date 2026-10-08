@@ -130,6 +130,13 @@ async def test_why_after_calendar_event(hass: HomeAssistant, autoarmer: AlarmArm
     assert explain(autoarmer).endswith("for the calendar event Skiing.")
 
 
+async def test_why_after_time_of_day_sensor(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
+    await _panel_starts(hass, autoarmer, "disarmed")
+    await autoarmer.arm(AlarmControlPanelState.ARMED_NIGHT, source=ChangeSource.TOD, change_context={"summary": "Bedtime"})
+
+    assert explain(autoarmer).endswith("by the time of day sensor Bedtime.")
+
+
 async def test_why_after_calendar_event_ended(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     await _panel_starts(hass, autoarmer, "armed_vacation")
     await autoarmer.arm(

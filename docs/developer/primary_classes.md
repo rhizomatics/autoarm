@@ -33,3 +33,9 @@ tags:
 ::: custom_components.autoarm.calendar_events.TrackedCalendarEvent
     handler: python
     heading_level: 4
+
+## Time of Day
+
+::: custom_components.autoarm.time_of_day.TrackedTimeOfDay
+    handler: python
+    heading_level: 4

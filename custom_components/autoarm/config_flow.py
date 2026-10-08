@@ -73,6 +73,10 @@ CONF_SENTENCE_ARM = "sentence_arm"
 CONF_SENTENCE_DISARM = "sentence_disarm"
 
 DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES: list[str] = ["disarmed", "armed_home", "armed_night", "armed_away"]
+# option holding the Time of Day sensors for each alarm state, a daily period doesn't suit vacations
+TIME_OF_DAY_OPTIONS: dict[str, str] = {
+    f"time_of_day_{state}": state for state in PUBLIC_ALARM_STATES if state != "armed_vacation"
+}
 
 
 def _time_to_str(t: dt.time | None) -> str | None:
@@ -310,6 +314,15 @@ class AutoArmOptionsFlow(OptionsFlow):
                                 mode=SelectSelectorMode.LIST,
                             )
                         ),
+                    }),
+                    {"collapsed": True},
+                ),
+                vol.Required("time_of_day_options"): section(
+                    vol.Schema({
+                        vol.Optional(option, default=options.get(option, [])): EntitySelector(
+                            EntitySelectorConfig(integration="tod", multiple=True)
+                        )
+                        for option in TIME_OF_DAY_OPTIONS
                     }),
                     {"collapsed": True},
                 ),

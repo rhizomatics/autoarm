@@ -44,6 +44,17 @@
                             "calendar_occupancy_override_states": "Cuando un evento del calendario establece uno de estos estados, los cambios de ocupación (llegadas y salidas) aún pueden actualizar el estado de la alarma. Por ejemplo, si el calendario indica Desarmado pero todos se van, cambiará a Armado Fuera."
                         }
                     },
+                    "time_of_day_options": {
+                        "name": "Hora del día",
+                        "description": "Sensores de hora del día que establecen un estado de alarma mientras están encendidos, como alternativa a los eventos de calendario, por ejemplo una hora de acostarse diaria para Armado noche. Cuando un sensor se apaga, se aplican los ajustes de fin de evento de calendario de Avanzado.",
+                        "data": {
+                            "time_of_day_disarmed": "Desarmado",
+                            "time_of_day_armed_home": "Armado en casa",
+                            "time_of_day_armed_away": "Armado ausente",
+                            "time_of_day_armed_night": "Armado noche",
+                            "time_of_day_armed_custom_bypass": "Armado personalizado"
+                        }
+                    },
                     "trigger_options": {
                         "name": "Disparadores",
                         "description": "Qué puede iniciar una reevaluación del estado de la alarma. Cambian cuándo se calcula el estado, no cómo. Automático desactiva un disparador cualquier día con un evento de calendario coincidente y lo reactiva los días sin actividad de calendario.",

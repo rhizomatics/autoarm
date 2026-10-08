@@ -44,6 +44,17 @@
                             "calendar_occupancy_override_states": "Wenn ein Kalenderereignis einen dieser Zustände setzt, können Belegungsänderungen (Ankünfte und Abfahrten) den Alarmzustand noch aktualisieren. Wenn der Kalender zum Beispiel 'Deaktiviert' angibt, aber alle das Haus verlassen, wechselt er zu 'Scharf Abwesend'."
                         }
                     },
+                    "time_of_day_options": {
+                        "name": "Tageszeit",
+                        "description": "Tageszeit-Sensoren, die einen Alarmzustand setzen, solange sie eingeschaltet sind, als Alternative zu Kalenderereignissen, zum Beispiel eine tägliche Schlafenszeit für 'Scharf Nacht'. Wenn ein Sensor ausschaltet, gelten die Einstellungen für das Ende von Kalenderereignissen unter Erweitert.",
+                        "data": {
+                            "time_of_day_disarmed": "Unscharf",
+                            "time_of_day_armed_home": "Scharf zu Hause",
+                            "time_of_day_armed_away": "Scharf abwesend",
+                            "time_of_day_armed_night": "Scharf Nacht",
+                            "time_of_day_armed_custom_bypass": "Scharf benutzerdefiniert"
+                        }
+                    },
                     "trigger_options": {
                         "name": "Auslöser",
                         "description": "Was eine Neubewertung des Alarmzustands auslösen kann. Diese ändern, wann der Zustand ermittelt wird, nicht wie. Automatisch schaltet einen Auslöser an jedem Tag mit passendem Kalendereintrag aus und an Tagen ohne Kalenderaktivität wieder ein.",

@@ -13,7 +13,7 @@ from homeassistant.components.logbook import (
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant, callback
 
-from .const import DOMAIN, EVENT_TRIGGERED
+from .const import DOMAIN, EVENT_TRIGGERED, ChangeSource
 
 
 @callback
@@ -26,7 +26,10 @@ def async_describe_events(
     @callback
     def async_describe_triggered(event: LazyEventPartialState) -> dict[str, Any]:
         data = event.data
-        cause: str = f"calendar event {data['summary']}" if data.get("summary") else data.get("source", "unknown")
+        cause: str = data.get("source", "unknown")
+        if data.get("summary"):
+            kind = "time of day sensor" if cause == ChangeSource.TOD else "calendar event"
+            cause = f"{kind} {data['summary']}"
         return {
             LOGBOOK_ENTRY_NAME: "AutoArm",
             LOGBOOK_ENTRY_MESSAGE: f"triggered by {cause}",
