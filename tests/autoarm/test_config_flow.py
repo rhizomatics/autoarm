@@ -29,6 +29,7 @@ from custom_components.autoarm.config_flow import (
     CONF_UNOCCUPIED_TRIGGER,
     CONF_USE_ALARM_SERVICE,
     RECIPE_URL,
+    SETUP_HELP_PLACEHOLDERS,
 )
 from custom_components.autoarm.const import (
     CONF_ALARM_PANEL,
@@ -44,13 +45,18 @@ from custom_components.autoarm.const import (
 
 
 async def test_user_flow_complete(hass: HomeAssistant, mock_notify: Any) -> None:
-    """Test the user config flow, a single step set up for the recommended recipe."""
+    """Test the quick setup config flow, a single step set up for the recommended recipe."""
     hass.data[YAML_DATA_KEY] = {}
 
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
-    assert result["type"] is FlowResultType.FORM
+    assert result["type"] is FlowResultType.MENU
     assert result["step_id"] == "user"
-    assert result["description_placeholders"] == {"recipe_url": RECIPE_URL}
+    assert result["menu_options"] == ["quick_setup", "advanced_setup"]
+
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "quick_setup"})
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "quick_setup"
+    assert result["description_placeholders"] == SETUP_HELP_PLACEHOLDERS
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -79,6 +85,7 @@ async def test_user_flow_minimal(hass: HomeAssistant, mock_notify: Any) -> None:
     hass.data[YAML_DATA_KEY] = {}
 
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "quick_setup"})
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -98,6 +105,7 @@ async def test_user_flow_preselects_known_persons(hass: HomeAssistant, mock_noti
     hass.states.async_set("person.alice", "not_home")
 
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "quick_setup"})
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {CONF_ALARM_PANEL: "alarm_control_panel.home"},
@@ -118,12 +126,55 @@ async def test_user_flow_already_configured(hass: HomeAssistant, mock_notify: An
     existing.add_to_hass(hass)
 
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {CONF_ALARM_PANEL: "alarm_control_panel.other"},
-    )
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "already_configured"
+
+
+async def test_user_flow_advanced_setup(hass: HomeAssistant, mock_notify: Any) -> None:
+    """Advanced setup shows the full set of options up front, instead of the quick recipe's defaults."""
+    hass.data[YAML_DATA_KEY] = {}
+
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "advanced_setup"})
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "advanced_setup"
+    assert result["description_placeholders"] == SETUP_HELP_PLACEHOLDERS
+    data_schema = result["data_schema"]
+    assert data_schema is not None
+    assert CONF_ALARM_PANEL in data_schema.schema
+    assert "notify_options" in data_schema.schema
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_ALARM_PANEL: "alarm_control_panel.home",
+            CONF_BEDTIME_ENTITIES: [],
+            CONF_CALENDAR_ENTITIES: [],
+            CONF_PERSON_ENTITIES: [],
+            "calendar_options": {},
+            "time_of_day_options": {},
+            "trigger_options": {CONF_SUNRISE_TRIGGER: "off", CONF_SUNSET_TRIGGER: "off"},
+            "sunrise_options": {},
+            "sunset_options": {},
+            "assist_options": {CONF_SENTENCE_ARM: False, CONF_SENTENCE_DISARM: True},
+            "advanced_options": {
+                CONF_USE_ALARM_SERVICE: True,
+                CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
+                CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_night",
+                CONF_CALENDAR_ARMED_END_MODE: "manual",
+                CONF_CALENDAR_DISARMED_END_MODE: "manual",
+            },
+            "notify_options": {CONF_NOTIFY_ACTION: "notify.supernotify", CONF_NOTIFY_TARGETS: []},
+        },
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["data"] == {CONF_ALARM_PANEL: "alarm_control_panel.home"}
+    assert result["options"][CONF_SENTENCE_ARM] is False
+    assert result["options"][CONF_SENTENCE_DISARM] is True
+    assert result["options"][CONF_CALENDAR_ARMED_END_MODE] == "manual"
+    assert result["options"][CONF_CALENDAR_DISARMED_END_MODE] == "manual"
+    assert result["options"][CONF_NOTIFY_ACTION] == "notify.supernotify"
+    assert CONF_ALARM_PANEL not in result["options"]
 
 
 async def test_import_flow(hass: HomeAssistant, mock_notify: Any) -> None:

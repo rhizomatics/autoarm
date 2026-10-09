@@ -4,6 +4,14 @@
         "step": {
             "user": {
                 "title": "Auto Arm einrichten",
+                "description": "Die Schnelleinrichtung folgt dem empfohlenen Rezept und fragt nur nach der Alarmzentrale und den dafür genutzten Entitäten, mit sinnvollen Standardwerten für alles andere. Die erweiterte Einrichtung zeigt direkt alle Optionen an.",
+                "menu_options": {
+                    "quick_setup": "Schnelleinrichtung (empfohlen)",
+                    "advanced_setup": "Erweiterte Einrichtung"
+                }
+            },
+            "quick_setup": {
+                "title": "Auto Arm einrichten",
                 "description": "Folgt dem [empfohlenen Rezept]({recipe_url}), mit einem Schlafenszeit-Sensor, einem Kalender für Urlaube und Scharfschaltung, wenn alle außer Haus sind. Nur die Alarmzentrale ist erforderlich, der Rest kann später ergänzt werden.",
                 "data": {
                     "alarm_panel": "Zu verwaltende Alarmzentrale",
@@ -12,7 +20,125 @@
                     "person_entities": "Personen für die belegungsbasierte Scharfschaltung"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Ein Tageszeit-Sensor, der jeden Tag zur Schlafenszeit eingeschaltet ist. Solange er an ist, bleibt der Alarm auf 'Scharf Nacht'."
+                    "time_of_day_armed_night": "Ein Tageszeit-Sensor, der jeden Tag zur Schlafenszeit eingeschaltet ist. Solange er an ist, bleibt der Alarm auf 'Scharf Nacht'. oder überspringen Sie dies und verwenden Sie einen Kalender oder die *Sonne*-Integration zur Steuerung der nächtlichen Scharfschaltung. Noch keinen Schlafenszeit-Sensor? [Erstellen Sie einen]({bedtime_help_url}), oder gehen Sie zu Einstellungen → Geräte & Dienste → Helfer → **+ Helfer erstellen** → **Tageszeit**. Geben Sie ihm einen Namen und legen Sie eine Nach-/Vor-Uhrzeit für Ihre übliche Schlafenszeit fest.",
+                    "alarm_panel": "Noch keine Alarmzentrale? [Erstellen Sie eine virtuelle]({alarm_panel_help_url}), oder gehen Sie in Home Assistant zu Einstellungen → Geräte & Dienste → Helfer → **+ Helfer erstellen** → Template → **Alarmzentrale**. Geben Sie ihr einen Namen und bestätigen Sie; alle anderen Felder sind optional.",
+                    "calendar_entities": "Noch keinen Kalender? [Erstellen Sie einen lokalen Kalender]({calendar_help_url}), oder gehen Sie zu Einstellungen → Geräte & Dienste → **+ Integration hinzufügen** → **Lokaler Kalender**. Geben Sie ihm einen Namen und lassen Sie „Leeren Kalender erstellen“ ausgewählt.",
+                    "person_entities": "Fehlt jemand? [Fügen Sie eine neue Person hinzu]({person_help_url}), oder gehen Sie zu Einstellungen → Personen → **+ Person hinzufügen**. Geben Sie ihr einen Namen; die Verknüpfung mit einem Benutzerkonto ist optional."
+                }
+            },
+            "advanced_setup": {
+                "title": "Auto Arm einrichten — Erweitert",
+                "data": {
+                    "alarm_panel": "Zu verwaltende Alarmzentrale",
+                    "time_of_day_armed_night": "Schlafenszeit-Sensor für 'Scharf Nacht'",
+                    "calendar_entities": "Kalender für Urlaube und Abwesenheiten",
+                    "person_entities": "Personen für die belegungsbasierte Scharfschaltung"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Ein Tageszeit-Sensor, der jeden Tag zur Schlafenszeit eingeschaltet ist. Solange er an ist, bleibt der Alarm auf 'Scharf Nacht'. oder überspringen Sie dies und verwenden Sie einen Kalender oder die *Sonne*-Integration zur Steuerung der nächtlichen Scharfschaltung. Noch keinen Schlafenszeit-Sensor? [Erstellen Sie einen]({bedtime_help_url}), oder gehen Sie zu Einstellungen → Geräte & Dienste → Helfer → **+ Helfer erstellen** → **Tageszeit**. Geben Sie ihm einen Namen und legen Sie eine Nach-/Vor-Uhrzeit für Ihre übliche Schlafenszeit fest.",
+                    "alarm_panel": "Noch keine Alarmzentrale? [Erstellen Sie eine virtuelle]({alarm_panel_help_url}), oder gehen Sie in Home Assistant zu Einstellungen → Geräte & Dienste → Helfer → **+ Helfer erstellen** → Template → **Alarmzentrale**. Geben Sie ihr einen Namen und bestätigen Sie; alle anderen Felder sind optional.",
+                    "calendar_entities": "Noch keinen Kalender? [Erstellen Sie einen lokalen Kalender]({calendar_help_url}), oder gehen Sie zu Einstellungen → Geräte & Dienste → **+ Integration hinzufügen** → **Lokaler Kalender**. Geben Sie ihm einen Namen und lassen Sie „Leeren Kalender erstellen“ ausgewählt.",
+                    "person_entities": "Fehlt jemand? [Fügen Sie eine neue Person hinzu]({person_help_url}), oder gehen Sie zu Einstellungen → Personen → **+ Person hinzufügen**. Geben Sie ihr einen Namen; die Verknüpfung mit einem Benutzerkonto ist optional."
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "Kalender-Belegungsüberschreibung",
+                        "data": {
+                            "calendar_occupancy_override_states": "Zustände, die die Belegung überschreiben kann"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "Wenn ein Kalenderereignis einen dieser Zustände setzt, können Belegungsänderungen (Ankünfte und Abfahrten) den Alarmzustand noch aktualisieren. Wenn der Kalender zum Beispiel 'Deaktiviert' angibt, aber alle das Haus verlassen, wechselt er zu 'Scharf Abwesend'."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Tageszeit",
+                        "description": "Tageszeit-Sensoren für die anderen Alarmzustände, die ihren Zustand setzen, solange sie eingeschaltet sind, genau wie der Schlafenszeit-Sensor. Wenn ein Sensor ausschaltet, gelten die Einstellungen für das Ende von Kalenderereignissen unter Erweitert.",
+                        "data": {
+                            "time_of_day_disarmed": "Unscharf",
+                            "time_of_day_armed_home": "Scharf zu Hause",
+                            "time_of_day_armed_away": "Scharf abwesend",
+                            "time_of_day_armed_custom_bypass": "Scharf benutzerdefiniert"
+                        }
+                    },
+                    "trigger_options": {
+                        "name": "Auslöser",
+                        "description": "Was eine Neubewertung des Alarmzustands auslösen kann. Diese ändern, wann der Zustand ermittelt wird, nicht wie. Automatisch schaltet einen Auslöser an jedem Tag mit passendem Kalendereintrag aus und an Tagen ohne Kalenderaktivität wieder ein.",
+                        "data": {
+                            "sunrise_trigger": "Sonnenaufgang",
+                            "sunset_trigger": "Sonnenuntergang",
+                            "occupied_trigger": "Jemand kommt nach Hause",
+                            "unoccupied_trigger": "Jemand verlässt das Haus"
+                        },
+                        "data_description": {
+                            "sunrise_trigger": "Alarmzustand bei Sonnenaufgang neu bewerten",
+                            "sunset_trigger": "Alarmzustand bei Sonnenuntergang neu bewerten",
+                            "occupied_trigger": "Alarmzustand neu bewerten, wenn eine Person nach Hause kommt",
+                            "unoccupied_trigger": "Alarmzustand neu bewerten, wenn eine Person das Haus verlässt"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "Sonnenaufgang-Einschränkungen",
+                        "data": {
+                            "sunrise_earliest": "Frühestens",
+                            "sunrise_latest": "Spätestens"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "Sonnenaufgang nicht früher als diese Uhrzeit",
+                            "sunrise_latest": "Sonnenaufgang nicht später als diese Uhrzeit"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "Sonnenuntergang-Einschränkungen",
+                        "data": {
+                            "sunset_earliest": "Frühestens",
+                            "sunset_latest": "Spätestens"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "Sonnenuntergang nicht früher als diese Uhrzeit",
+                            "sunset_latest": "Sonnenuntergang nicht später als diese Uhrzeit"
+                        }
+                    },
+                    "assist_options": {
+                        "name": "Sprachassistent",
+                        "data": {
+                            "sentence_arm": "Scharfschalten und erklären per Sprache",
+                            "sentence_disarm": "Unscharf schalten per Sprache"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Englische Sätze für den eingebauten Assist-Agenten von Home Assistant, z. B. 'arm the alarm', 'arm the alarm in night mode' und 'why is the alarm armed'.",
+                            "sentence_disarm": "Fügt 'disarm the alarm' hinzu. Warnung: Es wird kein Code abgefragt, daher kann jeder, der mit Assist sprechen kann, über einen Sprachsatelliten oder im Chat, die Alarmanlage unscharf schalten."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Erweitert",
+                        "data": {
+                            "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
+                            "occupancy_default_day": "Standard-Scharmodus bei Belegung tagsüber",
+                            "occupancy_default_night": "Standard-Scharmodus bei Belegung nachts",
+                            "calendar_armed_end_mode": "Alarmzustand, wenn ein scharfer Kalendereintrag endet",
+                            "calendar_disarmed_end_mode": "Alarmzustand, wenn ein unscharfer Kalendereintrag endet"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Die Zentrale darf keinen Code verlangen.",
+                            "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
+                            "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Benachrichtigungen",
+                        "data": {
+                            "notify_enabled": "Benachrichtigungen aktiviert",
+                            "notify_action": "Benachrichtigungsaktion",
+                            "notify_targets": "Benachrichtigungsempfänger",
+                            "notify_data": "Zusätzliche Benachrichtigungsdaten"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Benachrichtigungen für Alarmzustandsänderungen aktivieren",
+                            "notify_action": "Home Assistant-Aktion (Dienst) zum Senden von Benachrichtigungen",
+                            "notify_targets": "Liste von Adressen oder Notify-Entitäten; kann für Supernotify leer gelassen werden",
+                            "notify_data": "Zusätzliche Daten, die an die Benachrichtigungsaktion übergeben werden, z. B. Aktionen oder ein Kanal für eine mobile App-Benachrichtigung. Werte hier werden durch einen passenden Schlüssel in einem YAML-Benachrichtigungsprofil überschrieben."
+                        }
+                    }
                 }
             }
         },
@@ -32,7 +158,7 @@
                     "person_entities": "Personen für die belegungsbasierte Scharfschaltung"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Ein Tageszeit-Sensor, der jeden Tag zur Schlafenszeit eingeschaltet ist. Solange er an ist, bleibt der Alarm auf 'Scharf Nacht'."
+                    "time_of_day_armed_night": "Ein Tageszeit-Sensor, der jeden Tag zur Schlafenszeit eingeschaltet ist. Solange er an ist, bleibt der Alarm auf 'Scharf Nacht'. oder überspringen Sie dies und verwenden Sie einen Kalender oder die *Sonne*-Integration zur Steuerung der nächtlichen Scharfschaltung."
                 },
                 "sections": {
                     "calendar_options": {

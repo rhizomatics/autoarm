@@ -4,6 +4,14 @@
         "step": {
             "user": {
                 "title": "Configurar o Auto Arm",
+                "description": "A configuração rápida segue a receita recomendada e só pergunta pelo painel de alarme e pelas entidades que utiliza, com valores predefinidos sensatos para o resto. A configuração avançada mostra logo todas as opções.",
+                "menu_options": {
+                    "quick_setup": "Configuração rápida (recomendada)",
+                    "advanced_setup": "Configuração avançada"
+                }
+            },
+            "quick_setup": {
+                "title": "Configurar o Auto Arm",
                 "description": "Segue a [receita recomendada]({recipe_url}), com um sensor de hora de deitar, um calendário para férias e armar quando todos estão fora. Só o painel de alarme é obrigatório, o resto pode ser adicionado mais tarde.",
                 "data": {
                     "alarm_panel": "Painel de controlo de alarme a gerir",
@@ -12,7 +20,125 @@
                     "person_entities": "Pessoas para armar com base na ocupação"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Um sensor de hora do dia que está ligado todos os dias à hora de deitar. Enquanto está ligado, o alarme mantém-se em Armado noite."
+                    "time_of_day_armed_night": "Um sensor de hora do dia que está ligado todos os dias à hora de deitar. Enquanto está ligado, o alarme mantém-se em Armado noite. ou ignore isto e use um calendário ou a integração *Sun* para controlar o armar noturno. Ainda não tem sensor de hora de deitar? [Crie um]({bedtime_help_url}), ou vá a Definições → Dispositivos e serviços → Auxiliares → **+ Criar auxiliar** → **Hora do dia**. Dê-lhe um nome e defina uma hora de início/fim para a sua hora habitual de deitar.",
+                    "alarm_panel": "Ainda não tem painel de alarme? [Crie um virtual]({alarm_panel_help_url}), ou no Home Assistant vá a Definições → Dispositivos e serviços → Auxiliares → **+ Criar auxiliar** → Modelo → **Painel de controlo de alarme**. Dê-lhe um nome e envie; todos os outros campos são opcionais.",
+                    "calendar_entities": "Ainda não tem calendário? [Crie um calendário local]({calendar_help_url}), ou vá a Definições → Dispositivos e serviços → **+ Adicionar integração** → **Calendário local**. Dê-lhe um nome e deixe 'Criar calendário vazio' selecionado.",
+                    "person_entities": "Falta alguém? [Adicione uma nova pessoa]({person_help_url}), ou vá a Definições → Pessoas → **+ Adicionar pessoa**. Dê-lhe um nome; associar uma conta de utilizador é opcional."
+                }
+            },
+            "advanced_setup": {
+                "title": "Configurar o Auto Arm — Avançado",
+                "data": {
+                    "alarm_panel": "Painel de controlo de alarme a gerir",
+                    "time_of_day_armed_night": "Sensor de hora de deitar para Armado noite",
+                    "calendar_entities": "Calendários para férias e ausências",
+                    "person_entities": "Pessoas para armar com base na ocupação"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Um sensor de hora do dia que está ligado todos os dias à hora de deitar. Enquanto está ligado, o alarme mantém-se em Armado noite. ou ignore isto e use um calendário ou a integração *Sun* para controlar o armar noturno. Ainda não tem sensor de hora de deitar? [Crie um]({bedtime_help_url}), ou vá a Definições → Dispositivos e serviços → Auxiliares → **+ Criar auxiliar** → **Hora do dia**. Dê-lhe um nome e defina uma hora de início/fim para a sua hora habitual de deitar.",
+                    "alarm_panel": "Ainda não tem painel de alarme? [Crie um virtual]({alarm_panel_help_url}), ou no Home Assistant vá a Definições → Dispositivos e serviços → Auxiliares → **+ Criar auxiliar** → Modelo → **Painel de controlo de alarme**. Dê-lhe um nome e envie; todos os outros campos são opcionais.",
+                    "calendar_entities": "Ainda não tem calendário? [Crie um calendário local]({calendar_help_url}), ou vá a Definições → Dispositivos e serviços → **+ Adicionar integração** → **Calendário local**. Dê-lhe um nome e deixe 'Criar calendário vazio' selecionado.",
+                    "person_entities": "Falta alguém? [Adicione uma nova pessoa]({person_help_url}), ou vá a Definições → Pessoas → **+ Adicionar pessoa**. Dê-lhe um nome; associar uma conta de utilizador é opcional."
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "Substituição de ocupação por calendário",
+                        "data": {
+                            "calendar_occupancy_override_states": "Estados que a ocupação pode substituir"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "Quando um evento do calendário define um destes estados, as alterações de ocupação (chegadas e saídas) ainda podem atualizar o estado do alarme. Por exemplo, se o calendário indicar Desarmado mas todos saírem, mudará para Armado Fora."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Hora do dia",
+                        "description": "Sensores de hora do dia para os outros estados de alarme, que definem o seu estado enquanto estão ligados, tal como o sensor de hora de deitar. Quando um sensor se desliga, aplicam-se as definições de fim de evento de calendário em Avançado.",
+                        "data": {
+                            "time_of_day_disarmed": "Desarmado",
+                            "time_of_day_armed_home": "Armado em casa",
+                            "time_of_day_armed_away": "Armado ausente",
+                            "time_of_day_armed_custom_bypass": "Armado personalizado"
+                        }
+                    },
+                    "trigger_options": {
+                        "name": "Acionadores",
+                        "description": "O que pode iniciar uma reavaliação do estado do alarme. Mudam quando o estado é calculado, não como. Automático desliga um acionador em qualquer dia com um evento de calendário correspondente e volta a ligá-lo nos dias sem atividade de calendário.",
+                        "data": {
+                            "sunrise_trigger": "Nascer do sol",
+                            "sunset_trigger": "Pôr do sol",
+                            "occupied_trigger": "Alguém chega a casa",
+                            "unoccupied_trigger": "Alguém sai de casa"
+                        },
+                        "data_description": {
+                            "sunrise_trigger": "Reavaliar o estado do alarme ao nascer do sol",
+                            "sunset_trigger": "Reavaliar o estado do alarme ao pôr do sol",
+                            "occupied_trigger": "Reavaliar o estado do alarme quando alguém chega a casa",
+                            "unoccupied_trigger": "Reavaliar o estado do alarme quando alguém sai de casa"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "Restrições do nascer do sol",
+                        "data": {
+                            "sunrise_earliest": "Mais cedo",
+                            "sunrise_latest": "Mais tarde"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "Nascer do sol não antes desta hora",
+                            "sunrise_latest": "Nascer do sol não depois desta hora"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "Restrições do pôr do sol",
+                        "data": {
+                            "sunset_earliest": "Mais cedo",
+                            "sunset_latest": "Mais tarde"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "Pôr do sol não antes desta hora",
+                            "sunset_latest": "Pôr do sol não depois desta hora"
+                        }
+                    },
+                    "assist_options": {
+                        "name": "Assistente de voz",
+                        "data": {
+                            "sentence_arm": "Armar e explicar por voz",
+                            "sentence_disarm": "Desarmar por voz"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Frases em inglês para o agente Assist integrado do Home Assistant, como 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
+                            "sentence_disarm": "Adiciona 'disarm the alarm'. Aviso: nenhum código é pedido, por isso qualquer pessoa que fale com o Assist, num satélite de voz ou no chat, poderá desarmar o alarme."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Avançado",
+                        "data": {
+                            "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
+                            "occupancy_default_day": "Estado de armar predefinido quando ocupado durante o dia",
+                            "occupancy_default_night": "Estado de armar predefinido quando ocupado durante a noite",
+                            "calendar_armed_end_mode": "Estado do alarme quando termina um evento de calendário armado",
+                            "calendar_disarmed_end_mode": "Estado do alarme quando termina um evento de calendário desarmado"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. O painel não deve exigir código.",
+                            "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
+                            "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Notificações",
+                        "data": {
+                            "notify_enabled": "Notificações ativadas",
+                            "notify_action": "Ação de notificação",
+                            "notify_targets": "Destinos da notificação",
+                            "notify_data": "Dados extra de notificação"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Ativar notificações para alterações do estado do alarme",
+                            "notify_action": "Ação (serviço) do Home Assistant a usar para notificar",
+                            "notify_targets": "Lista de endereços ou entidades de notificação a notificar; pode ficar em branco para Supernotify",
+                            "notify_data": "Dados extra passados para a ação de notificação, como ações ou um canal para uma notificação da app móvel. Qualquer valor definido aqui é substituído por uma chave correspondente num perfil de notificação YAML."
+                        }
+                    }
                 }
             }
         },
@@ -32,7 +158,7 @@
                     "person_entities": "Pessoas para armar com base na ocupação"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Um sensor de hora do dia que está ligado todos os dias à hora de deitar. Enquanto está ligado, o alarme mantém-se em Armado noite."
+                    "time_of_day_armed_night": "Um sensor de hora do dia que está ligado todos os dias à hora de deitar. Enquanto está ligado, o alarme mantém-se em Armado noite. ou ignore isto e use um calendário ou a integração *Sun* para controlar o armar noturno."
                 },
                 "sections": {
                     "calendar_options": {

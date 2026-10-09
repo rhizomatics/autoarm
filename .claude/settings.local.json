@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run ruff check:*)",
+      "Bash(uv run python -m pytest:*)",
+      "Bash(claude mcp:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(uv run mypy:*)",
+      "Bash(git add:*)",
+      "Bash(xxd:*)",
+      "Bash(uv run mkdocs:*)",
+      "WebFetch(domain:developers.home-assistant.io)"
+    ]
+  }
+}

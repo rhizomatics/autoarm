@@ -1,10 +1,12 @@
 """Config flow for Auto Arm integration."""
 
 import datetime as dt
+from collections.abc import Mapping
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_SERVICE
+from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import section
 from homeassistant.helpers.selector import (
     BooleanSelector,
@@ -74,6 +76,19 @@ CONF_SENTENCE_DISARM = "sentence_disarm"
 
 DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES: list[str] = ["disarmed", "armed_home", "armed_night", "armed_away"]
 RECIPE_URL = "https://autoarm.rhizomatics.org.uk/configuration/examples/recommended_recipe/"
+# My Home Assistant deep links into the built-in helpers that can stand in for a missing entity,
+# a stable redirect rather than a hardcoded frontend path: https://www.home-assistant.io/integrations/my/
+ALARM_PANEL_HELP_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=template"
+CALENDAR_HELP_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=local_calendar"
+TIME_OF_DAY_HELP_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=tod"
+PERSON_HELP_URL = "https://my.home-assistant.io/redirect/people/"
+SETUP_HELP_PLACEHOLDERS: dict[str, str] = {
+    "recipe_url": RECIPE_URL,
+    "alarm_panel_help_url": ALARM_PANEL_HELP_URL,
+    "calendar_help_url": CALENDAR_HELP_URL,
+    "bedtime_help_url": TIME_OF_DAY_HELP_URL,
+    "person_help_url": PERSON_HELP_URL,
+}
 # option holding the Time of Day sensors for each alarm state, a daily period doesn't suit vacations
 TIME_OF_DAY_OPTIONS: dict[str, str] = {
     f"time_of_day_{state}": state for state in PUBLIC_ALARM_STATES if state != "armed_vacation"
@@ -117,6 +132,188 @@ DEFAULT_OPTIONS: dict[str, Any] = {
 }
 
 
+def _top_level_fields(options: Mapping[str, Any], alarm_panel_default: str | None = None) -> dict[Any, Any]:
+    """Alarm panel plus the recommended-recipe entities, shared by every setup path and the options flow."""
+    alarm_panel_marker = (
+        vol.Required(CONF_ALARM_PANEL, default=alarm_panel_default) if alarm_panel_default else vol.Required(CONF_ALARM_PANEL)
+    )
+    return {
+        alarm_panel_marker: EntitySelector(EntitySelectorConfig(domain="alarm_control_panel")),
+        vol.Optional(CONF_BEDTIME_ENTITIES, default=options.get(CONF_BEDTIME_ENTITIES, [])): _time_of_day_selector(),
+        vol.Optional(CONF_CALENDAR_ENTITIES, default=options.get(CONF_CALENDAR_ENTITIES, [])): EntitySelector(
+            EntitySelectorConfig(domain="calendar", multiple=True)
+        ),
+        vol.Optional(CONF_PERSON_ENTITIES, default=options.get(CONF_PERSON_ENTITIES, [])): EntitySelector(
+            EntitySelectorConfig(domain="person", multiple=True)
+        ),
+    }
+
+
+def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
+    """The full set of options flow sections, shared by advanced setup and the options flow."""
+    notify_services = sorted(f"notify.{service}" for service in hass.services.async_services().get("notify", {}))
+    if hass.services.has_service("supernotify", "notify"):
+        notify_services.insert(0, SUPERNOTIFY_ACTION)
+
+    return {
+        vol.Required("calendar_options"): section(
+            vol.Schema({
+                vol.Optional(
+                    CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
+                    default=options.get(CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES),
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=PUBLIC_ALARM_STATES,
+                        multiple=True,
+                        mode=SelectSelectorMode.LIST,
+                    )
+                ),
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("time_of_day_options"): section(
+            vol.Schema({
+                vol.Optional(option, default=options.get(option, [])): _time_of_day_selector()
+                for option in TIME_OF_DAY_OPTIONS
+                if option != CONF_BEDTIME_ENTITIES
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("trigger_options"): section(
+            vol.Schema({
+                vol.Required(
+                    CONF_SUNRISE_TRIGGER,
+                    default=options.get(CONF_SUNRISE_TRIGGER, TRIGGER_AUTO),
+                ): _sun_trigger_selector(),
+                vol.Required(
+                    CONF_SUNSET_TRIGGER,
+                    default=options.get(CONF_SUNSET_TRIGGER, TRIGGER_AUTO),
+                ): _sun_trigger_selector(),
+                vol.Required(
+                    CONF_OCCUPIED_TRIGGER,
+                    default=options.get(CONF_OCCUPIED_TRIGGER, True),
+                ): BooleanSelector(),
+                vol.Required(
+                    CONF_UNOCCUPIED_TRIGGER,
+                    default=options.get(CONF_UNOCCUPIED_TRIGGER, True),
+                ): BooleanSelector(),
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("sunrise_options"): section(
+            vol.Schema({
+                vol.Optional(
+                    CONF_SUNRISE_EARLIEST,
+                    description={"suggested_value": options.get(CONF_SUNRISE_EARLIEST)},
+                ): TimeSelector(),
+                vol.Optional(
+                    CONF_SUNRISE_LATEST,
+                    description={"suggested_value": options.get(CONF_SUNRISE_LATEST)},
+                ): TimeSelector(),
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("sunset_options"): section(
+            vol.Schema({
+                vol.Optional(
+                    CONF_SUNSET_EARLIEST,
+                    description={"suggested_value": options.get(CONF_SUNSET_EARLIEST)},
+                ): TimeSelector(),
+                vol.Optional(
+                    CONF_SUNSET_LATEST,
+                    description={"suggested_value": options.get(CONF_SUNSET_LATEST)},
+                ): TimeSelector(),
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("assist_options"): section(
+            vol.Schema({
+                vol.Required(
+                    CONF_SENTENCE_ARM,
+                    default=options.get(CONF_SENTENCE_ARM, True),
+                ): BooleanSelector(),
+                vol.Required(
+                    CONF_SENTENCE_DISARM,
+                    default=options.get(CONF_SENTENCE_DISARM, False),
+                ): BooleanSelector(),
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("advanced_options"): section(
+            vol.Schema({
+                vol.Required(
+                    CONF_USE_ALARM_SERVICE,
+                    default=options.get(CONF_USE_ALARM_SERVICE, True),
+                ): BooleanSelector(),
+                vol.Optional(
+                    CONF_OCCUPANCY_DEFAULT_DAY,
+                    default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "disarmed"),
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=PUBLIC_ALARM_STATES,
+                        mode=SelectSelectorMode.DROPDOWN,
+                    )
+                ),
+                vol.Optional(
+                    CONF_OCCUPANCY_DEFAULT_NIGHT,
+                    description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")},
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=PUBLIC_ALARM_STATES,
+                        mode=SelectSelectorMode.DROPDOWN,
+                    )
+                ),
+                vol.Required(
+                    CONF_CALENDAR_ARMED_END_MODE,
+                    default=options.get(CONF_CALENDAR_ARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
+                ): _calendar_end_mode_selector(),
+                vol.Required(
+                    CONF_CALENDAR_DISARMED_END_MODE,
+                    default=options.get(CONF_CALENDAR_DISARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
+                ): _calendar_end_mode_selector(),
+            }),
+            {"collapsed": True},
+        ),
+        # last, like the "then do" actions at the bottom of an automation
+        vol.Required("notify_options"): section(
+            vol.Schema({
+                vol.Required(
+                    CONF_NOTIFY_ENABLED,
+                    default=options.get(CONF_NOTIFY_ENABLED, True),
+                ): BooleanSelector(),
+                vol.Optional(
+                    CONF_NOTIFY_ACTION,
+                    default=options.get(CONF_NOTIFY_ACTION, DEFAULT_NOTIFY_ACTION),
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=notify_services,
+                        multiple=False,
+                        mode=SelectSelectorMode.DROPDOWN,
+                    )
+                ),
+                vol.Optional(
+                    CONF_NOTIFY_TARGETS,
+                    default=options.get(CONF_NOTIFY_TARGETS, []),
+                ): TextSelector(TextSelectorConfig(multiple=True)),
+                vol.Optional(
+                    CONF_NOTIFY_DATA,
+                    default=options.get(CONF_NOTIFY_DATA, {}),
+                ): ObjectSelector(),
+            }),
+            {"collapsed": True},
+        ),
+    }
+
+
+def _flatten_sections(user_input: dict[str, Any]) -> dict[str, Any]:
+    """Flatten the section sub-dicts from a form submission into a single-level options dict."""
+    data = {k: v for k, v in user_input.items() if not isinstance(v, dict)}
+    for v in user_input.values():
+        if isinstance(v, dict):
+            data.update(v)
+    return data
+
+
 class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Auto Arm."""
 
@@ -125,11 +322,14 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
     MINOR_VERSION = 2
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Offer a quick recommended-recipe setup, or the full set of options up front."""
+        await self.async_set_unique_id(DOMAIN)
+        self._abort_if_unique_id_configured()
+        return self.async_show_menu(step_id="user", menu_options=["quick_setup", "advanced_setup"])
+
+    async def async_step_quick_setup(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle set up, of the alarm panel and the entities used by the recommended recipe."""
         if user_input is not None:
-            await self.async_set_unique_id(DOMAIN)
-            self._abort_if_unique_id_configured()
-
             options = {
                 **DEFAULT_OPTIONS,
                 CONF_BEDTIME_ENTITIES: user_input.get(CONF_BEDTIME_ENTITIES, []),
@@ -143,20 +343,36 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
                 options=options,
             )
 
+        # everyone known to Home Assistant, to be cut down rather than built up
+        default_options = {CONF_PERSON_ENTITIES: sorted(self.hass.states.async_entity_ids("person"))}
         return self.async_show_form(
-            step_id="user",
+            step_id="quick_setup",
+            data_schema=vol.Schema(_top_level_fields(default_options)),
+            description_placeholders=SETUP_HELP_PLACEHOLDERS,
+        )
+
+    async def async_step_advanced_setup(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Handle set up with the full set of options shown up front, instead of the quick recipe's defaults."""
+        if user_input is not None:
+            data = _flatten_sections(user_input)
+            alarm_panel = data.pop(CONF_ALARM_PANEL)
+            return self.async_create_entry(
+                title="Auto Arm",
+                data={CONF_ALARM_PANEL: alarm_panel},
+                options=data,
+            )
+
+        default_options = {
+            **DEFAULT_OPTIONS,
+            CONF_PERSON_ENTITIES: sorted(self.hass.states.async_entity_ids("person")),
+        }
+        return self.async_show_form(
+            step_id="advanced_setup",
             data_schema=vol.Schema({
-                vol.Required(CONF_ALARM_PANEL): EntitySelector(EntitySelectorConfig(domain="alarm_control_panel")),
-                vol.Optional(CONF_BEDTIME_ENTITIES, default=[]): _time_of_day_selector(),
-                vol.Optional(CONF_CALENDAR_ENTITIES, default=[]): EntitySelector(
-                    EntitySelectorConfig(domain="calendar", multiple=True)
-                ),
-                # everyone known to Home Assistant, to be cut down rather than built up
-                vol.Optional(CONF_PERSON_ENTITIES, default=sorted(self.hass.states.async_entity_ids("person"))): EntitySelector(
-                    EntitySelectorConfig(domain="person", multiple=True)
-                ),
+                **_top_level_fields(default_options),
+                **_section_fields(self.hass, default_options),
             }),
-            description_placeholders={"recipe_url": RECIPE_URL},
+            description_placeholders=SETUP_HELP_PLACEHOLDERS,
         )
 
     async def async_step_import(self, import_data: dict[str, Any]) -> ConfigFlowResult:
@@ -225,11 +441,7 @@ class AutoArmOptionsFlow(OptionsFlow):
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Manage the options."""
         if user_input is not None:
-            # Flatten section dicts into top-level options
-            data = {k: v for k, v in user_input.items() if not isinstance(v, dict)}
-            for v in user_input.values():
-                if isinstance(v, dict):
-                    data.update(v)
+            data = _flatten_sections(user_input)
 
             # The alarm panel entity lives in config_entry.data, not options.
             alarm_panel = data.pop(CONF_ALARM_PANEL)
@@ -242,177 +454,11 @@ class AutoArmOptionsFlow(OptionsFlow):
             return self.async_create_entry(title="", data=data)
 
         options = self.config_entry.options
-        notify_services = sorted(f"notify.{service}" for service in self.hass.services.async_services().get("notify", {}))
-        if self.hass.services.has_service("supernotify", "notify"):
-            notify_services.insert(0, SUPERNOTIFY_ACTION)
-
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
-                vol.Required(
-                    CONF_ALARM_PANEL,
-                    default=self.config_entry.data.get(CONF_ALARM_PANEL, ""),
-                ): EntitySelector(EntitySelectorConfig(domain="alarm_control_panel")),
-                vol.Optional(
-                    CONF_BEDTIME_ENTITIES,
-                    default=options.get(CONF_BEDTIME_ENTITIES, []),
-                ): _time_of_day_selector(),
-                vol.Optional(
-                    CONF_CALENDAR_ENTITIES,
-                    default=options.get(CONF_CALENDAR_ENTITIES, []),
-                ): EntitySelector(EntitySelectorConfig(domain="calendar", multiple=True)),
-                vol.Optional(
-                    CONF_PERSON_ENTITIES,
-                    default=options.get(CONF_PERSON_ENTITIES, []),
-                ): EntitySelector(EntitySelectorConfig(domain="person", multiple=True)),
-                vol.Required("calendar_options"): section(
-                    vol.Schema({
-                        vol.Optional(
-                            CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
-                            default=options.get(
-                                CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
-                            ),
-                        ): SelectSelector(
-                            SelectSelectorConfig(
-                                options=PUBLIC_ALARM_STATES,
-                                multiple=True,
-                                mode=SelectSelectorMode.LIST,
-                            )
-                        ),
-                    }),
-                    {"collapsed": True},
-                ),
-                vol.Required("time_of_day_options"): section(
-                    vol.Schema({
-                        vol.Optional(option, default=options.get(option, [])): _time_of_day_selector()
-                        for option in TIME_OF_DAY_OPTIONS
-                        if option != CONF_BEDTIME_ENTITIES
-                    }),
-                    {"collapsed": True},
-                ),
-                vol.Required("trigger_options"): section(
-                    vol.Schema({
-                        vol.Required(
-                            CONF_SUNRISE_TRIGGER,
-                            default=options.get(CONF_SUNRISE_TRIGGER, TRIGGER_AUTO),
-                        ): _sun_trigger_selector(),
-                        vol.Required(
-                            CONF_SUNSET_TRIGGER,
-                            default=options.get(CONF_SUNSET_TRIGGER, TRIGGER_AUTO),
-                        ): _sun_trigger_selector(),
-                        vol.Required(
-                            CONF_OCCUPIED_TRIGGER,
-                            default=options.get(CONF_OCCUPIED_TRIGGER, True),
-                        ): BooleanSelector(),
-                        vol.Required(
-                            CONF_UNOCCUPIED_TRIGGER,
-                            default=options.get(CONF_UNOCCUPIED_TRIGGER, True),
-                        ): BooleanSelector(),
-                    }),
-                    {"collapsed": True},
-                ),
-                vol.Required("sunrise_options"): section(
-                    vol.Schema({
-                        vol.Optional(
-                            CONF_SUNRISE_EARLIEST,
-                            description={"suggested_value": options.get(CONF_SUNRISE_EARLIEST)},
-                        ): TimeSelector(),
-                        vol.Optional(
-                            CONF_SUNRISE_LATEST,
-                            description={"suggested_value": options.get(CONF_SUNRISE_LATEST)},
-                        ): TimeSelector(),
-                    }),
-                    {"collapsed": True},
-                ),
-                vol.Required("sunset_options"): section(
-                    vol.Schema({
-                        vol.Optional(
-                            CONF_SUNSET_EARLIEST,
-                            description={"suggested_value": options.get(CONF_SUNSET_EARLIEST)},
-                        ): TimeSelector(),
-                        vol.Optional(
-                            CONF_SUNSET_LATEST,
-                            description={"suggested_value": options.get(CONF_SUNSET_LATEST)},
-                        ): TimeSelector(),
-                    }),
-                    {"collapsed": True},
-                ),
-                vol.Required("assist_options"): section(
-                    vol.Schema({
-                        vol.Required(
-                            CONF_SENTENCE_ARM,
-                            default=options.get(CONF_SENTENCE_ARM, True),
-                        ): BooleanSelector(),
-                        vol.Required(
-                            CONF_SENTENCE_DISARM,
-                            default=options.get(CONF_SENTENCE_DISARM, False),
-                        ): BooleanSelector(),
-                    }),
-                    {"collapsed": True},
-                ),
-                vol.Required("advanced_options"): section(
-                    vol.Schema({
-                        vol.Required(
-                            CONF_USE_ALARM_SERVICE,
-                            default=options.get(CONF_USE_ALARM_SERVICE, True),
-                        ): BooleanSelector(),
-                        vol.Optional(
-                            CONF_OCCUPANCY_DEFAULT_DAY,
-                            default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "disarmed"),
-                        ): SelectSelector(
-                            SelectSelectorConfig(
-                                options=PUBLIC_ALARM_STATES,
-                                mode=SelectSelectorMode.DROPDOWN,
-                            )
-                        ),
-                        vol.Optional(
-                            CONF_OCCUPANCY_DEFAULT_NIGHT,
-                            description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")},
-                        ): SelectSelector(
-                            SelectSelectorConfig(
-                                options=PUBLIC_ALARM_STATES,
-                                mode=SelectSelectorMode.DROPDOWN,
-                            )
-                        ),
-                        vol.Required(
-                            CONF_CALENDAR_ARMED_END_MODE,
-                            default=options.get(CONF_CALENDAR_ARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
-                        ): _calendar_end_mode_selector(),
-                        vol.Required(
-                            CONF_CALENDAR_DISARMED_END_MODE,
-                            default=options.get(CONF_CALENDAR_DISARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
-                        ): _calendar_end_mode_selector(),
-                    }),
-                    {"collapsed": True},
-                ),
-                # last, like the "then do" actions at the bottom of an automation
-                vol.Required("notify_options"): section(
-                    vol.Schema({
-                        vol.Required(
-                            CONF_NOTIFY_ENABLED,
-                            default=options.get(CONF_NOTIFY_ENABLED, True),
-                        ): BooleanSelector(),
-                        vol.Optional(
-                            CONF_NOTIFY_ACTION,
-                            default=options.get(CONF_NOTIFY_ACTION, DEFAULT_NOTIFY_ACTION),
-                        ): SelectSelector(
-                            SelectSelectorConfig(
-                                options=notify_services,
-                                multiple=False,
-                                mode=SelectSelectorMode.DROPDOWN,
-                            )
-                        ),
-                        vol.Optional(
-                            CONF_NOTIFY_TARGETS,
-                            default=options.get(CONF_NOTIFY_TARGETS, []),
-                        ): TextSelector(TextSelectorConfig(multiple=True)),
-                        vol.Optional(
-                            CONF_NOTIFY_DATA,
-                            default=options.get(CONF_NOTIFY_DATA, {}),
-                        ): ObjectSelector(),
-                    }),
-                    {"collapsed": True},
-                ),
+                **_top_level_fields(options, alarm_panel_default=self.config_entry.data.get(CONF_ALARM_PANEL, "")),
+                **_section_fields(self.hass, options),
             }),
             description_placeholders={"recipe_url": RECIPE_URL},
         )

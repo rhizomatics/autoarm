@@ -10,6 +10,8 @@
 
 ### ✨ Enhancements
 
+Starting from v1.5.0, Auto Arm now has an opinion about how to set up your auto arming easily, and simplified the configuration significantly around that. The advanced route remains.
+
 #### Recommended Starter Recipe
 A new [recommended recipe](./configuration/examples/recommended_recipe.md) has been added, and the integration settings re-organized to make this easier to set up. It involves:
 
@@ -20,6 +22,7 @@ A new [recommended recipe](./configuration/examples/recommended_recipe.md) has b
   - New installs only, existing installs keep their settings and can change them in the **Advanced** section
 - *Disarmed* for occupied daytime, *Armed Home* for occupied evening
 - Set up is now a single page asking for the alarm panel, bedtime sensor, calendar and people, with a link to the recipe
+- Each step now has instructions and an optional direct link to create any missing calendar, alarm panel or time of day sensor
 
 None of this removes existing functionality, and all of it can be overridden or tuned for your needs. It is, however, the simplest to set up with the least ongoing administration, of any automated way to manage alarms.
 

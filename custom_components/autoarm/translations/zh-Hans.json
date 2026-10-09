@@ -4,6 +4,14 @@
         "step": {
             "user": {
                 "title": "设置 Auto Arm",
+                "description": "快速设置按照推荐方案进行,只询问警报面板及其使用的实体,其余均使用合理的默认值。高级设置会一次性显示所有选项。",
+                "menu_options": {
+                    "quick_setup": "快速设置(推荐)",
+                    "advanced_setup": "高级设置"
+                }
+            },
+            "quick_setup": {
+                "title": "设置 Auto Arm",
                 "description": "按照[推荐方案]({recipe_url})设置，包括就寝时间传感器、度假日历，以及所有人外出时布防。只有警报面板是必填项，其余可以稍后添加。",
                 "data": {
                     "alarm_panel": "要管理的警报控制面板",
@@ -12,7 +20,125 @@
                     "person_entities": "用于基于在家状态布防的人员"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间，警报保持在夜间布防。"
+                    "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间,警报保持在夜间布防。 或跳过此项,使用日历或 *Sun* 集成来控制夜间布防。 还没有就寝时间传感器?[创建一个]({bedtime_help_url}),或前往 设置 → 设备与服务 → 辅助 → **+ 创建辅助** → **时段**。为其命名,并为平常的就寝时间设置起止时间。",
+                    "alarm_panel": "还没有警报面板?[创建一个虚拟面板]({alarm_panel_help_url}),或在 Home Assistant 中前往 设置 → 设备与服务 → 辅助 → **+ 创建辅助** → 模板 → **警报控制面板**。为其命名并提交;其余字段均为可选。",
+                    "calendar_entities": "还没有日历?[创建本地日历]({calendar_help_url}),或前往 设置 → 设备与服务 → **+ 添加集成** → **本地日历**。为其命名,并保持选中“创建空日历”。",
+                    "person_entities": "少了谁?[添加新成员]({person_help_url}),或前往 设置 → 人员 → **+ 添加人员**。为其命名;关联用户账户为可选项。"
+                }
+            },
+            "advanced_setup": {
+                "title": "设置 Auto Arm — 高级",
+                "data": {
+                    "alarm_panel": "要管理的警报控制面板",
+                    "time_of_day_armed_night": "用于夜间布防的就寝时间传感器",
+                    "calendar_entities": "用于度假和外出的日历",
+                    "person_entities": "用于基于在家状态布防的人员"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间,警报保持在夜间布防。 或跳过此项,使用日历或 *Sun* 集成来控制夜间布防。 还没有就寝时间传感器?[创建一个]({bedtime_help_url}),或前往 设置 → 设备与服务 → 辅助 → **+ 创建辅助** → **时段**。为其命名,并为平常的就寝时间设置起止时间。",
+                    "alarm_panel": "还没有警报面板?[创建一个虚拟面板]({alarm_panel_help_url}),或在 Home Assistant 中前往 设置 → 设备与服务 → 辅助 → **+ 创建辅助** → 模板 → **警报控制面板**。为其命名并提交;其余字段均为可选。",
+                    "calendar_entities": "还没有日历?[创建本地日历]({calendar_help_url}),或前往 设置 → 设备与服务 → **+ 添加集成** → **本地日历**。为其命名,并保持选中“创建空日历”。",
+                    "person_entities": "少了谁?[添加新成员]({person_help_url}),或前往 设置 → 人员 → **+ 添加人员**。为其命名;关联用户账户为可选项。"
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "日历对在家状态的覆盖",
+                        "data": {
+                            "calendar_occupancy_override_states": "在家状态可以覆盖的状态"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。"
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "时段",
+                        "description": "用于其他报警状态的时段传感器，与就寝时间传感器一样，在开启期间设置各自的状态。传感器关闭时，将应用高级中的日历事件结束设置。",
+                        "data": {
+                            "time_of_day_disarmed": "撤防",
+                            "time_of_day_armed_home": "在家布防",
+                            "time_of_day_armed_away": "离家布防",
+                            "time_of_day_armed_custom_bypass": "自定义布防"
+                        }
+                    },
+                    "trigger_options": {
+                        "name": "触发器",
+                        "description": "哪些事件可以触发重新计算警报状态。它们改变的是何时计算状态，而不是如何计算。自动模式在有匹配日历事件的日子关闭触发器，在没有日历活动的日子重新开启。",
+                        "data": {
+                            "sunrise_trigger": "日出",
+                            "sunset_trigger": "日落",
+                            "occupied_trigger": "有人回家",
+                            "unoccupied_trigger": "有人离家"
+                        },
+                        "data_description": {
+                            "sunrise_trigger": "在日出时重新计算警报状态",
+                            "sunset_trigger": "在日落时重新计算警报状态",
+                            "occupied_trigger": "有人回家时重新计算警报状态",
+                            "unoccupied_trigger": "有人离家时重新计算警报状态"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "日出限制",
+                        "data": {
+                            "sunrise_earliest": "最早",
+                            "sunrise_latest": "最晚"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "日出不早于此时间",
+                            "sunrise_latest": "日出不晚于此时间"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "日落限制",
+                        "data": {
+                            "sunset_earliest": "最早",
+                            "sunset_latest": "最晚"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "日落不早于此时间",
+                            "sunset_latest": "日落不晚于此时间"
+                        }
+                    },
+                    "assist_options": {
+                        "name": "语音助手",
+                        "data": {
+                            "sentence_arm": "语音布防和解释",
+                            "sentence_disarm": "语音撤防"
+                        },
+                        "data_description": {
+                            "sentence_arm": "用于 Home Assistant 内置 Assist 代理的英语语句，例如 'arm the alarm'、'arm the alarm in night mode' 和 'why is the alarm armed'。",
+                            "sentence_disarm": "添加 'disarm the alarm'。警告：不会要求输入密码，因此任何能通过语音卫星或聊天与 Assist 对话的人都可以撤防警报。"
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "高级",
+                        "data": {
+                            "use_alarm_service": "使用报警面板的操作更改状态",
+                            "occupancy_default_day": "白天有人在家时的默认布防状态",
+                            "occupancy_default_night": "夜间有人在家时的默认布防状态",
+                            "calendar_armed_end_mode": "布防日历事件结束时的警报状态",
+                            "calendar_disarmed_end_mode": "撤防日历事件结束时的警报状态"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。面板不得要求密码。",
+                            "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
+                            "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。"
+                        }
+                    },
+                    "notify_options": {
+                        "name": "通知",
+                        "data": {
+                            "notify_enabled": "启用通知",
+                            "notify_action": "通知操作",
+                            "notify_targets": "通知目标",
+                            "notify_data": "额外通知数据"
+                        },
+                        "data_description": {
+                            "notify_enabled": "在警报状态发生变化时启用通知",
+                            "notify_action": "用于发送通知的 Home Assistant 操作（服务）",
+                            "notify_targets": "要通知的地址或通知实体列表；如使用 Supernotify 可留空",
+                            "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
+                        }
+                    }
                 }
             }
         },
@@ -32,7 +158,7 @@
                     "person_entities": "用于基于在家状态布防的人员"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间，警报保持在夜间布防。"
+                    "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间,警报保持在夜间布防。 或跳过此项,使用日历或 *Sun* 集成来控制夜间布防。"
                 },
                 "sections": {
                     "calendar_options": {

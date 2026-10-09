@@ -4,6 +4,14 @@
         "step": {
             "user": {
                 "title": "Configura AutoArm",
+                "description": "La configurazione rapida segue la ricetta consigliata e chiede solo il pannello di allarme e le entità che utilizza, con valori predefiniti sensati per tutto il resto. La configurazione avanzata mostra subito tutte le opzioni.",
+                "menu_options": {
+                    "quick_setup": "Configurazione rapida (consigliata)",
+                    "advanced_setup": "Configurazione avanzata"
+                }
+            },
+            "quick_setup": {
+                "title": "Configura AutoArm",
                 "description": "Segue la [ricetta consigliata]({recipe_url}), con un sensore per l'ora di andare a dormire, un calendario per le vacanze e l'inserimento quando tutti sono fuori casa. È obbligatorio solo il pannello di allarme, il resto si può aggiungere in seguito.",
                 "data": {
                     "alarm_panel": "Pannello di controllo allarme da gestire",
@@ -12,7 +20,125 @@
                     "person_entities": "Persone per l'inserimento basato sulla presenza"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte."
+                    "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte. oppure salta questo passaggio e usa un calendario o l'integrazione *Sun* per controllare l'inserimento notturno. Non hai ancora un sensore dell'ora di andare a dormire? [Creane uno]({bedtime_help_url}), oppure vai su Impostazioni → Dispositivi e servizi → Ausiliari → **+ Crea ausiliario** → **Ora del giorno**. Dagli un nome e imposta un orario di inizio/fine per la tua solita ora di andare a dormire.",
+                    "alarm_panel": "Non hai ancora un pannello di allarme? [Creane uno virtuale]({alarm_panel_help_url}), oppure in Home Assistant vai su Impostazioni → Dispositivi e servizi → Ausiliari → **+ Crea ausiliario** → Template → **Pannello di controllo allarme**. Dagli un nome e invia; tutti gli altri campi sono opzionali.",
+                    "calendar_entities": "Non hai ancora un calendario? [Crea un calendario locale]({calendar_help_url}), oppure vai su Impostazioni → Dispositivi e servizi → **+ Aggiungi integrazione** → **Calendario locale**. Dagli un nome e lascia selezionato 'Crea calendario vuoto'.",
+                    "person_entities": "Manca qualcuno? [Aggiungi una nuova persona]({person_help_url}), oppure vai su Impostazioni → Persone → **+ Aggiungi persona**. Dagli un nome; collegare un account utente è opzionale."
+                }
+            },
+            "advanced_setup": {
+                "title": "Configura AutoArm — Avanzata",
+                "data": {
+                    "alarm_panel": "Pannello di controllo allarme da gestire",
+                    "time_of_day_armed_night": "Sensore dell'ora di andare a dormire per Inserito notte",
+                    "calendar_entities": "Calendari per vacanze e assenze",
+                    "person_entities": "Persone per l'inserimento basato sulla presenza"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte. oppure salta questo passaggio e usa un calendario o l'integrazione *Sun* per controllare l'inserimento notturno. Non hai ancora un sensore dell'ora di andare a dormire? [Creane uno]({bedtime_help_url}), oppure vai su Impostazioni → Dispositivi e servizi → Ausiliari → **+ Crea ausiliario** → **Ora del giorno**. Dagli un nome e imposta un orario di inizio/fine per la tua solita ora di andare a dormire.",
+                    "alarm_panel": "Non hai ancora un pannello di allarme? [Creane uno virtuale]({alarm_panel_help_url}), oppure in Home Assistant vai su Impostazioni → Dispositivi e servizi → Ausiliari → **+ Crea ausiliario** → Template → **Pannello di controllo allarme**. Dagli un nome e invia; tutti gli altri campi sono opzionali.",
+                    "calendar_entities": "Non hai ancora un calendario? [Crea un calendario locale]({calendar_help_url}), oppure vai su Impostazioni → Dispositivi e servizi → **+ Aggiungi integrazione** → **Calendario locale**. Dagli un nome e lascia selezionato 'Crea calendario vuoto'.",
+                    "person_entities": "Manca qualcuno? [Aggiungi una nuova persona]({person_help_url}), oppure vai su Impostazioni → Persone → **+ Aggiungi persona**. Dagli un nome; collegare un account utente è opzionale."
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "Sostituzione occupazione calendario",
+                        "data": {
+                            "calendar_occupancy_override_states": "Stati che la presenza può sovrascrivere"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Ora del giorno",
+                        "description": "Sensori ora del giorno per gli altri stati di allarme, che impostano il proprio stato mentre sono attivi, come il sensore dell'ora di andare a dormire. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate.",
+                        "data": {
+                            "time_of_day_disarmed": "Disinserito",
+                            "time_of_day_armed_home": "Inserito in casa",
+                            "time_of_day_armed_away": "Inserito fuori casa",
+                            "time_of_day_armed_custom_bypass": "Inserito personalizzato"
+                        }
+                    },
+                    "trigger_options": {
+                        "name": "Attivatori",
+                        "description": "Cosa può avviare una rivalutazione dello stato dell'allarme. Cambiano quando lo stato viene calcolato, non come. Automatico disattiva un attivatore nei giorni con un evento di calendario corrispondente e lo riattiva nei giorni senza attività di calendario.",
+                        "data": {
+                            "sunrise_trigger": "Alba",
+                            "sunset_trigger": "Tramonto",
+                            "occupied_trigger": "Qualcuno arriva a casa",
+                            "unoccupied_trigger": "Qualcuno esce di casa"
+                        },
+                        "data_description": {
+                            "sunrise_trigger": "Rivalutare lo stato dell'allarme all'alba",
+                            "sunset_trigger": "Rivalutare lo stato dell'allarme al tramonto",
+                            "occupied_trigger": "Rivalutare lo stato dell'allarme quando una persona arriva a casa",
+                            "unoccupied_trigger": "Rivalutare lo stato dell'allarme quando una persona esce di casa"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "Vincoli alba",
+                        "data": {
+                            "sunrise_earliest": "Prima",
+                            "sunrise_latest": "Ultima"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "Alba non prima di questa ora",
+                            "sunrise_latest": "Alba non dopo questa ora"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "Vincoli tramonto",
+                        "data": {
+                            "sunset_earliest": "Prima",
+                            "sunset_latest": "Ultima"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "Tramonto non prima di questa ora",
+                            "sunset_latest": "Tramonto non dopo questa ora"
+                        }
+                    },
+                    "assist_options": {
+                        "name": "Assistente vocale",
+                        "data": {
+                            "sentence_arm": "Inserire e spiegare a voce",
+                            "sentence_disarm": "Disinserire a voce"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Frasi in inglese per l'agente Assist integrato di Home Assistant, come 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
+                            "sentence_disarm": "Aggiunge 'disarm the alarm'. Attenzione: non viene chiesto alcun codice, quindi chiunque possa parlare con Assist, da un satellite vocale o nella chat, potrà disinserire l'allarme."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Avanzate",
+                        "data": {
+                            "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
+                            "occupancy_default_day": "Stato di inserimento predefinito quando occupato di giorno",
+                            "occupancy_default_night": "Stato di inserimento predefinito quando occupato di notte",
+                            "calendar_armed_end_mode": "Stato di inserimento al termine di un evento di calendario inserito",
+                            "calendar_disarmed_end_mode": "Stato di inserimento al termine di un evento di calendario disinserito"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. La centrale non deve richiedere un codice.",
+                            "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
+                            "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Notifiche",
+                        "data": {
+                            "notify_enabled": "Notifiche abilitate",
+                            "notify_action": "Azione di notifica",
+                            "notify_targets": "Destinatari notifica",
+                            "notify_data": "Dati di notifica aggiuntivi"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Abilita le notifiche per i cambiamenti di stato dell'allarme",
+                            "notify_action": "Azione (servizio) di Home Assistant da usare per notificare",
+                            "notify_targets": "Elenco di indirizzi o entità notify da notificare, può essere lasciato vuoto per Supernotify",
+                            "notify_data": "Dati aggiuntivi passati all'azione di notifica, come azioni o un canale per una notifica dell'app mobile. Qualsiasi valore impostato qui viene sovrascritto da una chiave corrispondente in un profilo di notifica YAML."
+                        }
+                    }
                 }
             }
         },
@@ -32,7 +158,7 @@
                     "person_entities": "Persone per l'inserimento basato sulla presenza"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte."
+                    "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte. oppure salta questo passaggio e usa un calendario o l'integrazione *Sun* per controllare l'inserimento notturno."
                 },
                 "sections": {
                     "calendar_options": {

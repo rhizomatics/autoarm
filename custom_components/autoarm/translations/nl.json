@@ -4,6 +4,14 @@
         "step": {
             "user": {
                 "title": "Auto Arm instellen",
+                "description": "Snelle installatie volgt het aanbevolen recept en vraagt alleen naar het alarmpaneel en de entiteiten die het gebruikt, met verstandige standaardwaarden voor de rest. Geavanceerde installatie toont meteen alle opties.",
+                "menu_options": {
+                    "quick_setup": "Snelle installatie (aanbevolen)",
+                    "advanced_setup": "Geavanceerde installatie"
+                }
+            },
+            "quick_setup": {
+                "title": "Auto Arm instellen",
                 "description": "Volgt het [aanbevolen recept]({recipe_url}), met een bedtijdsensor, een agenda voor vakanties en inschakelen wanneer iedereen weg is. Alleen het alarmpaneel is verplicht, de rest kan later worden toegevoegd.",
                 "data": {
                     "alarm_panel": "Te beheren alarmcentrale",
@@ -12,7 +20,125 @@
                     "person_entities": "Personen voor aanwezigheid-gebaseerd inschakelen"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht."
+                    "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht. of sla dit over en gebruik een agenda of de *Sun*-integratie om de nachtelijke inschakeling te regelen. Nog geen bedtijdsensor? [Maak er een]({bedtime_help_url}), of ga naar Instellingen → Apparaten en diensten → Hulpmiddelen → **+ Hulpmiddel aanmaken** → **Tijdstip van de dag**. Geef hem een naam en stel een Na/Voor-tijd in voor uw gebruikelijke bedtijd.",
+                    "alarm_panel": "Nog geen alarmpaneel? [Maak een virtueel paneel]({alarm_panel_help_url}), of ga in Home Assistant naar Instellingen → Apparaten en diensten → Hulpmiddelen → **+ Hulpmiddel aanmaken** → Sjabloon → **Alarmcentrale**. Geef het een naam en bevestig; alle andere velden zijn optioneel.",
+                    "calendar_entities": "Nog geen agenda? [Maak een lokale agenda]({calendar_help_url}), of ga naar Instellingen → Apparaten en diensten → **+ Integratie toevoegen** → **Lokale agenda**. Geef hem een naam en laat 'Lege agenda aanmaken' geselecteerd.",
+                    "person_entities": "Mist er iemand? [Voeg een nieuwe persoon toe]({person_help_url}), of ga naar Instellingen → Personen → **+ Persoon toevoegen**. Geef diegene een naam; koppelen aan een gebruikersaccount is optioneel."
+                }
+            },
+            "advanced_setup": {
+                "title": "Auto Arm instellen — Geavanceerd",
+                "data": {
+                    "alarm_panel": "Te beheren alarmcentrale",
+                    "time_of_day_armed_night": "Bedtijdsensor voor Ingeschakeld nacht",
+                    "calendar_entities": "Agenda's voor vakanties en afwezigheid",
+                    "person_entities": "Personen voor aanwezigheid-gebaseerd inschakelen"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht. of sla dit over en gebruik een agenda of de *Sun*-integratie om de nachtelijke inschakeling te regelen. Nog geen bedtijdsensor? [Maak er een]({bedtime_help_url}), of ga naar Instellingen → Apparaten en diensten → Hulpmiddelen → **+ Hulpmiddel aanmaken** → **Tijdstip van de dag**. Geef hem een naam en stel een Na/Voor-tijd in voor uw gebruikelijke bedtijd.",
+                    "alarm_panel": "Nog geen alarmpaneel? [Maak een virtueel paneel]({alarm_panel_help_url}), of ga in Home Assistant naar Instellingen → Apparaten en diensten → Hulpmiddelen → **+ Hulpmiddel aanmaken** → Sjabloon → **Alarmcentrale**. Geef het een naam en bevestig; alle andere velden zijn optioneel.",
+                    "calendar_entities": "Nog geen agenda? [Maak een lokale agenda]({calendar_help_url}), of ga naar Instellingen → Apparaten en diensten → **+ Integratie toevoegen** → **Lokale agenda**. Geef hem een naam en laat 'Lege agenda aanmaken' geselecteerd.",
+                    "person_entities": "Mist er iemand? [Voeg een nieuwe persoon toe]({person_help_url}), of ga naar Instellingen → Personen → **+ Persoon toevoegen**. Geef diegene een naam; koppelen aan een gebruikersaccount is optioneel."
+                },
+                "sections": {
+                    "calendar_options": {
+                        "name": "Aanwezigheid-override via agenda",
+                        "data": {
+                            "calendar_occupancy_override_states": "Statussen die aanwezigheid mag overschrijven"
+                        },
+                        "data_description": {
+                            "calendar_occupancy_override_states": "Wanneer een agenda-item een van deze statussen instelt, kunnen aanwezigheidswijzigingen (aankomsten en vertrekken) de alarmstatus nog steeds bijwerken. Als de agenda bijvoorbeeld Uitgeschakeld aangeeft maar iedereen vertrekt, schakelt het over naar Ingeschakeld Afwezig."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Tijdstip van de dag",
+                        "description": "Tijdstip-van-de-dag-sensoren voor de andere alarmstatussen, die hun status instellen zolang ze aan staan, net als de bedtijdsensor. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-afspraak onder Geavanceerd.",
+                        "data": {
+                            "time_of_day_disarmed": "Uitgeschakeld",
+                            "time_of_day_armed_home": "Ingeschakeld thuis",
+                            "time_of_day_armed_away": "Ingeschakeld afwezig",
+                            "time_of_day_armed_custom_bypass": "Ingeschakeld aangepast"
+                        }
+                    },
+                    "trigger_options": {
+                        "name": "Triggers",
+                        "description": "Wat een herbeoordeling van de alarmstatus kan starten. Deze bepalen wanneer de status wordt berekend, niet hoe. Automatisch zet een trigger uit op elke dag met een overeenkomende agenda-afspraak, en weer aan op dagen zonder agenda-activiteit.",
+                        "data": {
+                            "sunrise_trigger": "Zonsopgang",
+                            "sunset_trigger": "Zonsondergang",
+                            "occupied_trigger": "Iemand komt thuis",
+                            "unoccupied_trigger": "Iemand vertrekt"
+                        },
+                        "data_description": {
+                            "sunrise_trigger": "Alarmstatus herbeoordelen bij zonsopgang",
+                            "sunset_trigger": "Alarmstatus herbeoordelen bij zonsondergang",
+                            "occupied_trigger": "Alarmstatus herbeoordelen wanneer iemand thuiskomt",
+                            "unoccupied_trigger": "Alarmstatus herbeoordelen wanneer iemand vertrekt"
+                        }
+                    },
+                    "sunrise_options": {
+                        "name": "Zonsopgangbeperkingen",
+                        "data": {
+                            "sunrise_earliest": "Vroegst",
+                            "sunrise_latest": "Laatst"
+                        },
+                        "data_description": {
+                            "sunrise_earliest": "Zonsopgang niet eerder dan dit tijdstip",
+                            "sunrise_latest": "Zonsopgang niet later dan dit tijdstip"
+                        }
+                    },
+                    "sunset_options": {
+                        "name": "Zonsondergangbeperkingen",
+                        "data": {
+                            "sunset_earliest": "Vroegst",
+                            "sunset_latest": "Laatst"
+                        },
+                        "data_description": {
+                            "sunset_earliest": "Zonsondergang niet eerder dan dit tijdstip",
+                            "sunset_latest": "Zonsondergang niet later dan dit tijdstip"
+                        }
+                    },
+                    "assist_options": {
+                        "name": "Spraakassistent",
+                        "data": {
+                            "sentence_arm": "Inschakelen en uitleggen met spraak",
+                            "sentence_disarm": "Uitschakelen met spraak"
+                        },
+                        "data_description": {
+                            "sentence_arm": "Engelse zinnen voor de ingebouwde Assist-agent van Home Assistant, zoals 'arm the alarm', 'arm the alarm in night mode' en 'why is the alarm armed'.",
+                            "sentence_disarm": "Voegt 'disarm the alarm' toe. Waarschuwing: er wordt geen code gevraagd, dus iedereen die met Assist kan praten, via een spraaksatelliet of in de chat, kan het alarm uitschakelen."
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Geavanceerd",
+                        "data": {
+                            "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
+                            "occupancy_default_day": "Standaard inschakelstatus bij aanwezigheid overdag",
+                            "occupancy_default_night": "Standaard inschakelstatus bij aanwezigheid 's nachts",
+                            "calendar_armed_end_mode": "Alarmstatus wanneer een ingeschakelde agenda-afspraak eindigt",
+                            "calendar_disarmed_end_mode": "Alarmstatus wanneer een uitgeschakelde agenda-afspraak eindigt"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Het paneel mag geen code vereisen.",
+                            "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
+                            "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is."
+                        }
+                    },
+                    "notify_options": {
+                        "name": "Meldingen",
+                        "data": {
+                            "notify_enabled": "Meldingen ingeschakeld",
+                            "notify_action": "Meldingsactie",
+                            "notify_targets": "Meldingsdoelen",
+                            "notify_data": "Extra meldingsgegevens"
+                        },
+                        "data_description": {
+                            "notify_enabled": "Meldingen inschakelen bij wijzigingen van de alarmstatus",
+                            "notify_action": "Home Assistant-actie (service) om mee te melden",
+                            "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden; kan leeg blijven voor Supernotify",
+                            "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
+                        }
+                    }
                 }
             }
         },
@@ -32,7 +158,7 @@
                     "person_entities": "Personen voor aanwezigheid-gebaseerd inschakelen"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht."
+                    "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht. of sla dit over en gebruik een agenda of de *Sun*-integratie om de nachtelijke inschakeling te regelen."
                 },
                 "sections": {
                     "calendar_options": {
