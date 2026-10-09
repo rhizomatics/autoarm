@@ -277,9 +277,7 @@ async def test_calendar_deleted_event_started_by_listener_is_ended(
     assert not simple_tracked_calendar.has_active_event()
 
 
-pytest.mark.skipif(sys.version_info < (3, 14, 2), reason="flaky with old home assistant")
-
-
+@pytest.mark.skipif(sys.version_info < (3, 14, 2), reason="flaky with old home assistant")
 async def test_calendar_prunes_ended_event_deleted_from_calendar(
     simple_tracked_calendar: TrackedCalendar, local_calendar: CalendarEntity
 ) -> None:
