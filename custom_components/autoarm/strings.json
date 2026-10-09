@@ -22,7 +22,7 @@
                 "data_description": {
                     "alarm_panel": "No alarm panel yet? [Create a virtual one]({alarm_panel_help_url}), or in Home Assistant go to Settings → Devices & Services → Helpers → **+ Create Helper** → Template → **Alarm control panel**. Give it a name and submit; every other field is optional.",
                     "calendar_entities": "No calendar yet? [Create a local calendar]({calendar_help_url}), or go to Settings → Devices & Services → **+ Add Integration** → **Local calendar**. Give it a name and leave 'Create empty calendar' selected.",
-                    "time_of_day_armed_night": "A Time of Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. or skip this and use a calendar or the *Sun* integration to control night time arming. No bedtime sensor yet? [Create one]({bedtime_help_url}), or go to Settings → Devices & Services → Helpers → **+ Create Helper** → **Time of the Day**. Give it a name and set an After/Before time for your usual bedtime window.",
+                    "time_of_day_armed_night": "A Time of Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. Alternatively use a calendar or the *Sun* integration to control night time arming. No bedtime sensor yet? [Create one]({bedtime_help_url}), or go to Settings → Devices & Services → Helpers → **+ Create Helper** → **Time of the Day**. Give it a name and set an After/Before time for your usual bedtime window.",
                     "person_entities": "Somebody missing? [Add a new person]({person_help_url}), or go to Settings → People → **+ Add Person**. Give them a name; linking a user account is optional."
                 }
             },
@@ -37,7 +37,7 @@
                 "data_description": {
                     "alarm_panel": "No alarm panel yet? [Create a virtual one]({alarm_panel_help_url}), or in Home Assistant go to Settings → Devices & Services → Helpers → **+ Create Helper** → Template → **Alarm control panel**. Give it a name and submit; every other field is optional.",
                     "calendar_entities": "No calendar yet? [Create a local calendar]({calendar_help_url}), or go to Settings → Devices & Services → **+ Add Integration** → **Local calendar**. Give it a name and leave 'Create empty calendar' selected.",
-                    "time_of_day_armed_night": "A Time of Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. or skip this and use a calendar or the *Sun* integration to control night time arming. No bedtime sensor yet? [Create one]({bedtime_help_url}), or go to Settings → Devices & Services → Helpers → **+ Create Helper** → **Time of the Day**. Give it a name and set an After/Before time for your usual bedtime window.",
+                    "time_of_day_armed_night": "A Time of Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. Alternatively use a calendar or the *Sun* integration to control night time arming. No bedtime sensor yet? [Create one]({bedtime_help_url}), or go to Settings → Devices & Services → Helpers → **+ Create Helper** → **Time of the Day**. Give it a name and set an After/Before time for your usual bedtime window.",
                     "person_entities": "Somebody missing? [Add a new person]({person_help_url}), or go to Settings → People → **+ Add Person**. Give them a name; linking a user account is optional."
                 },
                 "sections": {
@@ -158,7 +158,7 @@
                     "person_entities": "People for occupancy based arming"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "A Time of Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. or skip this and use a calendar or the *Sun* integration to control night time arming."
+                    "time_of_day_armed_night": "A Time of Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. Alternatively use a calendar or the *Sun* integration to control night time arming."
                 },
                 "sections": {
                     "calendar_options": {
