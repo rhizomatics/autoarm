@@ -11,10 +11,11 @@ With the config flow, some settings are now managed in the UI:
 | Alarm panel entity | UI (setup) | Selected when adding the integration |
 | Change state using panel actions | UI (options, Advanced) | On for new installs, see [Create Panel](../create_panel.md) |
 | Arm and explain by voice, Disarm by voice | UI (options) | Voice and chat commands, see [Automated Arming](../../automated_arming.md#built-in-agent-sentences) |
-| Calendar entities | UI (options) | Which calendars to use |
-| Person entities | UI (options) | Which persons to track for occupancy |
+| Bedtime sensor | UI (setup, options) | Time of Day sensor for `armed_night`, see [Recommended Recipe](recommended_recipe.md) |
+| Calendar entities | UI (setup, options) | Which calendars to use |
+| Person entities | UI (setup, options) | Which persons to track for occupancy |
 | Occupancy day/night defaults | UI (options, Advanced) | Default alarm state when occupied |
-| Time of Day sensors | UI (options) | Sensors that set an alarm state while on, see [Recommended Recipe](recommended_recipe.md) |
+| Time of Day sensors | UI (options) | Sensors that set any other alarm state while on |
 | Calendar end modes | UI (options, Advanced) | What happens when an armed or disarmed calendar event ends |
 | Triggers | UI (options) | Whether sunrise, sunset and people arriving or leaving re-evaluate the state |
 | Sunrise and sunset | UI (options) | Earliest and latest times |

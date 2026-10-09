@@ -12,17 +12,22 @@ A simple standard setup for a home that's lived in most days, with no YAML:
 
 1. Create a **Bedtime** sensor in **Settings** > **Devices & Services** > **Helpers** > **Create Helper** > **Times of the Day**, on at 23:00 and off at 07:00, or whatever suits.
 2. Have a calendar for vacations and time away. If you don't have one, see [Create a Calendar](../create_calendar.md).
-3. In **Settings** > **Devices & Services** > **Auto Arm** > **Configure**:
+3. Add the integration from **Settings** > **Devices & Services** > **Add Integration**, searching for **Auto Arm**, or if it's already set up, open **Settings** > **Devices & Services** > **Auto Arm** > **Configure**:
 
-| Section         | Setting                                         | Value                 |
-|-----------------|-------------------------------------------------|-----------------------|
-|                 | **Calendars to use for arming schedules**       | The calendar          |
-|                 | **People for occupancy based arming**           | Everyone who lives in |
-| **Time of Day** | **Armed night**                                 | The Bedtime sensor    |
-| **Advanced**    | **Default arming state when occupied during day** | Disarmed            |
-| **Advanced**    | **Default arming state when occupied at night** | Armed home            |
+| Setting                                   | Value                                                 |
+|-------------------------------------------|-------------------------------------------------------|
+| **Bedtime sensor for Armed Night**        | The Bedtime sensor                                    |
+| **Calendars for vacations and time away** | The calendar                                          |
+| **People for occupancy based arming**     | Everyone who lives in, already chosen on a new set up |
 
-Everything else is left at its default.
+Everything else is left at its default on a new set up.
+
+If Auto Arm was already set up, its existing settings are kept, so also check these in the **Advanced** section:
+
+| Setting                                           | Value      |
+|---------------------------------------------------|------------|
+| **Default arming state when occupied during day** | Disarmed   |
+| **Default arming state when occupied at night**   | Armed Home |
 
 ## An Ordinary Day
 

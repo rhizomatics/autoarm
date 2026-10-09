@@ -10,6 +10,22 @@
 
 ### ✨ Enhancements
 
+#### Recommended Starter Recipe
+A new [recommended recipe](./configuration/examples/recommended_recipe.md) has been added, and the integration settings re-organized to make this easier to set up. It involves:
+
+- [Time of Day](https://www.home-assistant.io/integrations/tod/) integration to manage bedtime for *Armed Night*
+- A calendar only for planned away or vacation times
+- Diurnal (`sun` integration) only for dark evenings pre-bedtime to be set to *Armed Home*
+- Every *Person* created in Home Assistant is pre-added to the occupied list
+  - New installs only, existing installs keep their settings and can change them in the **Advanced** section
+- *Disarmed* for occupied daytime, *Armed Home* for occupied evening
+- Set up is now a single page asking for the alarm panel, bedtime sensor, calendar and people, with a link to the recipe
+
+None of this removes existing functionality, and all of it can be overridden or tuned for your needs. It is, however, the simplest to set up with the least ongoing administration, of any automated way to manage alarms.
+
+#### Notifications
+- The alarm states are now the humane versions, e.g. "Armed Night" rather than `armed_night`
+
 #### Time of Day Sensors
 - [Time of Day](https://www.home-assistant.io/integrations/tod/) sensors can now set the alarm state, as an alternative to a recurring calendar event, for example a daily bedtime for `armed_night`
   - Choose the sensors for each alarm state in the new **Time of Day** section of the options

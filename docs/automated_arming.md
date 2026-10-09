@@ -159,7 +159,7 @@ This only debounces the *notification*; the alarm panel's actual state still upd
 A [Time of Day](https://www.home-assistant.io/integrations/tod/) sensor can set an alarm state for the same period every day, without needing a recurring calendar event. For example, a **Bedtime** sensor that is on from 23:00 to 07:00 holds the alarm at `armed_night`, whatever time the sun sets or rises. See the [Recommended Recipe](configuration/examples/recommended_recipe.md) for a complete setup with sunset and a vacation calendar.
 
 1. Create the sensor in **Settings** > **Devices & Services** > **Helpers** > **Create Helper** > **Times of the Day**, giving the times it turns on and off.
-2. In **Settings** > **Devices & Services** > **Auto Arm** > **Configure**, open the **Time of Day** section and choose the sensor for the alarm state it should set. More than one sensor can be chosen for a state. There's no choice for `armed_vacation`, as a daily period doesn't suit it.
+2. In **Settings** > **Devices & Services** > **Auto Arm** > **Configure**, choose it as the **Bedtime sensor for Armed Night**, or for any other alarm state, open the **Time of Day** section and choose the sensor for the state it should set. More than one sensor can be chosen for a state. There's no choice for `armed_vacation`, as a daily period doesn't suit it.
 
 While the sensor is on:
 

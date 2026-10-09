@@ -3,21 +3,16 @@
     "config": {
         "step": {
             "user": {
-                "title": "Alarmpaneel selecteren",
+                "title": "Auto Arm instellen",
+                "description": "Volgt het [aanbevolen recept]({recipe_url}), met een bedtijdsensor, een agenda voor vakanties en inschakelen wanneer iedereen weg is. Alleen het alarmpaneel is verplicht, de rest kan later worden toegevoegd.",
                 "data": {
-                    "alarm_panel": "Te beheren alarmcentrale"
-                }
-            },
-            "calendars": {
-                "title": "Agenda's selecteren",
-                "data": {
-                    "calendar_entities": "Agenda's om te gebruiken voor inschakelschema's"
-                }
-            },
-            "persons": {
-                "title": "Personen selecteren",
-                "data": {
+                    "alarm_panel": "Te beheren alarmcentrale",
+                    "time_of_day_armed_night": "Bedtijdsensor voor Ingeschakeld nacht",
+                    "calendar_entities": "Agenda's voor vakanties en afwezigheid",
                     "person_entities": "Personen voor aanwezigheid-gebaseerd inschakelen"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht."
                 }
             }
         },
@@ -29,10 +24,15 @@
         "step": {
             "init": {
                 "title": "Auto Arm-opties",
+                "description": "Het [aanbevolen recept]({recipe_url}) legt uit hoe de bedtijdsensor, de agenda en de personen samenwerken.",
                 "data": {
                     "alarm_panel": "Te beheren alarmcentrale",
-                    "calendar_entities": "Agenda's om te gebruiken voor inschakelschema's",
+                    "time_of_day_armed_night": "Bedtijdsensor voor Ingeschakeld nacht",
+                    "calendar_entities": "Agenda's voor vakanties en afwezigheid",
                     "person_entities": "Personen voor aanwezigheid-gebaseerd inschakelen"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht."
                 },
                 "sections": {
                     "calendar_options": {
@@ -46,12 +46,11 @@
                     },
                     "time_of_day_options": {
                         "name": "Tijdstip van de dag",
-                        "description": "Tijdstip-van-de-dag-sensoren die een alarmstatus instellen zolang ze aan staan, als alternatief voor agenda-afspraken, bijvoorbeeld een dagelijkse bedtijd voor Ingeschakeld nacht. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-afspraak onder Geavanceerd.",
+                        "description": "Tijdstip-van-de-dag-sensoren voor de andere alarmstatussen, die hun status instellen zolang ze aan staan, net als de bedtijdsensor. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-afspraak onder Geavanceerd.",
                         "data": {
                             "time_of_day_disarmed": "Uitgeschakeld",
                             "time_of_day_armed_home": "Ingeschakeld thuis",
                             "time_of_day_armed_away": "Ingeschakeld afwezig",
-                            "time_of_day_armed_night": "Ingeschakeld nacht",
                             "time_of_day_armed_custom_bypass": "Ingeschakeld aangepast"
                         }
                     },

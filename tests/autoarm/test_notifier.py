@@ -356,7 +356,7 @@ async def test_notify_auto_generates_title_from_to_state(hass: HomeAssistant) ->
     )
 
     assert len(calls) == 1
-    assert "armed_away" in calls[0]["data"]["title"].lower()
+    assert calls[0]["data"]["title"] == "Alarm now Armed Away"
 
 
 async def test_notify_auto_generates_message_from_states(hass: HomeAssistant) -> None:
@@ -385,7 +385,7 @@ async def test_notify_auto_generates_message_from_states(hass: HomeAssistant) ->
 
     assert len(calls) == 1
     message = calls[0]["data"]["message"]
-    assert message == "Alarm state changed from armed_home to armed_away by Alarm_panel"
+    assert message == "Alarm state changed from Armed Home to Armed Away by Alarm_panel"
 
 
 async def test_notify_profile_name_replacement(hass: HomeAssistant) -> None:
@@ -699,7 +699,7 @@ async def test_notify_supernotify_action_takes_data_at_top_level(hass: HomeAssis
 
     [data] = calls
     assert "data" not in data
-    assert data["message"] == "Alarm state changed from disarmed to armed_away by Calendar"
+    assert data["message"] == "Alarm state changed from Disarmed to Armed Away by Calendar"
     assert data["priority"] == "high"
     assert data["apply_scenarios"] == ["security"]
     assert data["target"] == ["person.jey"]

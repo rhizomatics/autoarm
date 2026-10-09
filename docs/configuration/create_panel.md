@@ -19,7 +19,7 @@ alarm_control_panel:
 
 ## Selecting the Alarm Panel in Auto Arm
 
-The alarm panel entity is selected during the Auto Arm UI config flow. Go to **Settings** > **Devices & Services** > **Add Integration**, search for **Auto Arm**, and select your alarm panel entity in the first step.
+The alarm panel entity is selected during the Auto Arm UI config flow. Go to **Settings** > **Devices & Services** > **Add Integration**, search for **Auto Arm**, and select your alarm panel entity.
 
 ## How Auto Arm Changes the Panel
 

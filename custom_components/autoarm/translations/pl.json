@@ -3,21 +3,16 @@
     "config": {
         "step": {
             "user": {
-                "title": "Wybierz panel alarmowy",
+                "title": "Skonfiguruj Auto Arm",
+                "description": "Zgodnie z [zalecanym przepisem]({recipe_url}), z czujnikiem pory snu, kalendarzem na urlopy i uzbrajaniem, gdy wszyscy są poza domem. Wymagany jest tylko panel alarmowy, resztę można dodać później.",
                 "data": {
-                    "alarm_panel": "Panel kontroli alarmu do zarządzania"
-                }
-            },
-            "calendars": {
-                "title": "Wybierz kalendarze",
-                "data": {
-                    "calendar_entities": "Kalendarze używane do harmonogramów uzbrajania"
-                }
-            },
-            "persons": {
-                "title": "Wybierz osoby",
-                "data": {
+                    "alarm_panel": "Panel kontroli alarmu do zarządzania",
+                    "time_of_day_armed_night": "Czujnik pory snu dla stanu Uzbrojony na noc",
+                    "calendar_entities": "Kalendarze na urlopy i nieobecności",
                     "person_entities": "Osoby do uzbrajania na podstawie obecności"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc."
                 }
             }
         },
@@ -29,10 +24,15 @@
         "step": {
             "init": {
                 "title": "Opcje Auto Arm",
+                "description": "[Zalecany przepis]({recipe_url}) wyjaśnia, jak współdziałają czujnik pory snu, kalendarz i osoby.",
                 "data": {
                     "alarm_panel": "Panel kontroli alarmu do zarządzania",
-                    "calendar_entities": "Kalendarze używane do harmonogramów uzbrajania",
+                    "time_of_day_armed_night": "Czujnik pory snu dla stanu Uzbrojony na noc",
+                    "calendar_entities": "Kalendarze na urlopy i nieobecności",
                     "person_entities": "Osoby do uzbrajania na podstawie obecności"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc."
                 },
                 "sections": {
                     "calendar_options": {
@@ -46,12 +46,11 @@
                     },
                     "time_of_day_options": {
                         "name": "Pora dnia",
-                        "description": "Czujniki pory dnia, które ustawiają stan alarmu, gdy są włączone, jako alternatywa dla wydarzeń kalendarza, na przykład codzienna pora snu dla stanu Uzbrojony na noc. Gdy czujnik się wyłącza, obowiązują ustawienia zakończenia wydarzenia kalendarza z sekcji Zaawansowane.",
+                        "description": "Czujniki pory dnia dla pozostałych stanów alarmu, które ustawiają swój stan, gdy są włączone, tak jak czujnik pory snu. Gdy czujnik się wyłącza, obowiązują ustawienia zakończenia wydarzenia kalendarza z sekcji Zaawansowane.",
                         "data": {
                             "time_of_day_disarmed": "Rozbrojony",
                             "time_of_day_armed_home": "Uzbrojony w domu",
                             "time_of_day_armed_away": "Uzbrojony poza domem",
-                            "time_of_day_armed_night": "Uzbrojony na noc",
                             "time_of_day_armed_custom_bypass": "Uzbrojony niestandardowo"
                         }
                     },

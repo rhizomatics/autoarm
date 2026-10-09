@@ -140,6 +140,7 @@ from .helpers import (
     change_source_as_enum,
     child_context,
     deobjectify,
+    friendly_state,
     safe_state,
 )
 from .sentences import async_register_sentences
@@ -1637,8 +1638,8 @@ class AlarmArmer:
                     ChangeSource.BUTTON,
                     from_state=self.armed_state(),
                     to_state=state,
-                    message=f"Alarm will be set to {state} in {delay}",
-                    title=f"Arm set to {state} process starting",
+                    message=f"Alarm will be set to {friendly_state(state)} in {delay}",
+                    title=f"Arm set to {friendly_state(state)} process starting",
                     context=context,
                 )
         else:

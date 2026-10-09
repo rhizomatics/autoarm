@@ -3,21 +3,16 @@
     "config": {
         "step": {
             "user": {
-                "title": "Seleziona pannello di allarme",
+                "title": "Configura AutoArm",
+                "description": "Segue la [ricetta consigliata]({recipe_url}), con un sensore per l'ora di andare a dormire, un calendario per le vacanze e l'inserimento quando tutti sono fuori casa. È obbligatorio solo il pannello di allarme, il resto si può aggiungere in seguito.",
                 "data": {
-                    "alarm_panel": "Pannello di controllo allarme da gestire"
-                }
-            },
-            "calendars": {
-                "title": "Seleziona calendari",
-                "data": {
-                    "calendar_entities": "Calendari da usare per la pianificazione dell'inserimento"
-                }
-            },
-            "persons": {
-                "title": "Seleziona persone",
-                "data": {
+                    "alarm_panel": "Pannello di controllo allarme da gestire",
+                    "time_of_day_armed_night": "Sensore dell'ora di andare a dormire per Inserito notte",
+                    "calendar_entities": "Calendari per vacanze e assenze",
                     "person_entities": "Persone per l'inserimento basato sulla presenza"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte."
                 }
             }
         },
@@ -29,10 +24,15 @@
         "step": {
             "init": {
                 "title": "Opzioni AutoArm",
+                "description": "La [ricetta consigliata]({recipe_url}) spiega come funzionano insieme il sensore dell'ora di andare a dormire, il calendario e le persone.",
                 "data": {
                     "alarm_panel": "Pannello di controllo allarme da gestire",
-                    "calendar_entities": "Calendari da usare per la pianificazione dell'inserimento",
+                    "time_of_day_armed_night": "Sensore dell'ora di andare a dormire per Inserito notte",
+                    "calendar_entities": "Calendari per vacanze e assenze",
                     "person_entities": "Persone per l'inserimento basato sulla presenza"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte."
                 },
                 "sections": {
                     "calendar_options": {
@@ -46,12 +46,11 @@
                     },
                     "time_of_day_options": {
                         "name": "Ora del giorno",
-                        "description": "Sensori ora del giorno che impostano uno stato di allarme mentre sono attivi, in alternativa agli eventi del calendario, ad esempio un orario quotidiano per andare a dormire per Inserito notte. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate.",
+                        "description": "Sensori ora del giorno per gli altri stati di allarme, che impostano il proprio stato mentre sono attivi, come il sensore dell'ora di andare a dormire. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate.",
                         "data": {
                             "time_of_day_disarmed": "Disinserito",
                             "time_of_day_armed_home": "Inserito in casa",
                             "time_of_day_armed_away": "Inserito fuori casa",
-                            "time_of_day_armed_night": "Inserito notte",
                             "time_of_day_armed_custom_bypass": "Inserito personalizzato"
                         }
                     },

@@ -17,6 +17,11 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 
+def friendly_state(state: str) -> str:
+    """Alarm state as shown to people, Armed Away rather than armed_away"""
+    return str(state).replace("_", " ").title()
+
+
 def alarm_state_as_enum(state_str: str | None) -> AlarmControlPanelState | None:
     if state_str is None:
         return None

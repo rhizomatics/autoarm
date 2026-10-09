@@ -3,21 +3,16 @@
     "config": {
         "step": {
             "user": {
-                "title": "Alarmzentrale auswählen",
+                "title": "Auto Arm einrichten",
+                "description": "Folgt dem [empfohlenen Rezept]({recipe_url}), mit einem Schlafenszeit-Sensor, einem Kalender für Urlaube und Scharfschaltung, wenn alle außer Haus sind. Nur die Alarmzentrale ist erforderlich, der Rest kann später ergänzt werden.",
                 "data": {
-                    "alarm_panel": "Zu verwaltende Alarmzentrale"
-                }
-            },
-            "calendars": {
-                "title": "Kalender auswählen",
-                "data": {
-                    "calendar_entities": "Kalender für die Scharf-Zeitplanung"
-                }
-            },
-            "persons": {
-                "title": "Personen auswählen",
-                "data": {
+                    "alarm_panel": "Zu verwaltende Alarmzentrale",
+                    "time_of_day_armed_night": "Schlafenszeit-Sensor für 'Scharf Nacht'",
+                    "calendar_entities": "Kalender für Urlaube und Abwesenheiten",
                     "person_entities": "Personen für die belegungsbasierte Scharfschaltung"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Ein Tageszeit-Sensor, der jeden Tag zur Schlafenszeit eingeschaltet ist. Solange er an ist, bleibt der Alarm auf 'Scharf Nacht'."
                 }
             }
         },
@@ -29,10 +24,15 @@
         "step": {
             "init": {
                 "title": "AutoArm-Optionen",
+                "description": "Das [empfohlene Rezept]({recipe_url}) erklärt, wie Schlafenszeit-Sensor, Kalender und Personen zusammenwirken.",
                 "data": {
                     "alarm_panel": "Zu verwaltende Alarmzentrale",
-                    "calendar_entities": "Kalender für die Scharf-Zeitplanung",
+                    "time_of_day_armed_night": "Schlafenszeit-Sensor für 'Scharf Nacht'",
+                    "calendar_entities": "Kalender für Urlaube und Abwesenheiten",
                     "person_entities": "Personen für die belegungsbasierte Scharfschaltung"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "Ein Tageszeit-Sensor, der jeden Tag zur Schlafenszeit eingeschaltet ist. Solange er an ist, bleibt der Alarm auf 'Scharf Nacht'."
                 },
                 "sections": {
                     "calendar_options": {
@@ -46,12 +46,11 @@
                     },
                     "time_of_day_options": {
                         "name": "Tageszeit",
-                        "description": "Tageszeit-Sensoren, die einen Alarmzustand setzen, solange sie eingeschaltet sind, als Alternative zu Kalenderereignissen, zum Beispiel eine tägliche Schlafenszeit für 'Scharf Nacht'. Wenn ein Sensor ausschaltet, gelten die Einstellungen für das Ende von Kalenderereignissen unter Erweitert.",
+                        "description": "Tageszeit-Sensoren für die anderen Alarmzustände, die ihren Zustand setzen, solange sie eingeschaltet sind, genau wie der Schlafenszeit-Sensor. Wenn ein Sensor ausschaltet, gelten die Einstellungen für das Ende von Kalenderereignissen unter Erweitert.",
                         "data": {
                             "time_of_day_disarmed": "Unscharf",
                             "time_of_day_armed_home": "Scharf zu Hause",
                             "time_of_day_armed_away": "Scharf abwesend",
-                            "time_of_day_armed_night": "Scharf Nacht",
                             "time_of_day_armed_custom_bypass": "Scharf benutzerdefiniert"
                         }
                     },

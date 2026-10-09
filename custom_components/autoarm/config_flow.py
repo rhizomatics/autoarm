@@ -73,10 +73,13 @@ CONF_SENTENCE_ARM = "sentence_arm"
 CONF_SENTENCE_DISARM = "sentence_disarm"
 
 DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES: list[str] = ["disarmed", "armed_home", "armed_night", "armed_away"]
+RECIPE_URL = "https://autoarm.rhizomatics.org.uk/configuration/examples/recommended_recipe/"
 # option holding the Time of Day sensors for each alarm state, a daily period doesn't suit vacations
 TIME_OF_DAY_OPTIONS: dict[str, str] = {
     f"time_of_day_{state}": state for state in PUBLIC_ALARM_STATES if state != "armed_vacation"
 }
+# the bedtime sensor of the recommended recipe, asked for up front rather than in the Time of Day section
+CONF_BEDTIME_ENTITIES = "time_of_day_armed_night"
 
 
 def _time_to_str(t: dt.time | None) -> str | None:
@@ -86,11 +89,13 @@ def _time_to_str(t: dt.time | None) -> str | None:
 
 DEFAULT_NOTIFY_ACTION = "notify.send_message"
 
+# as the recommended recipe, disarmed by day, armed home from sunset and armed night for bedtime
 DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_CALENDAR_ENTITIES: [],
     CONF_PERSON_ENTITIES: [],
-    CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",
-    CONF_OCCUPANCY_DEFAULT_NIGHT: None,
+    CONF_BEDTIME_ENTITIES: [],
+    CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
+    CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_home",
     CONF_CALENDAR_ARMED_END_MODE: NO_CAL_EVENT_MODE_AUTO,
     CONF_CALENDAR_DISARMED_END_MODE: NO_CAL_EVENT_MODE_AUTO,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
@@ -119,83 +124,39 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
     # 2 split no_event_mode into armed and disarmed end modes
     MINOR_VERSION = 2
 
-    def __init__(self) -> None:
-        """Initialize the config flow."""
-        self._alarm_panel: str = ""
-        self._calendar_entities: list[str] = []
-
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Handle the alarm panel selection step."""
-        if user_input is not None:
-            self._alarm_panel = user_input[CONF_ALARM_PANEL]
-            return await self.async_step_calendars()
-
-        return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema({
-                vol.Required(CONF_ALARM_PANEL): EntitySelector(EntitySelectorConfig(domain="alarm_control_panel")),
-            }),
-        )
-
-    async def async_step_calendars(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Handle the calendar entity selection step."""
-        if user_input is not None:
-            self._calendar_entities = user_input.get(CONF_CALENDAR_ENTITIES, [])
-            return await self.async_step_persons()
-
-        return self.async_show_form(
-            step_id="calendars",
-            data_schema=vol.Schema({
-                vol.Optional(CONF_CALENDAR_ENTITIES, default=[]): EntitySelector(
-                    EntitySelectorConfig(domain="calendar", multiple=True)
-                ),
-            }),
-        )
-
-    async def async_step_persons(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Handle the person entity selection step."""
+        """Handle set up, of the alarm panel and the entities used by the recommended recipe."""
         if user_input is not None:
             await self.async_set_unique_id(DOMAIN)
             self._abort_if_unique_id_configured()
 
             options = {
-                CONF_CALENDAR_ENTITIES: self._calendar_entities,
+                **DEFAULT_OPTIONS,
+                CONF_BEDTIME_ENTITIES: user_input.get(CONF_BEDTIME_ENTITIES, []),
+                CONF_CALENDAR_ENTITIES: user_input.get(CONF_CALENDAR_ENTITIES, []),
                 CONF_PERSON_ENTITIES: user_input.get(CONF_PERSON_ENTITIES, []),
-                CONF_OCCUPANCY_DEFAULT_DAY: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_DAY],
-                CONF_OCCUPANCY_DEFAULT_NIGHT: DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_NIGHT],
-                CONF_CALENDAR_ARMED_END_MODE: DEFAULT_OPTIONS[CONF_CALENDAR_ARMED_END_MODE],
-                CONF_CALENDAR_DISARMED_END_MODE: DEFAULT_OPTIONS[CONF_CALENDAR_DISARMED_END_MODE],
-                CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
-                CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
-                CONF_NOTIFY_ENABLED: True,
-                CONF_NOTIFY_TARGETS: [],
-                CONF_NOTIFY_DATA: {},
-                CONF_SUNRISE_TRIGGER: TRIGGER_AUTO,
-                CONF_SUNSET_TRIGGER: TRIGGER_AUTO,
-                CONF_OCCUPIED_TRIGGER: True,
-                CONF_UNOCCUPIED_TRIGGER: True,
-                CONF_SUNRISE_EARLIEST: None,
-                CONF_SUNRISE_LATEST: None,
-                CONF_SUNSET_EARLIEST: None,
-                CONF_SUNSET_LATEST: None,
-                CONF_USE_ALARM_SERVICE: True,
-                CONF_SENTENCE_ARM: True,
-                CONF_SENTENCE_DISARM: False,
             }
 
             return self.async_create_entry(
                 title="Auto Arm",
-                data={CONF_ALARM_PANEL: self._alarm_panel},
+                data={CONF_ALARM_PANEL: user_input[CONF_ALARM_PANEL]},
                 options=options,
             )
 
         return self.async_show_form(
-            step_id="persons",
+            step_id="user",
             data_schema=vol.Schema({
-                vol.Optional(CONF_PERSON_ENTITIES, default=[]): EntitySelector(
+                vol.Required(CONF_ALARM_PANEL): EntitySelector(EntitySelectorConfig(domain="alarm_control_panel")),
+                vol.Optional(CONF_BEDTIME_ENTITIES, default=[]): _time_of_day_selector(),
+                vol.Optional(CONF_CALENDAR_ENTITIES, default=[]): EntitySelector(
+                    EntitySelectorConfig(domain="calendar", multiple=True)
+                ),
+                # everyone known to Home Assistant, to be cut down rather than built up
+                vol.Optional(CONF_PERSON_ENTITIES, default=sorted(self.hass.states.async_entity_ids("person"))): EntitySelector(
                     EntitySelectorConfig(domain="person", multiple=True)
                 ),
             }),
+            description_placeholders={"recipe_url": RECIPE_URL},
         )
 
     async def async_step_import(self, import_data: dict[str, Any]) -> ConfigFlowResult:
@@ -225,7 +186,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         options = {
             CONF_CALENDAR_ENTITIES: calendar_entities,
             CONF_PERSON_ENTITIES: person_entities,
-            CONF_OCCUPANCY_DEFAULT_DAY: occupancy_defaults.get(CONF_DAY, DEFAULT_OPTIONS[CONF_OCCUPANCY_DEFAULT_DAY]),
+            CONF_OCCUPANCY_DEFAULT_DAY: occupancy_defaults.get(CONF_DAY, "armed_home"),
             CONF_OCCUPANCY_DEFAULT_NIGHT: occupancy_defaults.get(CONF_NIGHT),
             CONF_CALENDAR_ARMED_END_MODE: calendar_config.get(CONF_CALENDAR_ARMED_END, no_event_mode),
             CONF_CALENDAR_DISARMED_END_MODE: calendar_config.get(CONF_CALENDAR_DISARMED_END, no_event_mode),
@@ -293,6 +254,10 @@ class AutoArmOptionsFlow(OptionsFlow):
                     default=self.config_entry.data.get(CONF_ALARM_PANEL, ""),
                 ): EntitySelector(EntitySelectorConfig(domain="alarm_control_panel")),
                 vol.Optional(
+                    CONF_BEDTIME_ENTITIES,
+                    default=options.get(CONF_BEDTIME_ENTITIES, []),
+                ): _time_of_day_selector(),
+                vol.Optional(
                     CONF_CALENDAR_ENTITIES,
                     default=options.get(CONF_CALENDAR_ENTITIES, []),
                 ): EntitySelector(EntitySelectorConfig(domain="calendar", multiple=True)),
@@ -319,10 +284,9 @@ class AutoArmOptionsFlow(OptionsFlow):
                 ),
                 vol.Required("time_of_day_options"): section(
                     vol.Schema({
-                        vol.Optional(option, default=options.get(option, [])): EntitySelector(
-                            EntitySelectorConfig(integration="tod", multiple=True)
-                        )
+                        vol.Optional(option, default=options.get(option, [])): _time_of_day_selector()
                         for option in TIME_OF_DAY_OPTIONS
+                        if option != CONF_BEDTIME_ENTITIES
                     }),
                     {"collapsed": True},
                 ),
@@ -394,7 +358,7 @@ class AutoArmOptionsFlow(OptionsFlow):
                         ): BooleanSelector(),
                         vol.Optional(
                             CONF_OCCUPANCY_DEFAULT_DAY,
-                            default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "armed_home"),
+                            default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "disarmed"),
                         ): SelectSelector(
                             SelectSelectorConfig(
                                 options=PUBLIC_ALARM_STATES,
@@ -450,7 +414,12 @@ class AutoArmOptionsFlow(OptionsFlow):
                     {"collapsed": True},
                 ),
             }),
+            description_placeholders={"recipe_url": RECIPE_URL},
         )
+
+
+def _time_of_day_selector() -> EntitySelector:
+    return EntitySelector(EntitySelectorConfig(integration="tod", multiple=True))
 
 
 def _sun_trigger_selector() -> SelectSelector:

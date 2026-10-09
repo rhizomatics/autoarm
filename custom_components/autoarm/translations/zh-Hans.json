@@ -3,21 +3,16 @@
     "config": {
         "step": {
             "user": {
-                "title": "选择警报面板",
+                "title": "设置 Auto Arm",
+                "description": "按照[推荐方案]({recipe_url})设置，包括就寝时间传感器、度假日历，以及所有人外出时布防。只有警报面板是必填项，其余可以稍后添加。",
                 "data": {
-                    "alarm_panel": "要管理的警报控制面板"
-                }
-            },
-            "calendars": {
-                "title": "选择日历",
-                "data": {
-                    "calendar_entities": "用于布防计划的日历"
-                }
-            },
-            "persons": {
-                "title": "选择人员",
-                "data": {
+                    "alarm_panel": "要管理的警报控制面板",
+                    "time_of_day_armed_night": "用于夜间布防的就寝时间传感器",
+                    "calendar_entities": "用于度假和外出的日历",
                     "person_entities": "用于基于在家状态布防的人员"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间，警报保持在夜间布防。"
                 }
             }
         },
@@ -29,10 +24,15 @@
         "step": {
             "init": {
                 "title": "Auto Arm 选项",
+                "description": "[推荐方案]({recipe_url})说明了就寝时间传感器、日历和人员如何配合使用。",
                 "data": {
                     "alarm_panel": "要管理的警报控制面板",
-                    "calendar_entities": "用于布防计划的日历",
+                    "time_of_day_armed_night": "用于夜间布防的就寝时间传感器",
+                    "calendar_entities": "用于度假和外出的日历",
                     "person_entities": "用于基于在家状态布防的人员"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间，警报保持在夜间布防。"
                 },
                 "sections": {
                     "calendar_options": {
@@ -46,12 +46,11 @@
                     },
                     "time_of_day_options": {
                         "name": "时段",
-                        "description": "时段传感器在开启期间设置报警状态，可替代日历事件，例如用每天的就寝时间设置夜间布防。传感器关闭时，将应用高级中的日历事件结束设置。",
+                        "description": "用于其他报警状态的时段传感器，与就寝时间传感器一样，在开启期间设置各自的状态。传感器关闭时，将应用高级中的日历事件结束设置。",
                         "data": {
                             "time_of_day_disarmed": "撤防",
                             "time_of_day_armed_home": "在家布防",
                             "time_of_day_armed_away": "离家布防",
-                            "time_of_day_armed_night": "夜间布防",
                             "time_of_day_armed_custom_bypass": "自定义布防"
                         }
                     },

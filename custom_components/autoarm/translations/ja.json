@@ -3,21 +3,16 @@
     "config": {
         "step": {
             "user": {
-                "title": "アラームパネルを選択",
+                "title": "AutoArm のセットアップ",
+                "description": "[おすすめレシピ]({recipe_url})に沿った設定です。就寝時間センサー、休暇用カレンダー、全員外出時の警戒を使います。必須なのはアラームパネルだけで、残りは後から追加できます。",
                 "data": {
-                    "alarm_panel": "管理するアラームコントロールパネル"
-                }
-            },
-            "calendars": {
-                "title": "カレンダーを選択",
-                "data": {
-                    "calendar_entities": "警戒スケジュールに使用するカレンダー"
-                }
-            },
-            "persons": {
-                "title": "人物を選択",
-                "data": {
+                    "alarm_panel": "管理するアラームコントロールパネル",
+                    "time_of_day_armed_night": "夜間警戒用の就寝時間センサー",
+                    "calendar_entities": "休暇や外出用のカレンダー",
                     "person_entities": "在室ベースの警戒に使用する人物"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "毎日の就寝時間にオンになる時間帯センサーです。オンの間、アラームは夜間警戒に保たれます。"
                 }
             }
         },
@@ -29,10 +24,15 @@
         "step": {
             "init": {
                 "title": "AutoArm オプション",
+                "description": "就寝時間センサー、カレンダー、人物の組み合わせ方は[おすすめレシピ]({recipe_url})で説明しています。",
                 "data": {
                     "alarm_panel": "管理するアラームコントロールパネル",
-                    "calendar_entities": "警戒スケジュールに使用するカレンダー",
+                    "time_of_day_armed_night": "夜間警戒用の就寝時間センサー",
+                    "calendar_entities": "休暇や外出用のカレンダー",
                     "person_entities": "在室ベースの警戒に使用する人物"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "毎日の就寝時間にオンになる時間帯センサーです。オンの間、アラームは夜間警戒に保たれます。"
                 },
                 "sections": {
                     "calendar_options": {
@@ -46,12 +46,11 @@
                     },
                     "time_of_day_options": {
                         "name": "時間帯",
-                        "description": "オンの間アラーム状態を設定する時間帯センサーです。カレンダーイベントの代わりに使え、たとえば毎日の就寝時間に夜間警戒を設定できます。センサーがオフになると、詳細設定のカレンダーイベント終了時の設定が適用されます。",
+                        "description": "その他のアラーム状態用の時間帯センサーです。就寝時間センサーと同じように、オンの間その状態を設定します。センサーがオフになると、詳細設定のカレンダーイベント終了時の設定が適用されます。",
                         "data": {
                             "time_of_day_disarmed": "解除",
                             "time_of_day_armed_home": "在宅警戒",
                             "time_of_day_armed_away": "外出警戒",
-                            "time_of_day_armed_night": "夜間警戒",
                             "time_of_day_armed_custom_bypass": "カスタム警戒"
                         }
                     },

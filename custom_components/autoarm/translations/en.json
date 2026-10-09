@@ -3,21 +3,16 @@
     "config": {
         "step": {
             "user": {
-                "title": "Select Alarm Panel",
+                "title": "Set Up Auto Arm",
+                "description": "Follows the [recommended recipe]({recipe_url}), with a bedtime sensor, a calendar for vacations, and arming away when everyone is out. Only the alarm panel is required, the rest can be added later.",
                 "data": {
-                    "alarm_panel": "Alarm Control Panel to manage"
-                }
-            },
-            "calendars": {
-                "title": "Select Calendars",
-                "data": {
-                    "calendar_entities": "Calendars to use for arming schedules"
-                }
-            },
-            "persons": {
-                "title": "Select Persons",
-                "data": {
+                    "alarm_panel": "Alarm Control Panel to manage",
+                    "time_of_day_armed_night": "Bedtime sensor for Armed Night",
+                    "calendar_entities": "Calendars for vacations and time away",
                     "person_entities": "People for occupancy based arming"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "A Time of Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on."
                 }
             }
         },
@@ -29,10 +24,15 @@
         "step": {
             "init": {
                 "title": "Auto Arm Options",
+                "description": "The [recommended recipe]({recipe_url}) explains how the bedtime sensor, calendar and people work together.",
                 "data": {
                     "alarm_panel": "Alarm Control Panel to manage",
-                    "calendar_entities": "Calendars to use for arming schedules",
+                    "time_of_day_armed_night": "Bedtime sensor for Armed Night",
+                    "calendar_entities": "Calendars for vacations and time away",
                     "person_entities": "People for occupancy based arming"
+                },
+                "data_description": {
+                    "time_of_day_armed_night": "A Time of Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on."
                 },
                 "sections": {
                     "calendar_options": {
@@ -46,13 +46,12 @@
                     },
                     "time_of_day_options": {
                         "name": "Time of Day",
-                        "description": "Time of Day sensors that set an alarm state while they're on, as an alternative to calendar events, for example a daily bedtime for Armed night. When a sensor turns off, the calendar event end settings under Advanced apply.",
+                        "description": "Time of Day sensors for the other alarm states, each setting its state while it's on, in the same way as the bedtime sensor. When a sensor turns off, the calendar event end settings under Advanced apply.",
                         "data": {
                             "time_of_day_disarmed": "Disarmed",
-                            "time_of_day_armed_home": "Armed home",
-                            "time_of_day_armed_away": "Armed away",
-                            "time_of_day_armed_night": "Armed night",
-                            "time_of_day_armed_custom_bypass": "Armed custom bypass"
+                            "time_of_day_armed_home": "Armed Home",
+                            "time_of_day_armed_away": "Armed Away",
+                            "time_of_day_armed_custom_bypass": "Armed Custom Bypass"
                         }
                     },
                     "trigger_options": {
@@ -153,11 +152,11 @@
                 "auto_occupancy": "By occupancy",
                 "manual": "Manual (back to the state before the event)",
                 "disarmed": "Disarmed",
-                "armed_home": "Armed home",
-                "armed_away": "Armed away",
-                "armed_night": "Armed night",
-                "armed_vacation": "Armed vacation",
-                "armed_custom_bypass": "Armed custom bypass"
+                "armed_home": "Armed Home",
+                "armed_away": "Armed Away",
+                "armed_night": "Armed Night",
+                "armed_vacation": "Armed Vacation",
+                "armed_custom_bypass": "Armed Custom Bypass"
             }
         }
     },

@@ -14,7 +14,7 @@ from custom_components.autoarm.const import (
     SUPERNOTIFY_MOBILE_ACTIONS,
     ChangeSource,
 )
-from custom_components.autoarm.helpers import AppHealthTracker
+from custom_components.autoarm.helpers import AppHealthTracker, friendly_state
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -116,10 +116,13 @@ class Notifier:
                 return
 
             if title is None:
-                title = f"Alarm now {to_state}" if to_state else "Alarm Panel Change"
+                title = f"Alarm now {friendly_state(to_state)}" if to_state else "Alarm Panel Change"
             if message is None:
                 if from_state and to_state:
-                    message = f"Alarm state changed from {from_state} to {to_state} by {source.capitalize()}"
+                    message = (
+                        f"Alarm state changed from {friendly_state(from_state)} to {friendly_state(to_state)}"
+                        f" by {source.capitalize()}"
+                    )
                 else:
                     message = "Alarm control panel operation complete"
 

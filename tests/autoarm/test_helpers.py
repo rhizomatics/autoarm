@@ -2,6 +2,7 @@ import datetime as dt
 import re
 from unittest.mock import Mock
 
+from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.core import HomeAssistant
 
 from custom_components.autoarm.const import ChangeSource
@@ -10,6 +11,7 @@ from custom_components.autoarm.helpers import (
     ExtendedExtendedJSONEncoder,
     change_source_as_enum,
     deobjectify,
+    friendly_state,
     safe_state,
 )
 
@@ -72,3 +74,9 @@ def test_app_health_tracker_records_runtime_error(hass: HomeAssistant) -> None:
     assert tracker.failures == 0
     tracker.record_runtime_error()
     assert tracker.failures == 1
+
+
+def test_friendly_state() -> None:
+    assert friendly_state(AlarmControlPanelState.ARMED_AWAY) == "Armed Away"
+    assert friendly_state(AlarmControlPanelState.ARMED_CUSTOM_BYPASS) == "Armed Custom Bypass"
+    assert friendly_state("disarmed") == "Disarmed"
