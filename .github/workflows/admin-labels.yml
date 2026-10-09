@@ -14,4 +14,4 @@ jobs:
     permissions:
       issues: write
       contents: read
-    uses: rhizomatics/.github/.github/workflows/reusable-labels.yml@main
+    uses: rhizomatics/.github/.github/workflows/reusable-labels.yml@1.0.0

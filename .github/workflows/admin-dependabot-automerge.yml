@@ -10,4 +10,4 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    uses: rhizomatics/.github/.github/workflows/reusable-dependabot-automerge.yml@main
+    uses: rhizomatics/.github/.github/workflows/reusable-dependabot-automerge.yml@1.0.0
