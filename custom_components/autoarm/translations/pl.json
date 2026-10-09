@@ -4,7 +4,7 @@
         "step": {
             "user": {
                 "title": "Skonfiguruj Auto Arm",
-                "description": "Szybka konfiguracja opiera się na zalecanym przepisie i prosi tylko o panel alarmowy oraz wykorzystywane przez niego encje, z rozsądnymi wartościami domyślnymi dla reszty. Konfiguracja zaawansowana pokazuje od razu wszystkie opcje.",
+                "description": "Szybka konfiguracja opiera się na [zalecanym przepisie]({recipe_url}) i prosi tylko o panel alarmowy oraz wykorzystywane przez niego encje, z rozsądnymi wartościami domyślnymi dla reszty. Konfiguracja zaawansowana pokazuje od razu wszystkie opcje.",
                 "menu_options": {
                     "quick_setup": "Szybka konfiguracja (zalecana)",
                     "advanced_setup": "Konfiguracja zaawansowana"
@@ -120,6 +120,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Panel nie może wymagać kodu.",
+                            "occupancy_default_night": "Ustaw na Uzbrojony w domu jako domyślny stan przed porą snu, jeśli czujnik pory dnia lub kalendarz ustawia Uzbrojony na noc na porę snu, jak w [zalecanym przepisie]({recipe_url}).",
                             "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
                             "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma."
                         }
@@ -240,6 +241,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Panel nie może wymagać kodu.",
+                            "occupancy_default_night": "Ustaw na Uzbrojony w domu jako domyślny stan przed porą snu, jeśli czujnik pory dnia lub kalendarz ustawia Uzbrojony na noc na porę snu, jak w [zalecanym przepisie]({recipe_url}).",
                             "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
                             "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma."
                         }

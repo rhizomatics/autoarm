@@ -16,9 +16,19 @@ Here is a quick reminder of how Home Assistant intends armed states to be used, 
 | `armed_night`         | Similar to home mode, but tuned for sleeping. Typically covers perimeter sensors and selected interior zones while leaving bedroom areas free.           |
 | `armed_vacation`      | Extended away protection for longer trips. Some systems enable additional monitoring or alerts in this mode.                                             |
 | `armed_custom_bypass` | rmed with one or more zones deliberately skipped. Useful when you want to leave a specific door or window open while arming the rest of the system.      |
-| `disarmed`            | The alarm is off. Sensors are not being monitored.                                                                                                       |
+| `disarmed`            | The alarm is off. Sensors are not being monitored.   |
 
 (There are also some other ephemeral or problem states needed for dealing with real alarm systems).
+
+So a typical day, when the house is occupied, using the [recommended recipe](configuration/examples/recommended_recipe.md) could be:
+
+- Wake up (`armed_night`->`disarmed`)
+  - Sunrise is ignored in this example, either its before you wake up and its still bedtime, or its after you wake up and the alarm already disarmed
+- Sunset (`disarmed`->`armed_home`)
+- Go to sleep (`armed_home`->`armed_night`)
+
+Of course, in some latitudes, the sun might set after bedtime, or not rise until after woken up. Auto arm will cope with any combination of how you want it to be, with the help of the `sun` entity in Home Assistant driving sunrise and sunset times, calendar entries and a Time of Day sensor. You can also integrate physical buttons, for example to arm before leaving the house.
+
 
 ## Alarm Panel Control
 

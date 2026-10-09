@@ -4,7 +4,7 @@
         "step": {
             "user": {
                 "title": "Auto Arm instellen",
-                "description": "Snelle installatie volgt het aanbevolen recept en vraagt alleen naar het alarmpaneel en de entiteiten die het gebruikt, met verstandige standaardwaarden voor de rest. Geavanceerde installatie toont meteen alle opties.",
+                "description": "Snelle installatie volgt het [aanbevolen recept]({recipe_url}) en vraagt alleen naar het alarmpaneel en de entiteiten die het gebruikt, met verstandige standaardwaarden voor de rest. Geavanceerde installatie toont meteen alle opties.",
                 "menu_options": {
                     "quick_setup": "Snelle installatie (aanbevolen)",
                     "advanced_setup": "Geavanceerde installatie"
@@ -120,6 +120,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Het paneel mag geen code vereisen.",
+                            "occupancy_default_night": "Stel dit in op Ingeschakeld thuis als standaard vóór bedtijd als een tijdstip-van-de-dag-sensor of agenda Ingeschakeld nacht instelt voor bedtijd, zoals in het [aanbevolen recept]({recipe_url}).",
                             "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
                             "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is."
                         }
@@ -240,6 +241,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Het paneel mag geen code vereisen.",
+                            "occupancy_default_night": "Stel dit in op Ingeschakeld thuis als standaard vóór bedtijd als een tijdstip-van-de-dag-sensor of agenda Ingeschakeld nacht instelt voor bedtijd, zoals in het [aanbevolen recept]({recipe_url}).",
                             "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
                             "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is."
                         }

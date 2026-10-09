@@ -52,6 +52,7 @@ async def test_user_flow_complete(hass: HomeAssistant, mock_notify: Any) -> None
     assert result["type"] is FlowResultType.MENU
     assert result["step_id"] == "user"
     assert result["menu_options"] == ["quick_setup", "advanced_setup"]
+    assert result["description_placeholders"] == {"recipe_url": RECIPE_URL}
 
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "quick_setup"})
     assert result["type"] is FlowResultType.FORM

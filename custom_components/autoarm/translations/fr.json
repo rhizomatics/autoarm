@@ -4,7 +4,7 @@
         "step": {
             "user": {
                 "title": "Configurer AutoArm",
-                "description": "La configuration rapide suit la recette recommandée et ne demande que le panneau d'alarme et les entités qu'il utilise, avec des valeurs par défaut sensées pour le reste. La configuration avancée affiche toutes les options dès le départ.",
+                "description": "La configuration rapide suit la [recette recommandée]({recipe_url}) et ne demande que le panneau d'alarme et les entités qu'il utilise, avec des valeurs par défaut sensées pour le reste. La configuration avancée affiche toutes les options dès le départ.",
                 "menu_options": {
                     "quick_setup": "Configuration rapide (recommandé)",
                     "advanced_setup": "Configuration avancée"
@@ -120,6 +120,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code.",
+                            "occupancy_default_night": "Réglez-le sur Armé présence comme valeur par défaut avant le coucher si un capteur de moment de la journée ou un calendrier définit Armé nuit à l'heure du coucher, comme dans la [recette recommandée]({recipe_url}).",
                             "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
                             "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
                         }
@@ -240,6 +241,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code.",
+                            "occupancy_default_night": "Réglez-le sur Armé présence comme valeur par défaut avant le coucher si un capteur de moment de la journée ou un calendrier définit Armé nuit à l'heure du coucher, comme dans la [recette recommandée]({recipe_url}).",
                             "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
                             "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
                         }

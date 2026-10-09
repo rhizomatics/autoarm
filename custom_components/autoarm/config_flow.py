@@ -325,7 +325,11 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         """Offer a quick recommended-recipe setup, or the full set of options up front."""
         await self.async_set_unique_id(DOMAIN)
         self._abort_if_unique_id_configured()
-        return self.async_show_menu(step_id="user", menu_options=["quick_setup", "advanced_setup"])
+        return self.async_show_menu(
+            step_id="user",
+            menu_options=["quick_setup", "advanced_setup"],
+            description_placeholders={"recipe_url": RECIPE_URL},
+        )
 
     async def async_step_quick_setup(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle set up, of the alarm panel and the entities used by the recommended recipe."""

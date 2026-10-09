@@ -4,7 +4,7 @@
         "step": {
             "user": {
                 "title": "Auto Arm einrichten",
-                "description": "Die Schnelleinrichtung folgt dem empfohlenen Rezept und fragt nur nach der Alarmzentrale und den dafür genutzten Entitäten, mit sinnvollen Standardwerten für alles andere. Die erweiterte Einrichtung zeigt direkt alle Optionen an.",
+                "description": "Die Schnelleinrichtung folgt dem [empfohlenen Rezept]({recipe_url}) und fragt nur nach der Alarmzentrale und den dafür genutzten Entitäten, mit sinnvollen Standardwerten für alles andere. Die erweiterte Einrichtung zeigt direkt alle Optionen an.",
                 "menu_options": {
                     "quick_setup": "Schnelleinrichtung (empfohlen)",
                     "advanced_setup": "Erweiterte Einrichtung"
@@ -120,6 +120,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Die Zentrale darf keinen Code verlangen.",
+                            "occupancy_default_night": "Auf 'Scharf zu Hause' als Standard vor der Schlafenszeit setzen, wenn ein Tageszeit-Sensor oder Kalender zur Schlafenszeit 'Scharf Nacht' setzt, wie im [empfohlenen Rezept]({recipe_url}).",
                             "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
                             "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist."
                         }
@@ -240,6 +241,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Die Zentrale darf keinen Code verlangen.",
+                            "occupancy_default_night": "Auf 'Scharf zu Hause' als Standard vor der Schlafenszeit setzen, wenn ein Tageszeit-Sensor oder Kalender zur Schlafenszeit 'Scharf Nacht' setzt, wie im [empfohlenen Rezept]({recipe_url}).",
                             "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
                             "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist."
                         }

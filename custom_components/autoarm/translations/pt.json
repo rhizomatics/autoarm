@@ -4,7 +4,7 @@
         "step": {
             "user": {
                 "title": "Configurar o Auto Arm",
-                "description": "A configuração rápida segue a receita recomendada e só pergunta pelo painel de alarme e pelas entidades que utiliza, com valores predefinidos sensatos para o resto. A configuração avançada mostra logo todas as opções.",
+                "description": "A configuração rápida segue a [receita recomendada]({recipe_url}) e só pergunta pelo painel de alarme e pelas entidades que utiliza, com valores predefinidos sensatos para o resto. A configuração avançada mostra logo todas as opções.",
                 "menu_options": {
                     "quick_setup": "Configuração rápida (recomendada)",
                     "advanced_setup": "Configuração avançada"
@@ -120,6 +120,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. O painel não deve exigir código.",
+                            "occupancy_default_night": "Defina como Armado em casa como predefinição antes da hora de deitar se um sensor de hora do dia ou um calendário definir Armado noite para a hora de deitar, como na [receita recomendada]({recipe_url}).",
                             "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
                             "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém."
                         }
@@ -240,6 +241,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. O painel não deve exigir código.",
+                            "occupancy_default_night": "Defina como Armado em casa como predefinição antes da hora de deitar se um sensor de hora do dia ou um calendário definir Armado noite para a hora de deitar, como na [receita recomendada]({recipe_url}).",
                             "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
                             "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém."
                         }

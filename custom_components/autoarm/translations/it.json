@@ -4,7 +4,7 @@
         "step": {
             "user": {
                 "title": "Configura AutoArm",
-                "description": "La configurazione rapida segue la ricetta consigliata e chiede solo il pannello di allarme e le entità che utilizza, con valori predefiniti sensati per tutto il resto. La configurazione avanzata mostra subito tutte le opzioni.",
+                "description": "La configurazione rapida segue la [ricetta consigliata]({recipe_url}) e chiede solo il pannello di allarme e le entità che utilizza, con valori predefiniti sensati per tutto il resto. La configurazione avanzata mostra subito tutte le opzioni.",
                 "menu_options": {
                     "quick_setup": "Configurazione rapida (consigliata)",
                     "advanced_setup": "Configurazione avanzata"
@@ -120,6 +120,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. La centrale non deve richiedere un codice.",
+                            "occupancy_default_night": "Impostalo su Inserito in casa come valore predefinito prima di andare a dormire se un sensore ora del giorno o un calendario imposta Inserito notte all'ora di andare a dormire, come nella [ricetta consigliata]({recipe_url}).",
                             "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
                             "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno."
                         }
@@ -240,6 +241,7 @@
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. La centrale non deve richiedere un codice.",
+                            "occupancy_default_night": "Impostalo su Inserito in casa come valore predefinito prima di andare a dormire se un sensore ora del giorno o un calendario imposta Inserito notte all'ora di andare a dormire, come nella [ricetta consigliata]({recipe_url}).",
                             "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
                             "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno."
                         }
