@@ -27,7 +27,7 @@ So a typical day, when the house is occupied, using the [recommended recipe](con
 - Sunset (`disarmed`->`armed_home`)
 - Go to sleep (`armed_home`->`armed_night`)
 
-Of course, in some latitudes, the sun might set after bedtime, or not rise until after woken up. Auto arm will cope with any combination of how you want it to be, with the help of the `sun` entity in Home Assistant driving sunrise and sunset times, calendar entries and a Time of Day sensor. You can also integrate physical buttons, for example to arm before leaving the house.
+Of course, in some latitudes, the sun might set after bedtime, or not rise until after woken up. Auto arm will cope with any combination of how you want it to be, with the help of the `sun` entity in Home Assistant driving sunrise and sunset times, calendar entries and a Times of the Day sensor. You can also integrate physical buttons, for example to arm before leaving the house.
 
 
 ## Alarm Panel Control
@@ -137,7 +137,7 @@ The **Advanced** section of the options has separate settings for an **armed** e
 
 An `armed_night` event ending at 06:45, before the sun is up, would be worked out as still night by **By occupancy and sun** and stay armed for the night, until sunrise disarms it a few minutes later. With **By occupancy** it disarms as the event ends.
 
-**Auto** only takes day and night into account when sunrise or sunset will re-evaluate the state that day. With the sunrise and sunset triggers left at their default of **Auto**, they're off on any day with a calendar event, so an event ending goes by occupancy alone.
+**Auto** only takes day and night into account when sunrise or sunset will re-evaluate the state that day. With the sunrise and sunset triggers left at their default of **Auto**, they're off on any day with a `disarmed`, `armed_home` or `armed_night` calendar event, so an event ending that day goes by occupancy alone. On a day with only `armed_away`, `armed_vacation` or `armed_custom_bypass` events, they stay on, so an event ending after dark arms for the night if someone is home.
 
 In YAML, these are `auto`, `auto_sun` and `auto_occupancy` for `no_event_mode`, `armed_end_mode` and `disarmed_end_mode`.
 
@@ -164,12 +164,12 @@ out to no change at all, nothing is sent.
 
 This only debounces the *notification*; the alarm panel's actual state still updates immediately as each calendar-driven change happens.
 
-## Time of Day Control
+## Times of the Day Control
 
-A [Time of Day](https://www.home-assistant.io/integrations/tod/) sensor can set an alarm state for the same period every day, without needing a recurring calendar event. For example, a **Bedtime** sensor that is on from 23:00 to 07:00 holds the alarm at `armed_night`, whatever time the sun sets or rises. See the [Recommended Recipe](configuration/examples/recommended_recipe.md) for a complete setup with sunset and a vacation calendar.
+A [Times of the Day](https://www.home-assistant.io/integrations/tod/) sensor can set an alarm state for the same period every day, without needing a recurring calendar event. For example, a **Bedtime** sensor that is on from 23:00 to 07:00 holds the alarm at `armed_night`, whatever time the sun sets or rises. See the [Recommended Recipe](configuration/examples/recommended_recipe.md) for a complete setup with sunset and a vacation calendar.
 
 1. Create the sensor in **Settings** > **Devices & Services** > **Helpers** > **Create Helper** > **Times of the Day**, giving the times it turns on and off.
-2. In **Settings** > **Devices & Services** > **Auto Arm** > **Configure**, choose it as the **Bedtime sensor for Armed Night**, or for any other alarm state, open the **Time of Day** section and choose the sensor for the state it should set. More than one sensor can be chosen for a state. There's no choice for `armed_vacation`, as a daily period doesn't suit it.
+2. In **Settings** > **Devices & Services** > **Auto Arm** > **Configure**, choose it as the **Bedtime sensor for Armed Night**, or for any other alarm state, open the **Times of the Day** section and choose the sensor for the state it should set. More than one sensor can be chosen for a state. There's no choice for `armed_vacation`, as a daily period doesn't suit it.
 
 While the sensor is on:
 
@@ -180,9 +180,9 @@ While the sensor is on:
 
 When the sensor turns off, becomes unavailable or is removed, the period ends and the [calendar event end settings](#when-an-event-ends) decide the new state. **Auto** here always means **By occupancy**, so a bedtime ending before sunrise still disarms, or arms away if everyone is out.
 
-Unlike a calendar event, a Time of Day sensor doesn't switch off sunrise and sunset [triggers](#triggers) that are set to **Auto**, so sunset still arms on an ordinary evening before bedtime starts.
+Unlike a calendar event, a Times of the Day sensor doesn't switch off sunrise and sunset [triggers](#triggers) that are set to **Auto**, so sunset still arms on an ordinary evening before bedtime starts.
 
-Changes made by a Time of Day sensor have the `tod` source, for notification profiles and in the logbook, and are linked to the sensor's own state change.
+Changes made by a Times of the Day sensor have the `tod` source, for notification profiles and in the logbook, and are linked to the sensor's own state change.
 
 ## Triggers
 
@@ -195,7 +195,7 @@ The **Triggers** section of the options decides what can start a re-evaluation o
 | **Someone arrives home** | On, Off       | On      |
 | **Someone leaves home**  | On, Off       | On      |
 
-**Auto** switches the trigger off on any day with a matching [Calendar Control] event starting, ending or running that day, and back on for days without calendar activity. This suits a calendar that handles particular days, such as a night out or working from home, while sunrise and sunset take over on ordinary
+**Auto** switches the trigger off on any day with a `disarmed`, `armed_home` or `armed_night` [Calendar Control] event starting, ending or running that day, since those events replace day and night arming. Events for other states, such as `armed_away` or `armed_vacation`, leave the trigger on. This suits a calendar that handles particular days, such as a night out or working from home, while sunrise and sunset take over on ordinary
 days.
 
 Every arrival or departure re-evaluates, not just the house becoming occupied or empty, since [Transition Conditions](#algorithm-conditions) can depend on who in particular is home. When that doesn't change the alarm state, nothing happens.

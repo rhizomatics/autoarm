@@ -15,20 +15,20 @@ Starting from v1.5.0, Auto Arm now has an opinion about how to set up your auto 
 #### Recommended Starter Recipe
 A new [recommended recipe](./configuration/examples/recommended_recipe.md) has been added, and the integration settings re-organized to make this easier to set up. It involves:
 
-- [Time of Day](https://www.home-assistant.io/integrations/tod/) integration to manage bedtime for *Armed Night*
+- [Times of the Day](https://www.home-assistant.io/integrations/tod/) integration to manage bedtime for *Armed Night*
 - A calendar only for planned away or vacation times
 - Diurnal (`sun` integration) only for dark evenings pre-bedtime to be set to *Armed Home*
 - Every *Person* created in Home Assistant is pre-added to the occupied list
   - New installs only, existing installs keep their settings and can change them in the **Advanced** section
 - *Disarmed* for occupied daytime, *Armed Home* for occupied evening
 - Set up is now a single page asking for the alarm panel, bedtime sensor, calendar and people, with a link to the recipe
-- Each step now has instructions and an optional direct link to create any missing calendar, alarm panel or time of day sensor
+- Each step now has instructions and an optional direct link to create any missing calendar, alarm panel or times of the day sensor
 
 None of this removes existing functionality, and all of it can be overridden or tuned for your needs. It is, however, the simplest to set up with the least ongoing administration, of any automated way to manage alarms.
 
 #### Notifications
 - The alarm states are now the humane versions, e.g. "Armed Night" rather than `armed_night`
-- Changes made by a Time of Day sensor name the sensor, e.g. "by Bedtime Times of the Day sensor"
+- Changes made by a Times of the Day sensor name the sensor, e.g. "by Bedtime Times of the Day sensor"
 
 #### Calendar Occupancy Override
 - New switch so that someone coming home on the last day of an `armed_away` or `armed_vacation` calendar event ends the event there and then, rather than at its end time
@@ -36,9 +36,9 @@ None of this removes existing functionality, and all of it can be overridden or 
   - Needs an arrival that day, so someone always shown as home, for example without location sharing, doesn't end the event
   - Part of the [recommended recipe](./configuration/examples/recommended_recipe.md)
 
-#### Time of Day Sensors
-- [Time of Day](https://www.home-assistant.io/integrations/tod/) sensors can now set the alarm state, as an alternative to a recurring calendar event, for example a daily bedtime for `armed_night`
-  - Choose the sensors for each alarm state in the new **Time of Day** section of the options
+#### Times of the Day Sensors
+- [Times of the Day](https://www.home-assistant.io/integrations/tod/) sensors can now set the alarm state, as an alternative to a recurring calendar event, for example a daily bedtime for `armed_night`
+  - Choose the sensors for each alarm state in the new **Times of the Day** section of the options
   - While a sensor is on it holds its state against sunrise and sunset, or `armed_away` if everyone is out, and when it turns off or becomes unavailable the calendar event end settings apply, with **Auto** always going by occupancy
   - A live calendar event takes priority, so a bedtime sensor can be left running through a vacation in the calendar
   - Changes have a new `tod` source, included in the default `quiet` notification profile, and are linked in the logbook to the sensor's state change
@@ -63,12 +63,13 @@ None of this removes existing functionality, and all of it can be overridden or 
   - The single **Arming state when a calendar event ends** is split into separate settings for an armed and a disarmed event ending, with new **By occupancy** and **By occupancy and sun** choices, and a changed **Auto** as the default
     - **By occupancy** ignores day and night: an armed event ending disarms, or arms away if everyone is out, and a disarmed event ending arms home, or away if everyone is out
     - **By occupancy and sun** works the state out from occupancy and day or night, as `auto` did before, and is `auto_sun` in YAML
-    - **Auto** is now **By occupancy and sun** only if the sunrise or sunset trigger is active that day, otherwise **By occupancy**, so with the default triggers an event ending goes by occupancy alone
+    - **Auto** is now **By occupancy and sun** only if the sunrise or sunset trigger is active that day for a diurnal armed state, otherwise **By occupancy**, so with the default triggers a `disarmed`, `armed_home` or `armed_night` event ending goes by occupancy alone
     - Existing settings carry over to both, so an existing `auto` takes on the new **Auto** behaviour - choose **By occupancy and sun** to keep the old one
     - Other resets, such as sunrise or the reset button, now return to the live event's state, or follow the setting for the kind of event that last ended today, or with no calendar activity today, work as if there were no calendars. Before, the no-event setting applied to them on any day
 #### Trigger Control
 - New **Triggers** section in the options, to choose what starts a re-evaluation of the alarm state
-  - **Sunrise** and **Sunset** can each be on, off, or auto, where auto switches the trigger off on days with calendar activity and back on for days without
+  - **Sunrise** and **Sunset** can each be on, off, or auto, where auto switches the trigger off on days with a `disarmed`, `armed_home` or `armed_night` calendar event, as those replace day and night arming
+    - Events for other states, such as `armed_away` or `armed_vacation`, leave the triggers on, so sunset still arms after getting home from a day away
   - **Someone arrives home** and **Someone leaves home** can each be switched off
   - Triggers only change when the state is worked out, not how - a reset button, action or calendar event ending still work it out as usual, with day and night still choosing between armed states
 #### Simplified Settings Panel

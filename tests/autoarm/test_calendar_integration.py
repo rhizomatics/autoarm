@@ -191,20 +191,55 @@ async def test_calendar_event_ending_shortly(local_calendar: CalendarEntity, has
 async def test_auto_event_ending_by_occupancy_when_sun_triggers_inactive(
     local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any
 ) -> None:
-    """Sun triggers default to off on calendar days, so auto ignores night and disarms."""
+    """Sun triggers default to off on days with an armed night event, so auto ignores night and disarms."""
     hass.states.async_set("person.tenant", "home")
     hass.states.async_set("sun.sun", "below_horizon")
     start: dt.datetime = dt_util.start_of_local_day()
     end: dt.datetime = dt_util.now() + dt.timedelta(seconds=2)
-    await local_calendar.async_create_event(dtstart=start, dtend=end, summary="Holidays in Bahamas!!")
+    await local_calendar.async_create_event(dtstart=start, dtend=end, summary="ARMED_NIGHT")
     hass.states.async_set("alarm_panel.testing", "armed_away")
     local_options = ENTRY_OPTIONS.copy()
     local_options[CONF_CALENDAR_ARMED_END_MODE] = "auto"
     await _setup_entry(hass, options=local_options)
-    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_NIGHT
     await asyncio.sleep(3)
 
     assert panel_state(hass) == AlarmControlPanelState.DISARMED
+
+
+async def test_auto_event_ending_by_occupancy_and_sun_after_away_event(
+    local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any
+) -> None:
+    """An away event doesn't replace day and night arming, so sun triggers stay on and auto arms for the night."""
+    hass.states.async_set("person.tenant", "home")
+    hass.states.async_set("sun.sun", "below_horizon")
+    start: dt.datetime = dt_util.start_of_local_day()
+    end: dt.datetime = dt_util.now() + dt.timedelta(seconds=2)
+    await local_calendar.async_create_event(dtstart=start, dtend=end, summary="Away")
+    hass.states.async_set("alarm_panel.testing", "disarmed")
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_ARMED_END_MODE] = "auto"
+    await _setup_entry(hass, options=local_options)
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
+    await asyncio.sleep(3)
+
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_NIGHT
+
+
+async def test_startup_at_night_after_away_event_ended_today(
+    local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any
+) -> None:
+    """Restarting after dark, on a day an away event ended, arms for the night rather than staying disarmed."""
+    hass.states.async_set("person.tenant", "home")
+    hass.states.async_set("sun.sun", "below_horizon")
+    end: dt.datetime = dt_util.now() - dt.timedelta(seconds=5)
+    await local_calendar.async_create_event(dtstart=end - dt.timedelta(days=1), dtend=end, summary="Away")
+    hass.states.async_set("alarm_panel.testing", "disarmed")
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_ARMED_END_MODE] = "auto"
+    await _setup_entry(hass, options=local_options)
+
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_NIGHT
 
 
 async def test_auto_event_ending_by_occupancy_and_sun_when_sun_trigger_active(
@@ -362,10 +397,10 @@ async def test_calendar_event_ending_manual_mode(local_calendar: CalendarEntity,
 async def test_sunrise_trigger_auto_off_on_day_with_calendar_event(
     local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any
 ) -> None:
-    """A calendar event later today is enough to switch sunrise off, even though it's not active yet."""
+    """A disarmed event later today is enough to switch sunrise off, even though it's not active yet."""
     start = dt_util.now() + dt.timedelta(hours=6)
     end = start + dt.timedelta(hours=1)
-    await local_calendar.async_create_event(dtstart=start, dtend=end, summary="Away")
+    await local_calendar.async_create_event(dtstart=start, dtend=end, summary="DISARMED")
     local_options = ENTRY_OPTIONS.copy()
     local_options[CONF_NO_EVENT_MODE] = "disarmed"
     entry = await _setup_entry(hass, options=local_options)
@@ -379,6 +414,30 @@ async def test_sunrise_trigger_auto_off_on_day_with_calendar_event(
     await hass.async_block_till_done()
 
     assert panel_state(hass) == AlarmControlPanelState.ARMED_NIGHT
+
+
+async def test_sunrise_trigger_auto_on_day_with_away_calendar_event(
+    local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any
+) -> None:
+    """An away event later today leaves sunrise on, as it doesn't replace day and night arming."""
+    hass.states.async_set("person.tenant", "home")
+    start = dt_util.now() + dt.timedelta(hours=6)
+    end = start + dt.timedelta(hours=1)
+    await local_calendar.async_create_event(dtstart=start, dtend=end, summary="Away")
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_NO_EVENT_MODE] = "disarmed"
+    entry = await _setup_entry(hass, options=local_options)
+    armer = entry.runtime_data
+
+    hass.states.async_set("sun.sun", "above_horizon")
+    hass.states.async_set("alarm_panel.testing", "armed_night")
+    await hass.async_block_till_done()
+    armer.interventions = []
+
+    await armer.on_sunrise()
+    await hass.async_block_till_done()
+
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_HOME
 
 
 async def test_sunrise_trigger_auto_on_day_without_calendar_event(

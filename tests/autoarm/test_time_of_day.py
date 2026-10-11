@@ -250,7 +250,7 @@ async def test_reset_returns_to_sensor_state(hass: HomeAssistant, mock_notify: A
 async def test_time_of_day_is_not_a_calendar_day(hass: HomeAssistant, mock_notify: Any) -> None:
     entry = await _setup_entry(hass)
 
-    assert not await entry.runtime_data.has_calendar_event_today()
+    assert not await entry.runtime_data.has_diurnal_calendar_event_today()
     assert await entry.runtime_data.sun_trigger_active(TRIGGER_AUTO)
 
 

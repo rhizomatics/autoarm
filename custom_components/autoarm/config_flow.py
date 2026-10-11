@@ -90,11 +90,11 @@ SETUP_HELP_PLACEHOLDERS: dict[str, str] = {
     "bedtime_help_url": TIME_OF_DAY_HELP_URL,
     "person_help_url": PERSON_HELP_URL,
 }
-# option holding the Time of Day sensors for each alarm state, a daily period doesn't suit vacations
+# option holding the Times of the Day sensors for each alarm state, a daily period doesn't suit vacations
 TIME_OF_DAY_OPTIONS: dict[str, str] = {
     f"time_of_day_{state}": state for state in PUBLIC_ALARM_STATES if state != "armed_vacation"
 }
-# the bedtime sensor of the recommended recipe, asked for up front rather than in the Time of Day section
+# the bedtime sensor of the recommended recipe, asked for up front rather than in the Times of the Day section
 CONF_BEDTIME_ENTITIES = "time_of_day_armed_night"
 
 

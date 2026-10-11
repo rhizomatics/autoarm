@@ -195,7 +195,7 @@ class TrackedCalendarEvent:
             _LOGGER.debug("AUTOARM No action on event end since other cal event active")
             return
         if await self.armer.resume_time_of_day():
-            _LOGGER.debug("AUTOARM Calendar event %s ended, back to live time of day sensor", self.id)
+            _LOGGER.debug("AUTOARM Calendar event %s ended, back to live times of the day sensor", self.id)
             return
         end_mode: str = await self.armer.calendar_end_mode(self.arming_state)
         change_context: dict[str, Any] = {
@@ -352,14 +352,14 @@ class TrackedCalendar:
         """List all the events matching a state pattern that are currently open"""
         return [v for v in self.tracked_events.values() if v.is_current()]
 
-    async def has_event_on_day(self, day: dt.date) -> bool:
-        """Is there a state-matching event that starts, ends or spans this day"""
+    async def has_event_on_day(self, day: dt.date, states: list[str]) -> bool:
+        """Is there an event matching one of these states that starts, ends or spans this day"""
         if not self.enabled:
             return False
         start_dt: dt.datetime = dt_util.start_of_local_day(day)
         end_dt: dt.datetime = start_dt + dt.timedelta(days=1)
         events: list[CalendarEvent] = await self.calendar_entity.async_get_events(self.hass, start_dt, end_dt)
-        return any(self.match_event(event.summary, event.description) is not None for event in events)
+        return any(self.match_event(event.summary, event.description) in states for event in events)
 
     async def last_event_ended_today(self) -> tuple[dt.datetime, AlarmControlPanelState] | None:
         """End time and state of the state-matching event that most recently ended today"""

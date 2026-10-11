@@ -34,7 +34,7 @@ tags:
     handler: python
     heading_level: 4
 
-## Time of Day
+## Times of the Day
 
 ::: custom_components.autoarm.time_of_day.TrackedTimeOfDay
     handler: python

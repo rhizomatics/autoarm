@@ -67,9 +67,11 @@ CALENDAR_END_MODE_OPTIONS: list[str] = [
 
 TRIGGER_ON = "on"
 TRIGGER_OFF = "off"
-# on, except on days with a matching calendar event
+# on, except on days with a calendar event for a state that stands in for day and night arming
 TRIGGER_AUTO = "auto"
 SUN_TRIGGER_OPTIONS: list[str] = [TRIGGER_AUTO, TRIGGER_ON, TRIGGER_OFF]
+# calendar events for these states replace day and night arming, the others run alongside it
+DIURNAL_CALENDAR_STATES: list[str] = ["disarmed", "armed_home", "armed_night"]
 
 CONF_SUPERNOTIFY = "supernotify"
 CONF_SCENARIO = "scenario"

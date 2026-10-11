@@ -2,7 +2,7 @@
 
 A simple standard setup for a home that's lived in most days, with no YAML:
 
-- **Armed night** for a fixed bedtime every day, from a [Time of Day](https://www.home-assistant.io/integrations/tod/) sensor
+- **Armed night** for a fixed bedtime every day, from a [Times of the Day](https://www.home-assistant.io/integrations/tod/) sensor
 - **Armed home** from sunset until bedtime, when sunset comes first
 - **Disarmed** when bedtime ends, whether or not the sun is up yet
 - **Armed away** whenever everyone is out
@@ -50,6 +50,6 @@ Add a calendar event with **Vacation** or **Away** in its title. While the event
 
 Coming home on the day the event is due to end finishes it there and then, so there's no need to match the calendar to the exact time you get back. Coming home on any earlier day leaves the alarm armed, as does anyone who is always shown as home, for example without location sharing switched on. This is the **Coming home ends away and vacation events on their last day** switch, in the **Calendar Occupancy Override** section, which is on by default.
 
-When the event ends during bedtime, the alarm goes to `armed_night`, or stays `armed_away` until someone is home. When it ends at any other time, the alarm is disarmed if someone is home, or armed away if not.
+When the event ends during bedtime, the alarm goes to `armed_night`, or stays `armed_away` until someone is home. When it ends at any other time, the alarm is armed away if nobody is home, otherwise disarmed during the day, or `armed_home` after sunset.
 
-On a day with one of these calendar events, sunset doesn't arm the alarm, since the sunrise and sunset [triggers](../../automated_arming.md#triggers) are off by default on calendar days. Bedtime still does.
+Sunset still arms the alarm on a day with one of these calendar events, once the event has ended. The sunrise and sunset [triggers](../../automated_arming.md#triggers) are only off by default on days with a `disarmed`, `armed_home` or `armed_night` calendar event.

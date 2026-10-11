@@ -28,7 +28,7 @@ def async_describe_events(
         data = event.data
         cause: str = data.get("source", "unknown")
         if data.get("summary"):
-            kind = "time of day sensor" if cause == ChangeSource.TOD else "calendar event"
+            kind = "times of the day sensor" if cause == ChangeSource.TOD else "calendar event"
             cause = f"{kind} {data['summary']}"
         return {
             LOGBOOK_ENTRY_NAME: "AutoArm",

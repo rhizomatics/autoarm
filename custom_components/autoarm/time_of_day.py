@@ -14,7 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class TrackedTimeOfDay:
-    """Generate alarm state changes for a Home Assistant Time of Day sensor
+    """Generate alarm state changes for a Home Assistant Times of the Day sensor
 
     The alarm is held at the sensor's state for the period it is on, unless a calendar event is live
     """
@@ -41,7 +41,7 @@ class TrackedTimeOfDay:
         if state is not None and state.state == STATE_ON:
             self.active = True
             await self.start(state, None)
-        _LOGGER.debug("AUTOARM Now tracking time of day sensor %s for %s", self.entity_id, self.arming_state)
+        _LOGGER.debug("AUTOARM Now tracking times of the day sensor %s for %s", self.entity_id, self.arming_state)
 
     def shutdown(self) -> None:
         if self.listener:
@@ -62,11 +62,11 @@ class TrackedTimeOfDay:
             await self.end(context)
 
     async def start(self, state: State, context: Context | None) -> None:
-        _LOGGER.debug("AUTOARM Time of day sensor %s turned on", self.entity_id)
+        _LOGGER.debug("AUTOARM Times of the day sensor %s turned on", self.entity_id)
         self.name = state.name
         self.previous_state = self.armer.armed_state()
         if self.armer.has_active_calendar_event():
-            _LOGGER.info("AUTOARM Time of day sensor %s on, leaving state to the live calendar event", self.entity_id)
+            _LOGGER.info("AUTOARM Times of the day sensor %s on, leaving state to the live calendar event", self.entity_id)
             return
         await self.armer.arm(
             self.armer.time_of_day_state(self),
@@ -76,9 +76,9 @@ class TrackedTimeOfDay:
         )
 
     async def end(self, context: Context) -> None:
-        _LOGGER.debug("AUTOARM Time of day sensor %s no longer on", self.entity_id)
+        _LOGGER.debug("AUTOARM Times of the day sensor %s no longer on", self.entity_id)
         if self.armer.has_active_calendar_event():
-            _LOGGER.debug("AUTOARM No action on time of day end since calendar event active")
+            _LOGGER.debug("AUTOARM No action on times of day end since calendar event active")
             return
         if await self.armer.resume_time_of_day(context):
             return
@@ -102,13 +102,13 @@ class TrackedTimeOfDay:
             await self.armer.reset_armed_state(source=ChangeSource.TOD, context=context, change_context=change_context)
         elif end_mode == NO_CAL_EVENT_MODE_AUTO_OCCUPANCY:
             target_state = self.armer.occupancy_end_state(self.arming_state)
-            _LOGGER.info("AUTOARM Time of day %s ended, and arming by occupancy to %s", self.entity_id, target_state)
+            _LOGGER.info("AUTOARM Times of day %s ended, and arming by occupancy to %s", self.entity_id, target_state)
             await self.armer.arm(target_state, source=ChangeSource.TOD, change_context=change_context, context=context)
         elif end_mode in AlarmControlPanelState:
-            _LOGGER.info("AUTOARM Time of day %s ended, and returning to fixed state %s", self.entity_id, end_mode)
+            _LOGGER.info("AUTOARM Times of day %s ended, and returning to fixed state %s", self.entity_id, end_mode)
             await self.armer.arm(
                 alarm_state_as_enum(end_mode), source=ChangeSource.TOD, change_context=change_context, context=context
             )
         else:
-            _LOGGER.debug("AUTOARM Reinstate previous state on time of day end in manual mode")
+            _LOGGER.debug("AUTOARM Reinstate previous state on times of day end in manual mode")
             await self.armer.arm(self.previous_state, source=ChangeSource.TOD, change_context=change_context, context=context)
