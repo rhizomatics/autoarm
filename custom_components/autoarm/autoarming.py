@@ -595,6 +595,8 @@ class AlarmArmer:
             else DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
         )
         self.calendar_occupancy_ends_away: bool = calendar_occupancy_ends_away
+        # when someone was last seen to come home, rather than only being reported as home
+        self.last_arrival: dt.datetime | None = None
         # Time of Day sensor entity ids by the alarm state they set while on
         self.time_of_day_config: dict[str, list[str]] = time_of_day or {}
         self.time_of_day: list[TrackedTimeOfDay] = []
@@ -924,12 +926,18 @@ class AlarmArmer:
         return any(cal.has_active_event() for cal in self.calendars)
 
     def occupancy_ends_calendar_event(self, calendar_event: TrackedCalendarEvent) -> bool:
-        """Someone being home on the last day of an away or vacation event ends it, rather than waiting for its end time"""
+        """Someone coming home on the last day of an away or vacation event ends it, rather than waiting for its end time
+
+        Only for an arrival seen that day during the event, as a person without location sharing can be home throughout
+        """
         return (
             self.calendar_occupancy_ends_away
             and calendar_event.arming_state in (AlarmControlPanelState.ARMED_AWAY, AlarmControlPanelState.ARMED_VACATION)
             and calendar_event.ends_today()
             and self.is_occupied() is True
+            and self.last_arrival is not None
+            and self.last_arrival.date() == dt_util.now().date()
+            and self.last_arrival >= calendar_event.event.start_datetime_local
         )
 
     def active_time_of_day(self) -> TrackedTimeOfDay | None:
@@ -1733,6 +1741,8 @@ class AlarmArmer:
         )
         # every arrival or departure re-evaluates, as transitions can depend on who in particular is home
         arrived: bool = new == STATE_HOME
+        if arrived and old not in (None, STATE_UNKNOWN, STATE_UNAVAILABLE):
+            self.last_arrival = dt_util.now()
         if (arrived and not self.occupied_trigger) or (not arrived and not self.unoccupied_trigger):
             _LOGGER.debug("AUTOARM Occupancy change ignored, %s trigger is off", "occupied" if arrived else "unoccupied")
             return

@@ -529,6 +529,33 @@ async def test_coming_home_ends_away_event_on_its_last_day(local_calendar: Calen
     assert not armer.has_active_calendar_event()
 
 
+async def test_only_an_arrival_ends_away_event_on_its_last_day(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
+    """Someone always reported as home, such as without location sharing, doesn't end the event, only a real arrival."""
+    start_of_day = dt_util.start_of_local_day()
+    await local_calendar.async_create_event(
+        dtstart=start_of_day, dtend=start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1), summary="Away"
+    )
+    hass.states.async_set("person.house_owner", "home", {"friendly_name": "Bob"})
+    hass.states.async_set("person.tenant", "not_home", {"friendly_name": "Jill"})
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_ARMED_END_MODE] = "auto_occupancy"
+    entry = await _setup_entry(hass, options=local_options)
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
+
+    # occupancy changes that aren't an arrival, while the house counts as occupied
+    for state in ("work", "unavailable", "home", "not_home"):
+        hass.states.async_set("person.tenant", state, {"friendly_name": "Jill"})
+        await hass.async_block_till_done()
+        assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
+    assert entry.runtime_data.has_active_calendar_event()
+
+    hass.states.async_set("person.tenant", "home", {"friendly_name": "Jill"})
+    await hass.async_block_till_done()
+
+    assert panel_state(hass) == AlarmControlPanelState.DISARMED
+    assert not entry.runtime_data.has_active_calendar_event()
+
+
 async def test_coming_home_ends_all_day_vacation_event_on_its_last_day(
     local_calendar: CalendarEntity, hass: HomeAssistant
 ) -> None:

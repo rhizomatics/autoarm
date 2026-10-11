@@ -33,6 +33,7 @@ None of this removes existing functionality, and all of it can be overridden or 
 #### Calendar Occupancy Override
 - New switch so that someone coming home on the last day of an `armed_away` or `armed_vacation` calendar event ends the event there and then, rather than at its end time
   - On by default, including for existing installs, and applies to one-off as well as recurring events
+  - Needs an arrival that day, so someone always shown as home, for example without location sharing, doesn't end the event
   - Part of the [recommended recipe](./configuration/examples/recommended_recipe.md)
 
 #### Time of Day Sensors

@@ -48,7 +48,7 @@ If everyone is out, the alarm is `armed_away` at any time of day. Coming home du
 
 Add a calendar event with **Vacation** or **Away** in its title. While the event is live it takes priority over the Bedtime sensor, which carries on turning on and off with no effect.
 
-Coming home on the day the event is due to end finishes it there and then, so there's no need to match the calendar to the exact time you get back. Coming home on any earlier day leaves the alarm armed. This is the **Coming home ends away and vacation events on their last day** switch, in the **Calendar Occupancy Override** section, which is on by default.
+Coming home on the day the event is due to end finishes it there and then, so there's no need to match the calendar to the exact time you get back. Coming home on any earlier day leaves the alarm armed, as does anyone who is always shown as home, for example without location sharing switched on. This is the **Coming home ends away and vacation events on their last day** switch, in the **Calendar Occupancy Override** section, which is on by default.
 
 When the event ends during bedtime, the alarm goes to `armed_night`, or stays `armed_away` until someone is home. When it ends at any other time, the alarm is disarmed if someone is home, or armed away if not.
 

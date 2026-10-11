@@ -257,6 +257,8 @@ Separately, the **Coming home ends away and vacation events on their last day** 
 It's on by default. When someone comes home on the day the event is due to end, the event ends
 there and then, and the alarm goes to whatever is set for [when an event ends](#when-an-event-ends), so getting back
 from a trip a few hours ahead of the calendar doesn't mean walking into an armed house. It applies to one-off as well as recurring events.
+It takes someone actually arriving that day, a change from away to home, so a person who is always shown as home, for example without
+location sharing switched on, doesn't end the event.
 An arrival on any earlier day of the event leaves the alarm armed, and an all day event's last day is the last full day it covers.
 
 
