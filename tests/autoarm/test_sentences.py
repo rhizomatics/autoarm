@@ -134,7 +134,7 @@ async def test_why_after_time_of_day_sensor(hass: HomeAssistant, autoarmer: Alar
     await _panel_starts(hass, autoarmer, "disarmed")
     await autoarmer.arm(AlarmControlPanelState.ARMED_NIGHT, source=ChangeSource.TOD, change_context={"summary": "Bedtime"})
 
-    assert explain(autoarmer).endswith("by the time of day sensor Bedtime.")
+    assert explain(autoarmer).endswith("by the times of the day sensor Bedtime.")
 
 
 async def test_why_after_calendar_event_ended(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:

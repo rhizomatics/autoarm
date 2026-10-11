@@ -45,5 +45,5 @@ async def test_describes_calendar_event(hass: HomeAssistant) -> None:
 async def test_describes_time_of_day_sensor(hass: HomeAssistant) -> None:
     described = _describer(hass)(Mock(data={"entity_id": "alarm_control_panel.home", "source": "tod", "summary": "Bedtime"}))
 
-    assert described["message"] == "triggered by time of day sensor Bedtime"
-    assert described["source"] == "time of day sensor Bedtime"
+    assert described["message"] == "triggered by times of the day sensor Bedtime"
+    assert described["source"] == "times of the day sensor Bedtime"
