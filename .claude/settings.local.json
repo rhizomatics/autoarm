@@ -8,7 +8,7 @@
       "Bash(uv run mypy:*)",
       "Bash(git add:*)",
       "Bash(xxd:*)",
-      "Bash(uv run mkdocs:*)",
+      "Bash(uv run properdocs:*)",
       "WebFetch(domain:developers.home-assistant.io)"
     ]
   }
