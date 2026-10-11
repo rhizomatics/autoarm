@@ -44,10 +44,12 @@
                     "calendar_options": {
                         "name": "Remplacement d'occupation calendrier",
                         "data": {
-                            "calendar_occupancy_override_states": "États que l'occupation peut remplacer"
+                            "calendar_occupancy_override_states": "États que l'occupation peut remplacer",
+                            "calendar_occupancy_ends_away": "Le retour à la maison met fin aux événements d'absence et de vacances le dernier jour"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "Quand un événement calendrier définit l'un de ces états, les changements d'occupation (arrivées et départs) peuvent encore mettre à jour l'état de l'alarme. Par exemple, si le calendrier indique Désarmé mais que tout le monde part, il passera à Armé Absent."
+                            "calendar_occupancy_override_states": "Quand un événement calendrier définit l'un de ces états, les changements d'occupation (arrivées et départs) peuvent encore mettre à jour l'état de l'alarme. Par exemple, si le calendrier indique Désarmé mais que tout le monde part, il passera à Armé Absent.",
+                            "calendar_occupancy_ends_away": "Lorsque quelqu'un rentre le jour où un événement de calendrier Armé absence ou Armé vacances doit se terminer, l'événement prend fin à ce moment-là plutôt qu'à son heure de fin, et l'alarme passe à l'état défini pour la fin d'un événement de calendrier. S'applique aux événements ponctuels comme aux événements récurrents."
                         }
                     },
                     "time_of_day_options": {
@@ -165,10 +167,12 @@
                     "calendar_options": {
                         "name": "Remplacement d'occupation calendrier",
                         "data": {
-                            "calendar_occupancy_override_states": "États que l'occupation peut remplacer"
+                            "calendar_occupancy_override_states": "États que l'occupation peut remplacer",
+                            "calendar_occupancy_ends_away": "Le retour à la maison met fin aux événements d'absence et de vacances le dernier jour"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "Quand un événement calendrier définit l'un de ces états, les changements d'occupation (arrivées et départs) peuvent encore mettre à jour l'état de l'alarme. Par exemple, si le calendrier indique Désarmé mais que tout le monde part, il passera à Armé Absent."
+                            "calendar_occupancy_override_states": "Quand un événement calendrier définit l'un de ces états, les changements d'occupation (arrivées et départs) peuvent encore mettre à jour l'état de l'alarme. Par exemple, si le calendrier indique Désarmé mais que tout le monde part, il passera à Armé Absent.",
+                            "calendar_occupancy_ends_away": "Lorsque quelqu'un rentre le jour où un événement de calendrier Armé absence ou Armé vacances doit se terminer, l'événement prend fin à ce moment-là plutôt qu'à son heure de fin, et l'alarme passe à l'état défini pour la fin d'un événement de calendrier. S'applique aux événements ponctuels comme aux événements récurrents."
                         }
                     },
                     "time_of_day_options": {

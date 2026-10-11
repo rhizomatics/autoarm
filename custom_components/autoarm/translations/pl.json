@@ -44,10 +44,12 @@
                     "calendar_options": {
                         "name": "Nadpisanie obecności przez kalendarz",
                         "data": {
-                            "calendar_occupancy_override_states": "Stany, które obecność może nadpisać"
+                            "calendar_occupancy_override_states": "Stany, które obecność może nadpisać",
+                            "calendar_occupancy_ends_away": "Powrót do domu kończy wydarzenia nieobecności i urlopu w ich ostatnim dniu"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "Gdy wydarzenie w kalendarzu ustawia jeden z tych stanów, zmiany obecności (przyjazdy i wyjazdy) nadal mogą aktualizować stan alarmu. Na przykład, jeśli kalendarz wskazuje Rozbrojony, ale wszyscy wyjdą, stan zmieni się na Uzbrojony poza domem."
+                            "calendar_occupancy_override_states": "Gdy wydarzenie w kalendarzu ustawia jeden z tych stanów, zmiany obecności (przyjazdy i wyjazdy) nadal mogą aktualizować stan alarmu. Na przykład, jeśli kalendarz wskazuje Rozbrojony, ale wszyscy wyjdą, stan zmieni się na Uzbrojony poza domem.",
+                            "calendar_occupancy_ends_away": "Gdy ktoś wraca do domu w dniu, w którym ma się zakończyć wydarzenie kalendarza Uzbrojony poza domem lub Uzbrojony na urlop, wydarzenie kończy się od razu zamiast o swojej godzinie zakończenia, a alarm przechodzi w stan ustawiony na koniec wydarzenia kalendarza. Dotyczy wydarzeń jednorazowych i cyklicznych."
                         }
                     },
                     "time_of_day_options": {
@@ -165,10 +167,12 @@
                     "calendar_options": {
                         "name": "Nadpisanie obecności przez kalendarz",
                         "data": {
-                            "calendar_occupancy_override_states": "Stany, które obecność może nadpisać"
+                            "calendar_occupancy_override_states": "Stany, które obecność może nadpisać",
+                            "calendar_occupancy_ends_away": "Powrót do domu kończy wydarzenia nieobecności i urlopu w ich ostatnim dniu"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "Gdy wydarzenie w kalendarzu ustawia jeden z tych stanów, zmiany obecności (przyjazdy i wyjazdy) nadal mogą aktualizować stan alarmu. Na przykład, jeśli kalendarz wskazuje Rozbrojony, ale wszyscy wyjdą, stan zmieni się na Uzbrojony poza domem."
+                            "calendar_occupancy_override_states": "Gdy wydarzenie w kalendarzu ustawia jeden z tych stanów, zmiany obecności (przyjazdy i wyjazdy) nadal mogą aktualizować stan alarmu. Na przykład, jeśli kalendarz wskazuje Rozbrojony, ale wszyscy wyjdą, stan zmieni się na Uzbrojony poza domem.",
+                            "calendar_occupancy_ends_away": "Gdy ktoś wraca do domu w dniu, w którym ma się zakończyć wydarzenie kalendarza Uzbrojony poza domem lub Uzbrojony na urlop, wydarzenie kończy się od razu zamiast o swojej godzinie zakończenia, a alarm przechodzi w stan ustawiony na koniec wydarzenia kalendarza. Dotyczy wydarzeń jednorazowych i cyklicznych."
                         }
                     },
                     "time_of_day_options": {

@@ -58,6 +58,7 @@ CONF_NO_EVENT_MODE = "no_event_mode"
 CONF_CALENDAR_ARMED_END_MODE = "calendar_armed_end_mode"
 CONF_CALENDAR_DISARMED_END_MODE = "calendar_disarmed_end_mode"
 CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES = "calendar_occupancy_override_states"
+CONF_CALENDAR_OCCUPANCY_ENDS_AWAY = "calendar_occupancy_ends_away"
 CONF_NOTIFY_ACTION = "notify_action"
 CONF_NOTIFY_TARGETS = "notify_targets"
 CONF_NOTIFY_DATA = "notify_data"
@@ -114,6 +115,7 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_CALENDAR_ARMED_END_MODE: NO_CAL_EVENT_MODE_AUTO,
     CONF_CALENDAR_DISARMED_END_MODE: NO_CAL_EVENT_MODE_AUTO,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
+    CONF_CALENDAR_OCCUPANCY_ENDS_AWAY: True,
     CONF_NOTIFY_ENABLED: True,
     CONF_NOTIFY_ACTION: DEFAULT_NOTIFY_ACTION,
     CONF_NOTIFY_TARGETS: [],
@@ -168,6 +170,10 @@ def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any
                         mode=SelectSelectorMode.LIST,
                     )
                 ),
+                vol.Required(
+                    CONF_CALENDAR_OCCUPANCY_ENDS_AWAY,
+                    default=options.get(CONF_CALENDAR_OCCUPANCY_ENDS_AWAY, True),
+                ): BooleanSelector(),
             }),
             {"collapsed": True},
         ),

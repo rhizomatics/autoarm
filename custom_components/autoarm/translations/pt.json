@@ -44,10 +44,12 @@
                     "calendar_options": {
                         "name": "Substituição de ocupação por calendário",
                         "data": {
-                            "calendar_occupancy_override_states": "Estados que a ocupação pode substituir"
+                            "calendar_occupancy_override_states": "Estados que a ocupação pode substituir",
+                            "calendar_occupancy_ends_away": "Chegar a casa termina os eventos de ausência e de férias no seu último dia"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "Quando um evento do calendário define um destes estados, as alterações de ocupação (chegadas e saídas) ainda podem atualizar o estado do alarme. Por exemplo, se o calendário indicar Desarmado mas todos saírem, mudará para Armado Fora."
+                            "calendar_occupancy_override_states": "Quando um evento do calendário define um destes estados, as alterações de ocupação (chegadas e saídas) ainda podem atualizar o estado do alarme. Por exemplo, se o calendário indicar Desarmado mas todos saírem, mudará para Armado Fora.",
+                            "calendar_occupancy_ends_away": "Quando alguém chega a casa no dia em que um evento de calendário Armado ausente ou Armado férias deve terminar, o evento termina nesse momento em vez de na sua hora de fim, e o alarme passa para o estado definido para quando um evento de calendário termina. Aplica-se tanto a eventos únicos como a recorrentes."
                         }
                     },
                     "time_of_day_options": {
@@ -165,10 +167,12 @@
                     "calendar_options": {
                         "name": "Substituição de ocupação por calendário",
                         "data": {
-                            "calendar_occupancy_override_states": "Estados que a ocupação pode substituir"
+                            "calendar_occupancy_override_states": "Estados que a ocupação pode substituir",
+                            "calendar_occupancy_ends_away": "Chegar a casa termina os eventos de ausência e de férias no seu último dia"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "Quando um evento do calendário define um destes estados, as alterações de ocupação (chegadas e saídas) ainda podem atualizar o estado do alarme. Por exemplo, se o calendário indicar Desarmado mas todos saírem, mudará para Armado Fora."
+                            "calendar_occupancy_override_states": "Quando um evento do calendário define um destes estados, as alterações de ocupação (chegadas e saídas) ainda podem atualizar o estado do alarme. Por exemplo, se o calendário indicar Desarmado mas todos saírem, mudará para Armado Fora.",
+                            "calendar_occupancy_ends_away": "Quando alguém chega a casa no dia em que um evento de calendário Armado ausente ou Armado férias deve terminar, o evento termina nesse momento em vez de na sua hora de fim, e o alarme passa para o estado definido para quando um evento de calendário termina. Aplica-se tanto a eventos únicos como a recorrentes."
                         }
                     },
                     "time_of_day_options": {

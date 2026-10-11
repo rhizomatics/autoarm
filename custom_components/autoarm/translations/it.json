@@ -44,10 +44,12 @@
                     "calendar_options": {
                         "name": "Sostituzione occupazione calendario",
                         "data": {
-                            "calendar_occupancy_override_states": "Stati che la presenza può sovrascrivere"
+                            "calendar_occupancy_override_states": "Stati che la presenza può sovrascrivere",
+                            "calendar_occupancy_ends_away": "Il rientro a casa termina gli eventi di assenza e vacanza nel loro ultimo giorno"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa."
+                            "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa.",
+                            "calendar_occupancy_ends_away": "Quando qualcuno rientra a casa nel giorno in cui deve terminare un evento di calendario Inserito fuori casa o Inserito vacanza, l'evento termina in quel momento anziché all'orario di fine, e l'allarme passa allo stato impostato per la fine di un evento di calendario. Vale sia per gli eventi singoli sia per quelli ricorrenti."
                         }
                     },
                     "time_of_day_options": {
@@ -165,10 +167,12 @@
                     "calendar_options": {
                         "name": "Sostituzione occupazione calendario",
                         "data": {
-                            "calendar_occupancy_override_states": "Stati che la presenza può sovrascrivere"
+                            "calendar_occupancy_override_states": "Stati che la presenza può sovrascrivere",
+                            "calendar_occupancy_ends_away": "Il rientro a casa termina gli eventi di assenza e vacanza nel loro ultimo giorno"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa."
+                            "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa.",
+                            "calendar_occupancy_ends_away": "Quando qualcuno rientra a casa nel giorno in cui deve terminare un evento di calendario Inserito fuori casa o Inserito vacanza, l'evento termina in quel momento anziché all'orario di fine, e l'allarme passa allo stato impostato per la fine di un evento di calendario. Vale sia per gli eventi singoli sia per quelli ricorrenti."
                         }
                     },
                     "time_of_day_options": {

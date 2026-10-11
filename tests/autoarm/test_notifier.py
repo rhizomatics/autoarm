@@ -672,6 +672,30 @@ async def test_notify_skipped_when_action_is_empty_string(hass: HomeAssistant) -
     await notifier.notify(ChangeSource.BUTTON, message="Empty action")
 
 
+async def test_notify_names_time_of_day_sensor(hass: HomeAssistant) -> None:
+    """A change by a time of day sensor is described by the sensor's name, not the bare source."""
+    armer = AlarmArmer(
+        hass, TEST_PANEL, notify_enabled=True, notify_action="notify.test_service", notify_profiles={"backstop": {}}
+    )
+    messages: list[str] = []
+
+    @callback
+    def mock_handler(call: ServiceCall) -> None:
+        messages.append(call.data["message"])
+
+    hass.services.async_register("notify", "test_service", mock_handler)
+    hass.states.async_set(TEST_PANEL, AlarmControlPanelState.DISARMED)
+
+    await armer.arm(AlarmControlPanelState.ARMED_NIGHT, source=ChangeSource.TOD, change_context={"summary": "Bedtime"})
+    await hass.async_block_till_done()
+    assert messages == ["Alarm state changed from Disarmed to Armed Night by Bedtime Times of the Day sensor"]
+
+    assert armer.notifier is not None
+    await armer.notifier.notify(ChangeSource.TOD, AlarmControlPanelState.ARMED_NIGHT, AlarmControlPanelState.DISARMED)
+    await hass.async_block_till_done()
+    assert messages[1] == "Alarm state changed from Armed Night to Disarmed by Times of the Day sensor"
+
+
 async def test_notify_supernotify_action_takes_data_at_top_level(hass: HomeAssistant) -> None:
     """supernotify.notify has no nested data section, and gets the mobile actions by default."""
     notify_config: ConfigType = NOTIFY_SCHEMA({

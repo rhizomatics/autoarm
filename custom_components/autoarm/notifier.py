@@ -46,6 +46,7 @@ class Notifier:
         message: str | None = None,
         title: str | None = None,
         context: Context | None = None,
+        source_name: str | None = None,
     ) -> None:
 
         try:
@@ -119,9 +120,12 @@ class Notifier:
                 title = f"Alarm now {friendly_state(to_state)}" if to_state else "Alarm Panel Change"
             if message is None:
                 if from_state and to_state:
+                    if source == ChangeSource.TOD:
+                        changed_by = f"{source_name} Times of the Day sensor" if source_name else "Times of the Day sensor"
+                    else:
+                        changed_by = source.capitalize()
                     message = (
-                        f"Alarm state changed from {friendly_state(from_state)} to {friendly_state(to_state)}"
-                        f" by {source.capitalize()}"
+                        f"Alarm state changed from {friendly_state(from_state)} to {friendly_state(to_state)} by {changed_by}"
                     )
                 else:
                     message = "Alarm control panel operation complete"

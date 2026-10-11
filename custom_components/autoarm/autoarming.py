@@ -65,6 +65,7 @@ from .config_flow import (
     CONF_CALENDAR_ARMED_END_MODE,
     CONF_CALENDAR_DISARMED_END_MODE,
     CONF_CALENDAR_ENTITIES,
+    CONF_CALENDAR_OCCUPANCY_ENDS_AWAY,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
@@ -445,6 +446,7 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         calendar_occupancy_override_states=entry.options.get(
             CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
         ),
+        calendar_occupancy_ends_away=entry.options.get(CONF_CALENDAR_OCCUPANCY_ENDS_AWAY, True),
         # entries from before the option existed keep setting the state directly
         use_alarm_service=entry.options.get(CONF_USE_ALARM_SERVICE, False),
     )
@@ -560,6 +562,7 @@ class AlarmArmer:
         time_of_day: dict[str, list[str]] | None = None,
         transitions: dict[str, dict[str, list[ConfigType]]] | None = None,
         calendar_occupancy_override_states: list[str] | None = None,
+        calendar_occupancy_ends_away: bool = True,
         use_alarm_service: bool = True,
     ) -> None:
         occupancy = occupancy or {}
@@ -591,6 +594,7 @@ class AlarmArmer:
             if calendar_occupancy_override_states is not None
             else DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES
         )
+        self.calendar_occupancy_ends_away: bool = calendar_occupancy_ends_away
         # Time of Day sensor entity ids by the alarm state they set while on
         self.time_of_day_config: dict[str, list[str]] = time_of_day or {}
         self.time_of_day: list[TrackedTimeOfDay] = []
@@ -919,6 +923,15 @@ class AlarmArmer:
     def has_active_calendar_event(self) -> bool:
         return any(cal.has_active_event() for cal in self.calendars)
 
+    def occupancy_ends_calendar_event(self, calendar_event: TrackedCalendarEvent) -> bool:
+        """Someone being home on the last day of an away or vacation event ends it, rather than waiting for its end time"""
+        return (
+            self.calendar_occupancy_ends_away
+            and calendar_event.arming_state in (AlarmControlPanelState.ARMED_AWAY, AlarmControlPanelState.ARMED_VACATION)
+            and calendar_event.ends_today()
+            and self.is_occupied() is True
+        )
+
     def active_time_of_day(self) -> TrackedTimeOfDay | None:
         return next((tod for tod in self.time_of_day if tod.active), None)
 
@@ -1087,9 +1100,16 @@ class AlarmArmer:
         await self.reset_armed_state(**kwargs)
 
     async def reset_armed_state(
-        self, intervention: Intervention | None = None, source: ChangeSource | None = None, context: Context | None = None
+        self,
+        intervention: Intervention | None = None,
+        source: ChangeSource | None = None,
+        context: Context | None = None,
+        change_context: dict[str, Any] | None = None,
     ) -> str | None:
-        """Logic to automatically work out appropriate current armed state"""
+        """Logic to automatically work out appropriate current armed state
+
+        A change_context carries detail of whatever asked for the reset, such as its name, through to the change
+        """
         state: AlarmControlPanelState | None = None
         existing_state: AlarmControlPanelState | None = None
         must_change_state: bool = False
@@ -1113,6 +1133,13 @@ class AlarmArmer:
                 active_calendar_event = self.active_calendar_event()
                 if active_calendar_event:
                     cal_state: AlarmControlPanelState = active_calendar_event.arming_state
+                    if source == ChangeSource.OCCUPANCY and self.occupancy_ends_calendar_event(active_calendar_event):
+                        _LOGGER.info("AUTOARM Ending %s calendar event on its last day, now someone is home", cal_state)
+                        reset_decision = "end_calendar_event_for_occupancy"
+                        # the event's end decides the new state, as it would at its end time
+                        await active_calendar_event.end_early()
+                        state = self.armed_state()
+                        return state
                     if (
                         source == ChangeSource.OCCUPANCY
                         and cal_state is not None
@@ -1213,7 +1240,7 @@ class AlarmArmer:
                 state = await self.arm(
                     state,
                     source=source,
-                    change_context={"reset_decision": reset_decision, "caller": "reset_armed_state"},
+                    change_context={**(change_context or {}), "reset_decision": reset_decision, "caller": "reset_armed_state"},
                     context=context,
                 )
 
@@ -1410,7 +1437,11 @@ class AlarmArmer:
                         self._debounce_calendar_notification(notify_from_state, arming_state, context)
                     else:
                         await self.notifier.notify(
-                            source=source, from_state=notify_from_state, to_state=arming_state, context=context
+                            source=source,
+                            from_state=notify_from_state,
+                            to_state=arming_state,
+                            context=context,
+                            source_name=(change_context or {}).get("summary"),
                         )
 
                 self.last_change = StateChange(

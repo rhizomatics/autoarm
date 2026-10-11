@@ -44,10 +44,12 @@
                     "calendar_options": {
                         "name": "Calendar Occupancy Override",
                         "data": {
-                            "calendar_occupancy_override_states": "States that occupancy can override"
+                            "calendar_occupancy_override_states": "States that occupancy can override",
+                            "calendar_occupancy_ends_away": "Coming home ends away and vacation events on their last day"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "When a calendar event sets one of these states, occupancy changes (arrivals and departures) can still update the alarm state. For example, if the calendar says Disarmed but everyone leaves, it will switch to Armed Away."
+                            "calendar_occupancy_override_states": "When a calendar event sets one of these states, occupancy changes (arrivals and departures) can still update the alarm state. For example, if the calendar says Disarmed but everyone leaves, it will switch to Armed Away.",
+                            "calendar_occupancy_ends_away": "When someone comes home on the day an Armed Away or Armed Vacation calendar event is due to end, the event ends then rather than at its end time, and the alarm goes to the state set for when a calendar event ends. Applies to one-off events as well as recurring ones."
                         }
                     },
                     "time_of_day_options": {
@@ -165,10 +167,12 @@
                     "calendar_options": {
                         "name": "Calendar Occupancy Override",
                         "data": {
-                            "calendar_occupancy_override_states": "States that occupancy can override"
+                            "calendar_occupancy_override_states": "States that occupancy can override",
+                            "calendar_occupancy_ends_away": "Coming home ends away and vacation events on their last day"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "When a calendar event sets one of these states, occupancy changes (arrivals and departures) can still update the alarm state. For example, if the calendar says Disarmed but everyone leaves, it will switch to Armed Away."
+                            "calendar_occupancy_override_states": "When a calendar event sets one of these states, occupancy changes (arrivals and departures) can still update the alarm state. For example, if the calendar says Disarmed but everyone leaves, it will switch to Armed Away.",
+                            "calendar_occupancy_ends_away": "When someone comes home on the day an Armed Away or Armed Vacation calendar event is due to end, the event ends then rather than at its end time, and the alarm goes to the state set for when a calendar event ends. Applies to one-off events as well as recurring ones."
                         }
                     },
                     "time_of_day_options": {

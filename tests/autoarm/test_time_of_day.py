@@ -1,6 +1,7 @@
 import asyncio
 import datetime as dt
 from typing import Any
+from unittest.mock import AsyncMock
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
@@ -25,6 +26,7 @@ from custom_components.autoarm.const import (
     YAML_DATA_KEY,
     ChangeSource,
 )
+from custom_components.autoarm.notifier import Notifier
 
 PANEL = "alarm_panel.testing"
 BEDTIME = "binary_sensor.bedtime"
@@ -268,12 +270,18 @@ async def test_sensor_turning_off_by_occupancy_and_sun(hass: HomeAssistant, mock
     hass.states.async_set("person.tenant", "home")
     hass.states.async_set("sun.sun", "below_horizon")
     hass.states.async_set(BEDTIME, "on", BEDTIME_ATTRS)
-    await _setup_entry(hass, {CONF_CALENDAR_ARMED_END_MODE: "auto_sun", CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_home"})
+    entry = await _setup_entry(hass, {CONF_CALENDAR_ARMED_END_MODE: "auto_sun", CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_home"})
+    armer = entry.runtime_data
+    armer.notifier = AsyncMock(spec=Notifier)
     assert panel_state(hass) == AlarmControlPanelState.ARMED_NIGHT
 
     await _bedtime(hass, "off")
 
     assert panel_state(hass) == AlarmControlPanelState.ARMED_HOME
+    # the reset names the sensor, for the notification
+    assert armer.last_change.context["summary"] == "Bedtime"
+    armer.notifier.notify.assert_called_once()
+    assert armer.notifier.notify.call_args.kwargs["source_name"] == "Bedtime"
 
 
 async def test_sensor_turning_off_in_manual_mode_restores_previous_state(hass: HomeAssistant, mock_notify: Any) -> None:

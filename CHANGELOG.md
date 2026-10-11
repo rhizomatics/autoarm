@@ -28,6 +28,12 @@ None of this removes existing functionality, and all of it can be overridden or 
 
 #### Notifications
 - The alarm states are now the humane versions, e.g. "Armed Night" rather than `armed_night`
+- Changes made by a Time of Day sensor name the sensor, e.g. "by Bedtime Times of the Day sensor"
+
+#### Calendar Occupancy Override
+- New switch so that someone coming home on the last day of an `armed_away` or `armed_vacation` calendar event ends the event there and then, rather than at its end time
+  - On by default, including for existing installs, and applies to one-off as well as recurring events
+  - Part of the [recommended recipe](./configuration/examples/recommended_recipe.md)
 
 #### Time of Day Sensors
 - [Time of Day](https://www.home-assistant.io/integrations/tod/) sensors can now set the alarm state, as an alternative to a recurring calendar event, for example a daily bedtime for `armed_night`

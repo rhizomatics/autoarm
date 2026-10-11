@@ -7,6 +7,7 @@ A simple standard setup for a home that's lived in most days, with no YAML:
 - **Disarmed** when bedtime ends, whether or not the sun is up yet
 - **Armed away** whenever everyone is out
 - A calendar for vacations and other planned time away, with no need to switch the bedtime sensor off for them
+- Coming home on the last day of a vacation or time away ends it, without waiting for the calendar
 
 ## Set Up
 
@@ -46,6 +47,8 @@ If everyone is out, the alarm is `armed_away` at any time of day. Coming home du
 ## Vacations and Time Away
 
 Add a calendar event with **Vacation** or **Away** in its title. While the event is live it takes priority over the Bedtime sensor, which carries on turning on and off with no effect.
+
+Coming home on the day the event is due to end finishes it there and then, so there's no need to match the calendar to the exact time you get back. Coming home on any earlier day leaves the alarm armed. This is the **Coming home ends away and vacation events on their last day** switch, in the **Calendar Occupancy Override** section, which is on by default.
 
 When the event ends during bedtime, the alarm goes to `armed_night`, or stays `armed_away` until someone is home. When it ends at any other time, the alarm is disarmed if someone is home, or armed away if not.
 

@@ -44,10 +44,12 @@
                     "calendar_options": {
                         "name": "カレンダー在室オーバーライド",
                         "data": {
-                            "calendar_occupancy_override_states": "在室状況がオーバーライドできる状態"
+                            "calendar_occupancy_override_states": "在室状況がオーバーライドできる状態",
+                            "calendar_occupancy_ends_away": "帰宅すると、外出と休暇のイベントを最終日に終了する"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "カレンダーイベントがこれらの状態のいずれかを設定した場合、在室状況の変化（到着・出発）によってアラーム状態を更新できます。例えば、カレンダーが「解除」と設定していても全員が外出した場合、「外出モード」に切り替わります。"
+                            "calendar_occupancy_override_states": "カレンダーイベントがこれらの状態のいずれかを設定した場合、在室状況の変化（到着・出発）によってアラーム状態を更新できます。例えば、カレンダーが「解除」と設定していても全員が外出した場合、「外出モード」に切り替わります。",
+                            "calendar_occupancy_ends_away": "外出警戒または休暇警戒のカレンダーイベントが終了する予定の日に誰かが帰宅すると、イベントは終了時刻を待たずにその時点で終了し、アラームはカレンダーイベント終了時に設定された状態になります。単発のイベントにも繰り返しイベントにも適用されます。"
                         }
                     },
                     "time_of_day_options": {
@@ -165,10 +167,12 @@
                     "calendar_options": {
                         "name": "カレンダー在室オーバーライド",
                         "data": {
-                            "calendar_occupancy_override_states": "在室状況がオーバーライドできる状態"
+                            "calendar_occupancy_override_states": "在室状況がオーバーライドできる状態",
+                            "calendar_occupancy_ends_away": "帰宅すると、外出と休暇のイベントを最終日に終了する"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "カレンダーイベントがこれらの状態のいずれかを設定した場合、在室状況の変化（到着・出発）によってアラーム状態を更新できます。例えば、カレンダーが「解除」と設定していても全員が外出した場合、「外出モード」に切り替わります。"
+                            "calendar_occupancy_override_states": "カレンダーイベントがこれらの状態のいずれかを設定した場合、在室状況の変化（到着・出発）によってアラーム状態を更新できます。例えば、カレンダーが「解除」と設定していても全員が外出した場合、「外出モード」に切り替わります。",
+                            "calendar_occupancy_ends_away": "外出警戒または休暇警戒のカレンダーイベントが終了する予定の日に誰かが帰宅すると、イベントは終了時刻を待たずにその時点で終了し、アラームはカレンダーイベント終了時に設定された状態になります。単発のイベントにも繰り返しイベントにも適用されます。"
                         }
                     },
                     "time_of_day_options": {

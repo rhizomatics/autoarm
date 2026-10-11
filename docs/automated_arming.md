@@ -252,6 +252,13 @@ Occupancy checks can override recurring calendar driven alarm states if desired.
 alarm states for which the calendar state should be overridden. This means you can have a simple repeating `disarmed`
 / `armed_night` calendar setup but still have the alarm automatically go to `armed_away` if everyone leaves home.
 
+Separately, the **Coming home ends away and vacation events on their last day** switch, in the same
+**Calendar Occupancy Override** section, lets an arrival finish an `armed_away` or `armed_vacation` event early.
+It's on by default. When someone comes home on the day the event is due to end, the event ends
+there and then, and the alarm goes to whatever is set for [when an event ends](#when-an-event-ends), so getting back
+from a trip a few hours ahead of the calendar doesn't mean walking into an armed house. It applies to one-off as well as recurring events.
+An arrival on any earlier day of the event leaves the alarm armed, and an all day event's last day is the last full day it covers.
+
 
 ## Automated Transitions
 

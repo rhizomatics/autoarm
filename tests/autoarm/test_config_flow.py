@@ -13,6 +13,7 @@ from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ARMED_END_MODE,
     CONF_CALENDAR_DISARMED_END_MODE,
     CONF_CALENDAR_ENTITIES,
+    CONF_CALENDAR_OCCUPANCY_ENDS_AWAY,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
@@ -256,6 +257,7 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
             CONF_PERSON_ENTITIES: ["person.new_person"],
             "calendar_options": {
                 CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: ["armed_home", "disarmed"],
+                CONF_CALENDAR_OCCUPANCY_ENDS_AWAY: True,
             },
             "time_of_day_options": {"time_of_day_armed_home": ["binary_sensor.evening"]},
             "notify_options": {
@@ -293,6 +295,7 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     assert entry.options[CONF_OCCUPIED_TRIGGER] is True
     assert entry.options[CONF_UNOCCUPIED_TRIGGER] is False
     assert entry.options[CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES] == ["armed_home", "disarmed"]
+    assert entry.options[CONF_CALENDAR_OCCUPANCY_ENDS_AWAY] is True
     assert entry.options[CONF_BEDTIME_ENTITIES] == ["binary_sensor.bedtime"]
     assert entry.options["time_of_day_armed_home"] == ["binary_sensor.evening"]
     assert entry.options["time_of_day_disarmed"] == []

@@ -12,6 +12,7 @@ from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ARMED_END_MODE,
     CONF_CALENDAR_DISARMED_END_MODE,
     CONF_CALENDAR_ENTITIES,
+    CONF_CALENDAR_OCCUPANCY_ENDS_AWAY,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_NO_EVENT_MODE,
     CONF_OCCUPANCY_DEFAULT_DAY,
@@ -450,6 +451,8 @@ async def test_calendar_occupancy_override_blocked(local_calendar: CalendarEntit
     local_options = ENTRY_OPTIONS.copy()
     # armed_away is NOT in the override list — occupancy cannot override it
     local_options[CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES] = ["disarmed", "armed_home", "armed_night"]
+    # nor end it, though this is its last day
+    local_options[CONF_CALENDAR_OCCUPANCY_ENDS_AWAY] = False
     await _setup_entry(hass, options=local_options)
 
     assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
@@ -476,6 +479,8 @@ async def test_calendar_occupancy_override_allowed(local_calendar: CalendarEntit
     local_options = ENTRY_OPTIONS.copy()
     # armed_away IS in the override list — occupancy resets are not blocked
     local_options[CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES] = ["disarmed", "armed_home", "armed_night", "armed_away"]
+    # otherwise the arrival ends the event, as each day is the last day of a daily event
+    local_options[CONF_CALENDAR_OCCUPANCY_ENDS_AWAY] = False
     await _setup_entry(hass, options=local_options)
 
     assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
@@ -491,6 +496,81 @@ async def test_calendar_occupancy_override_allowed(local_calendar: CalendarEntit
     assert last_calc is not None
     assert last_calc.attributes["source"] == "occupancy"
     assert last_calc.attributes["reset_decision"] == "no_change"
+
+
+async def test_coming_home_ends_away_event_on_its_last_day(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:
+    """By default, an arrival on the day a one-off away event ends finishes the event there and then."""
+    start_of_day = dt_util.start_of_local_day()
+    await local_calendar.async_create_event(
+        dtstart=start_of_day, dtend=start_of_day + dt.timedelta(days=1) - dt.timedelta(seconds=1), summary="Away"
+    )
+    hass.states.async_set("person.house_owner", "not_home", {"friendly_name": "Bob"})
+    hass.states.async_set("person.tenant", "not_home", {"friendly_name": "Jill"})
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_ARMED_END_MODE] = "auto_occupancy"
+    entry = await _setup_entry(hass, options=local_options)
+    armer = entry.runtime_data
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_AWAY
+
+    hass.states.async_set("person.house_owner", "home", {"friendly_name": "Bob"})
+    await hass.async_block_till_done()
+
+    assert panel_state(hass) == AlarmControlPanelState.DISARMED
+    assert not armer.has_active_calendar_event()
+    last_calc = hass.states.get("sensor.autoarm_last_calculation")
+    assert last_calc is not None
+    assert last_calc.attributes["reset_decision"] == "end_calendar_event_for_occupancy"
+
+    # the event is still live in the calendar, and polls must not start it again
+    for _ in range(2):
+        await armer.calendars[0].on_timed_poll(dt_util.now())
+        await hass.async_block_till_done()
+    assert panel_state(hass) == AlarmControlPanelState.DISARMED
+    assert not armer.has_active_calendar_event()
+
+
+async def test_coming_home_ends_all_day_vacation_event_on_its_last_day(
+    local_calendar: CalendarEntity, hass: HomeAssistant
+) -> None:
+    """An all day event's last day is the day before the midnight it ends at."""
+    today: dt.date = dt_util.now().date()
+    await local_calendar.async_create_event(
+        dtstart=today - dt.timedelta(days=1), dtend=today + dt.timedelta(days=1), summary="Holidays in Bahamas!!"
+    )
+    hass.states.async_set("person.house_owner", "not_home", {"friendly_name": "Bob"})
+    hass.states.async_set("person.tenant", "not_home", {"friendly_name": "Jill"})
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_OCCUPANCY_ENDS_AWAY] = True
+    local_options[CONF_CALENDAR_ARMED_END_MODE] = "auto_occupancy"
+    await _setup_entry(hass, options=local_options)
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
+
+    hass.states.async_set("person.house_owner", "home", {"friendly_name": "Bob"})
+    await hass.async_block_till_done()
+
+    assert panel_state(hass) == AlarmControlPanelState.DISARMED
+
+
+async def test_coming_home_leaves_vacation_event_before_its_last_day(
+    local_calendar: CalendarEntity, hass: HomeAssistant
+) -> None:
+    """Even with the option on, an arrival before the event's last day leaves the event in control."""
+    start_of_day = dt_util.start_of_local_day()
+    await local_calendar.async_create_event(
+        dtstart=start_of_day, dtend=start_of_day + dt.timedelta(days=2), summary="Holidays in Bahamas!!"
+    )
+    hass.states.async_set("person.house_owner", "not_home", {"friendly_name": "Bob"})
+    hass.states.async_set("person.tenant", "not_home", {"friendly_name": "Jill"})
+    local_options = ENTRY_OPTIONS.copy()
+    local_options[CONF_CALENDAR_OCCUPANCY_ENDS_AWAY] = True
+    entry = await _setup_entry(hass, options=local_options)
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
+
+    hass.states.async_set("person.house_owner", "home", {"friendly_name": "Bob"})
+    await hass.async_block_till_done()
+
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_VACATION
+    assert entry.runtime_data.has_active_calendar_event()
 
 
 async def test_calendar_manual_mode_blocks_occupancy_reset(local_calendar: CalendarEntity, hass: HomeAssistant) -> None:

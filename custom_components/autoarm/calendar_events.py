@@ -65,6 +65,7 @@ class TrackedCalendarEvent:
         self.hass: HomeAssistant = hass
         self.previous_state: AlarmControlPanelState | None = armer.armed_state()
         self.track_status: str = "pending"
+        self.ended_early: bool = False
 
     async def initialize(self) -> None:
         if self.event.end_datetime_local < self.tracked_at:
@@ -96,6 +97,11 @@ class TrackedCalendarEvent:
         self.track_status = "ended"
         await self.on_calendar_event_end(dt_util.now())
         self.shutdown()
+
+    async def end_early(self) -> None:
+        """End an event ahead of its finish time, staying tracked until then so a poll doesn't start it again"""
+        self.ended_early = True
+        await self.end(dt_util.now())
 
     async def update(self, new_event: CalendarEvent) -> None:
         _LOGGER.debug("AUTOARM Calendar event updated for %s: %s", self.id, self.event.summary)
@@ -230,6 +236,11 @@ class TrackedCalendarEvent:
 
     def is_recurring(self) -> bool:
         return self.event.recurrence_id is not None
+
+    def ends_today(self) -> bool:
+        """Is today the last day of the event, where an all day event ends at the midnight after its last day"""
+        last_moment: dt.datetime = self.event.end_datetime_local - dt.timedelta(microseconds=1)
+        return last_moment.date() == dt_util.now().date()
 
     def is_future(self) -> bool:
         if self.track_status == "ended":
@@ -468,6 +479,8 @@ class TrackedCalendar:
                 min_start = tevent.event.start_datetime_local
             if max_end is None or max_end < tevent.event.end_datetime_local:
                 max_end = tevent.event.end_datetime_local
+            if tevent.ended_early and tevent.event.end_datetime_local > dt_util.now():
+                continue
             if not tevent.is_current() and not tevent.is_future():
                 _LOGGER.debug("AUTOARM Pruning expire calendar event: %s", tevent.event.uid)
                 to_remove.add(event_id)

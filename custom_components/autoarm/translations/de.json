@@ -44,10 +44,12 @@
                     "calendar_options": {
                         "name": "Kalender-Belegungsüberschreibung",
                         "data": {
-                            "calendar_occupancy_override_states": "Zustände, die die Belegung überschreiben kann"
+                            "calendar_occupancy_override_states": "Zustände, die die Belegung überschreiben kann",
+                            "calendar_occupancy_ends_away": "Heimkehr beendet Abwesenheits- und Urlaubsereignisse an ihrem letzten Tag"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "Wenn ein Kalenderereignis einen dieser Zustände setzt, können Belegungsänderungen (Ankünfte und Abfahrten) den Alarmzustand noch aktualisieren. Wenn der Kalender zum Beispiel 'Deaktiviert' angibt, aber alle das Haus verlassen, wechselt er zu 'Scharf Abwesend'."
+                            "calendar_occupancy_override_states": "Wenn ein Kalenderereignis einen dieser Zustände setzt, können Belegungsänderungen (Ankünfte und Abfahrten) den Alarmzustand noch aktualisieren. Wenn der Kalender zum Beispiel 'Deaktiviert' angibt, aber alle das Haus verlassen, wechselt er zu 'Scharf Abwesend'.",
+                            "calendar_occupancy_ends_away": "Wenn jemand an dem Tag nach Hause kommt, an dem ein Kalenderereignis für Scharf abwesend oder Scharf Urlaub enden soll, endet das Ereignis sofort statt zu seiner Endzeit, und die Alarmanlage wechselt in den Zustand, der für das Ende eines Kalenderereignisses festgelegt ist. Gilt für einmalige ebenso wie für wiederkehrende Ereignisse."
                         }
                     },
                     "time_of_day_options": {
@@ -165,10 +167,12 @@
                     "calendar_options": {
                         "name": "Kalender-Belegungsüberschreibung",
                         "data": {
-                            "calendar_occupancy_override_states": "Zustände, die die Belegung überschreiben kann"
+                            "calendar_occupancy_override_states": "Zustände, die die Belegung überschreiben kann",
+                            "calendar_occupancy_ends_away": "Heimkehr beendet Abwesenheits- und Urlaubsereignisse an ihrem letzten Tag"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "Wenn ein Kalenderereignis einen dieser Zustände setzt, können Belegungsänderungen (Ankünfte und Abfahrten) den Alarmzustand noch aktualisieren. Wenn der Kalender zum Beispiel 'Deaktiviert' angibt, aber alle das Haus verlassen, wechselt er zu 'Scharf Abwesend'."
+                            "calendar_occupancy_override_states": "Wenn ein Kalenderereignis einen dieser Zustände setzt, können Belegungsänderungen (Ankünfte und Abfahrten) den Alarmzustand noch aktualisieren. Wenn der Kalender zum Beispiel 'Deaktiviert' angibt, aber alle das Haus verlassen, wechselt er zu 'Scharf Abwesend'.",
+                            "calendar_occupancy_ends_away": "Wenn jemand an dem Tag nach Hause kommt, an dem ein Kalenderereignis für Scharf abwesend oder Scharf Urlaub enden soll, endet das Ereignis sofort statt zu seiner Endzeit, und die Alarmanlage wechselt in den Zustand, der für das Ende eines Kalenderereignisses festgelegt ist. Gilt für einmalige ebenso wie für wiederkehrende Ereignisse."
                         }
                     },
                     "time_of_day_options": {

@@ -44,10 +44,12 @@
                     "calendar_options": {
                         "name": "日历对在家状态的覆盖",
                         "data": {
-                            "calendar_occupancy_override_states": "在家状态可以覆盖的状态"
+                            "calendar_occupancy_override_states": "在家状态可以覆盖的状态",
+                            "calendar_occupancy_ends_away": "回家时在最后一天结束离家和度假事件"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。"
+                            "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。",
+                            "calendar_occupancy_ends_away": "当有人在离家布防或度假布防日历事件预定结束的当天回家时，事件会立即结束，而不是等到结束时间，警报将切换到为日历事件结束所设置的状态。适用于一次性事件和重复事件。"
                         }
                     },
                     "time_of_day_options": {
@@ -165,10 +167,12 @@
                     "calendar_options": {
                         "name": "日历对在家状态的覆盖",
                         "data": {
-                            "calendar_occupancy_override_states": "在家状态可以覆盖的状态"
+                            "calendar_occupancy_override_states": "在家状态可以覆盖的状态",
+                            "calendar_occupancy_ends_away": "回家时在最后一天结束离家和度假事件"
                         },
                         "data_description": {
-                            "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。"
+                            "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。",
+                            "calendar_occupancy_ends_away": "当有人在离家布防或度假布防日历事件预定结束的当天回家时，事件会立即结束，而不是等到结束时间，警报将切换到为日历事件结束所设置的状态。适用于一次性事件和重复事件。"
                         }
                     },
                     "time_of_day_options": {

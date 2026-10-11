@@ -4,6 +4,11 @@ tags:
 ---
 # Roadmap
 
+## Minor
+
+- Translations for notifications and other places where embedded user facing English hard-coded
+- ToD support for weekends or non-standard weeks (upstream PR or work around based on entity name)
+
 ## Occupancy
 
 ### Absence-Only Devices

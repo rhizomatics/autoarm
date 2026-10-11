@@ -51,6 +51,7 @@ async def test_pending_round_trip_is_never_notified(hass: HomeAssistant) -> None
         from_state=AlarmControlPanelState.ARMED_NIGHT,
         to_state=AlarmControlPanelState.DISARMED,
         context=autoarmer.notifier.notify.call_args.kwargs["context"],
+        source_name=None,
     )
 
 
