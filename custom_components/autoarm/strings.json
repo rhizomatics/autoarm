@@ -15,89 +15,90 @@
                 "description": "Follows the [recommended recipe]({recipe_url}), with a bedtime sensor, a calendar for vacations, and arming away when everyone is out. Only the alarm panel is required, the rest can be added later.",
                 "data": {
                     "alarm_panel": "Alarm Control Panel to manage",
-                    "time_of_day_armed_night": "Bedtime sensor for Armed Night",
-                    "calendar_entities": "Calendars for vacations and time away",
-                    "person_entities": "People for occupancy based arming"
+                    "time_of_day_armed_night": "Bedtime - Times of the Day Sensor",
+                    "calendar_entities": "Occupancy - Calendars",
+                    "person_entities": "Presence - People for Occupancy Based Arming"
                 },
                 "data_description": {
                     "alarm_panel": "No alarm panel yet? [Create a virtual one]({alarm_panel_help_url}), or in Home Assistant go to Settings → Devices & Services → Helpers → **+ Create Helper** → Template → **Alarm control panel**. Give it a name and submit; every other field is optional.",
-                    "calendar_entities": "No calendar yet? [Create a local calendar]({calendar_help_url}), or go to Settings → Devices & Services → **+ Add Integration** → **Local calendar**. Give it a name and leave 'Create empty calendar' selected.",
-                    "time_of_day_armed_night": "A Times of the Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. Alternatively use a calendar or the *Sun* integration to control night time arming. No bedtime sensor yet? [Create one]({bedtime_help_url}), or go to Settings → Devices & Services → Helpers → **+ Create Helper** → **Time of the Day**. Give it a name and set an After/Before time for your usual bedtime window.",
-                    "person_entities": "Somebody missing? [Add a new person]({person_help_url}), or go to Settings → People → **+ Add Person**. Give them a name; linking a user account is optional."
+                    "calendar_entities": "Calendars are needed to drive the Armed Vacation state, or if presence is unavailable or unreliable for working out occupancy. Calendars can also set any armed state, so can override other diurnal, bedtime or occupancy controls. No calendar yet? [Create a local calendar]({calendar_help_url}), or go to Settings → Devices & Services → **+ Add Integration** → **Local calendar**. Give it a name and leave 'Create empty calendar' selected.",
+                    "time_of_day_armed_night": "A Times of the Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. No bedtime sensor yet? [Create one]({bedtime_help_url}), or go to Settings → Devices & Services → Helpers → **+ Create Helper** → **Time of the Day**. Give it a name and set an After/Before time for your usual bedtime window.",
+                    "person_entities": "Whether or not all of these people are home drives the Armed Away, Armed Home and Disarmed states. Somebody missing? [Add a new person]({person_help_url}), or go to Settings → People → **+ Add Person**. Give them a name; linking a user account is optional."
                 }
             },
             "advanced_setup": {
                 "title": "Set Up Auto Arm — Advanced",
                 "data": {
                     "alarm_panel": "Alarm Control Panel to manage",
-                    "time_of_day_armed_night": "Bedtime sensor for Armed Night",
-                    "calendar_entities": "Calendars for vacations and time away",
-                    "person_entities": "People for occupancy based arming"
+                    "time_of_day_armed_night": "Bedtime - Times of the Day Sensor",
+                    "calendar_entities": "Occupancy - Calendars",
+                    "person_entities": "Presence - People for Occupancy Based Arming"
                 },
                 "data_description": {
                     "alarm_panel": "No alarm panel yet? [Create a virtual one]({alarm_panel_help_url}), or in Home Assistant go to Settings → Devices & Services → Helpers → **+ Create Helper** → Template → **Alarm control panel**. Give it a name and submit; every other field is optional.",
-                    "calendar_entities": "No calendar yet? [Create a local calendar]({calendar_help_url}), or go to Settings → Devices & Services → **+ Add Integration** → **Local calendar**. Give it a name and leave 'Create empty calendar' selected.",
-                    "time_of_day_armed_night": "A Times of the Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. Alternatively use a calendar or the *Sun* integration to control night time arming. No bedtime sensor yet? [Create one]({bedtime_help_url}), or go to Settings → Devices & Services → Helpers → **+ Create Helper** → **Time of the Day**. Give it a name and set an After/Before time for your usual bedtime window.",
-                    "person_entities": "Somebody missing? [Add a new person]({person_help_url}), or go to Settings → People → **+ Add Person**. Give them a name; linking a user account is optional."
+                    "calendar_entities": "Calendars are needed to drive the Armed Vacation state, or if presence is unavailable or unreliable for working out occupancy. Calendars can also set any armed state, so can override other diurnal, bedtime or occupancy controls. No calendar yet? [Create a local calendar]({calendar_help_url}), or go to Settings → Devices & Services → **+ Add Integration** → **Local calendar**. Give it a name and leave 'Create empty calendar' selected.",
+                    "time_of_day_armed_night": "A Times of the Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. No bedtime sensor yet? [Create one]({bedtime_help_url}), or go to Settings → Devices & Services → Helpers → **+ Create Helper** → **Time of the Day**. Give it a name and set an After/Before time for your usual bedtime window.",
+                    "person_entities": "Whether or not all of these people are home drives the Armed Away, Armed Home and Disarmed states. Somebody missing? [Add a new person]({person_help_url}), or go to Settings → People → **+ Add Person**. Give them a name; linking a user account is optional."
                 },
                 "sections": {
-                    "calendar_options": {
-                        "name": "Calendar Occupancy Override",
+                    "presence_options": {
+                        "name": "Presence",
                         "data": {
-                            "calendar_occupancy_override_states": "States that occupancy can override",
-                            "calendar_occupancy_ends_away": "Coming home ends away and vacation events on their last day"
+                            "occupied_trigger": "Someone arrives home",
+                            "unoccupied_trigger": "Someone leaves home",
+                            "calendar_occupancy_override_states": "Calendar based alarm states presence can override",
+                            "calendar_occupancy_ends_away": "Coming home ends Away and Vacation events on their last day"
                         },
                         "data_description": {
+                            "occupied_trigger": "Re-evaluate the alarm state when a person arrives home",
+                            "unoccupied_trigger": "Re-evaluate the alarm state when a person leaves home",
                             "calendar_occupancy_override_states": "When a calendar event sets one of these states, occupancy changes (arrivals and departures) can still update the alarm state. For example, if the calendar says Disarmed but everyone leaves, it will switch to Armed Away.",
                             "calendar_occupancy_ends_away": "When someone comes home on the day an Armed Away or Armed Vacation calendar event is due to end, the event ends then rather than at its end time, and the alarm goes to the state set for when a calendar event ends. Applies to one-off events as well as recurring ones."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Times of the Day",
-                        "description": "Times of the Day sensors for the other alarm states, each setting its state while it's on, in the same way as the bedtime sensor. When a sensor turns off, the calendar event end settings under Advanced apply.",
+                    "sun_options": {
+                        "name": "Diurnal - Sun",
+                        "description": "Morning is sunrise, and evening sunset, each kept within its earliest and latest times. The triggers re-evaluate the alarm state at morning and evening, and are ignored during bedtime. Auto switches a trigger off on any day with a Disarmed, Armed Home or Armed Night calendar event. The earliest and latest times are most useful when no Times of the Day sensor or calendar is used for bedtime.",
                         "data": {
-                            "time_of_day_disarmed": "Disarmed",
-                            "time_of_day_armed_home": "Armed Home",
-                            "time_of_day_armed_away": "Armed Away",
-                            "time_of_day_armed_custom_bypass": "Armed Custom Bypass"
-                        }
-                    },
-                    "trigger_options": {
-                        "name": "Triggers",
-                        "description": "What can start a re-evaluation of the alarm state. These change when the state is worked out, not how. Auto switches a trigger off on any day with a disarmed, armed home or armed night calendar event, as those replace day and night arming.",
-                        "data": {
-                            "sunrise_trigger": "Sunrise",
-                            "sunset_trigger": "Sunset",
-                            "occupied_trigger": "Someone arrives home",
-                            "unoccupied_trigger": "Someone leaves home"
+                            "occupancy_default_day": "Occupied state between morning and evening",
+                            "occupancy_default_after_bedtime": "Occupied state between bedtime and morning",
+                            "occupancy_default_night": "Occupied state between evening and bedtime",
+                            "sunrise_trigger": "Morning - Trigger",
+                            "sunrise_earliest": "Morning - Earliest",
+                            "sunrise_latest": "Morning - Latest",
+                            "sunset_trigger": "Evening - Trigger",
+                            "sunset_earliest": "Evening - Earliest",
+                            "sunset_latest": "Evening - Latest"
                         },
                         "data_description": {
-                            "sunrise_trigger": "Re-evaluate the alarm state at sunrise",
-                            "sunset_trigger": "Re-evaluate the alarm state at sunset",
-                            "occupied_trigger": "Re-evaluate the alarm state when a person arrives home",
-                            "unoccupied_trigger": "Re-evaluate the alarm state when a person leaves home"
+                            "occupancy_default_after_bedtime": "For when bedtime ends before morning. It has no use without a bedtime sensor.",
+                            "occupancy_default_night": "Set this to Armed Home as a pre-bedtime default if a Times of the Day sensor or calendar sets Armed Night for bedtime, as in the [recommended recipe]({recipe_url}). If nothing sets Armed Night for bedtime that day, neither a bedtime sensor nor a calendar event, it's Armed Night from evening.",
+                            "sunrise_trigger": "Re-evaluate the alarm state at morning",
+                            "sunrise_earliest": "Morning is no earlier than this time, however early the sun rises",
+                            "sunrise_latest": "Morning is no later than this time, however late the sun rises",
+                            "sunset_trigger": "Re-evaluate the alarm state at evening",
+                            "sunset_earliest": "Evening is no earlier than this time, however early the sun sets",
+                            "sunset_latest": "Evening is no later than this time, however late the sun sets"
                         }
                     },
-                    "sunrise_options": {
-                        "name": "Sunrise Constraints",
+                    "button_options": {
+                        "name": "Buttons",
+                        "description": "Physical buttons to set an alarm state, or to reset it to whatever Auto Arm works out. Button entities and binary sensors both work. Each can have a delay before it acts, such as time to get out of the door after arming away.",
                         "data": {
-                            "sunrise_earliest": "Earliest",
-                            "sunrise_latest": "Latest"
-                        },
-                        "data_description": {
-                            "sunrise_earliest": "Sunrise no earlier than time",
-                            "sunrise_latest": "Sunrise no later than time"
-                        }
-                    },
-                    "sunset_options": {
-                        "name": "Sunset Constraints",
-                        "data": {
-                            "sunset_earliest": "Earliest",
-                            "sunset_latest": "Latest"
-                        },
-                        "data_description": {
-                            "sunset_earliest": "Sunset no earlier than time",
-                            "sunset_latest": "Sunset no later than time"
+                            "button_reset": "Reset - buttons",
+                            "button_reset_delay": "Reset - delay",
+                            "button_disarmed": "Disarmed - buttons",
+                            "button_disarmed_delay": "Disarmed - delay",
+                            "button_armed_home": "Armed Home - buttons",
+                            "button_armed_home_delay": "Armed Home - delay",
+                            "button_armed_away": "Armed Away - buttons",
+                            "button_armed_away_delay": "Armed Away - delay",
+                            "button_armed_night": "Armed Night - buttons",
+                            "button_armed_night_delay": "Armed Night - delay",
+                            "button_armed_vacation": "Armed Vacation - buttons",
+                            "button_armed_vacation_delay": "Armed Vacation - delay",
+                            "button_armed_custom_bypass": "Armed Custom Bypass - buttons",
+                            "button_armed_custom_bypass_delay": "Armed Custom Bypass - delay"
                         }
                     },
                     "assist_options": {
@@ -109,22 +110,6 @@
                         "data_description": {
                             "sentence_arm": "English sentences for Home Assistant's built-in Assist agent, such as 'arm the alarm', 'arm the alarm in night mode' and 'why is the alarm armed'.",
                             "sentence_disarm": "Adds 'disarm the alarm'. Warning: no code is asked for, so anyone who can talk to Assist, on a voice satellite or in the chat, can disarm the alarm."
-                        }
-                    },
-                    "advanced_options": {
-                        "name": "Advanced",
-                        "data": {
-                            "use_alarm_service": "Change state using the alarm panel's actions",
-                            "occupancy_default_day": "Default arming state when occupied during day",
-                            "occupancy_default_night": "Default arming state when occupied at night",
-                            "calendar_armed_end_mode": "Arming state when an armed calendar event ends",
-                            "calendar_disarmed_end_mode": "Arming state when a disarmed calendar event ends"
-                        },
-                        "data_description": {
-                            "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. The panel must not require a code.",
-                            "occupancy_default_night": "Set this to Armed Home as a pre-bedtime default if a Times of the Day sensor or calendar sets Armed Night for bedtime, as in the [recommended recipe]({recipe_url}).",
-                            "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
-                            "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out."
                         }
                     },
                     "notify_options": {
@@ -140,6 +125,29 @@
                             "notify_action": "Home Assistant action (service) to use to notify",
                             "notify_targets": "List of addresses or notify entities to notify, can be left blank for Supernotify",
                             "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Advanced - Times of the Day Sensor",
+                        "description": "Times of the Day sensors for the other alarm states, each setting its state while it's on, in the same way as the bedtime sensor. When a sensor turns off, the calendar event end settings under Advanced apply.",
+                        "data": {
+                            "time_of_day_disarmed": "Disarmed",
+                            "time_of_day_armed_home": "Armed Home",
+                            "time_of_day_armed_away": "Armed Away",
+                            "time_of_day_armed_custom_bypass": "Armed Custom Bypass"
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Advanced",
+                        "data": {
+                            "use_alarm_service": "Change state using the alarm panel's actions",
+                            "calendar_armed_end_mode": "When a calendar arming override ends",
+                            "calendar_disarmed_end_mode": "When a calendar disarming override ends"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. The panel must not require a code.",
+                            "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
+                            "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out."
                         }
                     }
                 }
@@ -156,71 +164,74 @@
                 "description": "The [recommended recipe]({recipe_url}) explains how the bedtime sensor, calendar and people work together.",
                 "data": {
                     "alarm_panel": "Alarm Control Panel to manage",
-                    "time_of_day_armed_night": "Bedtime sensor for Armed Night",
-                    "calendar_entities": "Calendars for vacations and time away",
-                    "person_entities": "People for occupancy based arming"
+                    "time_of_day_armed_night": "Bedtime - Times of the Day Sensor",
+                    "calendar_entities": "Occupancy - Calendars",
+                    "person_entities": "Presence - People for Occupancy Based Arming"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "A Times of the Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. Alternatively use a calendar or the *Sun* integration to control night time arming."
+                    "time_of_day_armed_night": "A Times of the Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on.",
+                    "calendar_entities": "Calendars are needed to drive the Armed Vacation state, or if presence is unavailable or unreliable for working out occupancy. Calendars can also set any armed state, so can override other diurnal, bedtime or occupancy controls.",
+                    "person_entities": "Whether or not all of these people are home drives the Armed Away, Armed Home and Disarmed states."
                 },
                 "sections": {
-                    "calendar_options": {
-                        "name": "Calendar Occupancy Override",
+                    "presence_options": {
+                        "name": "Presence",
                         "data": {
-                            "calendar_occupancy_override_states": "States that occupancy can override",
-                            "calendar_occupancy_ends_away": "Coming home ends away and vacation events on their last day"
+                            "occupied_trigger": "Someone arrives home",
+                            "unoccupied_trigger": "Someone leaves home",
+                            "calendar_occupancy_override_states": "Calendar based alarm states presence can override",
+                            "calendar_occupancy_ends_away": "Coming home ends Away and Vacation events on their last day"
                         },
                         "data_description": {
+                            "occupied_trigger": "Re-evaluate the alarm state when a person arrives home",
+                            "unoccupied_trigger": "Re-evaluate the alarm state when a person leaves home",
                             "calendar_occupancy_override_states": "When a calendar event sets one of these states, occupancy changes (arrivals and departures) can still update the alarm state. For example, if the calendar says Disarmed but everyone leaves, it will switch to Armed Away.",
                             "calendar_occupancy_ends_away": "When someone comes home on the day an Armed Away or Armed Vacation calendar event is due to end, the event ends then rather than at its end time, and the alarm goes to the state set for when a calendar event ends. Applies to one-off events as well as recurring ones."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Times of the Day",
-                        "description": "Times of the Day sensors for the other alarm states, each setting its state while it's on, in the same way as the bedtime sensor. When a sensor turns off, the calendar event end settings under Advanced apply.",
+                    "sun_options": {
+                        "name": "Diurnal - Sun",
+                        "description": "Morning is sunrise, and evening sunset, each kept within its earliest and latest times. The triggers re-evaluate the alarm state at morning and evening, and are ignored during bedtime. Auto switches a trigger off on any day with a Disarmed, Armed Home or Armed Night calendar event. The earliest and latest times are most useful when no Times of the Day sensor or calendar is used for bedtime.",
                         "data": {
-                            "time_of_day_disarmed": "Disarmed",
-                            "time_of_day_armed_home": "Armed Home",
-                            "time_of_day_armed_away": "Armed Away",
-                            "time_of_day_armed_custom_bypass": "Armed Custom Bypass"
-                        }
-                    },
-                    "trigger_options": {
-                        "name": "Triggers",
-                        "description": "What can start a re-evaluation of the alarm state. These change when the state is worked out, not how. Auto switches a trigger off on any day with a disarmed, armed home or armed night calendar event, as those replace day and night arming.",
-                        "data": {
-                            "sunrise_trigger": "Sunrise",
-                            "sunset_trigger": "Sunset",
-                            "occupied_trigger": "Someone arrives home",
-                            "unoccupied_trigger": "Someone leaves home"
+                            "occupancy_default_day": "Occupied state between morning and evening",
+                            "occupancy_default_after_bedtime": "Occupied state between bedtime and morning",
+                            "occupancy_default_night": "Occupied state between evening and bedtime",
+                            "sunrise_trigger": "Morning - Trigger",
+                            "sunrise_earliest": "Morning - Earliest",
+                            "sunrise_latest": "Morning - Latest",
+                            "sunset_trigger": "Evening - Trigger",
+                            "sunset_earliest": "Evening - Earliest",
+                            "sunset_latest": "Evening - Latest"
                         },
                         "data_description": {
-                            "sunrise_trigger": "Re-evaluate the alarm state at sunrise",
-                            "sunset_trigger": "Re-evaluate the alarm state at sunset",
-                            "occupied_trigger": "Re-evaluate the alarm state when a person arrives home",
-                            "unoccupied_trigger": "Re-evaluate the alarm state when a person leaves home"
+                            "occupancy_default_after_bedtime": "For when bedtime ends before morning. It has no use without a bedtime sensor.",
+                            "occupancy_default_night": "Set this to Armed Home as a pre-bedtime default if a Times of the Day sensor or calendar sets Armed Night for bedtime, as in the [recommended recipe]({recipe_url}). If nothing sets Armed Night for bedtime that day, neither a bedtime sensor nor a calendar event, it's Armed Night from evening.",
+                            "sunrise_trigger": "Re-evaluate the alarm state at morning",
+                            "sunrise_earliest": "Morning is no earlier than this time, however early the sun rises",
+                            "sunrise_latest": "Morning is no later than this time, however late the sun rises",
+                            "sunset_trigger": "Re-evaluate the alarm state at evening",
+                            "sunset_earliest": "Evening is no earlier than this time, however early the sun sets",
+                            "sunset_latest": "Evening is no later than this time, however late the sun sets"
                         }
                     },
-                    "sunrise_options": {
-                        "name": "Sunrise Constraints",
+                    "button_options": {
+                        "name": "Buttons",
+                        "description": "Physical buttons to set an alarm state, or to reset it to whatever Auto Arm works out. Button entities and binary sensors both work. Each can have a delay before it acts, such as time to get out of the door after arming away.",
                         "data": {
-                            "sunrise_earliest": "Earliest",
-                            "sunrise_latest": "Latest"
-                        },
-                        "data_description": {
-                            "sunrise_earliest": "Sunrise no earlier than time",
-                            "sunrise_latest": "Sunrise no later than time"
-                        }
-                    },
-                    "sunset_options": {
-                        "name": "Sunset Constraints",
-                        "data": {
-                            "sunset_earliest": "Earliest",
-                            "sunset_latest": "Latest"
-                        },
-                        "data_description": {
-                            "sunset_earliest": "Sunset no earlier than time",
-                            "sunset_latest": "Sunset no later than time"
+                            "button_reset": "Reset - buttons",
+                            "button_reset_delay": "Reset - delay",
+                            "button_disarmed": "Disarmed - buttons",
+                            "button_disarmed_delay": "Disarmed - delay",
+                            "button_armed_home": "Armed Home - buttons",
+                            "button_armed_home_delay": "Armed Home - delay",
+                            "button_armed_away": "Armed Away - buttons",
+                            "button_armed_away_delay": "Armed Away - delay",
+                            "button_armed_night": "Armed Night - buttons",
+                            "button_armed_night_delay": "Armed Night - delay",
+                            "button_armed_vacation": "Armed Vacation - buttons",
+                            "button_armed_vacation_delay": "Armed Vacation - delay",
+                            "button_armed_custom_bypass": "Armed Custom Bypass - buttons",
+                            "button_armed_custom_bypass_delay": "Armed Custom Bypass - delay"
                         }
                     },
                     "assist_options": {
@@ -232,22 +243,6 @@
                         "data_description": {
                             "sentence_arm": "English sentences for Home Assistant's built-in Assist agent, such as 'arm the alarm', 'arm the alarm in night mode' and 'why is the alarm armed'.",
                             "sentence_disarm": "Adds 'disarm the alarm'. Warning: no code is asked for, so anyone who can talk to Assist, on a voice satellite or in the chat, can disarm the alarm."
-                        }
-                    },
-                    "advanced_options": {
-                        "name": "Advanced",
-                        "data": {
-                            "use_alarm_service": "Change state using the alarm panel's actions",
-                            "occupancy_default_day": "Default arming state when occupied during day",
-                            "occupancy_default_night": "Default arming state when occupied at night",
-                            "calendar_armed_end_mode": "Arming state when an armed calendar event ends",
-                            "calendar_disarmed_end_mode": "Arming state when a disarmed calendar event ends"
-                        },
-                        "data_description": {
-                            "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. The panel must not require a code.",
-                            "occupancy_default_night": "Set this to Armed Home as a pre-bedtime default if a Times of the Day sensor or calendar sets Armed Night for bedtime, as in the [recommended recipe]({recipe_url}).",
-                            "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
-                            "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out."
                         }
                     },
                     "notify_options": {
@@ -264,6 +259,29 @@
                             "notify_targets": "List of addresses or notify entities to notify, can be left blank for Supernotify",
                             "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
                         }
+                    },
+                    "time_of_day_options": {
+                        "name": "Advanced - Times of the Day Sensor",
+                        "description": "Times of the Day sensors for the other alarm states, each setting its state while it's on, in the same way as the bedtime sensor. When a sensor turns off, the calendar event end settings under Advanced apply.",
+                        "data": {
+                            "time_of_day_disarmed": "Disarmed",
+                            "time_of_day_armed_home": "Armed Home",
+                            "time_of_day_armed_away": "Armed Away",
+                            "time_of_day_armed_custom_bypass": "Armed Custom Bypass"
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Advanced",
+                        "data": {
+                            "use_alarm_service": "Change state using the alarm panel's actions",
+                            "calendar_armed_end_mode": "When a calendar arming override ends",
+                            "calendar_disarmed_end_mode": "When a calendar disarming override ends"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. The panel must not require a code.",
+                            "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
+                            "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out."
+                        }
                     }
                 }
             }
@@ -272,7 +290,7 @@
     "selector": {
         "sun_trigger": {
             "options": {
-                "auto": "Auto (off on calendar days)",
+                "auto": "Auto (off on days with a diurnal calendar event)",
                 "on": "On",
                 "off": "Off"
             }

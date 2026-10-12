@@ -18,6 +18,7 @@ from custom_components.autoarm.config_flow import (
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
     CONF_NOTIFY_TARGETS,
+    CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME,
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_OCCUPIED_TRIGGER,
@@ -153,16 +154,18 @@ async def test_user_flow_advanced_setup(hass: HomeAssistant, mock_notify: Any) -
             CONF_BEDTIME_ENTITIES: [],
             CONF_CALENDAR_ENTITIES: [],
             CONF_PERSON_ENTITIES: [],
-            "calendar_options": {},
+            "presence_options": {},
             "time_of_day_options": {},
-            "trigger_options": {CONF_SUNRISE_TRIGGER: "off", CONF_SUNSET_TRIGGER: "off"},
-            "sunrise_options": {},
-            "sunset_options": {},
+            "sun_options": {
+                CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
+                CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_night",
+                CONF_SUNRISE_TRIGGER: "off",
+                CONF_SUNSET_TRIGGER: "off",
+            },
+            "button_options": {"button_disarmed": ["binary_sensor.button"]},
             "assist_options": {CONF_SENTENCE_ARM: False, CONF_SENTENCE_DISARM: True},
             "advanced_options": {
                 CONF_USE_ALARM_SERVICE: True,
-                CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
-                CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_night",
                 CONF_CALENDAR_ARMED_END_MODE: "manual",
                 CONF_CALENDAR_DISARMED_END_MODE: "manual",
             },
@@ -175,6 +178,10 @@ async def test_user_flow_advanced_setup(hass: HomeAssistant, mock_notify: Any) -
     assert result["options"][CONF_SENTENCE_DISARM] is True
     assert result["options"][CONF_CALENDAR_ARMED_END_MODE] == "manual"
     assert result["options"][CONF_CALENDAR_DISARMED_END_MODE] == "manual"
+    assert result["options"][CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME] == "armed_home"
+    assert result["options"]["button_disarmed"] == ["binary_sensor.button"]
+    assert result["options"]["button_disarmed_delay"] == 0
+    assert result["options"]["button_armed_away_delay"] == 120
     assert result["options"][CONF_NOTIFY_ACTION] == "notify.supernotify"
     assert CONF_ALARM_PANEL not in result["options"]
 
@@ -255,23 +262,27 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
             CONF_BEDTIME_ENTITIES: ["binary_sensor.bedtime"],
             CONF_CALENDAR_ENTITIES: ["calendar.holidays"],
             CONF_PERSON_ENTITIES: ["person.new_person"],
-            "calendar_options": {
+            "presence_options": {
+                CONF_UNOCCUPIED_TRIGGER: False,
                 CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES: ["armed_home", "disarmed"],
                 CONF_CALENDAR_OCCUPANCY_ENDS_AWAY: True,
             },
+            "button_options": {"button_armed_away": ["binary_sensor.door_button"], "button_armed_away_delay": 60},
             "time_of_day_options": {"time_of_day_armed_home": ["binary_sensor.evening"]},
             "notify_options": {
                 CONF_NOTIFY_ACTION: "notify.supernotify",
                 CONF_NOTIFY_TARGETS: ["mobile_app_phone"],
             },
             "assist_options": {CONF_SENTENCE_ARM: False, CONF_SENTENCE_DISARM: True},
-            "trigger_options": {CONF_SUNSET_TRIGGER: "off", CONF_UNOCCUPIED_TRIGGER: False},
-            "sunrise_options": {CONF_SUNRISE_EARLIEST: "05:30:00"},
-            "sunset_options": {},
+            "sun_options": {
+                CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
+                CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME: "disarmed",
+                CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_night",
+                CONF_SUNSET_TRIGGER: "off",
+                CONF_SUNRISE_EARLIEST: "05:30:00",
+            },
             "advanced_options": {
                 CONF_USE_ALARM_SERVICE: True,
-                CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
-                CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_night",
                 CONF_CALENDAR_ARMED_END_MODE: "auto_occupancy",
                 CONF_CALENDAR_DISARMED_END_MODE: "manual",
             },
@@ -297,6 +308,9 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     assert entry.options[CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES] == ["armed_home", "disarmed"]
     assert entry.options[CONF_CALENDAR_OCCUPANCY_ENDS_AWAY] is True
     assert entry.options[CONF_BEDTIME_ENTITIES] == ["binary_sensor.bedtime"]
+    assert entry.options[CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME] == "disarmed"
+    assert entry.options["button_armed_away"] == ["binary_sensor.door_button"]
+    assert entry.options["button_armed_away_delay"] == 60
     assert entry.options["time_of_day_armed_home"] == ["binary_sensor.evening"]
     assert entry.options["time_of_day_disarmed"] == []
     assert "time_of_day_armed_vacation" not in entry.options

@@ -8,6 +8,13 @@ tags:
 
 - Translations for notifications and other places where embedded user facing English hard-coded
 - ToD support for weekends or non-standard weeks (upstream PR or work around based on entity name)
+- Calculate the +1 time so an armed notification can say when disarmed and vv
+- Add triggers so other automations can use auto arm transitions
+- offer 'dusk' as alternative to sunset
+- refactor the big lump of sun code in the main initialize
+
+## Remaining YAML
+- Buttons - v1.5.0
 
 ## Occupancy
 

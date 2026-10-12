@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, patch
 
 import homeassistant.util.dt as dt_util
+import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEntity
 from homeassistant.core import HomeAssistant
@@ -14,6 +15,8 @@ from custom_components.autoarm.const import TRIGGER_OFF, ChangeSource
 from custom_components.autoarm.notifier import Notifier
 
 if TYPE_CHECKING:
+    from freezegun.api import FrozenDateTimeFactory
+
     from custom_components.autoarm.calendar_events import TrackedCalendarEvent
 
 
@@ -247,6 +250,25 @@ async def test_on_sunrise_with_earliest_active_no_interventions(
     # wait for delayed_reset
     await asyncio.sleep(2)
     assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
+    # and the change is known to have been deferred from sunrise
+    assert autoarmer.last_change is not None
+    assert autoarmer.last_change.source == ChangeSource.SUNRISE
+    assert autoarmer.last_change.context["deferred_from"] == "sunrise"
+    assert autoarmer.status["last_calculation"].attributes["source"] == "deferred from sunrise"
+
+
+async def test_latest_times_stand_in_for_sunrise_and_sunset(hass: HomeAssistant, autoarmer: AlarmArmer, occupied: None) -> None:
+    """The latest time runs the trigger as the sunrise or sunset that hasn't happened yet"""
+    hass.states.async_set("sun.sun", "below_horizon")
+    await autoarmer.reset_armed_state(source=ChangeSource.STARTUP)
+    assert autoarmer.armed_state() == AlarmControlPanelState.ARMED_NIGHT
+
+    await autoarmer.on_sunrise_latest()
+    assert autoarmer.armed_state() == AlarmControlPanelState.ARMED_HOME
+
+    hass.states.async_set("sun.sun", "above_horizon")
+    await autoarmer.on_sunset_latest()
+    assert autoarmer.armed_state() == AlarmControlPanelState.ARMED_NIGHT
 
 
 async def test_on_sunrise_with_intervention_before_earliest(
@@ -328,26 +350,57 @@ async def test_reset_armed_state_uses_daytime_default(hass: HomeAssistant) -> No
     assert await autoarmer.reset_armed_state() == "disarmed"
 
 
-async def test_startup_defers_to_sunset_earliest(hass: HomeAssistant, night: None) -> None:
-    """Integration startup during nighttime before sunset_earliest defers the arm."""
-    hass.states.async_set(TEST_PANEL, "disarmed")
+@pytest.mark.parametrize(
+    ("hour", "sun", "night"),
+    [
+        (5, "above_horizon", True),  # the sun is up before morning
+        (7, "above_horizon", False),
+        (7, "below_horizon", True),
+        (9, "below_horizon", False),  # morning comes before the sun is up
+        (16, "below_horizon", False),  # the sun is down before evening
+        (18, "below_horizon", True),
+        (18, "above_horizon", False),
+        (23, "above_horizon", True),  # evening comes before the sun is down
+    ],
+)
+async def test_night_is_between_evening_and_morning(
+    hass: HomeAssistant, freezer: "FrozenDateTimeFactory", hour: int, sun: str, night: bool
+) -> None:
+    """Morning and evening are sunrise and sunset kept within their earliest and latest times"""
+    freezer.move_to(dt_util.as_utc(dt.datetime(2026, 10, 12, hour, 0, tzinfo=dt_util.get_default_time_zone())))
+    hass.states.async_set("sun.sun", sun)
+    autoarmer = AlarmArmer(
+        hass,
+        TEST_PANEL,
+        sunrise_earliest=dt.time(6, 30),
+        sunrise_latest=dt.time(8, 0),
+        sunset_earliest=dt.time(17, 30),
+        sunset_latest=dt.time(22, 30),
+    )
+
+    assert autoarmer.is_night() is night
+
+
+async def test_startup_before_evening_waits_for_sunset_earliest(hass: HomeAssistant, night: None, occupied: None) -> None:
+    """Starting up after sunset but before sunset earliest is still day, with evening to come at that time"""
+    hass.states.async_set(TEST_PANEL, "armed_night")
     await hass.async_block_till_done()
     future_earliest = (dt_util.now() + dt.timedelta(seconds=2)).time()
     autoarmer = AlarmArmer(
         hass,
         TEST_PANEL,
-        occupancy={"entity_id": ["person.tester_bob"]},
+        occupancy={"entity_id": ["person.tester_bob"], "default_state": {"day": "disarmed"}},
         sunset_earliest=future_earliest,
     )
-    # Override so the defer branch is taken regardless of the actual clock
-    # hour (test may run in the AM, when _has_sunset_passed_today = False).
+    # as if in the afternoon, whenever the test is run
     with patch.object(autoarmer, "_has_sunset_passed_today", return_value=True):
         await autoarmer.initialize()
-    # Should not have armed immediately — deferred to sunset_earliest
-    assert autoarmer.armed_state() == AlarmControlPanelState.DISARMED
-    await asyncio.sleep(2)
-    # After the deferred time, should have armed
-    assert autoarmer.armed_state() != AlarmControlPanelState.DISARMED
+        assert not autoarmer.is_night()
+        assert autoarmer.armed_state() == AlarmControlPanelState.DISARMED
+        await asyncio.sleep(2)
+        assert autoarmer.is_night()
+        assert autoarmer.armed_state() == AlarmControlPanelState.ARMED_NIGHT
+        assert autoarmer.status["last_calculation"].attributes["source"] == "deferred from sunset"
     autoarmer.shutdown()
 
 

@@ -125,7 +125,7 @@ async def test_own_change_starts_with_cause_event(hass: HomeAssistant) -> None:
 
     panel = hass.states.get(TEST_PANEL)
     assert panel is not None
-    assert causes[0].data == {"entity_id": TEST_PANEL, "source": "sunset", "summary": None}
+    assert causes[0].data == {"entity_id": TEST_PANEL, "source": "sunset", "summary": None, "deferred": False}
     # the logbook takes the first event fired with a context as its cause
     assert panel.context.origin_event is causes[0]
 

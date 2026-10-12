@@ -15,89 +15,90 @@
                 "description": "Zgodnie z [zalecanym przepisem]({recipe_url}), z czujnikiem pory snu, kalendarzem na urlopy i uzbrajaniem, gdy wszyscy są poza domem. Wymagany jest tylko panel alarmowy, resztę można dodać później.",
                 "data": {
                     "alarm_panel": "Panel kontroli alarmu do zarządzania",
-                    "time_of_day_armed_night": "Czujnik pory snu dla stanu Uzbrojony na noc",
-                    "calendar_entities": "Kalendarze na urlopy i nieobecności",
-                    "person_entities": "Osoby do uzbrajania na podstawie obecności"
+                    "time_of_day_armed_night": "Pora snu - Czujnik pory dnia",
+                    "calendar_entities": "Zajętość - Kalendarze",
+                    "person_entities": "Obecność - Osoby do uzbrajania na podstawie obecności"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc. albo pomiń to i użyj kalendarza lub integracji *Sun*, aby kontrolować uzbrajanie nocne. Nie masz jeszcze czujnika pory snu? [Utwórz go]({bedtime_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → Pomocnicy → **+ Utwórz pomocnika** → **Pora dnia**. Podaj nazwę i ustaw godzinę początku/końca swojej zwykłej pory snu.",
+                    "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc. Nie masz jeszcze czujnika pory snu? [Utwórz go]({bedtime_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → Pomocnicy → **+ Utwórz pomocnika** → **Pora dnia**. Podaj nazwę i ustaw godzinę początku/końca swojej zwykłej pory snu.",
                     "alarm_panel": "Nie masz jeszcze panelu alarmowego? [Utwórz wirtualny]({alarm_panel_help_url}), albo w Home Assistant przejdź do Ustawienia → Urządzenia i usługi → Pomocnicy → **+ Utwórz pomocnika** → Szablon → **Panel kontroli alarmu**. Podaj nazwę i zatwierdź; wszystkie inne pola są opcjonalne.",
-                    "calendar_entities": "Nie masz jeszcze kalendarza? [Utwórz lokalny kalendarz]({calendar_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → **+ Dodaj integrację** → **Kalendarz lokalny**. Podaj nazwę i pozostaw zaznaczone 'Utwórz pusty kalendarz'.",
-                    "person_entities": "Kogoś brakuje? [Dodaj nową osobę]({person_help_url}), albo przejdź do Ustawienia → Osoby → **+ Dodaj osobę**. Podaj jej imię; powiązanie z kontem użytkownika jest opcjonalne."
+                    "calendar_entities": "Kalendarze są potrzebne dla stanu Uzbrojony na urlop, albo gdy obecność jest niedostępna lub zawodna przy ustalaniu zajętości. Kalendarze mogą też ustawić dowolny stan uzbrojenia, więc mogą nadpisać inne sterowanie według słońca, pory snu lub zajętości. Nie masz jeszcze kalendarza? [Utwórz lokalny kalendarz]({calendar_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → **+ Dodaj integrację** → **Kalendarz lokalny**. Podaj nazwę i pozostaw zaznaczone 'Utwórz pusty kalendarz'.",
+                    "person_entities": "To, czy wszystkie te osoby są w domu, czy nie, decyduje o stanach Uzbrojony poza domem, Uzbrojony w domu i Rozbrojony. Kogoś brakuje? [Dodaj nową osobę]({person_help_url}), albo przejdź do Ustawienia → Osoby → **+ Dodaj osobę**. Podaj jej imię; powiązanie z kontem użytkownika jest opcjonalne."
                 }
             },
             "advanced_setup": {
                 "title": "Skonfiguruj Auto Arm — Zaawansowane",
                 "data": {
                     "alarm_panel": "Panel kontroli alarmu do zarządzania",
-                    "time_of_day_armed_night": "Czujnik pory snu dla stanu Uzbrojony na noc",
-                    "calendar_entities": "Kalendarze na urlopy i nieobecności",
-                    "person_entities": "Osoby do uzbrajania na podstawie obecności"
+                    "time_of_day_armed_night": "Pora snu - Czujnik pory dnia",
+                    "calendar_entities": "Zajętość - Kalendarze",
+                    "person_entities": "Obecność - Osoby do uzbrajania na podstawie obecności"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc. albo pomiń to i użyj kalendarza lub integracji *Sun*, aby kontrolować uzbrajanie nocne. Nie masz jeszcze czujnika pory snu? [Utwórz go]({bedtime_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → Pomocnicy → **+ Utwórz pomocnika** → **Pora dnia**. Podaj nazwę i ustaw godzinę początku/końca swojej zwykłej pory snu.",
+                    "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc. Nie masz jeszcze czujnika pory snu? [Utwórz go]({bedtime_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → Pomocnicy → **+ Utwórz pomocnika** → **Pora dnia**. Podaj nazwę i ustaw godzinę początku/końca swojej zwykłej pory snu.",
                     "alarm_panel": "Nie masz jeszcze panelu alarmowego? [Utwórz wirtualny]({alarm_panel_help_url}), albo w Home Assistant przejdź do Ustawienia → Urządzenia i usługi → Pomocnicy → **+ Utwórz pomocnika** → Szablon → **Panel kontroli alarmu**. Podaj nazwę i zatwierdź; wszystkie inne pola są opcjonalne.",
-                    "calendar_entities": "Nie masz jeszcze kalendarza? [Utwórz lokalny kalendarz]({calendar_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → **+ Dodaj integrację** → **Kalendarz lokalny**. Podaj nazwę i pozostaw zaznaczone 'Utwórz pusty kalendarz'.",
-                    "person_entities": "Kogoś brakuje? [Dodaj nową osobę]({person_help_url}), albo przejdź do Ustawienia → Osoby → **+ Dodaj osobę**. Podaj jej imię; powiązanie z kontem użytkownika jest opcjonalne."
+                    "calendar_entities": "Kalendarze są potrzebne dla stanu Uzbrojony na urlop, albo gdy obecność jest niedostępna lub zawodna przy ustalaniu zajętości. Kalendarze mogą też ustawić dowolny stan uzbrojenia, więc mogą nadpisać inne sterowanie według słońca, pory snu lub zajętości. Nie masz jeszcze kalendarza? [Utwórz lokalny kalendarz]({calendar_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → **+ Dodaj integrację** → **Kalendarz lokalny**. Podaj nazwę i pozostaw zaznaczone 'Utwórz pusty kalendarz'.",
+                    "person_entities": "To, czy wszystkie te osoby są w domu, czy nie, decyduje o stanach Uzbrojony poza domem, Uzbrojony w domu i Rozbrojony. Kogoś brakuje? [Dodaj nową osobę]({person_help_url}), albo przejdź do Ustawienia → Osoby → **+ Dodaj osobę**. Podaj jej imię; powiązanie z kontem użytkownika jest opcjonalne."
                 },
                 "sections": {
-                    "calendar_options": {
-                        "name": "Nadpisanie obecności przez kalendarz",
+                    "presence_options": {
+                        "name": "Obecność",
                         "data": {
-                            "calendar_occupancy_override_states": "Stany, które obecność może nadpisać",
+                            "occupied_trigger": "Ktoś wraca do domu",
+                            "unoccupied_trigger": "Ktoś wychodzi z domu",
+                            "calendar_occupancy_override_states": "Stany alarmu z kalendarza, które obecność może nadpisać",
                             "calendar_occupancy_ends_away": "Powrót do domu kończy wydarzenia nieobecności i urlopu w ich ostatnim dniu"
                         },
                         "data_description": {
+                            "occupied_trigger": "Ponownie oceń stan alarmu, gdy ktoś wraca do domu",
+                            "unoccupied_trigger": "Ponownie oceń stan alarmu, gdy ktoś wychodzi z domu",
                             "calendar_occupancy_override_states": "Gdy wydarzenie w kalendarzu ustawia jeden z tych stanów, zmiany obecności (przyjazdy i wyjazdy) nadal mogą aktualizować stan alarmu. Na przykład, jeśli kalendarz wskazuje Rozbrojony, ale wszyscy wyjdą, stan zmieni się na Uzbrojony poza domem.",
                             "calendar_occupancy_ends_away": "Gdy ktoś wraca do domu w dniu, w którym ma się zakończyć wydarzenie kalendarza Uzbrojony poza domem lub Uzbrojony na urlop, wydarzenie kończy się od razu zamiast o swojej godzinie zakończenia, a alarm przechodzi w stan ustawiony na koniec wydarzenia kalendarza. Dotyczy wydarzeń jednorazowych i cyklicznych."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Pora dnia",
-                        "description": "Czujniki pory dnia dla pozostałych stanów alarmu, które ustawiają swój stan, gdy są włączone, tak jak czujnik pory snu. Gdy czujnik się wyłącza, obowiązują ustawienia zakończenia wydarzenia kalendarza z sekcji Zaawansowane.",
+                    "sun_options": {
+                        "name": "Dzień i noc - Słońce",
+                        "description": "Ranek to wschód słońca, a wieczór to zachód słońca, każdy utrzymany w granicach najwcześniejszej i najpóźniejszej godziny. Wyzwalacze ponownie oceniają stan alarmu rano i wieczorem, a w porze snu są ignorowane. Automatyczny wyłącza wyzwalacz w dni z wydarzeniem w kalendarzu Rozbrojony, Uzbrojony w domu lub Uzbrojony na noc. Najwcześniejsza i najpóźniejsza godzina są najbardziej przydatne, gdy dla pory snu nie używa się czujnika pory dnia ani kalendarza.",
                         "data": {
-                            "time_of_day_disarmed": "Rozbrojony",
-                            "time_of_day_armed_home": "Uzbrojony w domu",
-                            "time_of_day_armed_away": "Uzbrojony poza domem",
-                            "time_of_day_armed_custom_bypass": "Uzbrojony niestandardowo"
-                        }
-                    },
-                    "trigger_options": {
-                        "name": "Wyzwalacze",
-                        "description": "Co może rozpocząć ponowną ocenę stanu alarmu. Zmieniają one, kiedy stan jest ustalany, a nie jak. Automatyczny wyłącza wyzwalacz w każdy dzień z pasującym wydarzeniem w kalendarzu i włącza go ponownie w dni bez aktywności w kalendarzu.",
-                        "data": {
-                            "sunrise_trigger": "Wschód słońca",
-                            "sunset_trigger": "Zachód słońca",
-                            "occupied_trigger": "Ktoś wraca do domu",
-                            "unoccupied_trigger": "Ktoś wychodzi z domu"
+                            "occupancy_default_day": "Stan przy obecności między rankiem a wieczorem",
+                            "occupancy_default_after_bedtime": "Stan przy obecności między porą snu a rankiem",
+                            "occupancy_default_night": "Stan przy obecności między wieczorem a porą snu",
+                            "sunrise_trigger": "Ranek - wyzwalacz",
+                            "sunrise_earliest": "Ranek - Najwcześniej",
+                            "sunrise_latest": "Ranek - Najpóźniej",
+                            "sunset_trigger": "Wieczór - wyzwalacz",
+                            "sunset_earliest": "Wieczór - Najwcześniej",
+                            "sunset_latest": "Wieczór - Najpóźniej"
                         },
                         "data_description": {
-                            "sunrise_trigger": "Ponownie oceń stan alarmu o wschodzie słońca",
-                            "sunset_trigger": "Ponownie oceń stan alarmu o zachodzie słońca",
-                            "occupied_trigger": "Ponownie oceń stan alarmu, gdy ktoś wraca do domu",
-                            "unoccupied_trigger": "Ponownie oceń stan alarmu, gdy ktoś wychodzi z domu"
+                            "occupancy_default_after_bedtime": "Gdy pora snu kończy się przed rankiem. Bez czujnika pory snu nie ma zastosowania.",
+                            "occupancy_default_night": "Ustaw na Uzbrojony w domu jako domyślny stan przed porą snu, jeśli czujnik pory dnia lub kalendarz ustawia Uzbrojony na noc na porę snu, jak w [zalecanym przepisie]({recipe_url}). Jeśli danego dnia nic nie ustawia Uzbrojony na noc na porę snu, ani czujnik pory snu, ani wydarzenie w kalendarzu, od wieczora obowiązuje Uzbrojony na noc.",
+                            "sunrise_trigger": "Ponownie oceń stan alarmu rano",
+                            "sunrise_earliest": "Ranek nie zaczyna się przed tą godziną, niezależnie od tego, jak wcześnie wschodzi słońce",
+                            "sunrise_latest": "Ranek nie zaczyna się po tej godzinie, niezależnie od tego, jak późno wschodzi słońce",
+                            "sunset_trigger": "Ponownie oceń stan alarmu wieczorem",
+                            "sunset_earliest": "Wieczór nie zaczyna się przed tą godziną, niezależnie od tego, jak wcześnie zachodzi słońce",
+                            "sunset_latest": "Wieczór nie zaczyna się po tej godzinie, niezależnie od tego, jak późno zachodzi słońce"
                         }
                     },
-                    "sunrise_options": {
-                        "name": "Ograniczenia wschodu słońca",
+                    "button_options": {
+                        "name": "Przyciski",
+                        "description": "Fizyczne przyciski do ustawiania stanu alarmu albo przywracania stanu ustalonego przez Auto Arm. Działają zarówno encje przycisków, jak i czujniki binarne. Każdy może mieć opóźnienie przed zadziałaniem, na przykład czas na wyjście po uzbrojeniu poza domem.",
                         "data": {
-                            "sunrise_earliest": "Najwcześniej",
-                            "sunrise_latest": "Najpóźniej"
-                        },
-                        "data_description": {
-                            "sunrise_earliest": "Wschód słońca nie wcześniej niż o tej godzinie",
-                            "sunrise_latest": "Wschód słońca nie później niż o tej godzinie"
-                        }
-                    },
-                    "sunset_options": {
-                        "name": "Ograniczenia zachodu słońca",
-                        "data": {
-                            "sunset_earliest": "Najwcześniej",
-                            "sunset_latest": "Najpóźniej"
-                        },
-                        "data_description": {
-                            "sunset_earliest": "Zachód słońca nie wcześniej niż o tej godzinie",
-                            "sunset_latest": "Zachód słońca nie później niż o tej godzinie"
+                            "button_reset": "Reset - przyciski",
+                            "button_reset_delay": "Reset - opóźnienie",
+                            "button_disarmed": "Rozbrojony - przyciski",
+                            "button_disarmed_delay": "Rozbrojony - opóźnienie",
+                            "button_armed_home": "Uzbrojony w domu - przyciski",
+                            "button_armed_home_delay": "Uzbrojony w domu - opóźnienie",
+                            "button_armed_away": "Uzbrojony poza domem - przyciski",
+                            "button_armed_away_delay": "Uzbrojony poza domem - opóźnienie",
+                            "button_armed_night": "Uzbrojony na noc - przyciski",
+                            "button_armed_night_delay": "Uzbrojony na noc - opóźnienie",
+                            "button_armed_vacation": "Uzbrojony na urlop - przyciski",
+                            "button_armed_vacation_delay": "Uzbrojony na urlop - opóźnienie",
+                            "button_armed_custom_bypass": "Uzbrojony niestandardowo - przyciski",
+                            "button_armed_custom_bypass_delay": "Uzbrojony niestandardowo - opóźnienie"
                         }
                     },
                     "assist_options": {
@@ -109,22 +110,6 @@
                         "data_description": {
                             "sentence_arm": "Angielskie zdania dla wbudowanego agenta Assist w Home Assistant, takie jak 'arm the alarm', 'arm the alarm in night mode' i 'why is the alarm armed'.",
                             "sentence_disarm": "Dodaje 'disarm the alarm'. Uwaga: kod nie jest wymagany, więc każdy, kto może mówić do Assist, przez satelitę głosowego lub na czacie, będzie mógł rozbroić alarm."
-                        }
-                    },
-                    "advanced_options": {
-                        "name": "Zaawansowane",
-                        "data": {
-                            "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
-                            "occupancy_default_day": "Domyślny stan uzbrojenia przy obecności w ciągu dnia",
-                            "occupancy_default_night": "Domyślny stan uzbrojenia przy obecności w nocy",
-                            "calendar_armed_end_mode": "Stan alarmu po zakończeniu uzbrojonego wydarzenia w kalendarzu",
-                            "calendar_disarmed_end_mode": "Stan alarmu po zakończeniu rozbrojonego wydarzenia w kalendarzu"
-                        },
-                        "data_description": {
-                            "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Panel nie może wymagać kodu.",
-                            "occupancy_default_night": "Ustaw na Uzbrojony w domu jako domyślny stan przed porą snu, jeśli czujnik pory dnia lub kalendarz ustawia Uzbrojony na noc na porę snu, jak w [zalecanym przepisie]({recipe_url}).",
-                            "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
-                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma."
                         }
                     },
                     "notify_options": {
@@ -140,6 +125,29 @@
                             "notify_action": "Akcja (usługa) Home Assistant używana do powiadamiania",
                             "notify_targets": "Lista adresów lub encji powiadomień do powiadomienia; można pozostawić puste dla Supernotify",
                             "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Zaawansowane - Pora dnia",
+                        "description": "Czujniki pory dnia dla pozostałych stanów alarmu, które ustawiają swój stan, gdy są włączone, tak jak czujnik pory snu. Gdy czujnik się wyłącza, obowiązują ustawienia zakończenia wydarzenia kalendarza z sekcji Zaawansowane.",
+                        "data": {
+                            "time_of_day_disarmed": "Rozbrojony",
+                            "time_of_day_armed_home": "Uzbrojony w domu",
+                            "time_of_day_armed_away": "Uzbrojony poza domem",
+                            "time_of_day_armed_custom_bypass": "Uzbrojony niestandardowo"
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Zaawansowane",
+                        "data": {
+                            "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
+                            "calendar_armed_end_mode": "Gdy kończy się uzbrojenie z kalendarza",
+                            "calendar_disarmed_end_mode": "Gdy kończy się rozbrojenie z kalendarza"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Panel nie może wymagać kodu.",
+                            "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
+                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma."
                         }
                     }
                 }
@@ -156,71 +164,74 @@
                 "description": "[Zalecany przepis]({recipe_url}) wyjaśnia, jak współdziałają czujnik pory snu, kalendarz i osoby.",
                 "data": {
                     "alarm_panel": "Panel kontroli alarmu do zarządzania",
-                    "time_of_day_armed_night": "Czujnik pory snu dla stanu Uzbrojony na noc",
-                    "calendar_entities": "Kalendarze na urlopy i nieobecności",
-                    "person_entities": "Osoby do uzbrajania na podstawie obecności"
+                    "time_of_day_armed_night": "Pora snu - Czujnik pory dnia",
+                    "calendar_entities": "Zajętość - Kalendarze",
+                    "person_entities": "Obecność - Osoby do uzbrajania na podstawie obecności"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc. albo pomiń to i użyj kalendarza lub integracji *Sun*, aby kontrolować uzbrajanie nocne."
+                    "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc.",
+                    "calendar_entities": "Kalendarze są potrzebne dla stanu Uzbrojony na urlop, albo gdy obecność jest niedostępna lub zawodna przy ustalaniu zajętości. Kalendarze mogą też ustawić dowolny stan uzbrojenia, więc mogą nadpisać inne sterowanie według słońca, pory snu lub zajętości.",
+                    "person_entities": "To, czy wszystkie te osoby są w domu, czy nie, decyduje o stanach Uzbrojony poza domem, Uzbrojony w domu i Rozbrojony."
                 },
                 "sections": {
-                    "calendar_options": {
-                        "name": "Nadpisanie obecności przez kalendarz",
+                    "presence_options": {
+                        "name": "Obecność",
                         "data": {
-                            "calendar_occupancy_override_states": "Stany, które obecność może nadpisać",
+                            "occupied_trigger": "Ktoś wraca do domu",
+                            "unoccupied_trigger": "Ktoś wychodzi z domu",
+                            "calendar_occupancy_override_states": "Stany alarmu z kalendarza, które obecność może nadpisać",
                             "calendar_occupancy_ends_away": "Powrót do domu kończy wydarzenia nieobecności i urlopu w ich ostatnim dniu"
                         },
                         "data_description": {
+                            "occupied_trigger": "Ponownie oceń stan alarmu, gdy ktoś wraca do domu",
+                            "unoccupied_trigger": "Ponownie oceń stan alarmu, gdy ktoś wychodzi z domu",
                             "calendar_occupancy_override_states": "Gdy wydarzenie w kalendarzu ustawia jeden z tych stanów, zmiany obecności (przyjazdy i wyjazdy) nadal mogą aktualizować stan alarmu. Na przykład, jeśli kalendarz wskazuje Rozbrojony, ale wszyscy wyjdą, stan zmieni się na Uzbrojony poza domem.",
                             "calendar_occupancy_ends_away": "Gdy ktoś wraca do domu w dniu, w którym ma się zakończyć wydarzenie kalendarza Uzbrojony poza domem lub Uzbrojony na urlop, wydarzenie kończy się od razu zamiast o swojej godzinie zakończenia, a alarm przechodzi w stan ustawiony na koniec wydarzenia kalendarza. Dotyczy wydarzeń jednorazowych i cyklicznych."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Pora dnia",
-                        "description": "Czujniki pory dnia dla pozostałych stanów alarmu, które ustawiają swój stan, gdy są włączone, tak jak czujnik pory snu. Gdy czujnik się wyłącza, obowiązują ustawienia zakończenia wydarzenia kalendarza z sekcji Zaawansowane.",
+                    "sun_options": {
+                        "name": "Dzień i noc - Słońce",
+                        "description": "Ranek to wschód słońca, a wieczór to zachód słońca, każdy utrzymany w granicach najwcześniejszej i najpóźniejszej godziny. Wyzwalacze ponownie oceniają stan alarmu rano i wieczorem, a w porze snu są ignorowane. Automatyczny wyłącza wyzwalacz w dni z wydarzeniem w kalendarzu Rozbrojony, Uzbrojony w domu lub Uzbrojony na noc. Najwcześniejsza i najpóźniejsza godzina są najbardziej przydatne, gdy dla pory snu nie używa się czujnika pory dnia ani kalendarza.",
                         "data": {
-                            "time_of_day_disarmed": "Rozbrojony",
-                            "time_of_day_armed_home": "Uzbrojony w domu",
-                            "time_of_day_armed_away": "Uzbrojony poza domem",
-                            "time_of_day_armed_custom_bypass": "Uzbrojony niestandardowo"
-                        }
-                    },
-                    "trigger_options": {
-                        "name": "Wyzwalacze",
-                        "description": "Co może rozpocząć ponowną ocenę stanu alarmu. Zmieniają one, kiedy stan jest ustalany, a nie jak. Automatyczny wyłącza wyzwalacz w każdy dzień z pasującym wydarzeniem w kalendarzu i włącza go ponownie w dni bez aktywności w kalendarzu.",
-                        "data": {
-                            "sunrise_trigger": "Wschód słońca",
-                            "sunset_trigger": "Zachód słońca",
-                            "occupied_trigger": "Ktoś wraca do domu",
-                            "unoccupied_trigger": "Ktoś wychodzi z domu"
+                            "occupancy_default_day": "Stan przy obecności między rankiem a wieczorem",
+                            "occupancy_default_after_bedtime": "Stan przy obecności między porą snu a rankiem",
+                            "occupancy_default_night": "Stan przy obecności między wieczorem a porą snu",
+                            "sunrise_trigger": "Ranek - wyzwalacz",
+                            "sunrise_earliest": "Ranek - Najwcześniej",
+                            "sunrise_latest": "Ranek - Najpóźniej",
+                            "sunset_trigger": "Wieczór - wyzwalacz",
+                            "sunset_earliest": "Wieczór - Najwcześniej",
+                            "sunset_latest": "Wieczór - Najpóźniej"
                         },
                         "data_description": {
-                            "sunrise_trigger": "Ponownie oceń stan alarmu o wschodzie słońca",
-                            "sunset_trigger": "Ponownie oceń stan alarmu o zachodzie słońca",
-                            "occupied_trigger": "Ponownie oceń stan alarmu, gdy ktoś wraca do domu",
-                            "unoccupied_trigger": "Ponownie oceń stan alarmu, gdy ktoś wychodzi z domu"
+                            "occupancy_default_after_bedtime": "Gdy pora snu kończy się przed rankiem. Bez czujnika pory snu nie ma zastosowania.",
+                            "occupancy_default_night": "Ustaw na Uzbrojony w domu jako domyślny stan przed porą snu, jeśli czujnik pory dnia lub kalendarz ustawia Uzbrojony na noc na porę snu, jak w [zalecanym przepisie]({recipe_url}). Jeśli danego dnia nic nie ustawia Uzbrojony na noc na porę snu, ani czujnik pory snu, ani wydarzenie w kalendarzu, od wieczora obowiązuje Uzbrojony na noc.",
+                            "sunrise_trigger": "Ponownie oceń stan alarmu rano",
+                            "sunrise_earliest": "Ranek nie zaczyna się przed tą godziną, niezależnie od tego, jak wcześnie wschodzi słońce",
+                            "sunrise_latest": "Ranek nie zaczyna się po tej godzinie, niezależnie od tego, jak późno wschodzi słońce",
+                            "sunset_trigger": "Ponownie oceń stan alarmu wieczorem",
+                            "sunset_earliest": "Wieczór nie zaczyna się przed tą godziną, niezależnie od tego, jak wcześnie zachodzi słońce",
+                            "sunset_latest": "Wieczór nie zaczyna się po tej godzinie, niezależnie od tego, jak późno zachodzi słońce"
                         }
                     },
-                    "sunrise_options": {
-                        "name": "Ograniczenia wschodu słońca",
+                    "button_options": {
+                        "name": "Przyciski",
+                        "description": "Fizyczne przyciski do ustawiania stanu alarmu albo przywracania stanu ustalonego przez Auto Arm. Działają zarówno encje przycisków, jak i czujniki binarne. Każdy może mieć opóźnienie przed zadziałaniem, na przykład czas na wyjście po uzbrojeniu poza domem.",
                         "data": {
-                            "sunrise_earliest": "Najwcześniej",
-                            "sunrise_latest": "Najpóźniej"
-                        },
-                        "data_description": {
-                            "sunrise_earliest": "Wschód słońca nie wcześniej niż o tej godzinie",
-                            "sunrise_latest": "Wschód słońca nie później niż o tej godzinie"
-                        }
-                    },
-                    "sunset_options": {
-                        "name": "Ograniczenia zachodu słońca",
-                        "data": {
-                            "sunset_earliest": "Najwcześniej",
-                            "sunset_latest": "Najpóźniej"
-                        },
-                        "data_description": {
-                            "sunset_earliest": "Zachód słońca nie wcześniej niż o tej godzinie",
-                            "sunset_latest": "Zachód słońca nie później niż o tej godzinie"
+                            "button_reset": "Reset - przyciski",
+                            "button_reset_delay": "Reset - opóźnienie",
+                            "button_disarmed": "Rozbrojony - przyciski",
+                            "button_disarmed_delay": "Rozbrojony - opóźnienie",
+                            "button_armed_home": "Uzbrojony w domu - przyciski",
+                            "button_armed_home_delay": "Uzbrojony w domu - opóźnienie",
+                            "button_armed_away": "Uzbrojony poza domem - przyciski",
+                            "button_armed_away_delay": "Uzbrojony poza domem - opóźnienie",
+                            "button_armed_night": "Uzbrojony na noc - przyciski",
+                            "button_armed_night_delay": "Uzbrojony na noc - opóźnienie",
+                            "button_armed_vacation": "Uzbrojony na urlop - przyciski",
+                            "button_armed_vacation_delay": "Uzbrojony na urlop - opóźnienie",
+                            "button_armed_custom_bypass": "Uzbrojony niestandardowo - przyciski",
+                            "button_armed_custom_bypass_delay": "Uzbrojony niestandardowo - opóźnienie"
                         }
                     },
                     "assist_options": {
@@ -232,22 +243,6 @@
                         "data_description": {
                             "sentence_arm": "Angielskie zdania dla wbudowanego agenta Assist w Home Assistant, takie jak 'arm the alarm', 'arm the alarm in night mode' i 'why is the alarm armed'.",
                             "sentence_disarm": "Dodaje 'disarm the alarm'. Uwaga: kod nie jest wymagany, więc każdy, kto może mówić do Assist, przez satelitę głosowego lub na czacie, będzie mógł rozbroić alarm."
-                        }
-                    },
-                    "advanced_options": {
-                        "name": "Zaawansowane",
-                        "data": {
-                            "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
-                            "occupancy_default_day": "Domyślny stan uzbrojenia przy obecności w ciągu dnia",
-                            "occupancy_default_night": "Domyślny stan uzbrojenia przy obecności w nocy",
-                            "calendar_armed_end_mode": "Stan alarmu po zakończeniu uzbrojonego wydarzenia w kalendarzu",
-                            "calendar_disarmed_end_mode": "Stan alarmu po zakończeniu rozbrojonego wydarzenia w kalendarzu"
-                        },
-                        "data_description": {
-                            "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Panel nie może wymagać kodu.",
-                            "occupancy_default_night": "Ustaw na Uzbrojony w domu jako domyślny stan przed porą snu, jeśli czujnik pory dnia lub kalendarz ustawia Uzbrojony na noc na porę snu, jak w [zalecanym przepisie]({recipe_url}).",
-                            "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
-                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma."
                         }
                     },
                     "notify_options": {
@@ -264,6 +259,29 @@
                             "notify_targets": "Lista adresów lub encji powiadomień do powiadomienia; można pozostawić puste dla Supernotify",
                             "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML."
                         }
+                    },
+                    "time_of_day_options": {
+                        "name": "Zaawansowane - Pora dnia",
+                        "description": "Czujniki pory dnia dla pozostałych stanów alarmu, które ustawiają swój stan, gdy są włączone, tak jak czujnik pory snu. Gdy czujnik się wyłącza, obowiązują ustawienia zakończenia wydarzenia kalendarza z sekcji Zaawansowane.",
+                        "data": {
+                            "time_of_day_disarmed": "Rozbrojony",
+                            "time_of_day_armed_home": "Uzbrojony w domu",
+                            "time_of_day_armed_away": "Uzbrojony poza domem",
+                            "time_of_day_armed_custom_bypass": "Uzbrojony niestandardowo"
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Zaawansowane",
+                        "data": {
+                            "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
+                            "calendar_armed_end_mode": "Gdy kończy się uzbrojenie z kalendarza",
+                            "calendar_disarmed_end_mode": "Gdy kończy się rozbrojenie z kalendarza"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Panel nie może wymagać kodu.",
+                            "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
+                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma."
+                        }
                     }
                 }
             }
@@ -272,7 +290,7 @@
     "selector": {
         "sun_trigger": {
             "options": {
-                "auto": "Automatyczny (wyłączony w dni kalendarza)",
+                "auto": "Automatyczny (wyłączony w dni z dziennym wydarzeniem w kalendarzu)",
                 "on": "Włączony",
                 "off": "Wyłączony"
             }

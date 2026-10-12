@@ -23,17 +23,15 @@
 Automate the arming and disarming of the built-in Home Assistant [Alarm
 Control Panel Integrations][], with additional support for calendar integration, occupancy-driven arming and disarming, manual override via remote control buttons, and mobile push actionable notifications.
 
-Calendar, occupancy and diurnal scheduling available with **zero YAML**, support for 11 languages, and everything configured from the Home Assistant settings. Advanced configuration for physical buttons, and fine-tuning for other scheduling, available from optional YAML configuration.
+Calendar, occupancy, physical buttons, diurnal and bedtime scheduling available with **zero YAML**, support for 11 languages, and everything configured from the Home Assistant settings. Advanced configuration for transition logic, and fine-tuning for notifications and other scheduling, available from optional YAML configuration.
 
 !!! question inline end "Why use alarm control panels?"
     A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful, even if there is no real alarm system, as a **single central state of the home**, and then use that to drive automations, notifications etc rather than littering notifications with checks for presence, time of day, vacations or similar.
 
     For example, it is likely that many things will change if `ARMED_VACATION` applies, and you may want to have all PIR alerts silenced if alarm state is `DISARMED`. This builds on how real alarm systems have worked for decades.
 
-    One big obstacle to using Alarm Control Panel is having to remember to change the
-    alarm panel state when people are in or out of the house, at night or when away on holiday.
-    *Auto Arm* solves that problem, and makes the Alarm Control Panel essential for any
-    well-automated home.
+    One big obstacle to using Alarm Control Panel is having to remember to change the alarm panel state when people are in or out of the house, at night or when away on holiday.
+    *Auto Arm* solves that problem, and makes the Alarm Control Panel essential for any well-automated home.
 
 ## Setup
 
@@ -68,7 +66,7 @@ If that's not quite how you like, its still a good starting place for an easy to
 
 ### YAML for Advanced Features
 
-Transitions, buttons, notifications, diurnal settings, rate limiting, and per-calendar overrides (state patterns, poll intervals) are configured in YAML. See [Typical Configuration](configuration/examples/typical.md) for a full example.
+Transition logic, advanced notifications, rate limiting, and per-calendar overrides (state patterns, poll intervals) are configured in YAML. See [Typical Configuration](configuration/examples/typical.md) for a full example.
 
 !!! note "Migrating from YAML-only"
     Existing YAML configurations are automatically migrated to a config entry on restart. See [Migration Guide](configuration/migration.md) for details.
@@ -77,20 +75,34 @@ Transitions, buttons, notifications, diurnal settings, rate limiting, and per-ca
 
 See [Automated Arming](automated_arming.md) for the various mechanisms, options and how to configure.
 
+There are 4 main things controlling arming:
+
+- **Diurnal**
+  - Is it day time or night time?
+- **Occupancy**
+  - Is everybody home? Is this a planned vacation?
+- **Bedtime**
+  - Is everyone in bed, asleep or needing peace?
+- **Interventions**
+  - Has someone hit a physical 'disarm' button?
+  - Is there a calendar event setting a specific state?
+  - Is there a real alarm panel that has changed state?
+
+
 The full list of how alarm panel state can be set:
 
 | Source        | Description                                                               |
 |---------------|---------------------------------------------------------------------------|
 | calendar      | Calendar events (with optional override for selected events by occupancy) |
-| tod           | A Times of the Day sensor turning on or off, such as a daily bedtime           |
+| tod           | A Times of the Day sensor turning on or off, such as a daily bedtime      |
 | mobile        | Mobile action                                                             |
 | occupancy     | Occupancy calculation, e.g. automatically switching off `ARMED_AWAY`      |
-| alarm_panel   | Changes made to Alarm Control Panel outside of Auto Arm                    |
+| alarm_panel   | Changes made to Alarm Control Panel outside of Auto Arm                   |
 | button        | A physical button push                                                    |
 | action        | A Home Assistant Action call (previously known as 'Service')              |
 | sunrise       | HomeAssistant `sun` integration event                                     |
 | sunset        | HomeAssistant `sun` integration event                                     |
-| startup       | Alarm changes made as part of Auto Arm startup                             |
+| startup       | Alarm changes made as part of Auto Arm startup                            |
 | zombification | Home Assistant alarm panel got itself into a 'zombie' state and was reset |
 
 

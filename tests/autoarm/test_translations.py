@@ -41,10 +41,6 @@ LOCALE_COGNATE_PATHS: dict[str, set[str]] = {
         "options.step.init.sections.notify_options.name",
         "config.step.advanced_setup.sections.notify_options.name",
     },
-    "nl": {
-        "options.step.init.sections.trigger_options.name",
-        "config.step.advanced_setup.sections.trigger_options.name",
-    },
 }
 
 

@@ -21,7 +21,7 @@ Existing YAML-only installations are **automatically migrated** to a config entr
 | `calendar_control.calendars[].poll_interval` | YAML | YAML (unchanged) |
 | `calendar_control.notify_grace_period` | YAML | YAML (unchanged) |
 | `transitions` | YAML | YAML (unchanged) |
-| `buttons` | YAML | YAML (unchanged) |
+| `buttons` | YAML | UI Options, copied from YAML on first start |
 | `notify` | YAML | Profiles in YAML (unchanged), Service in UI (Options) |
 | `rate_limit` | YAML | YAML (unchanged) |
 | `occupancy.delay_time` | YAML | YAML (unchanged) |
@@ -32,7 +32,7 @@ On restart, if Auto Arm finds a YAML configuration without a matching config ent
 
 1. Creates a config entry with the alarm panel entity from YAML
 2. Populates options with calendar entities, person entities, occupancy defaults, and calendar end modes from `no_event_mode` in YAML
-3. Continues to read advanced settings (transitions, buttons, notification profiles, etc.) from YAML
+3. Continues to read advanced settings (transitions, notification profiles, etc.) from YAML
 
 ## Cleaning Up YAML After Migration
 
@@ -44,7 +44,7 @@ After migration, the following YAML keys are read from the config entry and can 
 - `calendar_control.no_event_mode`
 - Calendar `entity_id` values (the entity list is managed in Options)
 
-The remaining YAML sections (`transitions`, `buttons`, `notify`, `rate_limit`, per-calendar `state_patterns` and `poll_interval`, and `calendar_control.notify_grace_period`) should be kept.
+The `buttons` section is copied into the options the first time, and can then be removed. The remaining YAML sections (`transitions`, `notify`, `rate_limit`, per-calendar `state_patterns` and `poll_interval`, and `calendar_control.notify_grace_period`) should be kept.
 
 ## Coexisting Configurations
 

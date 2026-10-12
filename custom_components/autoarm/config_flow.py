@@ -12,6 +12,9 @@ from homeassistant.helpers.selector import (
     BooleanSelector,
     EntitySelector,
     EntitySelectorConfig,
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
     ObjectSelector,
     SelectSelector,
     SelectSelectorConfig,
@@ -23,6 +26,7 @@ from homeassistant.helpers.selector import (
 
 from .compat import vol
 from .const import (
+    ATTR_RESET,
     CALENDAR_END_MODE_OPTIONS,
     CONF_ALARM_PANEL,
     CONF_CALENDAR_ARMED_END,
@@ -63,6 +67,8 @@ CONF_NOTIFY_ACTION = "notify_action"
 CONF_NOTIFY_TARGETS = "notify_targets"
 CONF_NOTIFY_DATA = "notify_data"
 CONF_NOTIFY_ENABLED = "notify_enabled"
+# for the dark between bedtime ending and sunrise
+CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME = "occupancy_default_after_bedtime"
 CONF_SUNRISE_TRIGGER = "sunrise_trigger"
 CONF_SUNSET_TRIGGER = "sunset_trigger"
 CONF_OCCUPIED_TRIGGER = "occupied_trigger"
@@ -94,6 +100,21 @@ SETUP_HELP_PLACEHOLDERS: dict[str, str] = {
 TIME_OF_DAY_OPTIONS: dict[str, str] = {
     f"time_of_day_{state}": state for state in PUBLIC_ALARM_STATES if state != "armed_vacation"
 }
+# a reset button, and buttons for each alarm state, each with a delay in seconds before it acts
+BUTTON_USES: list[str] = [ATTR_RESET, *PUBLIC_ALARM_STATES]
+BUTTON_DOMAINS: list[str] = ["binary_sensor", "button", "input_button"]
+# time to get out of the door
+DEFAULT_BUTTON_DELAYS: dict[str, int] = {"armed_away": 120}
+
+
+def button_option(use: str) -> str:
+    return f"button_{use}"
+
+
+def button_delay_option(use: str) -> str:
+    return f"button_{use}_delay"
+
+
 # the bedtime sensor of the recommended recipe, asked for up front rather than in the Times of the Day section
 CONF_BEDTIME_ENTITIES = "time_of_day_armed_night"
 
@@ -111,6 +132,7 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_PERSON_ENTITIES: [],
     CONF_BEDTIME_ENTITIES: [],
     CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
+    CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME: "armed_home",
     CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_home",
     CONF_CALENDAR_ARMED_END_MODE: NO_CAL_EVENT_MODE_AUTO,
     CONF_CALENDAR_DISARMED_END_MODE: NO_CAL_EVENT_MODE_AUTO,
@@ -158,8 +180,16 @@ def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any
         notify_services.insert(0, SUPERNOTIFY_ACTION)
 
     return {
-        vol.Required("calendar_options"): section(
+        vol.Required("presence_options"): section(
             vol.Schema({
+                vol.Required(
+                    CONF_OCCUPIED_TRIGGER,
+                    default=options.get(CONF_OCCUPIED_TRIGGER, True),
+                ): BooleanSelector(),
+                vol.Required(
+                    CONF_UNOCCUPIED_TRIGGER,
+                    default=options.get(CONF_UNOCCUPIED_TRIGGER, True),
+                ): BooleanSelector(),
                 vol.Optional(
                     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
                     default=options.get(CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES),
@@ -177,37 +207,24 @@ def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any
             }),
             {"collapsed": True},
         ),
-        vol.Required("time_of_day_options"): section(
+        vol.Required("sun_options"): section(
             vol.Schema({
-                vol.Optional(option, default=options.get(option, [])): _time_of_day_selector()
-                for option in TIME_OF_DAY_OPTIONS
-                if option != CONF_BEDTIME_ENTITIES
-            }),
-            {"collapsed": True},
-        ),
-        vol.Required("trigger_options"): section(
-            vol.Schema({
+                vol.Optional(
+                    CONF_OCCUPANCY_DEFAULT_DAY,
+                    default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "disarmed"),
+                ): _alarm_state_selector(),
+                vol.Optional(
+                    CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME,
+                    default=options.get(CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME, "armed_home"),
+                ): _alarm_state_selector(),
+                vol.Optional(
+                    CONF_OCCUPANCY_DEFAULT_NIGHT,
+                    description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")},
+                ): _alarm_state_selector(),
                 vol.Required(
                     CONF_SUNRISE_TRIGGER,
                     default=options.get(CONF_SUNRISE_TRIGGER, TRIGGER_AUTO),
                 ): _sun_trigger_selector(),
-                vol.Required(
-                    CONF_SUNSET_TRIGGER,
-                    default=options.get(CONF_SUNSET_TRIGGER, TRIGGER_AUTO),
-                ): _sun_trigger_selector(),
-                vol.Required(
-                    CONF_OCCUPIED_TRIGGER,
-                    default=options.get(CONF_OCCUPIED_TRIGGER, True),
-                ): BooleanSelector(),
-                vol.Required(
-                    CONF_UNOCCUPIED_TRIGGER,
-                    default=options.get(CONF_UNOCCUPIED_TRIGGER, True),
-                ): BooleanSelector(),
-            }),
-            {"collapsed": True},
-        ),
-        vol.Required("sunrise_options"): section(
-            vol.Schema({
                 vol.Optional(
                     CONF_SUNRISE_EARLIEST,
                     description={"suggested_value": options.get(CONF_SUNRISE_EARLIEST)},
@@ -216,11 +233,10 @@ def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any
                     CONF_SUNRISE_LATEST,
                     description={"suggested_value": options.get(CONF_SUNRISE_LATEST)},
                 ): TimeSelector(),
-            }),
-            {"collapsed": True},
-        ),
-        vol.Required("sunset_options"): section(
-            vol.Schema({
+                vol.Required(
+                    CONF_SUNSET_TRIGGER,
+                    default=options.get(CONF_SUNSET_TRIGGER, TRIGGER_AUTO),
+                ): _sun_trigger_selector(),
                 vol.Optional(
                     CONF_SUNSET_EARLIEST,
                     description={"suggested_value": options.get(CONF_SUNSET_EARLIEST)},
@@ -229,6 +245,28 @@ def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any
                     CONF_SUNSET_LATEST,
                     description={"suggested_value": options.get(CONF_SUNSET_LATEST)},
                 ): TimeSelector(),
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("button_options"): section(
+            vol.Schema({
+                marker: selector
+                for use in BUTTON_USES
+                for marker, selector in (
+                    (
+                        vol.Optional(button_option(use), default=options.get(button_option(use), [])),
+                        EntitySelector(EntitySelectorConfig(domain=BUTTON_DOMAINS, multiple=True)),
+                    ),
+                    (
+                        vol.Optional(
+                            button_delay_option(use),
+                            default=options.get(button_delay_option(use), DEFAULT_BUTTON_DELAYS.get(use, 0)),
+                        ),
+                        NumberSelector(
+                            NumberSelectorConfig(min=0, max=3600, mode=NumberSelectorMode.BOX, unit_of_measurement="s")
+                        ),
+                    ),
+                )
             }),
             {"collapsed": True},
         ),
@@ -245,42 +283,7 @@ def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any
             }),
             {"collapsed": True},
         ),
-        vol.Required("advanced_options"): section(
-            vol.Schema({
-                vol.Required(
-                    CONF_USE_ALARM_SERVICE,
-                    default=options.get(CONF_USE_ALARM_SERVICE, True),
-                ): BooleanSelector(),
-                vol.Optional(
-                    CONF_OCCUPANCY_DEFAULT_DAY,
-                    default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "disarmed"),
-                ): SelectSelector(
-                    SelectSelectorConfig(
-                        options=PUBLIC_ALARM_STATES,
-                        mode=SelectSelectorMode.DROPDOWN,
-                    )
-                ),
-                vol.Optional(
-                    CONF_OCCUPANCY_DEFAULT_NIGHT,
-                    description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")},
-                ): SelectSelector(
-                    SelectSelectorConfig(
-                        options=PUBLIC_ALARM_STATES,
-                        mode=SelectSelectorMode.DROPDOWN,
-                    )
-                ),
-                vol.Required(
-                    CONF_CALENDAR_ARMED_END_MODE,
-                    default=options.get(CONF_CALENDAR_ARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
-                ): _calendar_end_mode_selector(),
-                vol.Required(
-                    CONF_CALENDAR_DISARMED_END_MODE,
-                    default=options.get(CONF_CALENDAR_DISARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
-                ): _calendar_end_mode_selector(),
-            }),
-            {"collapsed": True},
-        ),
-        # last, like the "then do" actions at the bottom of an automation
+        # above the advanced sections, like the "then do" actions at the bottom of an automation
         vol.Required("notify_options"): section(
             vol.Schema({
                 vol.Required(
@@ -305,6 +308,31 @@ def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any
                     CONF_NOTIFY_DATA,
                     default=options.get(CONF_NOTIFY_DATA, {}),
                 ): ObjectSelector(),
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("time_of_day_options"): section(
+            vol.Schema({
+                vol.Optional(option, default=options.get(option, [])): _time_of_day_selector()
+                for option in TIME_OF_DAY_OPTIONS
+                if option != CONF_BEDTIME_ENTITIES
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("advanced_options"): section(
+            vol.Schema({
+                vol.Required(
+                    CONF_USE_ALARM_SERVICE,
+                    default=options.get(CONF_USE_ALARM_SERVICE, True),
+                ): BooleanSelector(),
+                vol.Required(
+                    CONF_CALENDAR_ARMED_END_MODE,
+                    default=options.get(CONF_CALENDAR_ARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
+                ): _calendar_end_mode_selector(),
+                vol.Required(
+                    CONF_CALENDAR_DISARMED_END_MODE,
+                    default=options.get(CONF_CALENDAR_DISARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
+                ): _calendar_end_mode_selector(),
             }),
             {"collapsed": True},
         ),
@@ -472,6 +500,10 @@ class AutoArmOptionsFlow(OptionsFlow):
             }),
             description_placeholders={"recipe_url": RECIPE_URL},
         )
+
+
+def _alarm_state_selector() -> SelectSelector:
+    return SelectSelector(SelectSelectorConfig(options=PUBLIC_ALARM_STATES, mode=SelectSelectorMode.DROPDOWN))
 
 
 def _time_of_day_selector() -> EntitySelector:

@@ -15,89 +15,90 @@
                 "description": "Suit la [recette recommandée]({recipe_url}), avec un capteur d'heure de coucher, un calendrier pour les vacances et un armement lorsque tout le monde est sorti. Seul le panneau d'alarme est obligatoire, le reste peut être ajouté plus tard.",
                 "data": {
                     "alarm_panel": "Panneau de contrôle d'alarme à gérer",
-                    "time_of_day_armed_night": "Capteur d'heure de coucher pour Armé nuit",
-                    "calendar_entities": "Calendriers pour les vacances et les absences",
-                    "person_entities": "Personnes pour l'armement basé sur l'occupation"
+                    "time_of_day_armed_night": "Coucher - Capteur de moment de la journée",
+                    "calendar_entities": "Occupation - Calendriers",
+                    "person_entities": "Présence - Personnes pour l'armement basé sur l'occupation"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Un capteur de moment de la journée actif chaque jour à l'heure du coucher. Tant qu'il est actif, l'alarme reste sur Armé nuit. ou ignorez cette étape et utilisez un calendrier ou l'intégration *Soleil* pour contrôler l'armement de nuit. Pas encore de capteur d'heure de coucher ? [Créez-en un]({bedtime_help_url}), ou allez dans Paramètres → Appareils et services → Auxiliaires → **+ Créer un auxiliaire** → **Heure de la journée**. Donnez-lui un nom et définissez une heure de début/fin pour votre heure de coucher habituelle.",
+                    "time_of_day_armed_night": "Un capteur de moment de la journée actif chaque jour à l'heure du coucher. Tant qu'il est actif, l'alarme reste sur Armé nuit. Pas encore de capteur d'heure de coucher ? [Créez-en un]({bedtime_help_url}), ou allez dans Paramètres → Appareils et services → Auxiliaires → **+ Créer un auxiliaire** → **Heure de la journée**. Donnez-lui un nom et définissez une heure de début/fin pour votre heure de coucher habituelle.",
                     "alarm_panel": "Pas encore de panneau d'alarme ? [Créez-en un virtuel]({alarm_panel_help_url}), ou dans Home Assistant allez dans Paramètres → Appareils et services → Auxiliaires → **+ Créer un auxiliaire** → Modèle → **Panneau de contrôle d'alarme**. Donnez-lui un nom et validez ; tous les autres champs sont facultatifs.",
-                    "calendar_entities": "Pas encore de calendrier ? [Créez un calendrier local]({calendar_help_url}), ou allez dans Paramètres → Appareils et services → **+ Ajouter une intégration** → **Calendrier local**. Donnez-lui un nom et laissez « Créer un calendrier vide » sélectionné.",
-                    "person_entities": "Quelqu'un manque ? [Ajoutez une nouvelle personne]({person_help_url}), ou allez dans Paramètres → Personnes → **+ Ajouter une personne**. Donnez-lui un nom ; associer un compte utilisateur est facultatif."
+                    "calendar_entities": "Les calendriers sont nécessaires pour l'état Armé vacances, ou si la présence est indisponible ou peu fiable pour déterminer l'occupation. Les calendriers peuvent aussi définir n'importe quel état armé, et donc remplacer les autres contrôles selon le soleil, le coucher ou l'occupation. Pas encore de calendrier ? [Créez un calendrier local]({calendar_help_url}), ou allez dans Paramètres → Appareils et services → **+ Ajouter une intégration** → **Calendrier local**. Donnez-lui un nom et laissez « Créer un calendrier vide » sélectionné.",
+                    "person_entities": "Le fait que toutes ces personnes soient ou non à la maison détermine les états Armé absence, Armé présence et Désarmé. Quelqu'un manque ? [Ajoutez une nouvelle personne]({person_help_url}), ou allez dans Paramètres → Personnes → **+ Ajouter une personne**. Donnez-lui un nom ; associer un compte utilisateur est facultatif."
                 }
             },
             "advanced_setup": {
                 "title": "Configurer AutoArm — Avancé",
                 "data": {
                     "alarm_panel": "Panneau de contrôle d'alarme à gérer",
-                    "time_of_day_armed_night": "Capteur d'heure de coucher pour Armé nuit",
-                    "calendar_entities": "Calendriers pour les vacances et les absences",
-                    "person_entities": "Personnes pour l'armement basé sur l'occupation"
+                    "time_of_day_armed_night": "Coucher - Capteur de moment de la journée",
+                    "calendar_entities": "Occupation - Calendriers",
+                    "person_entities": "Présence - Personnes pour l'armement basé sur l'occupation"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Un capteur de moment de la journée actif chaque jour à l'heure du coucher. Tant qu'il est actif, l'alarme reste sur Armé nuit. ou ignorez cette étape et utilisez un calendrier ou l'intégration *Soleil* pour contrôler l'armement de nuit. Pas encore de capteur d'heure de coucher ? [Créez-en un]({bedtime_help_url}), ou allez dans Paramètres → Appareils et services → Auxiliaires → **+ Créer un auxiliaire** → **Heure de la journée**. Donnez-lui un nom et définissez une heure de début/fin pour votre heure de coucher habituelle.",
+                    "time_of_day_armed_night": "Un capteur de moment de la journée actif chaque jour à l'heure du coucher. Tant qu'il est actif, l'alarme reste sur Armé nuit. Pas encore de capteur d'heure de coucher ? [Créez-en un]({bedtime_help_url}), ou allez dans Paramètres → Appareils et services → Auxiliaires → **+ Créer un auxiliaire** → **Heure de la journée**. Donnez-lui un nom et définissez une heure de début/fin pour votre heure de coucher habituelle.",
                     "alarm_panel": "Pas encore de panneau d'alarme ? [Créez-en un virtuel]({alarm_panel_help_url}), ou dans Home Assistant allez dans Paramètres → Appareils et services → Auxiliaires → **+ Créer un auxiliaire** → Modèle → **Panneau de contrôle d'alarme**. Donnez-lui un nom et validez ; tous les autres champs sont facultatifs.",
-                    "calendar_entities": "Pas encore de calendrier ? [Créez un calendrier local]({calendar_help_url}), ou allez dans Paramètres → Appareils et services → **+ Ajouter une intégration** → **Calendrier local**. Donnez-lui un nom et laissez « Créer un calendrier vide » sélectionné.",
-                    "person_entities": "Quelqu'un manque ? [Ajoutez une nouvelle personne]({person_help_url}), ou allez dans Paramètres → Personnes → **+ Ajouter une personne**. Donnez-lui un nom ; associer un compte utilisateur est facultatif."
+                    "calendar_entities": "Les calendriers sont nécessaires pour l'état Armé vacances, ou si la présence est indisponible ou peu fiable pour déterminer l'occupation. Les calendriers peuvent aussi définir n'importe quel état armé, et donc remplacer les autres contrôles selon le soleil, le coucher ou l'occupation. Pas encore de calendrier ? [Créez un calendrier local]({calendar_help_url}), ou allez dans Paramètres → Appareils et services → **+ Ajouter une intégration** → **Calendrier local**. Donnez-lui un nom et laissez « Créer un calendrier vide » sélectionné.",
+                    "person_entities": "Le fait que toutes ces personnes soient ou non à la maison détermine les états Armé absence, Armé présence et Désarmé. Quelqu'un manque ? [Ajoutez une nouvelle personne]({person_help_url}), ou allez dans Paramètres → Personnes → **+ Ajouter une personne**. Donnez-lui un nom ; associer un compte utilisateur est facultatif."
                 },
                 "sections": {
-                    "calendar_options": {
-                        "name": "Remplacement d'occupation calendrier",
+                    "presence_options": {
+                        "name": "Présence",
                         "data": {
-                            "calendar_occupancy_override_states": "États que l'occupation peut remplacer",
+                            "occupied_trigger": "Quelqu'un rentre à la maison",
+                            "unoccupied_trigger": "Quelqu'un quitte la maison",
+                            "calendar_occupancy_override_states": "États d'alarme du calendrier que la présence peut remplacer",
                             "calendar_occupancy_ends_away": "Le retour à la maison met fin aux événements d'absence et de vacances le dernier jour"
                         },
                         "data_description": {
+                            "occupied_trigger": "Réévaluer l'état de l'alarme quand une personne rentre",
+                            "unoccupied_trigger": "Réévaluer l'état de l'alarme quand une personne part",
                             "calendar_occupancy_override_states": "Quand un événement calendrier définit l'un de ces états, les changements d'occupation (arrivées et départs) peuvent encore mettre à jour l'état de l'alarme. Par exemple, si le calendrier indique Désarmé mais que tout le monde part, il passera à Armé Absent.",
                             "calendar_occupancy_ends_away": "Lorsque quelqu'un rentre le jour où un événement de calendrier Armé absence ou Armé vacances doit se terminer, l'événement prend fin à ce moment-là plutôt qu'à son heure de fin, et l'alarme passe à l'état défini pour la fin d'un événement de calendrier. S'applique aux événements ponctuels comme aux événements récurrents."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Moment de la journée",
-                        "description": "Capteurs de moment de la journée pour les autres états d'alarme, qui définissent leur état tant qu'ils sont actifs, comme le capteur d'heure de coucher. Lorsqu'un capteur se désactive, les réglages de fin d'événement de calendrier de la section Avancé s'appliquent.",
+                    "sun_options": {
+                        "name": "Diurne - Soleil",
+                        "description": "Le matin est le lever du soleil, et le soir le coucher du soleil, chacun maintenu entre ses heures au plus tôt et au plus tard. Les déclencheurs réévaluent l'état de l'alarme le matin et le soir, et sont ignorés pendant le coucher. Automatique désactive un déclencheur les jours avec un événement de calendrier Désarmé, Armé présence ou Armé nuit. Les heures au plus tôt et au plus tard sont surtout utiles quand aucun capteur de moment de la journée ni calendrier n'est utilisé pour le coucher.",
                         "data": {
-                            "time_of_day_disarmed": "Désarmé",
-                            "time_of_day_armed_home": "Armé présence",
-                            "time_of_day_armed_away": "Armé absence",
-                            "time_of_day_armed_custom_bypass": "Armé personnalisé"
-                        }
-                    },
-                    "trigger_options": {
-                        "name": "Déclencheurs",
-                        "description": "Ce qui peut lancer une réévaluation de l'état de l'alarme. Ils changent quand l'état est calculé, pas comment. Automatique désactive un déclencheur les jours avec un événement de calendrier correspondant, et le réactive les jours sans activité de calendrier.",
-                        "data": {
-                            "sunrise_trigger": "Lever du soleil",
-                            "sunset_trigger": "Coucher du soleil",
-                            "occupied_trigger": "Quelqu'un rentre à la maison",
-                            "unoccupied_trigger": "Quelqu'un quitte la maison"
+                            "occupancy_default_day": "État lorsqu'occupé entre le matin et le soir",
+                            "occupancy_default_after_bedtime": "État lorsqu'occupé entre le coucher et le matin",
+                            "occupancy_default_night": "État lorsqu'occupé entre le soir et le coucher",
+                            "sunrise_trigger": "Matin - déclencheur",
+                            "sunrise_earliest": "Matin - Plus tôt",
+                            "sunrise_latest": "Matin - Plus tard",
+                            "sunset_trigger": "Soir - déclencheur",
+                            "sunset_earliest": "Soir - Plus tôt",
+                            "sunset_latest": "Soir - Plus tard"
                         },
                         "data_description": {
-                            "sunrise_trigger": "Réévaluer l'état de l'alarme au lever du soleil",
-                            "sunset_trigger": "Réévaluer l'état de l'alarme au coucher du soleil",
-                            "occupied_trigger": "Réévaluer l'état de l'alarme quand une personne rentre",
-                            "unoccupied_trigger": "Réévaluer l'état de l'alarme quand une personne part"
+                            "occupancy_default_after_bedtime": "Pour quand le coucher se termine avant le matin. Sans effet sans capteur d'heure de coucher.",
+                            "occupancy_default_night": "Réglez-le sur Armé présence comme valeur par défaut avant le coucher si un capteur de moment de la journée ou un calendrier définit Armé nuit à l'heure du coucher, comme dans la [recette recommandée]({recipe_url}). Si rien ne définit Armé nuit pour le coucher ce jour-là, ni capteur d'heure de coucher ni événement de calendrier, c'est Armé nuit dès le soir.",
+                            "sunrise_trigger": "Réévaluer l'état de l'alarme le matin",
+                            "sunrise_earliest": "Le matin n'est pas avant cette heure, même si le soleil se lève plus tôt",
+                            "sunrise_latest": "Le matin n'est pas après cette heure, même si le soleil se lève plus tard",
+                            "sunset_trigger": "Réévaluer l'état de l'alarme le soir",
+                            "sunset_earliest": "Le soir n'est pas avant cette heure, même si le soleil se couche plus tôt",
+                            "sunset_latest": "Le soir n'est pas après cette heure, même si le soleil se couche plus tard"
                         }
                     },
-                    "sunrise_options": {
-                        "name": "Contraintes de lever du soleil",
+                    "button_options": {
+                        "name": "Boutons",
+                        "description": "Boutons physiques pour définir un état d'alarme, ou pour le réinitialiser à ce qu'Auto Arm détermine. Les entités bouton et les capteurs binaires fonctionnent tous deux. Chacun peut avoir un délai avant d'agir, par exemple le temps de sortir après un armement en absence.",
                         "data": {
-                            "sunrise_earliest": "Plus tôt",
-                            "sunrise_latest": "Plus tard"
-                        },
-                        "data_description": {
-                            "sunrise_earliest": "Lever du soleil au plus tôt à cette heure",
-                            "sunrise_latest": "Lever du soleil au plus tard à cette heure"
-                        }
-                    },
-                    "sunset_options": {
-                        "name": "Contraintes de coucher du soleil",
-                        "data": {
-                            "sunset_earliest": "Plus tôt",
-                            "sunset_latest": "Plus tard"
-                        },
-                        "data_description": {
-                            "sunset_earliest": "Coucher du soleil au plus tôt à cette heure",
-                            "sunset_latest": "Coucher du soleil au plus tard à cette heure"
+                            "button_reset": "Réinitialiser - boutons",
+                            "button_reset_delay": "Réinitialiser - délai",
+                            "button_disarmed": "Désarmé - boutons",
+                            "button_disarmed_delay": "Désarmé - délai",
+                            "button_armed_home": "Armé présence - boutons",
+                            "button_armed_home_delay": "Armé présence - délai",
+                            "button_armed_away": "Armé absence - boutons",
+                            "button_armed_away_delay": "Armé absence - délai",
+                            "button_armed_night": "Armé nuit - boutons",
+                            "button_armed_night_delay": "Armé nuit - délai",
+                            "button_armed_vacation": "Armé vacances - boutons",
+                            "button_armed_vacation_delay": "Armé vacances - délai",
+                            "button_armed_custom_bypass": "Armé personnalisé - boutons",
+                            "button_armed_custom_bypass_delay": "Armé personnalisé - délai"
                         }
                     },
                     "assist_options": {
@@ -109,22 +110,6 @@
                         "data_description": {
                             "sentence_arm": "Phrases en anglais pour l'agent Assist intégré de Home Assistant, comme 'arm the alarm', 'arm the alarm in night mode' et 'why is the alarm armed'.",
                             "sentence_disarm": "Ajoute 'disarm the alarm'. Attention : aucun code n'est demandé, donc toute personne pouvant parler à Assist, sur un satellite vocal ou dans le chat, pourra désarmer l'alarme."
-                        }
-                    },
-                    "advanced_options": {
-                        "name": "Avancé",
-                        "data": {
-                            "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
-                            "occupancy_default_day": "État d'armement par défaut lorsqu'occupé pendant la journée",
-                            "occupancy_default_night": "État d'armement par défaut lorsqu'occupé la nuit",
-                            "calendar_armed_end_mode": "État d'armement à la fin d'un événement de calendrier armé",
-                            "calendar_disarmed_end_mode": "État d'armement à la fin d'un événement de calendrier désarmé"
-                        },
-                        "data_description": {
-                            "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code.",
-                            "occupancy_default_night": "Réglez-le sur Armé présence comme valeur par défaut avant le coucher si un capteur de moment de la journée ou un calendrier définit Armé nuit à l'heure du coucher, comme dans la [recette recommandée]({recipe_url}).",
-                            "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
-                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
                         }
                     },
                     "notify_options": {
@@ -140,6 +125,29 @@
                             "notify_action": "Action (service) Home Assistant à utiliser pour notifier",
                             "notify_targets": "Liste d'adresses ou d'entités notify à notifier, peut être laissée vide pour Supernotify",
                             "notify_data": "Données supplémentaires transmises à l'action de notification, telles que des actions ou un canal pour une notification d'application mobile. Toute valeur définie ici est remplacée par une clé correspondante dans un profil de notification YAML."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Avancé - Moment de la journée",
+                        "description": "Capteurs de moment de la journée pour les autres états d'alarme, qui définissent leur état tant qu'ils sont actifs, comme le capteur d'heure de coucher. Lorsqu'un capteur se désactive, les réglages de fin d'événement de calendrier de la section Avancé s'appliquent.",
+                        "data": {
+                            "time_of_day_disarmed": "Désarmé",
+                            "time_of_day_armed_home": "Armé présence",
+                            "time_of_day_armed_away": "Armé absence",
+                            "time_of_day_armed_custom_bypass": "Armé personnalisé"
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Avancé",
+                        "data": {
+                            "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
+                            "calendar_armed_end_mode": "À la fin d'un armement par calendrier",
+                            "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code.",
+                            "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
+                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
                         }
                     }
                 }
@@ -156,71 +164,74 @@
                 "description": "La [recette recommandée]({recipe_url}) explique comment le capteur d'heure de coucher, le calendrier et les personnes fonctionnent ensemble.",
                 "data": {
                     "alarm_panel": "Panneau de contrôle d'alarme à gérer",
-                    "time_of_day_armed_night": "Capteur d'heure de coucher pour Armé nuit",
-                    "calendar_entities": "Calendriers pour les vacances et les absences",
-                    "person_entities": "Personnes pour l'armement basé sur l'occupation"
+                    "time_of_day_armed_night": "Coucher - Capteur de moment de la journée",
+                    "calendar_entities": "Occupation - Calendriers",
+                    "person_entities": "Présence - Personnes pour l'armement basé sur l'occupation"
                 },
                 "data_description": {
-                    "time_of_day_armed_night": "Un capteur de moment de la journée actif chaque jour à l'heure du coucher. Tant qu'il est actif, l'alarme reste sur Armé nuit. ou ignorez cette étape et utilisez un calendrier ou l'intégration *Soleil* pour contrôler l'armement de nuit."
+                    "time_of_day_armed_night": "Un capteur de moment de la journée actif chaque jour à l'heure du coucher. Tant qu'il est actif, l'alarme reste sur Armé nuit.",
+                    "calendar_entities": "Les calendriers sont nécessaires pour l'état Armé vacances, ou si la présence est indisponible ou peu fiable pour déterminer l'occupation. Les calendriers peuvent aussi définir n'importe quel état armé, et donc remplacer les autres contrôles selon le soleil, le coucher ou l'occupation.",
+                    "person_entities": "Le fait que toutes ces personnes soient ou non à la maison détermine les états Armé absence, Armé présence et Désarmé."
                 },
                 "sections": {
-                    "calendar_options": {
-                        "name": "Remplacement d'occupation calendrier",
+                    "presence_options": {
+                        "name": "Présence",
                         "data": {
-                            "calendar_occupancy_override_states": "États que l'occupation peut remplacer",
+                            "occupied_trigger": "Quelqu'un rentre à la maison",
+                            "unoccupied_trigger": "Quelqu'un quitte la maison",
+                            "calendar_occupancy_override_states": "États d'alarme du calendrier que la présence peut remplacer",
                             "calendar_occupancy_ends_away": "Le retour à la maison met fin aux événements d'absence et de vacances le dernier jour"
                         },
                         "data_description": {
+                            "occupied_trigger": "Réévaluer l'état de l'alarme quand une personne rentre",
+                            "unoccupied_trigger": "Réévaluer l'état de l'alarme quand une personne part",
                             "calendar_occupancy_override_states": "Quand un événement calendrier définit l'un de ces états, les changements d'occupation (arrivées et départs) peuvent encore mettre à jour l'état de l'alarme. Par exemple, si le calendrier indique Désarmé mais que tout le monde part, il passera à Armé Absent.",
                             "calendar_occupancy_ends_away": "Lorsque quelqu'un rentre le jour où un événement de calendrier Armé absence ou Armé vacances doit se terminer, l'événement prend fin à ce moment-là plutôt qu'à son heure de fin, et l'alarme passe à l'état défini pour la fin d'un événement de calendrier. S'applique aux événements ponctuels comme aux événements récurrents."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Moment de la journée",
-                        "description": "Capteurs de moment de la journée pour les autres états d'alarme, qui définissent leur état tant qu'ils sont actifs, comme le capteur d'heure de coucher. Lorsqu'un capteur se désactive, les réglages de fin d'événement de calendrier de la section Avancé s'appliquent.",
+                    "sun_options": {
+                        "name": "Diurne - Soleil",
+                        "description": "Le matin est le lever du soleil, et le soir le coucher du soleil, chacun maintenu entre ses heures au plus tôt et au plus tard. Les déclencheurs réévaluent l'état de l'alarme le matin et le soir, et sont ignorés pendant le coucher. Automatique désactive un déclencheur les jours avec un événement de calendrier Désarmé, Armé présence ou Armé nuit. Les heures au plus tôt et au plus tard sont surtout utiles quand aucun capteur de moment de la journée ni calendrier n'est utilisé pour le coucher.",
                         "data": {
-                            "time_of_day_disarmed": "Désarmé",
-                            "time_of_day_armed_home": "Armé présence",
-                            "time_of_day_armed_away": "Armé absence",
-                            "time_of_day_armed_custom_bypass": "Armé personnalisé"
-                        }
-                    },
-                    "trigger_options": {
-                        "name": "Déclencheurs",
-                        "description": "Ce qui peut lancer une réévaluation de l'état de l'alarme. Ils changent quand l'état est calculé, pas comment. Automatique désactive un déclencheur les jours avec un événement de calendrier correspondant, et le réactive les jours sans activité de calendrier.",
-                        "data": {
-                            "sunrise_trigger": "Lever du soleil",
-                            "sunset_trigger": "Coucher du soleil",
-                            "occupied_trigger": "Quelqu'un rentre à la maison",
-                            "unoccupied_trigger": "Quelqu'un quitte la maison"
+                            "occupancy_default_day": "État lorsqu'occupé entre le matin et le soir",
+                            "occupancy_default_after_bedtime": "État lorsqu'occupé entre le coucher et le matin",
+                            "occupancy_default_night": "État lorsqu'occupé entre le soir et le coucher",
+                            "sunrise_trigger": "Matin - déclencheur",
+                            "sunrise_earliest": "Matin - Plus tôt",
+                            "sunrise_latest": "Matin - Plus tard",
+                            "sunset_trigger": "Soir - déclencheur",
+                            "sunset_earliest": "Soir - Plus tôt",
+                            "sunset_latest": "Soir - Plus tard"
                         },
                         "data_description": {
-                            "sunrise_trigger": "Réévaluer l'état de l'alarme au lever du soleil",
-                            "sunset_trigger": "Réévaluer l'état de l'alarme au coucher du soleil",
-                            "occupied_trigger": "Réévaluer l'état de l'alarme quand une personne rentre",
-                            "unoccupied_trigger": "Réévaluer l'état de l'alarme quand une personne part"
+                            "occupancy_default_after_bedtime": "Pour quand le coucher se termine avant le matin. Sans effet sans capteur d'heure de coucher.",
+                            "occupancy_default_night": "Réglez-le sur Armé présence comme valeur par défaut avant le coucher si un capteur de moment de la journée ou un calendrier définit Armé nuit à l'heure du coucher, comme dans la [recette recommandée]({recipe_url}). Si rien ne définit Armé nuit pour le coucher ce jour-là, ni capteur d'heure de coucher ni événement de calendrier, c'est Armé nuit dès le soir.",
+                            "sunrise_trigger": "Réévaluer l'état de l'alarme le matin",
+                            "sunrise_earliest": "Le matin n'est pas avant cette heure, même si le soleil se lève plus tôt",
+                            "sunrise_latest": "Le matin n'est pas après cette heure, même si le soleil se lève plus tard",
+                            "sunset_trigger": "Réévaluer l'état de l'alarme le soir",
+                            "sunset_earliest": "Le soir n'est pas avant cette heure, même si le soleil se couche plus tôt",
+                            "sunset_latest": "Le soir n'est pas après cette heure, même si le soleil se couche plus tard"
                         }
                     },
-                    "sunrise_options": {
-                        "name": "Contraintes de lever du soleil",
+                    "button_options": {
+                        "name": "Boutons",
+                        "description": "Boutons physiques pour définir un état d'alarme, ou pour le réinitialiser à ce qu'Auto Arm détermine. Les entités bouton et les capteurs binaires fonctionnent tous deux. Chacun peut avoir un délai avant d'agir, par exemple le temps de sortir après un armement en absence.",
                         "data": {
-                            "sunrise_earliest": "Plus tôt",
-                            "sunrise_latest": "Plus tard"
-                        },
-                        "data_description": {
-                            "sunrise_earliest": "Lever du soleil au plus tôt à cette heure",
-                            "sunrise_latest": "Lever du soleil au plus tard à cette heure"
-                        }
-                    },
-                    "sunset_options": {
-                        "name": "Contraintes de coucher du soleil",
-                        "data": {
-                            "sunset_earliest": "Plus tôt",
-                            "sunset_latest": "Plus tard"
-                        },
-                        "data_description": {
-                            "sunset_earliest": "Coucher du soleil au plus tôt à cette heure",
-                            "sunset_latest": "Coucher du soleil au plus tard à cette heure"
+                            "button_reset": "Réinitialiser - boutons",
+                            "button_reset_delay": "Réinitialiser - délai",
+                            "button_disarmed": "Désarmé - boutons",
+                            "button_disarmed_delay": "Désarmé - délai",
+                            "button_armed_home": "Armé présence - boutons",
+                            "button_armed_home_delay": "Armé présence - délai",
+                            "button_armed_away": "Armé absence - boutons",
+                            "button_armed_away_delay": "Armé absence - délai",
+                            "button_armed_night": "Armé nuit - boutons",
+                            "button_armed_night_delay": "Armé nuit - délai",
+                            "button_armed_vacation": "Armé vacances - boutons",
+                            "button_armed_vacation_delay": "Armé vacances - délai",
+                            "button_armed_custom_bypass": "Armé personnalisé - boutons",
+                            "button_armed_custom_bypass_delay": "Armé personnalisé - délai"
                         }
                     },
                     "assist_options": {
@@ -232,22 +243,6 @@
                         "data_description": {
                             "sentence_arm": "Phrases en anglais pour l'agent Assist intégré de Home Assistant, comme 'arm the alarm', 'arm the alarm in night mode' et 'why is the alarm armed'.",
                             "sentence_disarm": "Ajoute 'disarm the alarm'. Attention : aucun code n'est demandé, donc toute personne pouvant parler à Assist, sur un satellite vocal ou dans le chat, pourra désarmer l'alarme."
-                        }
-                    },
-                    "advanced_options": {
-                        "name": "Avancé",
-                        "data": {
-                            "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
-                            "occupancy_default_day": "État d'armement par défaut lorsqu'occupé pendant la journée",
-                            "occupancy_default_night": "État d'armement par défaut lorsqu'occupé la nuit",
-                            "calendar_armed_end_mode": "État d'armement à la fin d'un événement de calendrier armé",
-                            "calendar_disarmed_end_mode": "État d'armement à la fin d'un événement de calendrier désarmé"
-                        },
-                        "data_description": {
-                            "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code.",
-                            "occupancy_default_night": "Réglez-le sur Armé présence comme valeur par défaut avant le coucher si un capteur de moment de la journée ou un calendrier définit Armé nuit à l'heure du coucher, comme dans la [recette recommandée]({recipe_url}).",
-                            "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
-                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
                         }
                     },
                     "notify_options": {
@@ -264,6 +259,29 @@
                             "notify_targets": "Liste d'adresses ou d'entités notify à notifier, peut être laissée vide pour Supernotify",
                             "notify_data": "Données supplémentaires transmises à l'action de notification, telles que des actions ou un canal pour une notification d'application mobile. Toute valeur définie ici est remplacée par une clé correspondante dans un profil de notification YAML."
                         }
+                    },
+                    "time_of_day_options": {
+                        "name": "Avancé - Moment de la journée",
+                        "description": "Capteurs de moment de la journée pour les autres états d'alarme, qui définissent leur état tant qu'ils sont actifs, comme le capteur d'heure de coucher. Lorsqu'un capteur se désactive, les réglages de fin d'événement de calendrier de la section Avancé s'appliquent.",
+                        "data": {
+                            "time_of_day_disarmed": "Désarmé",
+                            "time_of_day_armed_home": "Armé présence",
+                            "time_of_day_armed_away": "Armé absence",
+                            "time_of_day_armed_custom_bypass": "Armé personnalisé"
+                        }
+                    },
+                    "advanced_options": {
+                        "name": "Avancé",
+                        "data": {
+                            "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
+                            "calendar_armed_end_mode": "À la fin d'un armement par calendrier",
+                            "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier"
+                        },
+                        "data_description": {
+                            "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code.",
+                            "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
+                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
+                        }
                     }
                 }
             }
@@ -272,7 +290,7 @@
     "selector": {
         "sun_trigger": {
             "options": {
-                "auto": "Automatique (désactivé les jours de calendrier)",
+                "auto": "Automatique (désactivé les jours avec un événement de calendrier diurne)",
                 "on": "Activé",
                 "off": "Désactivé"
             }

@@ -1,7 +1,9 @@
 import asyncio
 import datetime as dt
 import json
+from collections.abc import Generator
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, AlarmControlPanelState
@@ -14,6 +16,7 @@ from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ENTITIES,
     CONF_NO_EVENT_MODE,
@@ -55,6 +58,14 @@ YAML_CONFIG: dict[str, Any] = {
         "normal": {"data": {"priority": "medium"}},
     },
 }
+
+
+@pytest.fixture(autouse=True)
+def day_and_night_by_the_sun() -> Generator[None]:
+    """These go by the sun alone, as the sunrise earliest time would make it night whenever they were run before it"""
+    with patch.object(AlarmArmer, "is_night", AlarmArmer.is_sun_down):
+        yield
+
 
 ENTRY_DATA: dict[str, Any] = {CONF_ALARM_PANEL: "alarm_panel.testing"}
 ENTRY_OPTIONS: dict[str, Any] = {

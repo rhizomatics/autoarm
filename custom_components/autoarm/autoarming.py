@@ -62,6 +62,7 @@ from custom_components.autoarm.notifier import Notifier
 from .calendar_events import TrackedCalendar, TrackedCalendarEvent
 from .compat import vol
 from .config_flow import (
+    BUTTON_USES,
     CONF_CALENDAR_ARMED_END_MODE,
     CONF_CALENDAR_DISARMED_END_MODE,
     CONF_CALENDAR_ENTITIES,
@@ -72,6 +73,7 @@ from .config_flow import (
     CONF_NOTIFY_DATA,
     CONF_NOTIFY_ENABLED,
     CONF_NOTIFY_TARGETS,
+    CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME,
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_OCCUPIED_TRIGGER,
@@ -89,6 +91,8 @@ from .config_flow import (
     DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     DEFAULT_NOTIFY_ACTION,
     TIME_OF_DAY_OPTIONS,
+    button_delay_option,
+    button_option,
 )
 from .const import (
     ATTR_RESET,
@@ -305,6 +309,7 @@ async def async_setup(
 async def async_setup_entry(hass: HomeAssistant, entry: AutoArmConfigEntry) -> bool:
     """Set up Auto Arm from a config entry."""
     yaml_config: ConfigType = hass.data.get(YAML_DATA_KEY, {})
+    _migrate_yaml_buttons(hass, entry, yaml_config)
     try:
         armer = _build_armer_from_entry(hass, entry, yaml_config)
     except Exception as err:
@@ -431,9 +436,10 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         sunset_latest=_parse_time(CONF_SUNSET_LATEST, yaml_sunset.get(CONF_LATEST)),
         sunrise_trigger=entry.options.get(CONF_SUNRISE_TRIGGER, TRIGGER_AUTO),
         sunset_trigger=entry.options.get(CONF_SUNSET_TRIGGER, TRIGGER_AUTO),
+        occupied_after_bedtime=entry.options.get(CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME, "armed_home"),
         occupied_trigger=entry.options.get(CONF_OCCUPIED_TRIGGER, True),
         unoccupied_trigger=entry.options.get(CONF_UNOCCUPIED_TRIGGER, True),
-        buttons=yaml_config.get(CONF_BUTTONS, {}),
+        buttons=_buttons_from_options(entry.options),
         occupancy=occupancy,
         notify_profiles=notify_profiles,
         notify_enabled=entry.options.get(CONF_NOTIFY_ENABLED, False),
@@ -451,6 +457,31 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         # entries from before the option existed keep setting the state directly
         use_alarm_service=entry.options.get(CONF_USE_ALARM_SERVICE, False),
     )
+
+
+def _buttons_from_options(options: "Mapping[str, Any]") -> dict[str, ConfigType]:
+    """Buttons as they are in YAML, an entity list and optional delay for a reset and for each alarm state"""
+    buttons: dict[str, ConfigType] = {}
+    for use in BUTTON_USES:
+        if entity_ids := options.get(button_option(use)):
+            buttons[use] = {CONF_ENTITY_ID: entity_ids}
+            if delay := options.get(button_delay_option(use)):
+                buttons[use][CONF_DELAY_TIME] = dt.timedelta(seconds=delay)
+    return buttons
+
+
+def _migrate_yaml_buttons(hass: HomeAssistant, entry: ConfigEntry, yaml_config: ConfigType) -> None:
+    """Copy buttons from YAML into the options, the first time round, where they can then be changed"""
+    yaml_buttons: dict[str, ConfigType] = yaml_config.get(CONF_BUTTONS) or {}
+    if not yaml_buttons or any(button_option(use) in entry.options for use in BUTTON_USES):
+        return
+    options: dict[str, Any] = dict(entry.options)
+    for use, button_config in yaml_buttons.items():
+        delay: dt.timedelta | None = button_config.get(CONF_DELAY_TIME)
+        options[button_option(str(use))] = list(button_config.get(CONF_ENTITY_ID, []))
+        options[button_delay_option(str(use))] = int(delay.total_seconds()) if delay else 0
+    _LOGGER.info("AUTOARM Migrated buttons from YAML to the options: %s", ", ".join(str(use) for use in yaml_buttons))
+    hass.config_entries.async_update_entry(entry, options=options)
 
 
 def _validated_default_calendar_mappings() -> dict[str, list[re.Pattern[str]]]:
@@ -556,6 +587,7 @@ class AlarmArmer:
         sunset_latest: dt.time | None = None,
         sunrise_trigger: str = TRIGGER_AUTO,
         sunset_trigger: str = TRIGGER_AUTO,
+        occupied_after_bedtime: str = "armed_home",
         occupied_trigger: bool = True,
         unoccupied_trigger: bool = True,
         rate_limit: ConfigType | None = None,
@@ -601,6 +633,10 @@ class AlarmArmer:
         # Times of the Day sensor entity ids by the alarm state they set while on
         self.time_of_day_config: dict[str, list[str]] = time_of_day or {}
         self.time_of_day: list[TrackedTimeOfDay] = []
+        # a sensor for armed night is a bedtime, so armed night is for bedtime rather than darkness
+        self.has_bedtime: bool = bool(self.time_of_day_config.get(AlarmControlPanelState.ARMED_NIGHT))
+        # state for the dark between bedtime ending and sunrise, when occupied
+        self.occupied_after_bedtime: AlarmControlPanelState = AlarmControlPanelState(occupied_after_bedtime)
         self.alarm_panel: str = alarm_panel
         self.sunrise_earliest: dt.time | None = sunrise_earliest
         self.sunrise_latest: dt.time | None = sunrise_latest
@@ -662,31 +698,36 @@ class AlarmArmer:
         self.initialize_housekeeping()
         self.initialize_home_assistant()
 
-        # Apply diurnal constraints at startup - don't bypass sunrise/sunset
-        # earliest/latest restrictions just because the integration (re)loaded
+        # morning or evening is still to come where the sun got there before the earliest time,
+        # and its own sunrise or sunset has already been and gone
         now = dt_util.now()
-        if self.is_night() and self.sunset_earliest and now.time() < self.sunset_earliest:
-            if self._has_sunset_passed_today(now):
-                _LOGGER.info("AUTOARM Deferring startup reset to sunset earliest: %s", self.sunset_earliest)
+        if self.is_sun_down():
+            if (
+                self.sunset_earliest
+                and now.time() < self.sunset_earliest
+                and self._has_sunset_passed_today(now)
+                and await self.sun_trigger_active(sunrise=False)
+            ):
+                _LOGGER.info("AUTOARM Evening still to come at sunset earliest: %s", self.sunset_earliest)
                 self.schedule_state(
                     dt.datetime.combine(now.date(), self.sunset_earliest, tzinfo=now.tzinfo),
                     intervention=None,
                     state=None,
-                    source=ChangeSource.STARTUP,
+                    source=ChangeSource.SUNSET,
                 )
-                _LOGGER.info("AUTOARM Initialized, deferred to sunset earliest: %s", self.sunset_earliest)
-                return
-        elif not self.is_night() and self.sunrise_earliest and now.time() < self.sunrise_earliest:
-            if self._has_sunrise_occurred_today(now):
-                _LOGGER.info("AUTOARM Deferring startup reset to sunrise earliest: %s", self.sunrise_earliest)
-                self.schedule_state(
-                    dt.datetime.combine(now.date(), self.sunrise_earliest, tzinfo=now.tzinfo),
-                    intervention=None,
-                    state=None,
-                    source=ChangeSource.STARTUP,
-                )
-                _LOGGER.info("AUTOARM Initialized, deferred to sunrise earliest: %s", self.sunrise_earliest)
-                return
+        elif (
+            self.sunrise_earliest
+            and now.time() < self.sunrise_earliest
+            and self._has_sunrise_occurred_today(now)
+            and await self.sun_trigger_active(sunrise=True)
+        ):
+            _LOGGER.info("AUTOARM Morning still to come at sunrise earliest: %s", self.sunrise_earliest)
+            self.schedule_state(
+                dt.datetime.combine(now.date(), self.sunrise_earliest, tzinfo=now.tzinfo),
+                intervention=None,
+                state=None,
+                source=ChangeSource.SUNRISE,
+            )
 
         await self.reset_armed_state(source=ChangeSource.STARTUP)
 
@@ -944,6 +985,18 @@ class AlarmArmer:
     def active_time_of_day(self) -> TrackedTimeOfDay | None:
         return next((tod for tod in self.time_of_day if tod.active), None)
 
+    def after_bedtime(self) -> bool:
+        """Has bedtime ended since the sun last set, leaving the dark before sunrise rather than before bedtime"""
+        bedtimes: list[TrackedTimeOfDay] = [
+            tod for tod in self.time_of_day if tod.arming_state == AlarmControlPanelState.ARMED_NIGHT
+        ]
+        ended: list[dt.datetime] = [tod.ended_at for tod in bedtimes if tod.ended_at is not None]
+        # not known after a restart, when the dark is taken to be before bedtime
+        if not ended or any(tod.active for tod in bedtimes):
+            return False
+        sun: State | None = self.hass.states.get("sun.sun")
+        return sun is None or max(ended) >= sun.last_changed
+
     def time_of_day_state(self, tod: TrackedTimeOfDay) -> AlarmControlPanelState:
         """State for a live Times of the Day sensor, armed away instead if everyone is out and occupancy can override it"""
         if self.is_unoccupied() and str(tod.arming_state) in self.calendar_occupancy_override_states:
@@ -971,13 +1024,24 @@ class AlarmArmer:
                 return True
         return False
 
-    async def sun_trigger_active(self, trigger: str) -> bool:
-        """Should a sunrise or sunset, with this trigger setting, re-evaluate the armed state today"""
+    async def sun_trigger_active(self, sunrise: bool) -> bool:
+        """Should a sunrise, or else a sunset, re-evaluate the armed state today"""
+        trigger: str = self.sunrise_trigger if sunrise else self.sunset_trigger
         if trigger == TRIGGER_OFF:
             return False
         if trigger == TRIGGER_AUTO and self.calendars:
             return not await self.has_diurnal_calendar_event_today()
         return True
+
+    async def armed_night_programmed(self) -> bool:
+        """Is there a bedtime sensor, or a calendar event today, to set armed night"""
+        if self.has_bedtime:
+            return True
+        today = dt_util.now().date()
+        for cal in self.calendars:
+            if await cal.has_event_on_day(today, [AlarmControlPanelState.ARMED_NIGHT]):
+                return True
+        return False
 
     async def calendar_end_mode(self, ended_state: AlarmControlPanelState) -> str:
         """What to do when a calendar event for this state ends, with no other event live, auto resolved"""
@@ -986,7 +1050,7 @@ class AlarmArmer:
         else:
             end_mode = self.calendar_armed_end_mode
         if end_mode == NO_CAL_EVENT_MODE_AUTO:
-            if await self.sun_trigger_active(self.sunrise_trigger) or await self.sun_trigger_active(self.sunset_trigger):
+            if await self.sun_trigger_active(sunrise=True) or await self.sun_trigger_active(sunrise=False):
                 return NO_CAL_EVENT_MODE_AUTO_SUN
             return NO_CAL_EVENT_MODE_AUTO_OCCUPANCY
         return end_mode
@@ -1029,8 +1093,22 @@ class AlarmArmer:
             return all(safe_state(self.hass.states.get(p)) != STATE_HOME for p in self.occupants)
         return None
 
-    def is_night(self) -> bool:
+    def is_sun_down(self) -> bool:
         return safe_state(self.hass.states.get("sun.sun")) == STATE_BELOW_HORIZON
+
+    def is_night(self) -> bool:
+        """Is it between evening and morning, which are sunset and sunrise kept within their earliest and latest times"""
+        sun_down: bool = self.is_sun_down()
+        now: dt.datetime = dt_util.now()
+        if self._has_sunset_passed_today(now):
+            if sun_down:
+                # evening is still to come if the sun set before the earliest time
+                return not (self.sunset_earliest and now.time() < self.sunset_earliest)
+            return bool(self.sunset_latest and now.time() >= self.sunset_latest)
+        if sun_down:
+            # morning has come if the sun isn't up by the latest time
+            return not (self.sunrise_latest and now.time() >= self.sunrise_latest)
+        return bool(self.sunrise_earliest and now.time() < self.sunrise_earliest)
 
     def _has_sunset_passed_today(self, now: dt.datetime) -> bool:
         """Check if the sun has already set today (vs. yesterday, pre-dawn)."""
@@ -1114,10 +1192,13 @@ class AlarmArmer:
         source: ChangeSource | None = None,
         context: Context | None = None,
         change_context: dict[str, Any] | None = None,
+        night: bool | None = None,
     ) -> str | None:
         """Logic to automatically work out appropriate current armed state
 
         A change_context carries detail of whatever asked for the reset, such as its name, through to the change
+
+        Sunrise and sunset say whether it's night, as the sun entity may not have changed state yet
         """
         state: AlarmControlPanelState | None = None
         existing_state: AlarmControlPanelState | None = None
@@ -1243,7 +1324,7 @@ class AlarmArmer:
                     )
                     reset_decision = "ignore_after_manual_intervention"
                     return existing_state
-            state = self.determine_state()
+            state = self.determine_state(night, armed_night_programmed=await self.armed_night_programmed())
             if state is not None and state != AlarmControlPanelState.PENDING and state != existing_state:
                 reset_decision = "change_state"
                 state = await self.arm(
@@ -1261,7 +1342,7 @@ class AlarmArmer:
                     "changed": state is not None and state != existing_state,
                     "new_state": str(state),
                     "old_state": str(existing_state),
-                    "source": str(source),
+                    "source": f"deferred from {source}" if "deferred_from" in (change_context or {}) else str(source),
                     "active_calendar_event": deobjectify(active_calendar_event.event) if active_calendar_event else None,
                     "occupied": self.is_occupied(),
                     "night": self.is_night(),
@@ -1283,17 +1364,27 @@ class AlarmArmer:
             return True
         return False
 
-    def determine_state(self) -> AlarmControlPanelState | None:
-        """Compute a new state using occupancy, sun and transition conditions"""
+    def determine_state(self, night: bool | None = None, armed_night_programmed: bool = True) -> AlarmControlPanelState | None:
+        """Compute a new state using occupancy, sun and transition conditions
+
+        The default state for the night is for the evening before bedtime, with another for after bedtime,
+        and if nothing is going to set armed night for a bedtime then the night is armed night
+        """
         evaluated_state: AlarmControlPanelState | None = None
         active_calendar_event: TrackedCalendarEvent | None = self.active_calendar_event()
+        night = self.is_night() if night is None else night
+        occupied_defaults: dict[str, AlarmControlPanelState] = self.occupied_defaults
+        if night and not armed_night_programmed:
+            occupied_defaults = {**occupied_defaults, CONF_NIGHT: AlarmControlPanelState.ARMED_NIGHT}
+        elif night and self.after_bedtime():
+            occupied_defaults = {**occupied_defaults, CONF_NIGHT: self.occupied_after_bedtime}
         condition_vars: ConditionVariables = ConditionVariables(
             occupied=self.is_occupied(),
             unoccupied=self.is_unoccupied(),
-            night=self.is_night(),
+            night=night,
             state=self.armed_state(),
             calendar_event=active_calendar_event.event if active_calendar_event else None,
-            occupied_defaults=self.occupied_defaults,
+            occupied_defaults=occupied_defaults,
             at_home=self.at_home(),
             not_home=self.not_home(),
         )
@@ -1346,7 +1437,9 @@ class AlarmArmer:
             _LOGGER.debug("AUTOARM Rate limit triggered by %s, skipping arm", source)
             return None
         # one context for the panel change, notification and event, so they can be traced together
-        context = self.cause(source, (change_context or {}).get("summary"), context)
+        context = self.cause(
+            source, (change_context or {}).get("summary"), context, deferred="deferred_from" in (change_context or {})
+        )
         try:
             self.arming_in_progress.set()
             existing_state: AlarmControlPanelState | None = self.armed_state()
@@ -1494,7 +1587,9 @@ class AlarmArmer:
         source: ChangeSource | None = None,
         context: Context | None = None,
     ) -> None:
-        source = source or intervention.source if intervention else None
+        source = source or (intervention.source if intervention else None)
+        # so the change, when it comes, is known to be deferred from whatever asked for it
+        change_context: dict[str, Any] = {"deferred_from": str(source)}
 
         job: Callable[[dt.datetime], Coroutine[Any, Any, None] | None]
         if state is None:
@@ -1505,11 +1600,19 @@ class AlarmArmer:
                 source=source,
                 requested_at=dt_util.now(),
                 context=context,
+                change_context=change_context,
             )
         else:
             _LOGGER.debug("AUTOARM Delayed arm %s, triggered at: %s, source%s", state, trigger_time, source)
 
-            job = partial(self.delayed_arm, arming_state=state, source=source, requested_at=dt_util.now(), context=context)
+            job = partial(
+                self.delayed_arm,
+                arming_state=state,
+                source=source,
+                requested_at=dt_util.now(),
+                context=context,
+                change_context=change_context,
+            )
 
         self.unsubscribes.append(
             async_track_point_in_time(
@@ -1519,7 +1622,9 @@ class AlarmArmer:
             )
         )
 
-    def cause(self, source: ChangeSource | None, summary: str | None = None, context: Context | None = None) -> Context:
+    def cause(
+        self, source: ChangeSource | None, summary: str | None = None, context: Context | None = None, deferred: bool = False
+    ) -> Context:
         """Context for a change AutoArm makes, starting with an event so the logbook shows the cause
 
         A context passed in, such as one linked back to a button press, only gets the event if nothing has
@@ -1535,6 +1640,7 @@ class AlarmArmer:
                 ATTR_ENTITY_ID: self.alarm_panel,
                 "source": str(source or ChangeSource.UNKNOWN),
                 "summary": summary,
+                "deferred": deferred,
             },
             context=context,
         )
@@ -1569,12 +1675,12 @@ class AlarmArmer:
     @callback
     async def on_sunrise(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunrise")
-        if not await self.sun_trigger_active(self.sunrise_trigger):
+        if not await self.sun_trigger_active(sunrise=True):
             _LOGGER.debug("AUTOARM Sunrise ignored, sunrise trigger is %s", self.sunrise_trigger)
             return
         now = dt_util.now()
         if not self.sunrise_earliest or now.time() >= self.sunrise_earliest:
-            await self.reset_armed_state(source=ChangeSource.SUNRISE)
+            await self.reset_armed_state(source=ChangeSource.SUNRISE, night=False)
         else:
             _LOGGER.debug("AUTOARM Rescheduling delayed sunrise action to %s", self.sunrise_earliest)
             self.schedule_state(
@@ -1587,20 +1693,21 @@ class AlarmArmer:
     @callback
     async def on_sunrise_latest(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunrise latest cutoff reached")
-        if not await self.sun_trigger_active(self.sunrise_trigger):
+        if not await self.sun_trigger_active(sunrise=True):
             _LOGGER.debug("AUTOARM Sunrise latest ignored, sunrise trigger is %s", self.sunrise_trigger)
             return
-        await self.reset_armed_state(source=ChangeSource.SUNRISE)
+        # stands in for a sunrise that hasn't happened yet
+        await self.reset_armed_state(source=ChangeSource.SUNRISE, night=False)
 
     @callback
     async def on_sunset(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunset")
-        if not await self.sun_trigger_active(self.sunset_trigger):
+        if not await self.sun_trigger_active(sunrise=False):
             _LOGGER.debug("AUTOARM Sunset ignored, sunset trigger is %s", self.sunset_trigger)
             return
         now = dt_util.now()
         if not self.sunset_earliest or now.time() >= self.sunset_earliest:
-            await self.reset_armed_state(source=ChangeSource.SUNSET)
+            await self.reset_armed_state(source=ChangeSource.SUNSET, night=True)
         else:
             _LOGGER.debug("AUTOARM Rescheduling delayed sunset action to %s", self.sunset_earliest)
             self.schedule_state(
@@ -1613,10 +1720,11 @@ class AlarmArmer:
     @callback
     async def on_sunset_latest(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunset latest cutoff reached")
-        if not await self.sun_trigger_active(self.sunset_trigger):
+        if not await self.sun_trigger_active(sunrise=False):
             _LOGGER.debug("AUTOARM Sunset latest ignored, sunset trigger is %s", self.sunset_trigger)
             return
-        await self.reset_armed_state(source=ChangeSource.SUNSET)
+        # stands in for a sunset that hasn't happened yet
+        await self.reset_armed_state(source=ChangeSource.SUNSET, night=True)
 
     @callback
     async def on_mobile_action(self, event: Event) -> None:

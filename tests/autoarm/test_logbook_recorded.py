@@ -57,7 +57,8 @@ async def test_logbook_shows_autoarm_as_cause(
     panel_entry = await _panel_entry(hass_ws_client, start, "armed_night")
     assert panel_entry["context_event_type"] == EVENT_TRIGGERED
     assert panel_entry["context_domain"] == DOMAIN
-    assert panel_entry["context_name"] == "AutoArm"
+    # the frontend shows only the name as the cause of the panel's change
+    assert panel_entry["context_name"] == "AutoArm (sunset)"
     assert panel_entry["context_source"] == "sunset"
 
 

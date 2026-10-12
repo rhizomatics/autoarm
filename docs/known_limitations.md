@@ -9,7 +9,6 @@ Auto Arm supports only one alarm control panel per installation.
 While core settings (alarm panel, calendars, persons, occupancy defaults) are managed via the UI config flow, advanced features require YAML configuration:
 
 - Transition conditions
-- Physical button mappings
 - Notification profiles
 - Rate limiting
 - Per-calendar state pattern overrides and poll intervals

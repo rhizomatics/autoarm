@@ -30,8 +30,11 @@ def async_describe_events(
         if data.get("summary"):
             kind = "times of the day sensor" if cause == ChangeSource.TOD else "calendar event"
             cause = f"{kind} {data['summary']}"
+        if data.get("deferred"):
+            cause = f"deferred from {cause}"
         return {
-            LOGBOOK_ENTRY_NAME: "AutoArm",
+            # the cause is in the name, as it's all the logbook shows of this event against the panel's change
+            LOGBOOK_ENTRY_NAME: f"AutoArm ({cause})",
             LOGBOOK_ENTRY_MESSAGE: f"triggered by {cause}",
             LOGBOOK_ENTRY_SOURCE: cause,
             LOGBOOK_ENTRY_ENTITY_ID: data.get(ATTR_ENTITY_ID),

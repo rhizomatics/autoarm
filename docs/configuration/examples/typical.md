@@ -14,15 +14,15 @@ With the config flow, some settings are now managed in the UI:
 | Bedtime sensor | UI (setup, options) | Times of the Day sensor for `armed_night`, see [Recommended Recipe](recommended_recipe.md) |
 | Calendar entities | UI (setup, options) | Which calendars to use |
 | Person entities | UI (setup, options) | Which persons to track for occupancy |
-| Occupancy day/night defaults | UI (options, Advanced) | Default alarm state when occupied |
+| Occupied states | UI (options, Diurnal - Sun) | Alarm state when occupied by day, after bedtime and before bedtime |
 | Times of the Day sensors | UI (options) | Sensors that set any other alarm state while on |
 | Calendar end modes | UI (options, Advanced) | What happens when an armed or disarmed calendar event ends |
-| Triggers | UI (options) | Whether sunrise, sunset and people arriving or leaving re-evaluate the state |
+| Triggers | UI (options, Diurnal - Sun and Presence) | Whether sunrise, sunset and people arriving or leaving re-evaluate the state |
 | Sunrise and sunset | UI (options) | Earliest and latest times |
 | Per-calendar state patterns | YAML | Regex patterns matching calendar events to alarm states |
 | Per-calendar poll interval | YAML | How often to check each calendar |
 | Transitions | YAML | Condition templates for state transitions |
-| Buttons | YAML | Physical button entity mappings |
+| Buttons | UI (options, Buttons) | Physical button entities and delays, copied from YAML if already there |
 | Notifications | UI (options) | Notification service and targets |
 | Notification Profiles | YAML | Notification profile configuration |
 | Rate limit | YAML | Throttling for arm calls |
