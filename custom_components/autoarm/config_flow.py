@@ -16,6 +16,7 @@ from homeassistant.helpers.selector import (
     NumberSelectorConfig,
     NumberSelectorMode,
     ObjectSelector,
+    Selector,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
@@ -468,7 +469,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
     @staticmethod
-    def async_get_options_flow(config_entry: ConfigEntry) -> "AutoArmOptionsFlow":
+    def async_get_options_flow(config_entry: ConfigEntry) -> AutoArmOptionsFlow:
         """Get the options flow for this handler."""
         return AutoArmOptionsFlow()
 
@@ -502,21 +503,21 @@ class AutoArmOptionsFlow(OptionsFlow):
         )
 
 
-def _alarm_state_selector() -> SelectSelector:
+def _alarm_state_selector() -> Selector[SelectSelectorConfig]:
     return SelectSelector(SelectSelectorConfig(options=PUBLIC_ALARM_STATES, mode=SelectSelectorMode.DROPDOWN))
 
 
-def _time_of_day_selector() -> EntitySelector:
+def _time_of_day_selector() -> Selector[EntitySelectorConfig]:
     return EntitySelector(EntitySelectorConfig(integration="tod", multiple=True))
 
 
-def _sun_trigger_selector() -> SelectSelector:
+def _sun_trigger_selector() -> Selector[SelectSelectorConfig]:
     return SelectSelector(
         SelectSelectorConfig(options=SUN_TRIGGER_OPTIONS, mode=SelectSelectorMode.DROPDOWN, translation_key="sun_trigger")
     )
 
 
-def _calendar_end_mode_selector() -> SelectSelector:
+def _calendar_end_mode_selector() -> Selector[SelectSelectorConfig]:
     return SelectSelector(
         SelectSelectorConfig(
             options=CALENDAR_END_MODE_OPTIONS, mode=SelectSelectorMode.DROPDOWN, translation_key="calendar_end_mode"

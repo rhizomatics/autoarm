@@ -364,7 +364,7 @@ async def test_reset_armed_state_uses_daytime_default(hass: HomeAssistant) -> No
     ],
 )
 async def test_night_is_between_evening_and_morning(
-    hass: HomeAssistant, freezer: "FrozenDateTimeFactory", hour: int, sun: str, night: bool
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, hour: int, sun: str, night: bool
 ) -> None:
     """Morning and evening are sunrise and sunset kept within their earliest and latest times"""
     freezer.move_to(dt_util.as_utc(dt.datetime(2026, 10, 12, hour, 0, tzinfo=dt_util.get_default_time_zone())))

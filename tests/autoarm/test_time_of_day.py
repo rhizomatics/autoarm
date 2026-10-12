@@ -81,7 +81,7 @@ async def _bedtime(hass: HomeAssistant, state: str) -> None:
     await hass.async_block_till_done()
 
 
-def _clock(freezer: "FrozenDateTimeFactory", hour: int, minute: int = 0, day: int = 12) -> None:
+def _clock(freezer: FrozenDateTimeFactory, hour: int, minute: int = 0, day: int = 12) -> None:
     freezer.move_to(dt_util.as_utc(dt.datetime(2026, 10, day, hour, minute, tzinfo=dt_util.get_default_time_zone())))
 
 
@@ -91,7 +91,7 @@ def panel_state(hass: HomeAssistant) -> str | None:
 
 
 async def test_recipe_bedtime_with_sun(
-    local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any, freezer: "FrozenDateTimeFactory"
+    local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any, freezer: FrozenDateTimeFactory
 ) -> None:
     """Armed home from sunset to bedtime, armed night for bedtime, then armed home again until the sun is up"""
     _clock(freezer, 17)
@@ -128,7 +128,7 @@ async def test_recipe_bedtime_with_sun(
 
 
 async def test_recipe_bedtime_ending_before_sunrise(
-    hass: HomeAssistant, mock_notify: Any, freezer: "FrozenDateTimeFactory"
+    hass: HomeAssistant, mock_notify: Any, freezer: FrozenDateTimeFactory
 ) -> None:
     """Bedtime ending in the dark goes to the state for after bedtime, and sunrise then works the state out again"""
     _clock(freezer, 23)
@@ -163,7 +163,7 @@ async def test_recipe_bedtime_ending_before_sunrise(
     assert panel_state(hass) == AlarmControlPanelState.ARMED_NIGHT
 
 
-async def test_recipe_disarmed_after_bedtime(hass: HomeAssistant, mock_notify: Any, freezer: "FrozenDateTimeFactory") -> None:
+async def test_recipe_disarmed_after_bedtime(hass: HomeAssistant, mock_notify: Any, freezer: FrozenDateTimeFactory) -> None:
     _clock(freezer, 23)
     hass.states.async_set("person.tenant", "home")
     hass.states.async_set("sun.sun", "below_horizon")
@@ -176,7 +176,7 @@ async def test_recipe_disarmed_after_bedtime(hass: HomeAssistant, mock_notify: A
     assert panel_state(hass) == AlarmControlPanelState.DISARMED
 
 
-async def test_bedtime_at_any_time_of_day(hass: HomeAssistant, mock_notify: Any, freezer: "FrozenDateTimeFactory") -> None:
+async def test_bedtime_at_any_time_of_day(hass: HomeAssistant, mock_notify: Any, freezer: FrozenDateTimeFactory) -> None:
     """A shift worker's bedtime is armed night in daylight, with sunset ignored during it"""
     _clock(freezer, 9)
     hass.states.async_set("person.tenant", "home")

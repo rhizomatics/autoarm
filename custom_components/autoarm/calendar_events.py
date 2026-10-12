@@ -51,7 +51,7 @@ class TrackedCalendarEvent:
         calendar_id: str,
         event: CalendarEvent,
         arming_state: AlarmControlPanelState,
-        armer: "AlarmArmer",  # type: ignore # ruff:ignore[undefined-name]
+        armer: AlarmArmer,  # type: ignore # ruff:ignore[undefined-name]
         hass: HomeAssistant,
     ) -> None:
         self.tracked_at: dt.datetime = dt_util.now()
@@ -268,7 +268,7 @@ class TrackedCalendar:
         self,
         hass: HomeAssistant,
         calendar_config: ConfigType,
-        armer: "AlarmArmer",  # type: ignore # ruff:ignore[undefined-name]
+        armer: AlarmArmer,  # type: ignore # ruff:ignore[undefined-name]
         app_health_tracker: AppHealthTracker,
     ) -> None:
         self.enabled = False

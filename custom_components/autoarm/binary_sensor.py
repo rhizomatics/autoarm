@@ -30,10 +30,10 @@ class AutoArmInitializedSensor(AutoArmEntity, BinarySensorEntity):
         super().__init__(armer, entry, Platform.BINARY_SENSOR, INITIALIZED)
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool:  # type: ignore
         tracker = self.armer.app_health_tracker
         return tracker.initialized and not tracker.initialization_errors
 
     @property
-    def extra_state_attributes(self) -> dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:  # type: ignore
         return dict(self.armer.app_health_tracker.initialization_errors)

@@ -359,7 +359,7 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
     await hass.config_entries.async_reload(entry.entry_id)
 
 
-def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config: ConfigType) -> "AlarmArmer":
+def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config: ConfigType) -> AlarmArmer:
     """Build an AlarmArmer instance from ConfigEntry data/options merged with YAML."""
     migrate(hass)
 
@@ -459,7 +459,7 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
     )
 
 
-def _buttons_from_options(options: "Mapping[str, Any]") -> dict[str, ConfigType]:
+def _buttons_from_options(options: Mapping[str, Any]) -> dict[str, ConfigType]:
     """Buttons as they are in YAML, an entity list and optional delay for a reset and for each alarm state"""
     buttons: dict[str, ConfigType] = {}
     for use in BUTTON_USES:

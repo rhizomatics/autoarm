@@ -83,9 +83,9 @@ class AutoArmSensor(AutoArmEntity, SensorEntity):
         super().__init__(armer, entry, Platform.SENSOR, description)
 
     @property
-    def native_value(self) -> StateType | dt.datetime:
+    def native_value(self) -> StateType | dt.datetime:  # type: ignore
         return self.entity_description.value_fn(self.armer)
 
     @property
-    def extra_state_attributes(self) -> dict[str, Any] | None:
+    def extra_state_attributes(self) -> dict[str, Any] | None:  # type: ignore
         return self.entity_description.attributes_fn(self.armer)

@@ -174,7 +174,7 @@ async def test_why_after_forgotten_outside_change(hass: HomeAssistant, autoarmer
     assert "It was changed outside AutoArm. AutoArm last set it to armed away at" in explain(autoarmer)
 
 
-async def test_why_on_another_day(hass: HomeAssistant, autoarmer: AlarmArmer, freezer: "FrozenDateTimeFactory") -> None:
+async def test_why_on_another_day(hass: HomeAssistant, autoarmer: AlarmArmer, freezer: FrozenDateTimeFactory) -> None:
     freezer.move_to(dt_util.as_utc(dt.datetime(2026, 9, 24, 18, 30, tzinfo=dt_util.get_default_time_zone())))
     await _panel_starts(hass, autoarmer, "disarmed")
     await autoarmer.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.BUTTON)

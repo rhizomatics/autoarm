@@ -25,7 +25,7 @@ class TrackedTimeOfDay:
         self,
         entity_id: str,
         arming_state: AlarmControlPanelState,
-        armer: "AlarmArmer",  # type: ignore # ruff:ignore[undefined-name]
+        armer: AlarmArmer,  # type: ignore # ruff:ignore[undefined-name]
         hass: HomeAssistant,
     ) -> None:
         self.entity_id: str = entity_id
