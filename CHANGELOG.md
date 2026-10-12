@@ -6,25 +6,42 @@
     released. Newer releases may work on older installations, but there
     will no longer be the automated testing to assure it.
 
-## 1.5.0
+## 2.0.0
 
 ### ✨ Enhancements
 
-Starting from v1.5.0, Auto Arm now has an opinion about how to set up your auto arming easily, and simplified the configuration significantly around that. The advanced route remains.
+Starting from v2.0.0, Auto Arm now has an opinion about the easiest way to set up a house for auto arming, and streamlined the configuration around that. All of the previous advanced options remain available, to tune things just the way you like.
 
-#### Recommended Starter Recipe
-A new [recommended recipe](./configuration/examples/recommended_recipe.md) has been added, and the integration settings re-organized to make this easier to set up. It involves:
+Existing installations will have configuration automatically migrated where changed, although recommended to update to the new recipe for ease of use. There are no known breaking changes in v2.
 
-- [Times of the Day](https://www.home-assistant.io/integrations/tod/) integration to manage bedtime for *Armed Night*
-- Calendar required only for vacations, although can be used anyway needed
-- Diurnal (`sun` integration) only used as a back-stop if there is no *Bedtime* Times of Day sensor provided, and for any gap between daylight and bedtime
-- Every *Person* created in Home Assistant is pre-added to the occupied list
-  - New installs only, existing installs keep their settings and can change them in the **Advanced** section
-- Default to *Disarmed* for occupied daytime, *Armed Home* for occupied evening
-- Set up is now a single page asking for the alarm panel, bedtime sensor, calendar and people, with a link to the recipe and advanced stuff in their own boxes
-- Each step now has instructions and an optional direct link to create any missing calendar, alarm panel or times of the day sensor
+
+#### Recommended Recipe
+A new [recommended recipe](./configuration/examples/recommended_recipe.md) has been added, and the integration settings re-organized to make this easier to set up.
+
+Set up is now a single page asking for the alarm panel, bedtime sensor, calendar and people, with a link to the recipe and advanced stuff in their own boxes. Each step now instructions and an optional direct link to create any missing calendar, alarm panel or times of the day sensor
 
 None of this removes existing functionality, and all of it can be overridden or tuned for your needs. It is, however, the simplest to set up with the least ongoing administration, of any automated way to manage alarms.
+
+##### Out of the Box
+  If there is no configuration given, other than the name of the alarm control panel:
+
+- Diurnal (`sun` integration) is used as the back-stop to control day/night ('diurnal') alarm settings, alarm will be *Disarmed* during the day and *Armed Night* at night
+
+##### Times the Day Sensor for Bedtime
+- Add a [Times of the Day](https://www.home-assistant.io/integrations/tod/) integration to manage bedtime for *Armed Night* so it can reflect how you live rather than what the sunrise/sunset is doing over the course of the year
+- The `sun` integration is still used for any gap between daylight and bedtime, so the house will be *Armed Home* for dark evenings prior to bedtime, and likewise for dark mornings
+
+##### Calendar Set Up
+- Add a calendar to use *Armed Vacation* state
+  - Can also use calendars for any other state, for example as an alternative to a *Times of the Day* sensor to manage bedtimes, or to set *Disarmed* time bands.
+- Local calendars can be used with repeated events to reduce maintenance, or remote calendars, like Google, integrated via Home Assistant
+
+##### People with Device Trackers
+- Every *Person* created in Home Assistant is pre-added to the occupied list
+  - New installs only, existing installs keep their settings and can change them in the **Advanced** section
+- If people have *Device Trackers* associated with them, typically the Home Assistant mobile app, then *Occupancy* is automatically factored into alarm state
+  - Where *presence* is available, alarm states default to *Disarmed* for occupied daytime, *Armed Home* for occupied evening
+
 
 #### Times of the Day Sensors
 - [Times of the Day](https://www.home-assistant.io/integrations/tod/) sensors can now set the alarm state, as an alternative to a recurring calendar event
@@ -73,6 +90,7 @@ None of this removes existing functionality, and all of it can be overridden or 
 
 ## 📝 Other changes
 - Built and tested against Home Assistant 2026.10.0
+- Context for the *Logbook* and *Activity* views in Home Assistant improved
 - Compatibility added for the Voluptuous->Probatio change in recent versions of Home Assistant while maintaining backward compatibility
 
 ## 1.4.0

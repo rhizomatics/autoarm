@@ -14,7 +14,7 @@ tags:
 - refactor the big lump of sun code in the main initialize
 
 ## Remaining YAML
-- Buttons - v1.5.0
+- Buttons - v2.0.0
 
 ## Occupancy
 
