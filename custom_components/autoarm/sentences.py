@@ -7,8 +7,6 @@ English only for now. Arming and explaining are on by default, disarming is swit
 since anyone who can talk to Assist could then disarm the alarm.
 """
 
-from __future__ import annotations
-
 import datetime as dt
 import logging
 from typing import TYPE_CHECKING, Any
@@ -89,6 +87,7 @@ async def async_register_sentences(
         return ScriptRunResult(conversation_response=response, service_response=None, variables={})
 
     try:
+        # HA renamed platform to trigger in 2024.10
         config = await async_validate_trigger_config(
             hass,
             [{"platform": "conversation", "id": str(command), "command": sentences} for command, sentences in commands.items()],

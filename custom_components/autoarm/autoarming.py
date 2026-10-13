@@ -36,7 +36,6 @@ from homeassistant.core import (
     ServiceResponse,
     State,
     SupportsResponse,
-    callback,
 )
 from homeassistant.exceptions import ConditionError, ConfigEntryNotReady, HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
@@ -1154,7 +1153,6 @@ class AlarmArmer:
             new_attributes = new_obj.attributes
         return entity_id, old, new, new_attributes
 
-    @callback
     async def delayed_reset_armed_state(
         self, triggered_at: dt.datetime, requested_at: dt.datetime | None, **kwargs: Any
     ) -> None:
@@ -1388,7 +1386,6 @@ class AlarmArmer:
             return None
         return AlarmControlPanelState(evaluated_state)
 
-    @callback
     async def delayed_arm(self, triggered_at: dt.datetime, requested_at: dt.datetime | None, **kwargs: Any) -> None:
         _LOGGER.debug("AUTOARM delayed_arm at %s, requested_at: %s", triggered_at, requested_at)
         if self.is_intervention_since_request(requested_at):
@@ -1647,7 +1644,6 @@ class AlarmArmer:
             return candidates[-1]
         return None
 
-    @callback
     async def on_sunrise(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunrise")
         if not await self.sun_trigger_active(sunrise=True):
@@ -1665,7 +1661,6 @@ class AlarmArmer:
                 source=ChangeSource.SUNRISE,
             )
 
-    @callback
     async def on_sunrise_latest(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunrise latest cutoff reached")
         if not await self.sun_trigger_active(sunrise=True):
@@ -1674,7 +1669,6 @@ class AlarmArmer:
         # stands in for a sunrise that hasn't happened yet
         await self.reset_armed_state(source=ChangeSource.SUNRISE, night=False)
 
-    @callback
     async def on_sunset(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunset")
         if not await self.sun_trigger_active(sunrise=False):
@@ -1692,7 +1686,6 @@ class AlarmArmer:
                 source=ChangeSource.SUNSET,
             )
 
-    @callback
     async def on_sunset_latest(self, *args: Any) -> None:
         _LOGGER.debug("AUTOARM Sunset latest cutoff reached")
         if not await self.sun_trigger_active(sunrise=False):
@@ -1701,7 +1694,6 @@ class AlarmArmer:
         # stands in for a sunset that hasn't happened yet
         await self.reset_armed_state(source=ChangeSource.SUNSET, night=True)
 
-    @callback
     async def on_mobile_action(self, event: Event) -> None:
         _LOGGER.debug("AUTOARM Mobile Action: %s", event)
         source: ChangeSource = ChangeSource.MOBILE
@@ -1744,7 +1736,6 @@ class AlarmArmer:
             return False
         return old_state is None or old_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE)
 
-    @callback
     async def on_alarm_state_button(
         self, state: AlarmControlPanelState, delay: dt.timedelta | None, event: Event[EventStateChangedData]
     ) -> None:
@@ -1778,7 +1769,6 @@ class AlarmArmer:
                 context=context,
             )
 
-    @callback
     async def on_reset_button(self, delay: dt.timedelta | None, event: Event[EventStateChangedData]) -> None:
         _LOGGER.debug("AUTOARM Reset Button: %s", event)
         if not self.is_button_press(event):
@@ -1800,7 +1790,6 @@ class AlarmArmer:
                 intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None, context=context), context=context
             )
 
-    @callback
     async def on_occupancy_change(self, event: Event[EventStateChangedData]) -> None:
         """Listen for person state events
 
@@ -1842,7 +1831,6 @@ class AlarmArmer:
         else:
             await self.reset_armed_state(source=ChangeSource.OCCUPANCY, context=context)
 
-    @callback
     async def on_panel_change(self, event: Event[EventStateChangedData]) -> None:
         """Alarm Control Panel has been changed outside of AutoArm"""
         entity_id, old, new, new_attributes = self._extract_event(event)
@@ -1887,7 +1875,6 @@ class AlarmArmer:
         else:
             _LOGGER.debug("AUTOARM panel change leaves state unchanged at %s", new)
 
-    @callback
     async def housekeeping(self, triggered_at: dt.datetime) -> None:
         _LOGGER.debug("AUTOARM Housekeeping starting, triggered at %s", triggered_at)
         now = dt_util.now()
