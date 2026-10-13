@@ -300,7 +300,7 @@ class ConditionVariables:
             "daytime": not self.night,
             "occupied": self.occupied,
             "at_home": self.at_home or [],
-            "not_home": self.at_home or [],
+            "not_home": self.not_home or [],
             "vacation": self.state == AlarmControlPanelState.ARMED_VACATION,
             "night": self.night,
             "day": not self.night,
