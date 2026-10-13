@@ -4,7 +4,7 @@ More extensive example configuration, using most of the features.
 
 ## UI vs YAML Settings
 
-With the config flow, some settings are now managed in the UI:
+With the config flow, most settings are now managed in the UI:
 
 | Setting | Where | Notes |
 |---------|-------|-------|

@@ -83,7 +83,7 @@ Buttons are chosen in the **Buttons** section of the options, with any number fo
 
 A delay in seconds can be set for each, so if for example you have an *away* button next to the front door, you can give yourself a couple of minutes to exit the property before the alarm is set. The delay is zero unless set, other than for `armed_away`, which starts at 120 seconds.
 
-Buttons already set up in YAML are copied into the options the first time Auto Arm starts with them, and the options are used from then on, so the `buttons` section can be removed from YAML.
+![Buttons Config](assets/images/config_flow_buttons.png)
 
 See also the [Manual MQTT Alarm Control Panel](https://www.home-assistant.io/integrations/manual_mqtt/)
 for another way to integrate physical buttons to control state.
@@ -259,7 +259,7 @@ A change held back like this, or by an occupancy or button delay, is shown as de
 ## Occupancy Control
 
 !!! note "Configuration split"
-    Person entities, occupancy `default_state` and the delays after someone arrives or leaves are configured via the Auto Arm **Options** UI. A `delay_time` in YAML is copied into the options the first time.
+    Person entities, occupancy `default_state` and the delays after someone arrives or leaves are configured via the Auto Arm **Options** UI.
 
 The people who live at the property can be defined as [Person Integration][] entities [Person Entities]() in the `occupancy` configuration, and used to derive an `occupied` value for [Automated Transitions]. This works best with the Companion App on a mobile phone, although other [Device Tracker Integrations](https://www.home-assistant.io/integrations/?cat=device-tracker)
 can work, such as a home network `device_tracker`.
@@ -272,21 +272,11 @@ See the [Presence Detection](https://www.home-assistant.io/getting-started/prese
 
 If the house is occupied, and its daytime, some people like that to be `disarmed` and others prefer `armed_home`. You can control this via [Calendar Control][] or use the `state_default` settings for day and/or night in the `occupancy` configuration.
 
-One problem with device trackers is that they can be noisy, for example if someone tracked by phone walks out of wifi range, or reboots their device. This tends to be a problem when building occupied, since its much less likely for a device tracker to intermittenly think the device is at home. A delay timer can be set, separately for `home` and `not_home`, to smooth this out, so alarm won't reset unless someone still out a few minutes later.
+One problem with device trackers is that they can be noisy, for example if someone tracked by phone walks out of wifi range, or reboots their device. This tends to be a problem when building occupied, since its much less likely for a device tracker to intermittently think the device is at home. A delay timer can be set, separately for `home` and `not_home`, to smooth this out, so alarm won't reset unless someone still out a few minutes later.
 
-In this configuration, there will be a three minute wait to make sure the device tracker stable for `home`->`not_home`, and zero delay when arriving home.
+In this *Advanced Settings* configuration, there will be a three minute wait to make sure the device tracker stable for `home`->`not_home`, and zero delay when arriving home.
 
-```yaml
-  occupancy:
-    entity_id:
-      - person.house_owner
-      - person.tenant
-    default_state:
-      day: disarmed
-      night: armed_night
-    delay_time:
-      not_home: 180
-```
+![Occupancy Delay Config](assets/images/config_occupancy_delay.png)
 
 Occupancy checks can override recurring calendar driven alarm states if desired. In the configuration screen, select the
 alarm states for which the calendar state should be overridden. This means you can have a simple repeating `disarmed`

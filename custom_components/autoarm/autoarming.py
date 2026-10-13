@@ -107,6 +107,7 @@ from .config_flow import (
     CONF_USE_ALARM_SERVICE,
     DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     DEFAULT_NOTIFY_ACTION,
+    DEFAULT_OCCUPANCY_DELAYS,
     DEFAULT_RATE_LIMIT_MAX_CALLS,
     DEFAULT_RATE_LIMIT_SECONDS,
     TIME_OF_DAY_OPTIONS,
@@ -411,7 +412,7 @@ def _build_armer_from_entry(
     occupancy[CONF_DELAY_TIME] = {
         person_state: dt.timedelta(seconds=seconds)
         for person_state, option in OCCUPANCY_DELAY_OPTIONS.items()
-        if (seconds := entry.options.get(option, 0))
+        if (seconds := entry.options.get(option, DEFAULT_OCCUPANCY_DELAYS[option]))
     }
 
     # Build calendar config

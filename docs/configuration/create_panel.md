@@ -61,13 +61,3 @@ The code set in Auto Arm is handled with some care, though it is not a vault:
 With the option switched off, Auto Arm sets the panel's state directly instead. This was the default before
 1.3.0, and installs from then keep it until the option is changed. It works with a *manual* panel, including
 one that needs a code, but not with integrations like Alarmo, which will overwrite the state or be left out of step.
-
-### Legacy YAML Reference
-
-Before the UI config flow, the alarm panel was specified in YAML. This is still supported for auto-migration, but new installations should use the UI.
-
-```yaml
-autoarm:
-  alarm_panel:
-    entity_id: alarm_panel.home_alarm_control
-```

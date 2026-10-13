@@ -95,6 +95,8 @@ DEFAULT_RATE_LIMIT_SECONDS = 60
 # seconds to wait after someone arrives or leaves before working out the state
 CONF_OCCUPIED_DELAY = "occupied_delay"
 CONF_UNOCCUPIED_DELAY = "unoccupied_delay"
+# time for a tracker to settle, or to come back for something forgotten, before arming for an empty house
+DEFAULT_OCCUPANCY_DELAYS: dict[str, int] = {CONF_OCCUPIED_DELAY: 0, CONF_UNOCCUPIED_DELAY: 120}
 # held encrypted, see crypto
 CONF_PANEL_CODE = "panel_code"
 # only a form field, to remove the stored code, since that isn't shown to be blanked out
@@ -172,8 +174,7 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_SUNSET_EARLIEST: None,
     CONF_SUNSET_LATEST: None,
     CONF_USE_ALARM_SERVICE: True,
-    CONF_OCCUPIED_DELAY: 0,
-    CONF_UNOCCUPIED_DELAY: 0,
+    **DEFAULT_OCCUPANCY_DELAYS,
     CONF_RATE_LIMIT_MAX_CALLS: DEFAULT_RATE_LIMIT_MAX_CALLS,
     CONF_RATE_LIMIT_SECONDS: DEFAULT_RATE_LIMIT_SECONDS,
     CONF_SENTENCE_ARM: True,
@@ -388,8 +389,10 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
                     CONF_CALENDAR_DISARMED_END_MODE,
                     default=options.get(CONF_CALENDAR_DISARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
                 ): _calendar_end_mode_selector(),
-                vol.Optional(CONF_OCCUPIED_DELAY, default=options.get(CONF_OCCUPIED_DELAY, 0)): _seconds_selector(),
-                vol.Optional(CONF_UNOCCUPIED_DELAY, default=options.get(CONF_UNOCCUPIED_DELAY, 0)): _seconds_selector(),
+                **{
+                    vol.Optional(option, default=options.get(option, default)): _seconds_selector()
+                    for option, default in DEFAULT_OCCUPANCY_DELAYS.items()
+                },
                 vol.Optional(
                     CONF_RATE_LIMIT_MAX_CALLS,
                     default=options.get(CONF_RATE_LIMIT_MAX_CALLS, DEFAULT_RATE_LIMIT_MAX_CALLS),

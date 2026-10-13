@@ -106,6 +106,7 @@ None of this removes existing functionality, and all of it can be overridden or 
   - **Advanced** holds **Change state using the alarm panel's actions** and the calendar end settings, now **When a calendar arming override ends** and **When a calendar disarming override ends**
     - The rate limit, and the delays after someone arrives or leaves home, are now set here rather than in YAML
     - `rate_limit` and `occupancy.delay_time` in YAML are copied into the options the first time, and the options used from then on
+    - The delay after someone leaves home is now 2 minutes unless set, in YAML or the options, where before there was none
 - The bedtime sensor, calendars and people are now **Bedtime - Times of the Day Sensor**, **Occupancy - Calendars** and **Presence - People for Occupancy Based Arming**
 
 ## 📚 Documentation

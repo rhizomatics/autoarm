@@ -55,7 +55,9 @@ async def test_defaults_without_options_or_yaml(hass: HomeAssistant, mock_notify
     entry = await _setup_entry(hass, {})
 
     armer = entry.runtime_data
-    assert armer.occupied_delay == {}
+    # two minutes after the last person leaves, and straight away when someone arrives
+    assert armer.occupied_delay == {"not_home": dt.timedelta(seconds=120)}
+    assert CONF_UNOCCUPIED_DELAY not in entry.options
     assert armer.rate_limiter.window == dt.timedelta(seconds=60)
     assert armer.rate_limiter.max_calls == 5
     assert CONF_RATE_LIMIT_SECONDS not in entry.options

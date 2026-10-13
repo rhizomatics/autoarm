@@ -23,6 +23,7 @@ from custom_components.autoarm.config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_PERSON_ENTITIES,
+    CONF_UNOCCUPIED_DELAY,
     CONF_USE_ALARM_SERVICE,
 )
 from custom_components.autoarm.const import (
@@ -69,6 +70,8 @@ def day_and_night_by_the_sun() -> Generator[None]:
 
 ENTRY_DATA: dict[str, Any] = {CONF_ALARM_PANEL: "alarm_panel.testing"}
 ENTRY_OPTIONS: dict[str, Any] = {
+    # leaving home is acted on straight away
+    CONF_UNOCCUPIED_DELAY: 0,
     CONF_CALENDAR_ENTITIES: [],
     CONF_PERSON_ENTITIES: ["person.house_owner", "person.tenant"],
     CONF_OCCUPANCY_DEFAULT_DAY: "armed_home",

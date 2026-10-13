@@ -365,7 +365,7 @@ async def test_options_flow_advanced_delays_and_rate_limit(hass: HomeAssistant, 
         "calendar_armed_end_mode": "auto",
         "calendar_disarmed_end_mode": "auto",
         "occupied_delay": 0,
-        "unoccupied_delay": 0,
+        "unoccupied_delay": 120,
         "rate_limit_max_calls": 5,
         "rate_limit_period": 60,
     }
