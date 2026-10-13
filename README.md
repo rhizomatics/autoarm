@@ -123,53 +123,44 @@ Two notifications are sent:
 - Alarm status has changed, by any means
 - A button has been pressed, and the arm status will be actioned with a few seconds delay
 
-If [Supernotify](https://supernotify.rhizomatics.org.uk) is installed, its `supernotify.notify` action is offered first in
-the **Notification Action** list. New installs have it already selected. It takes the same fields as the YAML `data` section, such as `priority`, and adds the
-[Mobile Actions](mobile_actions.md) to disarm, reset or arm away from the notification. Leave the targets blank to let Supernotify choose who to notify. With Supernotify installed, the options have its own **Targets**, **Custom targets** and **Deliveries** fields in place of **Notification Targets**, and any targets already there are carried over as custom ones.
-The action chosen here is used for every notification, unless a YAML profile sets its own `service`.
+### Basic Notification
 
-Without Supernotify, only a simple title and message can be sent, to the **Notification Targets**. Priorities, mobile actions, scenarios and a choice of deliveries all need Supernotify.
+If Supernotify is not installed then only the standard Home Assistant [Send Message](https://www.home-assistant.io/actions/notify.send_message/) is supported, which offers only a *message* to a configured *Notify Entity*.
 
 ### Supernotify
 
-With `supernotify.notify` as the **Notification Action**:
+If [Supernotify](https://supernotify.rhizomatics.org.uk) is installed, its `supernotify.notify` action is offered first in
+the **Notification Action** list, and is preselected on new installs have it already selected.
+
+It offers:
+
+- [Mobile Actions](mobile_actions.md) to disarm, reset or arm away from pop-up actions on the mobile app  notification.
+- Automatic targets  - leave the targets blank to let Supernotify choose who to notify based on its auto-discovery of mobile apps
+- Defined targets - Add targets from a list of Home Assistant notifiable entities, selectors like *area* or *label*, email addresses or other types like `discord` or SMS numbers that Supernotify can be configured for.
+- Voice notifications - using Alexa devices, or the `tts` integration
+- Delivery choice - custom select which deliveries you want, from a list populated automatically from what the local Supernotify can do
+- Automatic selection of Supernotift **scenarios**
+
+#### Priority
 
 - **Priority** can be set separately for three kinds of change, and left empty for Supernotify's own default
     - **Scheduled changes** - Times of the Day sensor, calendar, sunrise or sunset
     - **Occupancy changes** - people arriving or leaving
     - **Manual changes** - alarm panel, button, mobile action or voice
-- **Scenarios** are applied for the new alarm state, named `autoarm-` and the state, such as `autoarm-armed_away` or `autoarm-disarmed`, with `autoarm-armed` added for every armed state
-    - Define any of these as scenarios in Supernotify to tune the deliveries, sounds or wording for that state, the ones not defined there are ignored
-- **Mobile Actions** have their titles in the Home Assistant language, and leave out any that would do nothing, so there's no *Disarm* when the alarm has just been disarmed, nor *Arm Away* when it has just been armed away
 
-A `priority` in **Extra Notification Data** is used in place of these priorities.
+#### Scenarios
 
-### Advanced Notifications
+**Scenarios** are automatically sent for each notification, which a name based on the new alarm state and an `autoarm-` prefix, such as `autoarm-armed_away` or `autoarm-disarmed`. For convenience, all armed states all supply a `autoarm-armed` scenario.
 
-!!! warning "Deprecated"
-    The YAML `notify` section is deprecated, replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released. Use the priorities in the options, and Supernotify scenarios for the `autoarm-` scenario names, in its place. A repair is raised while it is still in the YAML configuration.
+Define any of these as [Supernotify Scenarios](https://supernotify.rhizomatics.org.uk/latest/configuration/scenarios/) to tune the deliveries, sounds, actions or wording for that state, the ones not defined there are ignored
 
-More control over notifications is available using YAML configuration,
+#### Mobile Actions
 
-The alarm status message by default uses a `quiet` profile, and another one called `normal`, which can be overridden with as many profiles named as you like. Each profile is defined by the source of alarm change, optionally restricted by which alarm states are involved, and lets you change the priority, or any of the other message content (the ubiquitous Home Assistant `data` section).
+**Mobile Actions** have their titles in the Home Assistant language, and leave out any that would do nothing, so there's no *Disarm* when the alarm has just been disarmed, nor *Arm Away* when it has just been armed away
 
-```yaml
-notify:
-    quiet:
-      scenario: nerdy
-      data:
-        priority: low
-    normal:
-      source:
-        - calendar
-      state:
-        - armed_vacation
-        - armed_away
-      data:
-        priority: medium
-```
+### YAML Notification Configuration
 
- If you want to send to e-mail and mobile then this will fail with a notify group unless you use very basic messages, since additional fields, like the `actions` in the `data` field for Actionable Notifications aren't supported by other notification platforms. The best way to resolve that is with [Supernotify](https://supernotify.rhizomatics.org.uk) which will tune each message for the underlying transport ( mobile apps, and also e-mail, text, chime etc.) along with lots of other tuning options and automatic discovery.
+This is a left-over from when everything was in YAML, and is now deprecated. The details are in the [advanced configuration](./advanced_config.md#advanced-notifications).
 
 ## Home Assistant Features Supported
 
@@ -185,6 +176,7 @@ notify:
 - [Repairs](https://www.home-assistant.io/integrations/repairs/)
     - Raises repairs for invalid transition configurations
 - [Sun Integration](https://www.home-assistant.io/integrations/sun/)
+- [Times of the Day](https://www.home-assistant.io/integrations/tod/)
 - [Tools](https://www.home-assistant.io/docs/tools/dev-tools/)
     - Configurable integration with UI config flow and options
     - Reloadable from the *YAML* tab

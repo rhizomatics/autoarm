@@ -112,6 +112,33 @@ in the [shortcut template style](https://www.home-assistant.io/docs/scripts/cond
 | calendar_event.location    | str             | Event location                                           |
 | occupied_daytime_state     | str             | Default state for occupied in day time                   |
 
+### Advanced Notifications
+
+!!! warning "Deprecated"
+    The YAML `notify` section is deprecated, replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released. Use the priorities in the options, and Supernotify scenarios for the `autoarm-` scenario names, in its place. A repair is raised while it is still in the YAML configuration.
+
+More control over notifications is available using YAML configuration,
+
+The alarm status message by default uses a `quiet` profile, and another one called `normal`, which can be overridden with as many profiles named as you like. Each profile is defined by the source of alarm change, optionally restricted by which alarm states are involved, and lets you change the priority, or any of the other message content (the ubiquitous Home Assistant `data` section).
+
+```yaml
+notify:
+    quiet:
+      scenario: nerdy
+      data:
+        priority: low
+    normal:
+      source:
+        - calendar
+      state:
+        - armed_vacation
+        - armed_away
+      data:
+        priority: medium
+```
+
+ If you want to send to e-mail and mobile then this will fail with a notify group unless you use very basic messages, since additional fields, like the `actions` in the `data` field for Actionable Notifications aren't supported by other notification platforms. The best way to resolve that is with [Supernotify](https://supernotify.rhizomatics.org.uk) which will tune each message for the underlying transport ( mobile apps, and also e-mail, text, chime etc.) along with lots of other tuning options and automatic discovery.
+
 [CalendarEvent]: https://github.com/home-assistant/core/blob/56a71e6798ada65e9c99f92f64bd4168e98b935b/homeassistant/components/calendar/__init__.py#L364
 [Alarm Control Panel Integrations]: https://www.home-assistant.io/integrations/?search=alarm+control+panel
 [Conditions]: https://www.home-assistant.io/docs/scripts/conditions/
