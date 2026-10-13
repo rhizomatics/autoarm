@@ -73,9 +73,16 @@ None of this removes existing functionality, and all of it can be overridden or 
   - The delay is zero unless set, other than for `armed_away`, which starts at 120 seconds
   - Buttons in YAML are copied into the options the first time, and the options used from then on
 
+### Alarm Panels That Need a Code
+- New **Alarm panel code** in the **Advanced** section of the options, passed to the alarm panel's actions when arming or disarming
+  - Stored encrypted, never shown again once set, and left out of logs and diagnostics, see [Panels That Need a Code](configuration/create_panel.md#panels-that-need-a-code) for what that does and doesn't protect against
+- A repair is raised if the alarm panel wants a code and there isn't one, either set in Auto Arm or as the Home Assistant default code for the panel
+
 ### Notifications
 - The alarm states are now the humane versions, e.g. "Armed Night" rather than `armed_night`
 - Changes made by a Times of the Day sensor name the sensor, e.g. "by Bedtime Times of the Day sensor"
+- New installs have `supernotify.notify` as the notification action if Supernotify is already installed
+- A warning is logged at start up if notifications are enabled using `notify.send_message` with no **Notification Targets**, since nothing can then be sent
 
 ### Calendar Occupancy Override
 - New switch so that someone coming home on the last day of an `armed_away` or `armed_vacation` calendar event ends the event there and then, rather than at its end time

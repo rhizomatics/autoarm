@@ -41,6 +41,14 @@ LOCALE_COGNATE_PATHS: dict[str, set[str]] = {
         "options.step.init.sections.notify_options.name",
         "config.step.advanced_setup.sections.notify_options.name",
     },
+    "nl": {
+        "options.step.init.sections.button_options.data.button_reset",
+        "config.step.advanced_setup.sections.button_options.data.button_reset",
+    },
+    "pl": {
+        "options.step.init.sections.button_options.data.button_reset",
+        "config.step.advanced_setup.sections.button_options.data.button_reset",
+    },
 }
 
 

@@ -125,7 +125,7 @@ Two notifications are sent:
 - A button has been pressed, and the arm status will be actioned with a few seconds delay
 
 If [Supernotify](https://supernotify.rhizomatics.org.uk) is installed, its `supernotify.notify` action is offered first in
-the **Notification Action** list. It takes the same fields as the YAML `data` section, such as `priority`, and adds the
+the **Notification Action** list. New installs have it already selected. It takes the same fields as the YAML `data` section, such as `priority`, and adds the
 [Mobile Actions](mobile_actions.md) to disarm, reset or arm away from the notification. Leave the targets blank to let Supernotify choose who to notify.
 The action chosen here is used for every notification, unless a YAML profile sets its own `service`.
 

@@ -101,6 +101,41 @@ async def test_user_flow_minimal(hass: HomeAssistant, mock_notify: Any) -> None:
     assert result["options"][CONF_PERSON_ENTITIES] == []
 
 
+async def test_quick_setup_presets_supernotify_when_installed(hass: HomeAssistant, mock_notify: Any) -> None:
+    hass.data[YAML_DATA_KEY] = {}
+    hass.services.async_register("supernotify", "notify", lambda _call: None)
+
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "quick_setup"})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_ALARM_PANEL: "alarm_control_panel.home"})
+
+    assert result["options"][CONF_NOTIFY_ACTION] == "supernotify.notify"
+
+
+async def test_quick_setup_without_supernotify(hass: HomeAssistant, mock_notify: Any) -> None:
+    hass.data[YAML_DATA_KEY] = {}
+
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "quick_setup"})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_ALARM_PANEL: "alarm_control_panel.home"})
+
+    assert result["options"][CONF_NOTIFY_ACTION] == "notify.send_message"
+
+
+async def test_advanced_setup_presets_supernotify_when_installed(hass: HomeAssistant, mock_notify: Any) -> None:
+    hass.data[YAML_DATA_KEY] = {}
+    hass.services.async_register("supernotify", "notify", lambda _call: None)
+
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"next_step_id": "advanced_setup"})
+
+    data_schema = result["data_schema"]
+    assert data_schema is not None
+    notify_section = data_schema.schema["notify_options"].schema.schema
+    action_key = next(k for k in notify_section if k == CONF_NOTIFY_ACTION)
+    assert action_key.default() == "supernotify.notify"
+
+
 async def test_user_flow_preselects_known_persons(hass: HomeAssistant, mock_notify: Any) -> None:
     """Everyone known to Home Assistant is selected to start with, and kept if left alone."""
     hass.data[YAML_DATA_KEY] = {}

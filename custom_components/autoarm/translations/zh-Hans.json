@@ -85,19 +85,19 @@
                         "name": "按钮",
                         "description": "用于设置警报状态,或将其重置为 Auto Arm 判断的状态的实体按钮。按钮实体和二元传感器均可使用。每个按钮都可以设置生效前的延迟,例如离家布防后出门的时间。",
                         "data": {
-                            "button_reset": "重置 - 按钮",
+                            "button_reset": "重置",
                             "button_reset_delay": "重置 - 延迟",
-                            "button_disarmed": "撤防 - 按钮",
+                            "button_disarmed": "撤防",
                             "button_disarmed_delay": "撤防 - 延迟",
-                            "button_armed_home": "在家布防 - 按钮",
+                            "button_armed_home": "在家布防",
                             "button_armed_home_delay": "在家布防 - 延迟",
-                            "button_armed_away": "离家布防 - 按钮",
+                            "button_armed_away": "离家布防",
                             "button_armed_away_delay": "离家布防 - 延迟",
-                            "button_armed_night": "夜间布防 - 按钮",
+                            "button_armed_night": "夜间布防",
                             "button_armed_night_delay": "夜间布防 - 延迟",
-                            "button_armed_vacation": "度假布防 - 按钮",
+                            "button_armed_vacation": "度假布防",
                             "button_armed_vacation_delay": "度假布防 - 延迟",
-                            "button_armed_custom_bypass": "自定义布防 - 按钮",
+                            "button_armed_custom_bypass": "自定义布防",
                             "button_armed_custom_bypass_delay": "自定义布防 - 延迟"
                         }
                     },
@@ -141,11 +141,13 @@
                         "name": "高级",
                         "data": {
                             "use_alarm_service": "使用报警面板的操作更改状态",
+                            "panel_code": "报警面板密码",
                             "calendar_armed_end_mode": "日历布防覆盖结束时",
                             "calendar_disarmed_end_mode": "日历撤防覆盖结束时"
                         },
                         "data_description": {
-                            "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。面板不得要求密码。",
+                            "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在下方设置。",
+                            "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。",
                             "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
                             "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。"
                         }
@@ -218,19 +220,19 @@
                         "name": "按钮",
                         "description": "用于设置警报状态,或将其重置为 Auto Arm 判断的状态的实体按钮。按钮实体和二元传感器均可使用。每个按钮都可以设置生效前的延迟,例如离家布防后出门的时间。",
                         "data": {
-                            "button_reset": "重置 - 按钮",
+                            "button_reset": "重置",
                             "button_reset_delay": "重置 - 延迟",
-                            "button_disarmed": "撤防 - 按钮",
+                            "button_disarmed": "撤防",
                             "button_disarmed_delay": "撤防 - 延迟",
-                            "button_armed_home": "在家布防 - 按钮",
+                            "button_armed_home": "在家布防",
                             "button_armed_home_delay": "在家布防 - 延迟",
-                            "button_armed_away": "离家布防 - 按钮",
+                            "button_armed_away": "离家布防",
                             "button_armed_away_delay": "离家布防 - 延迟",
-                            "button_armed_night": "夜间布防 - 按钮",
+                            "button_armed_night": "夜间布防",
                             "button_armed_night_delay": "夜间布防 - 延迟",
-                            "button_armed_vacation": "度假布防 - 按钮",
+                            "button_armed_vacation": "度假布防",
                             "button_armed_vacation_delay": "度假布防 - 延迟",
-                            "button_armed_custom_bypass": "自定义布防 - 按钮",
+                            "button_armed_custom_bypass": "自定义布防",
                             "button_armed_custom_bypass_delay": "自定义布防 - 延迟"
                         }
                     },
@@ -274,11 +276,14 @@
                         "name": "高级",
                         "data": {
                             "use_alarm_service": "使用报警面板的操作更改状态",
+                            "panel_code": "报警面板密码",
+                            "panel_code_clear": "删除已存储的报警面板密码",
                             "calendar_armed_end_mode": "日历布防覆盖结束时",
                             "calendar_disarmed_end_mode": "日历撤防覆盖结束时"
                         },
                         "data_description": {
-                            "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。面板不得要求密码。",
+                            "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在下方设置。",
+                            "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。",
                             "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
                             "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。"
                         }
@@ -350,6 +355,10 @@
         "yaml_core_config_deprecated": {
             "title": "YAML 核心配置已弃用",
             "description": "AutoArm 的核心设置（alarm_panel、occupancy、calendars）已迁移到 UI 配置项。请从您的 YAML 配置中删除这些设置，并使用 UI 进行管理。高级设置（transitions、buttons、notify、diurnal、rate_limit）可以保留在 YAML 中。"
+        },
+        "panel_code_required": {
+            "title": "报警面板需要密码",
+            "description": "报警面板 {panel} 要求提供密码，而 Auto Arm 没有可提供的密码，因此布防或撤防可能失败。请在 Auto Arm 选项的高级部分设置 **报警面板密码**，或在报警面板实体自身的设置中设置默认密码，或在面板的集成中关闭密码要求。"
         }
     }
 }

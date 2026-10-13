@@ -85,19 +85,19 @@
                         "name": "Tasten",
                         "description": "Physische Tasten, um einen Alarmzustand zu setzen oder ihn auf das zurückzusetzen, was Auto Arm ermittelt. Tasten-Entitäten und Binärsensoren funktionieren beide. Jede kann eine Verzögerung haben, bevor sie wirkt, etwa Zeit, um nach dem Scharfschalten das Haus zu verlassen.",
                         "data": {
-                            "button_reset": "Zurücksetzen - Tasten",
+                            "button_reset": "Zurücksetzen",
                             "button_reset_delay": "Zurücksetzen - Verzögerung",
-                            "button_disarmed": "Unscharf - Tasten",
+                            "button_disarmed": "Unscharf",
                             "button_disarmed_delay": "Unscharf - Verzögerung",
-                            "button_armed_home": "Scharf zu Hause - Tasten",
+                            "button_armed_home": "Scharf zu Hause",
                             "button_armed_home_delay": "Scharf zu Hause - Verzögerung",
-                            "button_armed_away": "Scharf abwesend - Tasten",
+                            "button_armed_away": "Scharf abwesend",
                             "button_armed_away_delay": "Scharf abwesend - Verzögerung",
-                            "button_armed_night": "Scharf Nacht - Tasten",
+                            "button_armed_night": "Scharf Nacht",
                             "button_armed_night_delay": "Scharf Nacht - Verzögerung",
-                            "button_armed_vacation": "Scharf Urlaub - Tasten",
+                            "button_armed_vacation": "Scharf Urlaub",
                             "button_armed_vacation_delay": "Scharf Urlaub - Verzögerung",
-                            "button_armed_custom_bypass": "Scharf benutzerdefiniert - Tasten",
+                            "button_armed_custom_bypass": "Scharf benutzerdefiniert",
                             "button_armed_custom_bypass_delay": "Scharf benutzerdefiniert - Verzögerung"
                         }
                     },
@@ -141,11 +141,13 @@
                         "name": "Erweitert",
                         "data": {
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
+                            "panel_code": "Code der Alarmzentrale",
                             "calendar_armed_end_mode": "Wenn eine Kalender-Scharfschaltung endet",
                             "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet"
                         },
                         "data_description": {
-                            "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Die Zentrale darf keinen Code verlangen.",
+                            "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn unten fest.",
+                            "panel_code": "Code, den Auto Arm den Aktionen der Alarmzentrale beim Scharf- oder Unscharfschalten übergibt, falls die Zentrale einen verlangt. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um den bereits gespeicherten Code zu behalten.",
                             "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
                             "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist."
                         }
@@ -218,19 +220,19 @@
                         "name": "Tasten",
                         "description": "Physische Tasten, um einen Alarmzustand zu setzen oder ihn auf das zurückzusetzen, was Auto Arm ermittelt. Tasten-Entitäten und Binärsensoren funktionieren beide. Jede kann eine Verzögerung haben, bevor sie wirkt, etwa Zeit, um nach dem Scharfschalten das Haus zu verlassen.",
                         "data": {
-                            "button_reset": "Zurücksetzen - Tasten",
+                            "button_reset": "Zurücksetzen",
                             "button_reset_delay": "Zurücksetzen - Verzögerung",
-                            "button_disarmed": "Unscharf - Tasten",
+                            "button_disarmed": "Unscharf",
                             "button_disarmed_delay": "Unscharf - Verzögerung",
-                            "button_armed_home": "Scharf zu Hause - Tasten",
+                            "button_armed_home": "Scharf zu Hause",
                             "button_armed_home_delay": "Scharf zu Hause - Verzögerung",
-                            "button_armed_away": "Scharf abwesend - Tasten",
+                            "button_armed_away": "Scharf abwesend",
                             "button_armed_away_delay": "Scharf abwesend - Verzögerung",
-                            "button_armed_night": "Scharf Nacht - Tasten",
+                            "button_armed_night": "Scharf Nacht",
                             "button_armed_night_delay": "Scharf Nacht - Verzögerung",
-                            "button_armed_vacation": "Scharf Urlaub - Tasten",
+                            "button_armed_vacation": "Scharf Urlaub",
                             "button_armed_vacation_delay": "Scharf Urlaub - Verzögerung",
-                            "button_armed_custom_bypass": "Scharf benutzerdefiniert - Tasten",
+                            "button_armed_custom_bypass": "Scharf benutzerdefiniert",
                             "button_armed_custom_bypass_delay": "Scharf benutzerdefiniert - Verzögerung"
                         }
                     },
@@ -274,11 +276,14 @@
                         "name": "Erweitert",
                         "data": {
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
+                            "panel_code": "Code der Alarmzentrale",
+                            "panel_code_clear": "Gespeicherten Code der Alarmzentrale entfernen",
                             "calendar_armed_end_mode": "Wenn eine Kalender-Scharfschaltung endet",
                             "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet"
                         },
                         "data_description": {
-                            "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Die Zentrale darf keinen Code verlangen.",
+                            "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn unten fest.",
+                            "panel_code": "Code, den Auto Arm den Aktionen der Alarmzentrale beim Scharf- oder Unscharfschalten übergibt, falls die Zentrale einen verlangt. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um den bereits gespeicherten Code zu behalten.",
                             "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
                             "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist."
                         }
@@ -350,6 +355,10 @@
         "yaml_core_config_deprecated": {
             "title": "YAML-Kernkonfiguration ist veraltet",
             "description": "Die AutoArm-Kerneinstellungen (alarm_panel, occupancy, calendars) wurden in den UI-Konfigurationseintrag migriert. Entferne sie aus deiner YAML-Konfiguration und verwalte sie über die Benutzeroberfläche. Erweiterte Einstellungen (transitions, buttons, notify, diurnal, rate_limit) können in YAML verbleiben."
+        },
+        "panel_code_required": {
+            "title": "Alarmzentrale verlangt einen Code",
+            "description": "Die Alarmzentrale {panel} verlangt einen Code, und Auto Arm hat keinen, sodass das Scharf- oder Unscharfschalten fehlschlagen kann. Lege **Code der Alarmzentrale** im Abschnitt Erweitert der Auto-Arm-Optionen fest, oder einen Standardcode in den Einstellungen der Alarmzentralen-Entität, oder schalte die Code-Anforderung in der Integration der Zentrale ab."
         }
     }
 }

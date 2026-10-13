@@ -85,19 +85,19 @@
                         "name": "ボタン",
                         "description": "アラーム状態を設定する、または Auto Arm が判断する状態にリセットするための物理ボタンです。ボタンエンティティとバイナリセンサーのどちらも使えます。外出警戒の後に外へ出る時間など、それぞれに作動までの遅延を設定できます。",
                         "data": {
-                            "button_reset": "リセット - ボタン",
+                            "button_reset": "リセット",
                             "button_reset_delay": "リセット - 遅延",
-                            "button_disarmed": "解除 - ボタン",
+                            "button_disarmed": "解除",
                             "button_disarmed_delay": "解除 - 遅延",
-                            "button_armed_home": "在宅警戒 - ボタン",
+                            "button_armed_home": "在宅警戒",
                             "button_armed_home_delay": "在宅警戒 - 遅延",
-                            "button_armed_away": "外出警戒 - ボタン",
+                            "button_armed_away": "外出警戒",
                             "button_armed_away_delay": "外出警戒 - 遅延",
-                            "button_armed_night": "夜間警戒 - ボタン",
+                            "button_armed_night": "夜間警戒",
                             "button_armed_night_delay": "夜間警戒 - 遅延",
-                            "button_armed_vacation": "休暇警戒 - ボタン",
+                            "button_armed_vacation": "休暇警戒",
                             "button_armed_vacation_delay": "休暇警戒 - 遅延",
-                            "button_armed_custom_bypass": "カスタム警戒 - ボタン",
+                            "button_armed_custom_bypass": "カスタム警戒",
                             "button_armed_custom_bypass_delay": "カスタム警戒 - 遅延"
                         }
                     },
@@ -141,11 +141,13 @@
                         "name": "詳細設定",
                         "data": {
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
+                            "panel_code": "アラームパネルのコード",
                             "calendar_armed_end_mode": "カレンダーによる警戒オーバーライドの終了時",
                             "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時"
                         },
                         "data_description": {
-                            "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルはコードを要求しない設定にしてください。",
+                            "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、下で設定してください。",
+                            "panel_code": "パネルがコードを必要とする場合に、警戒・解除時に Auto Arm がアラームパネルのアクションへ渡すコードです。暗号化して保存され、再表示されることはありません。保存済みのコードをそのまま使う場合は空欄にしてください。",
                             "calendar_armed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは解除し、全員外出中なら外出警戒にします。",
                             "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。"
                         }
@@ -218,19 +220,19 @@
                         "name": "ボタン",
                         "description": "アラーム状態を設定する、または Auto Arm が判断する状態にリセットするための物理ボタンです。ボタンエンティティとバイナリセンサーのどちらも使えます。外出警戒の後に外へ出る時間など、それぞれに作動までの遅延を設定できます。",
                         "data": {
-                            "button_reset": "リセット - ボタン",
+                            "button_reset": "リセット",
                             "button_reset_delay": "リセット - 遅延",
-                            "button_disarmed": "解除 - ボタン",
+                            "button_disarmed": "解除",
                             "button_disarmed_delay": "解除 - 遅延",
-                            "button_armed_home": "在宅警戒 - ボタン",
+                            "button_armed_home": "在宅警戒",
                             "button_armed_home_delay": "在宅警戒 - 遅延",
-                            "button_armed_away": "外出警戒 - ボタン",
+                            "button_armed_away": "外出警戒",
                             "button_armed_away_delay": "外出警戒 - 遅延",
-                            "button_armed_night": "夜間警戒 - ボタン",
+                            "button_armed_night": "夜間警戒",
                             "button_armed_night_delay": "夜間警戒 - 遅延",
-                            "button_armed_vacation": "休暇警戒 - ボタン",
+                            "button_armed_vacation": "休暇警戒",
                             "button_armed_vacation_delay": "休暇警戒 - 遅延",
-                            "button_armed_custom_bypass": "カスタム警戒 - ボタン",
+                            "button_armed_custom_bypass": "カスタム警戒",
                             "button_armed_custom_bypass_delay": "カスタム警戒 - 遅延"
                         }
                     },
@@ -274,11 +276,14 @@
                         "name": "詳細設定",
                         "data": {
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
+                            "panel_code": "アラームパネルのコード",
+                            "panel_code_clear": "保存済みのアラームパネルのコードを削除する",
                             "calendar_armed_end_mode": "カレンダーによる警戒オーバーライドの終了時",
                             "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時"
                         },
                         "data_description": {
-                            "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルはコードを要求しない設定にしてください。",
+                            "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、下で設定してください。",
+                            "panel_code": "パネルがコードを必要とする場合に、警戒・解除時に Auto Arm がアラームパネルのアクションへ渡すコードです。暗号化して保存され、再表示されることはありません。保存済みのコードをそのまま使う場合は空欄にしてください。",
                             "calendar_armed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは解除し、全員外出中なら外出警戒にします。",
                             "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。"
                         }
@@ -350,6 +355,10 @@
         "yaml_core_config_deprecated": {
             "title": "YAML コア設定は非推奨です",
             "description": "AutoArm のコア設定（alarm_panel、occupancy、calendars）は UI 設定エントリに移行されました。YAML 設定から削除し、UI で管理してください。高度な設定（transitions、buttons、notify、diurnal、rate_limit）は YAML に残すことができます。"
+        },
+        "panel_code_required": {
+            "title": "アラームパネルにコードが必要です",
+            "description": "アラームパネル {panel} はコードを要求していますが、Auto Arm には渡すコードがないため、警戒や解除に失敗する可能性があります。Auto Arm のオプションの詳細設定セクションで **アラームパネルのコード** を設定するか、アラームパネルのエンティティ設定でデフォルトコードを設定するか、パネルの統合でコードの要求を無効にしてください。"
         }
     }
 }

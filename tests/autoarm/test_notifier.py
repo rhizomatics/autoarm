@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any
 from unittest.mock import Mock
 
+import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -664,6 +665,28 @@ async def test_notify_send_message_uses_entity_id_target(hass: HomeAssistant) ->
     assert len(calls) == 1
     assert calls[0]["data"]["entity_id"] == ["notify.mobile_app_test"]
     assert "target" not in calls[0]["data"]
+
+
+async def test_notify_send_message_without_targets_warns_and_is_skipped(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    """notify.send_message has nobody to send to without targets, so say so once and never call it"""
+    notifier = Notifier({"backstop": {}}, hass, Mock(spec=AppHealthTracker), notify_action="notify.send_message")
+    assert "No notifications will be sent" in caplog.text
+    calls: list[ServiceCall] = []
+    hass.services.async_register("notify", "send_message", callback(lambda call: calls.append(call)))
+
+    await notifier.notify(ChangeSource.BUTTON, message="Nobody to tell")
+
+    assert calls == []
+    notifier.app_health_tracker.record_runtime_error.assert_not_called()  # type: ignore
+
+
+def test_notify_with_targets_or_other_action_has_no_warning(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    Notifier({}, hass, Mock(spec=AppHealthTracker), notify_action="notify.send_message", notify_targets=["notify.phone"])
+    Notifier({}, hass, Mock(spec=AppHealthTracker), notify_action="supernotify.notify")
+    Notifier({"backstop": {"target": ["notify.phone"]}}, hass, Mock(spec=AppHealthTracker), notify_action="notify.send_message")
+    assert "No notifications will be sent" not in caplog.text
 
 
 async def test_notify_skipped_when_action_is_empty_string(hass: HomeAssistant) -> None:

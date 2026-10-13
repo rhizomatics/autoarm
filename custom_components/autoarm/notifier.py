@@ -37,6 +37,14 @@ class Notifier:
         # extra service data configured via the options UI's ObjectSelector, lowest priority so
         # YAML profile data (common or per-profile) can still override individual keys
         self.notify_data: dict[str, Any] = notify_data or {}
+        if (
+            (self.notify_action or self.notify_profiles.get(NOTIFY_COMMON, {}).get(CONF_SERVICE)) == "notify.send_message"
+            and not self.notify_targets
+            and not any(profile.get(CONF_TARGET) for profile in self.notify_profiles.values())
+        ):
+            _LOGGER.warning(
+                "AUTOARM No notifications will be sent, as notify.send_message needs Notification Targets, set in the options"
+            )
 
     async def notify(
         self,

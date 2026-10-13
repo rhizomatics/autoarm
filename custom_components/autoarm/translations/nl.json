@@ -85,19 +85,19 @@
                         "name": "Knoppen",
                         "description": "Fysieke knoppen om een alarmstatus in te stellen, of om terug te zetten naar wat Auto Arm bepaalt. Zowel knop-entiteiten als binaire sensoren werken. Elke knop kan een vertraging hebben voordat hij werkt, zoals tijd om de deur uit te gaan na inschakelen bij afwezigheid.",
                         "data": {
-                            "button_reset": "Reset - knoppen",
+                            "button_reset": "Reset",
                             "button_reset_delay": "Reset - vertraging",
-                            "button_disarmed": "Uitgeschakeld - knoppen",
+                            "button_disarmed": "Uitgeschakeld",
                             "button_disarmed_delay": "Uitgeschakeld - vertraging",
-                            "button_armed_home": "Ingeschakeld thuis - knoppen",
+                            "button_armed_home": "Ingeschakeld thuis",
                             "button_armed_home_delay": "Ingeschakeld thuis - vertraging",
-                            "button_armed_away": "Ingeschakeld afwezig - knoppen",
+                            "button_armed_away": "Ingeschakeld afwezig",
                             "button_armed_away_delay": "Ingeschakeld afwezig - vertraging",
-                            "button_armed_night": "Ingeschakeld nacht - knoppen",
+                            "button_armed_night": "Ingeschakeld nacht",
                             "button_armed_night_delay": "Ingeschakeld nacht - vertraging",
-                            "button_armed_vacation": "Ingeschakeld vakantie - knoppen",
+                            "button_armed_vacation": "Ingeschakeld vakantie",
                             "button_armed_vacation_delay": "Ingeschakeld vakantie - vertraging",
-                            "button_armed_custom_bypass": "Ingeschakeld aangepast - knoppen",
+                            "button_armed_custom_bypass": "Ingeschakeld aangepast",
                             "button_armed_custom_bypass_delay": "Ingeschakeld aangepast - vertraging"
                         }
                     },
@@ -141,11 +141,13 @@
                         "name": "Geavanceerd",
                         "data": {
                             "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
+                            "panel_code": "Code van het alarmpaneel",
                             "calendar_armed_end_mode": "Wanneer een inschakeling via de agenda eindigt",
                             "calendar_disarmed_end_mode": "Wanneer een uitschakeling via de agenda eindigt"
                         },
                         "data_description": {
-                            "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Het paneel mag geen code vereisen.",
+                            "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hieronder in.",
+                            "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden.",
                             "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
                             "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is."
                         }
@@ -218,19 +220,19 @@
                         "name": "Knoppen",
                         "description": "Fysieke knoppen om een alarmstatus in te stellen, of om terug te zetten naar wat Auto Arm bepaalt. Zowel knop-entiteiten als binaire sensoren werken. Elke knop kan een vertraging hebben voordat hij werkt, zoals tijd om de deur uit te gaan na inschakelen bij afwezigheid.",
                         "data": {
-                            "button_reset": "Reset - knoppen",
+                            "button_reset": "Reset",
                             "button_reset_delay": "Reset - vertraging",
-                            "button_disarmed": "Uitgeschakeld - knoppen",
+                            "button_disarmed": "Uitgeschakeld",
                             "button_disarmed_delay": "Uitgeschakeld - vertraging",
-                            "button_armed_home": "Ingeschakeld thuis - knoppen",
+                            "button_armed_home": "Ingeschakeld thuis",
                             "button_armed_home_delay": "Ingeschakeld thuis - vertraging",
-                            "button_armed_away": "Ingeschakeld afwezig - knoppen",
+                            "button_armed_away": "Ingeschakeld afwezig",
                             "button_armed_away_delay": "Ingeschakeld afwezig - vertraging",
-                            "button_armed_night": "Ingeschakeld nacht - knoppen",
+                            "button_armed_night": "Ingeschakeld nacht",
                             "button_armed_night_delay": "Ingeschakeld nacht - vertraging",
-                            "button_armed_vacation": "Ingeschakeld vakantie - knoppen",
+                            "button_armed_vacation": "Ingeschakeld vakantie",
                             "button_armed_vacation_delay": "Ingeschakeld vakantie - vertraging",
-                            "button_armed_custom_bypass": "Ingeschakeld aangepast - knoppen",
+                            "button_armed_custom_bypass": "Ingeschakeld aangepast",
                             "button_armed_custom_bypass_delay": "Ingeschakeld aangepast - vertraging"
                         }
                     },
@@ -274,11 +276,14 @@
                         "name": "Geavanceerd",
                         "data": {
                             "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
+                            "panel_code": "Code van het alarmpaneel",
+                            "panel_code_clear": "Opgeslagen code van het alarmpaneel verwijderen",
                             "calendar_armed_end_mode": "Wanneer een inschakeling via de agenda eindigt",
                             "calendar_disarmed_end_mode": "Wanneer een uitschakeling via de agenda eindigt"
                         },
                         "data_description": {
-                            "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Het paneel mag geen code vereisen.",
+                            "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hieronder in.",
+                            "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden.",
                             "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
                             "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is."
                         }
@@ -350,6 +355,10 @@
         "yaml_core_config_deprecated": {
             "title": "YAML-kernconfiguratie is verouderd",
             "description": "De kerninstellingen van AutoArm (alarm_panel, occupancy, calendars) zijn gemigreerd naar de UI-configuratie-item. Verwijder deze uit uw YAML-configuratie en gebruik de UI om ze te beheren. Geavanceerde instellingen (transitions, buttons, notify, diurnal, rate_limit) kunnen in YAML blijven staan."
+        },
+        "panel_code_required": {
+            "title": "Alarmpaneel heeft een code nodig",
+            "description": "Het alarmpaneel {panel} vraagt om een code en Auto Arm heeft er geen om te geven, waardoor in- of uitschakelen kan mislukken. Stel **Code van het alarmpaneel** in bij de sectie Geavanceerd van de Auto Arm-opties, of een standaardcode in de instellingen van de alarmpaneel-entiteit, of schakel de codevereiste uit in de integratie van het paneel."
         }
     }
 }

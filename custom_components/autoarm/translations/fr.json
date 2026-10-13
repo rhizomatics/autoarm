@@ -85,19 +85,19 @@
                         "name": "Boutons",
                         "description": "Boutons physiques pour définir un état d'alarme, ou pour le réinitialiser à ce qu'Auto Arm détermine. Les entités bouton et les capteurs binaires fonctionnent tous deux. Chacun peut avoir un délai avant d'agir, par exemple le temps de sortir après un armement en absence.",
                         "data": {
-                            "button_reset": "Réinitialiser - boutons",
+                            "button_reset": "Réinitialiser",
                             "button_reset_delay": "Réinitialiser - délai",
-                            "button_disarmed": "Désarmé - boutons",
+                            "button_disarmed": "Désarmé",
                             "button_disarmed_delay": "Désarmé - délai",
-                            "button_armed_home": "Armé présence - boutons",
+                            "button_armed_home": "Armé présence",
                             "button_armed_home_delay": "Armé présence - délai",
-                            "button_armed_away": "Armé absence - boutons",
+                            "button_armed_away": "Armé absence",
                             "button_armed_away_delay": "Armé absence - délai",
-                            "button_armed_night": "Armé nuit - boutons",
+                            "button_armed_night": "Armé nuit",
                             "button_armed_night_delay": "Armé nuit - délai",
-                            "button_armed_vacation": "Armé vacances - boutons",
+                            "button_armed_vacation": "Armé vacances",
                             "button_armed_vacation_delay": "Armé vacances - délai",
-                            "button_armed_custom_bypass": "Armé personnalisé - boutons",
+                            "button_armed_custom_bypass": "Armé personnalisé",
                             "button_armed_custom_bypass_delay": "Armé personnalisé - délai"
                         }
                     },
@@ -141,11 +141,13 @@
                         "name": "Avancé",
                         "data": {
                             "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
+                            "panel_code": "Code de la centrale d'alarme",
                             "calendar_armed_end_mode": "À la fin d'un armement par calendrier",
                             "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier"
                         },
                         "data_description": {
-                            "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code.",
+                            "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. Si la centrale exige un code, définissez-le ci-dessous.",
+                            "panel_code": "Code qu'Auto Arm fournit aux actions de la centrale d'alarme lors de l'armement ou du désarmement, si la centrale en exige un. Il est stocké chiffré et n'est plus jamais affiché. Laissez vide pour conserver le code déjà enregistré.",
                             "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
                             "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
                         }
@@ -218,19 +220,19 @@
                         "name": "Boutons",
                         "description": "Boutons physiques pour définir un état d'alarme, ou pour le réinitialiser à ce qu'Auto Arm détermine. Les entités bouton et les capteurs binaires fonctionnent tous deux. Chacun peut avoir un délai avant d'agir, par exemple le temps de sortir après un armement en absence.",
                         "data": {
-                            "button_reset": "Réinitialiser - boutons",
+                            "button_reset": "Réinitialiser",
                             "button_reset_delay": "Réinitialiser - délai",
-                            "button_disarmed": "Désarmé - boutons",
+                            "button_disarmed": "Désarmé",
                             "button_disarmed_delay": "Désarmé - délai",
-                            "button_armed_home": "Armé présence - boutons",
+                            "button_armed_home": "Armé présence",
                             "button_armed_home_delay": "Armé présence - délai",
-                            "button_armed_away": "Armé absence - boutons",
+                            "button_armed_away": "Armé absence",
                             "button_armed_away_delay": "Armé absence - délai",
-                            "button_armed_night": "Armé nuit - boutons",
+                            "button_armed_night": "Armé nuit",
                             "button_armed_night_delay": "Armé nuit - délai",
-                            "button_armed_vacation": "Armé vacances - boutons",
+                            "button_armed_vacation": "Armé vacances",
                             "button_armed_vacation_delay": "Armé vacances - délai",
-                            "button_armed_custom_bypass": "Armé personnalisé - boutons",
+                            "button_armed_custom_bypass": "Armé personnalisé",
                             "button_armed_custom_bypass_delay": "Armé personnalisé - délai"
                         }
                     },
@@ -274,11 +276,14 @@
                         "name": "Avancé",
                         "data": {
                             "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
+                            "panel_code": "Code de la centrale d'alarme",
+                            "panel_code_clear": "Supprimer le code enregistré de la centrale d'alarme",
                             "calendar_armed_end_mode": "À la fin d'un armement par calendrier",
                             "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier"
                         },
                         "data_description": {
-                            "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. La centrale ne doit pas exiger de code.",
+                            "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. Si la centrale exige un code, définissez-le ci-dessous.",
+                            "panel_code": "Code qu'Auto Arm fournit aux actions de la centrale d'alarme lors de l'armement ou du désarmement, si la centrale en exige un. Il est stocké chiffré et n'est plus jamais affiché. Laissez vide pour conserver le code déjà enregistré.",
                             "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
                             "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
                         }
@@ -350,6 +355,10 @@
         "yaml_core_config_deprecated": {
             "title": "La configuration YAML principale est obsolète",
             "description": "Les paramètres principaux d'AutoArm (alarm_panel, occupancy, calendars) ont été migrés vers l'interface utilisateur. Supprimez-les de votre configuration YAML et utilisez l'interface pour les gérer. Les paramètres avancés (transitions, buttons, notify, diurnal, rate_limit) peuvent rester en YAML."
+        },
+        "panel_code_required": {
+            "title": "La centrale d'alarme exige un code",
+            "description": "La centrale d'alarme {panel} demande un code et Auto Arm n'en a aucun à lui fournir, l'armement ou le désarmement peut donc échouer. Définissez **Code de la centrale d'alarme** dans la section Avancé des options d'Auto Arm, ou un code par défaut dans les paramètres de l'entité de la centrale, ou désactivez l'exigence de code dans l'intégration de la centrale."
         }
     }
 }

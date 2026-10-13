@@ -22,6 +22,7 @@ from homeassistant.helpers.selector import (
     SelectSelectorMode,
     TextSelector,
     TextSelectorConfig,
+    TextSelectorType,
     TimeSelector,
 )
 
@@ -53,6 +54,7 @@ from .const import (
     SUPERNOTIFY_ACTION,
     TRIGGER_AUTO,
 )
+from .crypto import async_encrypt
 
 CONF_CALENDAR_ENTITIES = "calendar_entities"
 CONF_PERSON_ENTITIES = "person_entities"
@@ -79,6 +81,10 @@ CONF_SUNRISE_LATEST = "sunrise_latest"
 CONF_SUNSET_EARLIEST = "sunset_earliest"
 CONF_SUNSET_LATEST = "sunset_latest"
 CONF_USE_ALARM_SERVICE = "use_alarm_service"
+# held encrypted, see crypto
+CONF_PANEL_CODE = "panel_code"
+# only a form field, to remove the stored code, since that isn't shown to be blanked out
+CONF_PANEL_CODE_CLEAR = "panel_code_clear"
 CONF_SENTENCE_ARM = "sentence_arm"
 CONF_SENTENCE_DISARM = "sentence_disarm"
 
@@ -172,6 +178,11 @@ def _top_level_fields(options: Mapping[str, Any], alarm_panel_default: str | Non
             EntitySelectorConfig(domain="person", multiple=True)
         ),
     }
+
+
+def _default_notify_action(hass: HomeAssistant) -> str:
+    """Notification action for a new install, Supernotify if that's already there"""
+    return SUPERNOTIFY_ACTION if hass.services.has_service("supernotify", "notify") else DEFAULT_NOTIFY_ACTION
 
 
 def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
@@ -326,6 +337,15 @@ def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any
                     CONF_USE_ALARM_SERVICE,
                     default=options.get(CONF_USE_ALARM_SERVICE, True),
                 ): BooleanSelector(),
+                # never filled in with the stored code, so that isn't sent back out to a browser
+                vol.Optional(CONF_PANEL_CODE): TextSelector(
+                    TextSelectorConfig(type=TextSelectorType.PASSWORD, autocomplete="off")
+                ),
+                **(
+                    {vol.Optional(CONF_PANEL_CODE_CLEAR, default=False): BooleanSelector()}
+                    if options.get(CONF_PANEL_CODE)
+                    else {}
+                ),
                 vol.Required(
                     CONF_CALENDAR_ARMED_END_MODE,
                     default=options.get(CONF_CALENDAR_ARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
@@ -347,6 +367,16 @@ def _flatten_sections(user_input: dict[str, Any]) -> dict[str, Any]:
         if isinstance(v, dict):
             data.update(v)
     return data
+
+
+async def _protect_panel_code(hass: HomeAssistant, data: dict[str, Any], stored: str | None = None) -> None:
+    """Swap a code typed in for its encrypted form, keeping the one already stored if none was typed"""
+    code: str | None = data.pop(CONF_PANEL_CODE, None)
+    clear: bool = data.pop(CONF_PANEL_CODE_CLEAR, False)
+    if code:
+        data[CONF_PANEL_CODE] = await async_encrypt(hass, code)
+    elif stored and not clear:
+        data[CONF_PANEL_CODE] = stored
 
 
 class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -371,6 +401,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             options = {
                 **DEFAULT_OPTIONS,
+                CONF_NOTIFY_ACTION: _default_notify_action(self.hass),
                 CONF_BEDTIME_ENTITIES: user_input.get(CONF_BEDTIME_ENTITIES, []),
                 CONF_CALENDAR_ENTITIES: user_input.get(CONF_CALENDAR_ENTITIES, []),
                 CONF_PERSON_ENTITIES: user_input.get(CONF_PERSON_ENTITIES, []),
@@ -394,6 +425,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         """Handle set up with the full set of options shown up front, instead of the quick recipe's defaults."""
         if user_input is not None:
             data = _flatten_sections(user_input)
+            await _protect_panel_code(self.hass, data)
             alarm_panel = data.pop(CONF_ALARM_PANEL)
             return self.async_create_entry(
                 title="Auto Arm",
@@ -403,6 +435,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
 
         default_options = {
             **DEFAULT_OPTIONS,
+            CONF_NOTIFY_ACTION: _default_notify_action(self.hass),
             CONF_PERSON_ENTITIES: sorted(self.hass.states.async_entity_ids("person")),
         }
         return self.async_show_form(
@@ -481,6 +514,7 @@ class AutoArmOptionsFlow(OptionsFlow):
         """Manage the options."""
         if user_input is not None:
             data = _flatten_sections(user_input)
+            await _protect_panel_code(self.hass, data, self.config_entry.options.get(CONF_PANEL_CODE))
 
             # The alarm panel entity lives in config_entry.data, not options.
             alarm_panel = data.pop(CONF_ALARM_PANEL)

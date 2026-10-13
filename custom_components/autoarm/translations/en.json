@@ -58,7 +58,7 @@
                     },
                     "sun_options": {
                         "name": "Diurnal - Sun",
-                        "description": "Morning is sunrise, and evening sunset, each kept within its earliest and latest times. The triggers re-evaluate the alarm state at morning and evening, and are ignored during bedtime. Auto switches a trigger off on any day with a Disarmed, Armed Home or Armed Night calendar event. The earliest and latest times are most useful when no Times of the Day sensor or calendar is used for bedtime.",
+                        "description": "Morning and evening are based on sunrise and sunset times with the extra earliest/latest bounds set below. The triggers re-evaluate the alarm state at morning and evening, and are ignored during bedtime. Auto switches a trigger off on any day with a Disarmed, Armed Home or Armed Night calendar event. The earliest and latest times are most useful when no Times of the Day sensor or calendar is used for bedtime.",
                         "data": {
                             "occupancy_default_day": "Occupied state between morning and evening",
                             "occupancy_default_after_bedtime": "Occupied state between bedtime and morning",
@@ -85,19 +85,19 @@
                         "name": "Buttons",
                         "description": "Physical buttons to set an alarm state, or to reset it to whatever Auto Arm works out. Button entities and binary sensors both work. Each can have a delay before it acts, such as time to get out of the door after arming away.",
                         "data": {
-                            "button_reset": "Reset - buttons",
+                            "button_reset": "Reset",
                             "button_reset_delay": "Reset - delay",
-                            "button_disarmed": "Disarmed - buttons",
+                            "button_disarmed": "Disarmed",
                             "button_disarmed_delay": "Disarmed - delay",
-                            "button_armed_home": "Armed Home - buttons",
+                            "button_armed_home": "Armed Home",
                             "button_armed_home_delay": "Armed Home - delay",
-                            "button_armed_away": "Armed Away - buttons",
+                            "button_armed_away": "Armed Away",
                             "button_armed_away_delay": "Armed Away - delay",
-                            "button_armed_night": "Armed Night - buttons",
+                            "button_armed_night": "Armed Night",
                             "button_armed_night_delay": "Armed Night - delay",
-                            "button_armed_vacation": "Armed Vacation - buttons",
+                            "button_armed_vacation": "Armed Vacation",
                             "button_armed_vacation_delay": "Armed Vacation - delay",
-                            "button_armed_custom_bypass": "Armed Custom Bypass - buttons",
+                            "button_armed_custom_bypass": "Armed Custom Bypass",
                             "button_armed_custom_bypass_delay": "Armed Custom Bypass - delay"
                         }
                     },
@@ -141,11 +141,13 @@
                         "name": "Advanced",
                         "data": {
                             "use_alarm_service": "Change state using the alarm panel's actions",
+                            "panel_code": "Alarm panel code",
                             "calendar_armed_end_mode": "When a calendar arming override ends",
                             "calendar_disarmed_end_mode": "When a calendar disarming override ends"
                         },
                         "data_description": {
-                            "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. The panel must not require a code.",
+                            "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. If the panel requires a code, set it below.",
+                            "panel_code": "Code for Auto Arm to give the alarm panel's actions when arming or disarming, if the panel needs one. It is stored encrypted and never shown again. Leave blank to keep the code already stored.",
                             "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
                             "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out."
                         }
@@ -191,7 +193,7 @@
                     },
                     "sun_options": {
                         "name": "Diurnal - Sun",
-                        "description": "Morning is sunrise, and evening sunset, each kept within its earliest and latest times. The triggers re-evaluate the alarm state at morning and evening, and are ignored during bedtime. Auto switches a trigger off on any day with a Disarmed, Armed Home or Armed Night calendar event. The earliest and latest times are most useful when no Times of the Day sensor or calendar is used for bedtime.",
+                        "description": "Morning and evening are based on sunrise and sunset times with the extra earliest/latest bounds set below. The triggers re-evaluate the alarm state at morning and evening, and are ignored during bedtime. Auto switches a trigger off on any day with a Disarmed, Armed Home or Armed Night calendar event. The earliest and latest times are most useful when no Times of the Day sensor or calendar is used for bedtime.",
                         "data": {
                             "occupancy_default_day": "Occupied state between morning and evening",
                             "occupancy_default_after_bedtime": "Occupied state between bedtime and morning",
@@ -218,19 +220,19 @@
                         "name": "Buttons",
                         "description": "Physical buttons to set an alarm state, or to reset it to whatever Auto Arm works out. Button entities and binary sensors both work. Each can have a delay before it acts, such as time to get out of the door after arming away.",
                         "data": {
-                            "button_reset": "Reset - buttons",
+                            "button_reset": "Reset",
                             "button_reset_delay": "Reset - delay",
-                            "button_disarmed": "Disarmed - buttons",
+                            "button_disarmed": "Disarmed",
                             "button_disarmed_delay": "Disarmed - delay",
-                            "button_armed_home": "Armed Home - buttons",
+                            "button_armed_home": "Armed Home",
                             "button_armed_home_delay": "Armed Home - delay",
-                            "button_armed_away": "Armed Away - buttons",
+                            "button_armed_away": "Armed Away",
                             "button_armed_away_delay": "Armed Away - delay",
-                            "button_armed_night": "Armed Night - buttons",
+                            "button_armed_night": "Armed Night",
                             "button_armed_night_delay": "Armed Night - delay",
-                            "button_armed_vacation": "Armed Vacation - buttons",
+                            "button_armed_vacation": "Armed Vacation",
                             "button_armed_vacation_delay": "Armed Vacation - delay",
-                            "button_armed_custom_bypass": "Armed Custom Bypass - buttons",
+                            "button_armed_custom_bypass": "Armed Custom Bypass",
                             "button_armed_custom_bypass_delay": "Armed Custom Bypass - delay"
                         }
                     },
@@ -274,11 +276,14 @@
                         "name": "Advanced",
                         "data": {
                             "use_alarm_service": "Change state using the alarm panel's actions",
+                            "panel_code": "Alarm panel code",
+                            "panel_code_clear": "Remove the stored alarm panel code",
                             "calendar_armed_end_mode": "When a calendar arming override ends",
                             "calendar_disarmed_end_mode": "When a calendar disarming override ends"
                         },
                         "data_description": {
-                            "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. The panel must not require a code.",
+                            "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. If the panel requires a code, set it below.",
+                            "panel_code": "Code for Auto Arm to give the alarm panel's actions when arming or disarming, if the panel needs one. It is stored encrypted and never shown again. Leave blank to keep the code already stored.",
                             "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
                             "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out."
                         }
@@ -350,6 +355,10 @@
         "yaml_core_config_deprecated": {
             "title": "YAML core configuration is deprecated",
             "description": "Core AutoArm settings (alarm_panel, occupancy, calendars) have been migrated to the UI config entry. Remove these from your YAML configuration and use the UI to manage them. Advanced settings (transitions, buttons, notify, diurnal, rate_limit) can remain in YAML."
+        },
+        "panel_code_required": {
+            "title": "Alarm panel needs a code",
+            "description": "The alarm panel {panel} asks for a code, and Auto Arm has none to give it, so arming or disarming may fail. Set **Alarm panel code** in the Advanced section of the Auto Arm options, or a default code in the alarm panel entity's own settings, or switch off the code requirement in the panel's integration."
         }
     }
 }

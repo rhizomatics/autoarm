@@ -85,19 +85,19 @@
                         "name": "Pulsanti",
                         "description": "Pulsanti fisici per impostare uno stato di allarme, o per riportarlo a quello che Auto Arm determina. Funzionano sia le entità pulsante sia i sensori binari. Ognuno può avere un ritardo prima di agire, ad esempio il tempo per uscire dopo l'inserimento fuori casa.",
                         "data": {
-                            "button_reset": "Ripristina - pulsanti",
+                            "button_reset": "Ripristina",
                             "button_reset_delay": "Ripristina - ritardo",
-                            "button_disarmed": "Disinserito - pulsanti",
+                            "button_disarmed": "Disinserito",
                             "button_disarmed_delay": "Disinserito - ritardo",
-                            "button_armed_home": "Inserito in casa - pulsanti",
+                            "button_armed_home": "Inserito in casa",
                             "button_armed_home_delay": "Inserito in casa - ritardo",
-                            "button_armed_away": "Inserito fuori casa - pulsanti",
+                            "button_armed_away": "Inserito fuori casa",
                             "button_armed_away_delay": "Inserito fuori casa - ritardo",
-                            "button_armed_night": "Inserito notte - pulsanti",
+                            "button_armed_night": "Inserito notte",
                             "button_armed_night_delay": "Inserito notte - ritardo",
-                            "button_armed_vacation": "Inserito vacanza - pulsanti",
+                            "button_armed_vacation": "Inserito vacanza",
                             "button_armed_vacation_delay": "Inserito vacanza - ritardo",
-                            "button_armed_custom_bypass": "Inserito personalizzato - pulsanti",
+                            "button_armed_custom_bypass": "Inserito personalizzato",
                             "button_armed_custom_bypass_delay": "Inserito personalizzato - ritardo"
                         }
                     },
@@ -141,11 +141,13 @@
                         "name": "Avanzate",
                         "data": {
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
+                            "panel_code": "Codice della centrale d'allarme",
                             "calendar_armed_end_mode": "Al termine di un inserimento da calendario",
                             "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario"
                         },
                         "data_description": {
-                            "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. La centrale non deve richiedere un codice.",
+                            "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sotto.",
+                            "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato.",
                             "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
                             "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno."
                         }
@@ -218,19 +220,19 @@
                         "name": "Pulsanti",
                         "description": "Pulsanti fisici per impostare uno stato di allarme, o per riportarlo a quello che Auto Arm determina. Funzionano sia le entità pulsante sia i sensori binari. Ognuno può avere un ritardo prima di agire, ad esempio il tempo per uscire dopo l'inserimento fuori casa.",
                         "data": {
-                            "button_reset": "Ripristina - pulsanti",
+                            "button_reset": "Ripristina",
                             "button_reset_delay": "Ripristina - ritardo",
-                            "button_disarmed": "Disinserito - pulsanti",
+                            "button_disarmed": "Disinserito",
                             "button_disarmed_delay": "Disinserito - ritardo",
-                            "button_armed_home": "Inserito in casa - pulsanti",
+                            "button_armed_home": "Inserito in casa",
                             "button_armed_home_delay": "Inserito in casa - ritardo",
-                            "button_armed_away": "Inserito fuori casa - pulsanti",
+                            "button_armed_away": "Inserito fuori casa",
                             "button_armed_away_delay": "Inserito fuori casa - ritardo",
-                            "button_armed_night": "Inserito notte - pulsanti",
+                            "button_armed_night": "Inserito notte",
                             "button_armed_night_delay": "Inserito notte - ritardo",
-                            "button_armed_vacation": "Inserito vacanza - pulsanti",
+                            "button_armed_vacation": "Inserito vacanza",
                             "button_armed_vacation_delay": "Inserito vacanza - ritardo",
-                            "button_armed_custom_bypass": "Inserito personalizzato - pulsanti",
+                            "button_armed_custom_bypass": "Inserito personalizzato",
                             "button_armed_custom_bypass_delay": "Inserito personalizzato - ritardo"
                         }
                     },
@@ -274,11 +276,14 @@
                         "name": "Avanzate",
                         "data": {
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
+                            "panel_code": "Codice della centrale d'allarme",
+                            "panel_code_clear": "Rimuovi il codice salvato della centrale d'allarme",
                             "calendar_armed_end_mode": "Al termine di un inserimento da calendario",
                             "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario"
                         },
                         "data_description": {
-                            "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. La centrale non deve richiedere un codice.",
+                            "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sotto.",
+                            "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato.",
                             "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
                             "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno."
                         }
@@ -350,6 +355,10 @@
         "yaml_core_config_deprecated": {
             "title": "La configurazione YAML principale è obsoleta",
             "description": "Le impostazioni principali di AutoArm (alarm_panel, occupancy, calendars) sono state migrate all'interfaccia utente. Rimuovile dalla tua configurazione YAML e usa l'interfaccia utente per gestirle. Le impostazioni avanzate (transitions, buttons, notify, diurnal, rate_limit) possono rimanere in YAML."
+        },
+        "panel_code_required": {
+            "title": "La centrale d'allarme richiede un codice",
+            "description": "La centrale d'allarme {panel} chiede un codice e Auto Arm non ne ha uno da fornire, quindi l'inserimento o il disinserimento può fallire. Imposta **Codice della centrale d'allarme** nella sezione Avanzate delle opzioni di Auto Arm, oppure un codice predefinito nelle impostazioni dell'entità della centrale, oppure disattiva la richiesta del codice nell'integrazione della centrale."
         }
     }
 }

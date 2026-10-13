@@ -85,19 +85,19 @@
                         "name": "Botões",
                         "description": "Botões físicos para definir um estado de alarme, ou para o repor no que o Auto Arm determinar. Funcionam tanto entidades de botão como sensores binários. Cada um pode ter um atraso antes de atuar, como o tempo para sair depois de armar ausente.",
                         "data": {
-                            "button_reset": "Repor - botões",
+                            "button_reset": "Repor",
                             "button_reset_delay": "Repor - atraso",
-                            "button_disarmed": "Desarmado - botões",
+                            "button_disarmed": "Desarmado",
                             "button_disarmed_delay": "Desarmado - atraso",
-                            "button_armed_home": "Armado em casa - botões",
+                            "button_armed_home": "Armado em casa",
                             "button_armed_home_delay": "Armado em casa - atraso",
-                            "button_armed_away": "Armado ausente - botões",
+                            "button_armed_away": "Armado ausente",
                             "button_armed_away_delay": "Armado ausente - atraso",
-                            "button_armed_night": "Armado noite - botões",
+                            "button_armed_night": "Armado noite",
                             "button_armed_night_delay": "Armado noite - atraso",
-                            "button_armed_vacation": "Armado férias - botões",
+                            "button_armed_vacation": "Armado férias",
                             "button_armed_vacation_delay": "Armado férias - atraso",
-                            "button_armed_custom_bypass": "Armado personalizado - botões",
+                            "button_armed_custom_bypass": "Armado personalizado",
                             "button_armed_custom_bypass_delay": "Armado personalizado - atraso"
                         }
                     },
@@ -141,11 +141,13 @@
                         "name": "Avançado",
                         "data": {
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
+                            "panel_code": "Código do painel de alarme",
                             "calendar_armed_end_mode": "Quando termina um armar por calendário",
                             "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário"
                         },
                         "data_description": {
-                            "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. O painel não deve exigir código.",
+                            "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o abaixo.",
+                            "panel_code": "Código que o Auto Arm dá às ações do painel de alarme ao armar ou desarmar, se o painel precisar de um. É guardado encriptado e nunca mais é mostrado. Deixe em branco para manter o código já guardado.",
                             "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
                             "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém."
                         }
@@ -218,19 +220,19 @@
                         "name": "Botões",
                         "description": "Botões físicos para definir um estado de alarme, ou para o repor no que o Auto Arm determinar. Funcionam tanto entidades de botão como sensores binários. Cada um pode ter um atraso antes de atuar, como o tempo para sair depois de armar ausente.",
                         "data": {
-                            "button_reset": "Repor - botões",
+                            "button_reset": "Repor",
                             "button_reset_delay": "Repor - atraso",
-                            "button_disarmed": "Desarmado - botões",
+                            "button_disarmed": "Desarmado",
                             "button_disarmed_delay": "Desarmado - atraso",
-                            "button_armed_home": "Armado em casa - botões",
+                            "button_armed_home": "Armado em casa",
                             "button_armed_home_delay": "Armado em casa - atraso",
-                            "button_armed_away": "Armado ausente - botões",
+                            "button_armed_away": "Armado ausente",
                             "button_armed_away_delay": "Armado ausente - atraso",
-                            "button_armed_night": "Armado noite - botões",
+                            "button_armed_night": "Armado noite",
                             "button_armed_night_delay": "Armado noite - atraso",
-                            "button_armed_vacation": "Armado férias - botões",
+                            "button_armed_vacation": "Armado férias",
                             "button_armed_vacation_delay": "Armado férias - atraso",
-                            "button_armed_custom_bypass": "Armado personalizado - botões",
+                            "button_armed_custom_bypass": "Armado personalizado",
                             "button_armed_custom_bypass_delay": "Armado personalizado - atraso"
                         }
                     },
@@ -274,11 +276,14 @@
                         "name": "Avançado",
                         "data": {
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
+                            "panel_code": "Código do painel de alarme",
+                            "panel_code_clear": "Remover o código guardado do painel de alarme",
                             "calendar_armed_end_mode": "Quando termina um armar por calendário",
                             "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário"
                         },
                         "data_description": {
-                            "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. O painel não deve exigir código.",
+                            "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o abaixo.",
+                            "panel_code": "Código que o Auto Arm dá às ações do painel de alarme ao armar ou desarmar, se o painel precisar de um. É guardado encriptado e nunca mais é mostrado. Deixe em branco para manter o código já guardado.",
                             "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
                             "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém."
                         }
@@ -350,6 +355,10 @@
         "yaml_core_config_deprecated": {
             "title": "A configuração YAML principal está descontinuada",
             "description": "As definições principais do AutoArm (alarm_panel, occupancy, calendars) foram migradas para a entrada de configuração da interface. Remova-as da sua configuração YAML e use a interface para as gerir. As definições avançadas (transitions, buttons, notify, diurnal, rate_limit) podem permanecer em YAML."
+        },
+        "panel_code_required": {
+            "title": "O painel de alarme precisa de um código",
+            "description": "O painel de alarme {panel} pede um código e o Auto Arm não tem nenhum para lhe dar, pelo que armar ou desarmar pode falhar. Defina **Código do painel de alarme** na secção Avançado das opções do Auto Arm, ou um código predefinido nas definições da entidade do painel de alarme, ou desative a exigência de código na integração do painel."
         }
     }
 }

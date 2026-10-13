@@ -9,11 +9,19 @@ from functools import partial
 from typing import TYPE_CHECKING, Any, cast
 
 import homeassistant.util.dt as dt_util
-from homeassistant.components.alarm_control_panel.const import ATTR_CHANGED_BY, AlarmControlPanelState
+from homeassistant.components.alarm_control_panel import CONF_DEFAULT_CODE
+from homeassistant.components.alarm_control_panel.const import (
+    ATTR_CHANGED_BY,
+    ATTR_CODE_ARM_REQUIRED,
+    AlarmControlPanelState,
+)
+from homeassistant.components.alarm_control_panel.const import DOMAIN as ALARM_PANEL_DOMAIN
 from homeassistant.components.calendar.const import DOMAIN as CALENDAR_DOMAIN
 from homeassistant.components.sun.const import STATE_BELOW_HORIZON
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import (
+    ATTR_CODE,
+    ATTR_CODE_FORMAT,
     ATTR_ENTITY_ID,
     CONF_CONDITIONS,
     CONF_DELAY_TIME,
@@ -40,6 +48,7 @@ from homeassistant.core import (
 from homeassistant.exceptions import ConditionError, ConfigEntryNotReady, HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import (
@@ -76,6 +85,7 @@ from .config_flow import (
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
     CONF_OCCUPIED_TRIGGER,
+    CONF_PANEL_CODE,
     CONF_PERSON_ENTITIES,
     CONF_SENTENCE_ARM,
     CONF_SENTENCE_DISARM,
@@ -137,6 +147,7 @@ from .const import (
     ChangeSource,
     ConditionVariables,
 )
+from .crypto import async_decrypt
 from .helpers import (
     AppHealthTracker,
     ExtendedExtendedJSONEncoder,
@@ -166,6 +177,7 @@ EPHEMERAL_STATES = (
     AlarmControlPanelState.TRIGGERED,
 )
 ZOMBIE_STATES = ("unknown", "unavailable")
+PANEL_CODE_ISSUE = "panel_code_required"
 NS_MOBILE_ACTIONS = "mobile_actions"
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR]
 
@@ -310,7 +322,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: AutoArmConfigEntry) -> b
     yaml_config: ConfigType = hass.data.get(YAML_DATA_KEY, {})
     _migrate_yaml_buttons(hass, entry, yaml_config)
     try:
-        armer = _build_armer_from_entry(hass, entry, yaml_config)
+        panel_code: str | None = None
+        if stored_code := entry.options.get(CONF_PANEL_CODE):
+            panel_code = await async_decrypt(hass, stored_code)
+        armer = _build_armer_from_entry(hass, entry, yaml_config, panel_code)
     except Exception as err:
         raise ConfigEntryNotReady(f"Failed to initialize Auto Arm: {err}") from err
     entry.runtime_data = armer
@@ -358,7 +373,9 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
     await hass.config_entries.async_reload(entry.entry_id)
 
 
-def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config: ConfigType) -> AlarmArmer:
+def _build_armer_from_entry(
+    hass: HomeAssistant, entry: ConfigEntry, yaml_config: ConfigType, panel_code: str | None = None
+) -> AlarmArmer:
     """Build an AlarmArmer instance from ConfigEntry data/options merged with YAML."""
     migrate(hass)
 
@@ -455,6 +472,7 @@ def _build_armer_from_entry(hass: HomeAssistant, entry: ConfigEntry, yaml_config
         calendar_occupancy_ends_away=entry.options.get(CONF_CALENDAR_OCCUPANCY_ENDS_AWAY, True),
         # entries from before the option existed keep setting the state directly
         use_alarm_service=entry.options.get(CONF_USE_ALARM_SERVICE, False),
+        panel_code=panel_code,
     )
 
 
@@ -596,6 +614,7 @@ class AlarmArmer:
         calendar_occupancy_override_states: list[str] | None = None,
         calendar_occupancy_ends_away: bool = True,
         use_alarm_service: bool = True,
+        panel_code: str | None = None,
     ) -> None:
         occupancy = occupancy or {}
         rate_limit = rate_limit or {}
@@ -658,6 +677,8 @@ class AlarmArmer:
         self.arming_in_progress: asyncio.Event = asyncio.Event()
         # change state with alarm_control_panel actions rather than setting it, for panels like Alarmo
         self.use_alarm_service: bool = use_alarm_service
+        # given to the alarm panel's actions, and kept out of logs, events and diagnostics
+        self._panel_code: str | None = panel_code
         # state the panel is being moved to by its actions, so the change isn't mistaken for a manual one
         self._service_target: AlarmControlPanelState | None = None
         self.last_change: StateChange | None = None
@@ -744,7 +765,27 @@ class AlarmArmer:
         Succeeds even if control panel has not yet started, listener will pick up events when it does
         """
         self.unsubscribes.append(async_track_state_change_event(self.hass, [self.alarm_panel], self.on_panel_change))
+        self.check_panel_code()
         _LOGGER.debug("AUTOARM Auto-arming %s", self.alarm_panel)
+
+    def check_panel_code(self) -> None:
+        """Raise a repair when the alarm panel's actions want a code, and there isn't one to give them
+
+        A default code set for the alarm panel entity in Home Assistant does as well as one set in AutoArm
+        """
+        panel: State | None = self.hass.states.get(self.alarm_panel)
+        if panel is None:
+            return
+        wants_code: bool = bool(panel.attributes.get(ATTR_CODE_ARM_REQUIRED) or panel.attributes.get(ATTR_CODE_FORMAT))
+        if self.use_alarm_service and wants_code and not self._panel_code and not self.panel_default_code():
+            self.hass_api.raise_issue(PANEL_CODE_ISSUE, PANEL_CODE_ISSUE, {"panel": self.alarm_panel})
+        else:
+            ir.async_delete_issue(self.hass, DOMAIN, PANEL_CODE_ISSUE)
+
+    def panel_default_code(self) -> bool:
+        entry: er.RegistryEntry | None = er.async_get(self.hass).async_get(self.alarm_panel)
+        panel_options = entry.options.get(ALARM_PANEL_DOMAIN) if entry else None
+        return bool(panel_options and panel_options.get(CONF_DEFAULT_CODE))
 
     def initialize_housekeeping(self) -> None:
         self.unsubscribes.append(
@@ -1448,10 +1489,13 @@ class AlarmArmer:
                     # the panel's state change may be seen after the action returns, so match on the state
                     self._service_target = arming_state
                     try:
+                        service_data: dict[str, str] = {"entity_id": self.alarm_panel}
+                        if self._panel_code:
+                            service_data[ATTR_CODE] = self._panel_code
                         await self.hass.services.async_call(
                             "alarm_control_panel",
                             service_name,
-                            {"entity_id": self.alarm_panel},
+                            service_data,
                             blocking=True,
                             context=context,
                         )
@@ -1834,6 +1878,7 @@ class AlarmArmer:
     async def on_panel_change(self, event: Event[EventStateChangedData]) -> None:
         """Alarm Control Panel has been changed outside of AutoArm"""
         entity_id, old, new, new_attributes = self._extract_event(event)
+        self.check_panel_code()
         if self._service_target is not None:
             if new == AlarmControlPanelState.ARMING:
                 # exit delay - the panel's own change to the armed state follows later
