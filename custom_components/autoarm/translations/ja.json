@@ -118,12 +118,18 @@
                             "notify_enabled": "通知を有効にする",
                             "notify_action": "通知アクション",
                             "notify_targets": "通知先",
+                            "notify_target": "通知先",
+                            "notify_custom_target": "カスタム通知先",
+                            "notify_deliveries": "配信",
                             "notify_data": "追加の通知データ"
                         },
                         "data_description": {
                             "notify_enabled": "アラーム状態変化の通知を有効にする",
                             "notify_action": "通知に使用する Home Assistant アクション（サービス）",
                             "notify_targets": "通知先アドレスまたは notify エンティティのリスト（Supernotify の場合は空白可）",
+                            "notify_target": "通知する相手や対象です。Supernotify の通知と同じように指定します。空欄にすると Supernotify が選びます。",
+                            "notify_custom_target": "メールアドレスや電話番号など、Home Assistant の外にある通知先です。",
+                            "notify_deliveries": "通知をこれらの Supernotify の配信に限定します。空欄にすると Supernotify が選びます。",
                             "notify_data": "通知アクションに渡される追加データ。モバイルアプリ通知のアクションやチャンネルなど。ここで設定した値は、YAML通知プロファイル内の一致するキーによって上書きされます。"
                         }
                     },
@@ -143,13 +149,21 @@
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
                             "panel_code": "アラームパネルのコード",
                             "calendar_armed_end_mode": "カレンダーによる警戒オーバーライドの終了時",
-                            "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時"
+                            "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時",
+                            "occupied_delay": "誰かが帰宅した後の遅延",
+                            "unoccupied_delay": "誰かが外出した後の遅延",
+                            "rate_limit_max_calls": "レート制限 - 最大変更回数",
+                            "rate_limit_period": "レート制限 - 期間"
                         },
                         "data_description": {
                             "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、下で設定してください。",
                             "panel_code": "パネルがコードを必要とする場合に、警戒・解除時に Auto Arm がアラームパネルのアクションへ渡すコードです。暗号化して保存され、再表示されることはありません。保存済みのコードをそのまま使う場合は空欄にしてください。",
                             "calendar_armed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは解除し、全員外出中なら外出警戒にします。",
-                            "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。"
+                            "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。",
+                            "occupied_delay": "誰かが帰宅してからアラーム状態を判定するまでの待ち時間（秒）です。その間に手動で変更すると取り消されます。",
+                            "unoccupied_delay": "誰かが外出してからアラーム状態を判定するまでの待ち時間（秒）です。短時間の不在やトラッカーの切断で警戒状態にならないようにします。その間に手動で変更すると取り消されます。",
+                            "rate_limit_max_calls": "ループを防ぐため、レート制限の期間内に Auto Arm が行うアラーム状態の変更の最大回数です。期間内のそれ以上の変更はスキップされます。",
+                            "rate_limit_period": "最大変更回数を数える期間の長さ（秒）です。"
                         }
                     }
                 }
@@ -253,12 +267,18 @@
                             "notify_enabled": "通知を有効にする",
                             "notify_action": "通知アクション",
                             "notify_targets": "通知先",
+                            "notify_target": "通知先",
+                            "notify_custom_target": "カスタム通知先",
+                            "notify_deliveries": "配信",
                             "notify_data": "追加の通知データ"
                         },
                         "data_description": {
                             "notify_enabled": "アラーム状態変化の通知を有効にする",
                             "notify_action": "通知に使用する Home Assistant アクション（サービス）",
                             "notify_targets": "通知先アドレスまたは notify エンティティのリスト（Supernotify の場合は空白可）",
+                            "notify_target": "通知する相手や対象です。Supernotify の通知と同じように指定します。空欄にすると Supernotify が選びます。",
+                            "notify_custom_target": "メールアドレスや電話番号など、Home Assistant の外にある通知先です。",
+                            "notify_deliveries": "通知をこれらの Supernotify の配信に限定します。空欄にすると Supernotify が選びます。",
                             "notify_data": "通知アクションに渡される追加データ。モバイルアプリ通知のアクションやチャンネルなど。ここで設定した値は、YAML通知プロファイル内の一致するキーによって上書きされます。"
                         }
                     },
@@ -279,13 +299,21 @@
                             "panel_code": "アラームパネルのコード",
                             "panel_code_clear": "保存済みのアラームパネルのコードを削除する",
                             "calendar_armed_end_mode": "カレンダーによる警戒オーバーライドの終了時",
-                            "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時"
+                            "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時",
+                            "occupied_delay": "誰かが帰宅した後の遅延",
+                            "unoccupied_delay": "誰かが外出した後の遅延",
+                            "rate_limit_max_calls": "レート制限 - 最大変更回数",
+                            "rate_limit_period": "レート制限 - 期間"
                         },
                         "data_description": {
                             "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、下で設定してください。",
                             "panel_code": "パネルがコードを必要とする場合に、警戒・解除時に Auto Arm がアラームパネルのアクションへ渡すコードです。暗号化して保存され、再表示されることはありません。保存済みのコードをそのまま使う場合は空欄にしてください。",
                             "calendar_armed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは解除し、全員外出中なら外出警戒にします。",
-                            "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。"
+                            "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。",
+                            "occupied_delay": "誰かが帰宅してからアラーム状態を判定するまでの待ち時間（秒）です。その間に手動で変更すると取り消されます。",
+                            "unoccupied_delay": "誰かが外出してからアラーム状態を判定するまでの待ち時間（秒）です。短時間の不在やトラッカーの切断で警戒状態にならないようにします。その間に手動で変更すると取り消されます。",
+                            "rate_limit_max_calls": "ループを防ぐため、レート制限の期間内に Auto Arm が行うアラーム状態の変更の最大回数です。期間内のそれ以上の変更はスキップされます。",
+                            "rate_limit_period": "最大変更回数を数える期間の長さ（秒）です。"
                         }
                     }
                 }

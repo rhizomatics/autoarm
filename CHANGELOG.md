@@ -72,6 +72,7 @@ None of this removes existing functionality, and all of it can be overridden or 
 - New **Buttons** section in the options, for any number of buttons for each alarm state and for a reset, each with a delay in seconds
   - The delay is zero unless set, other than for `armed_away`, which starts at 120 seconds
   - Buttons in YAML are copied into the options the first time, and the options used from then on
+- The reset button always gets a notification in reply, even when the state stays as it is, and says if it has cancelled a delayed change from another button
 
 ### Alarm Panels That Need a Code
 - New **Alarm panel code** in the **Advanced** section of the options, passed to the alarm panel's actions when arming or disarming
@@ -82,6 +83,8 @@ None of this removes existing functionality, and all of it can be overridden or 
 - The alarm states are now the humane versions, e.g. "Armed Night" rather than `armed_night`
 - Changes made by a Times of the Day sensor name the sensor, e.g. "by Bedtime Times of the Day sensor"
 - New installs have `supernotify.notify` as the notification action if Supernotify is already installed
+- With Supernotify installed, the options have **Targets**, to pick people, entities, devices, areas or labels, **Custom targets** for addresses and numbers, and **Deliveries** to limit which Supernotify deliveries are used
+  - These replace **Notification Targets**, and targets already set are carried over as custom targets
 - A warning is logged at start up if notifications are enabled using `notify.send_message` with no **Notification Targets**, since nothing can then be sent
 
 ### Calendar Occupancy Override
@@ -101,6 +104,8 @@ None of this removes existing functionality, and all of it can be overridden or 
   - **Buttons** has the physical buttons
   - **Notifications** comes after these, ahead of the advanced sections, **Advanced - Times of the Day Sensor** and **Advanced**
   - **Advanced** holds **Change state using the alarm panel's actions** and the calendar end settings, now **When a calendar arming override ends** and **When a calendar disarming override ends**
+    - The rate limit, and the delays after someone arrives or leaves home, are now set here rather than in YAML
+    - `rate_limit` and `occupancy.delay_time` in YAML are copied into the options the first time, and the options used from then on
 - The bedtime sensor, calendars and people are now **Bedtime - Times of the Day Sensor**, **Occupancy - Calendars** and **Presence - People for Occupancy Based Arming**
 
 ## 📚 Documentation

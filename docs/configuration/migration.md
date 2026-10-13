@@ -23,8 +23,8 @@ Existing YAML-only installations are **automatically migrated** to a config entr
 | `transitions` | YAML | YAML (unchanged) |
 | `buttons` | YAML | UI Options, copied from YAML on first start |
 | `notify` | YAML | Profiles in YAML (unchanged), Service in UI (Options) |
-| `rate_limit` | YAML | YAML (unchanged) |
-| `occupancy.delay_time` | YAML | YAML (unchanged) |
+| `rate_limit` | YAML | UI Options, copied from YAML on first start |
+| `occupancy.delay_time` | YAML | UI Options, copied from YAML on first start |
 
 ## Auto-Migration
 
@@ -44,7 +44,7 @@ After migration, the following YAML keys are read from the config entry and can 
 - `calendar_control.no_event_mode`
 - Calendar `entity_id` values (the entity list is managed in Options)
 
-The `buttons` section is copied into the options the first time, and can then be removed. The remaining YAML sections (`transitions`, `notify`, `rate_limit`, per-calendar `state_patterns` and `poll_interval`, and `calendar_control.notify_grace_period`) should be kept.
+The `buttons` and `rate_limit` sections, and `occupancy.delay_time`, are copied into the options the first time, and can then be removed. The remaining YAML sections (`transitions`, `notify`, per-calendar `state_patterns` and `poll_interval`, and `calendar_control.notify_grace_period`) should be kept.
 
 ## Coexisting Configurations
 

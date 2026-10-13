@@ -259,7 +259,7 @@ A change held back like this, or by an occupancy or button delay, is shown as de
 ## Occupancy Control
 
 !!! note "Configuration split"
-    Person entities and occupancy `default_state` are configured via the Auto Arm **Options** UI. The `delay_time` setting remains in YAML.
+    Person entities, occupancy `default_state` and the delays after someone arrives or leaves are configured via the Auto Arm **Options** UI. A `delay_time` in YAML is copied into the options the first time.
 
 The people who live at the property can be defined as [Person Integration][] entities [Person Entities]() in the `occupancy` configuration, and used to derive an `occupied` value for [Automated Transitions]. This works best with the Companion App on a mobile phone, although other [Device Tracker Integrations](https://www.home-assistant.io/integrations/?cat=device-tracker)
 can work, such as a home network `device_tracker`.

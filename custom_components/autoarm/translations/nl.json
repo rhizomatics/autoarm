@@ -118,12 +118,18 @@
                             "notify_enabled": "Meldingen ingeschakeld",
                             "notify_action": "Meldingsactie",
                             "notify_targets": "Meldingsdoelen",
+                            "notify_target": "Doelen",
+                            "notify_custom_target": "Aangepaste doelen",
+                            "notify_deliveries": "Bezorgingen",
                             "notify_data": "Extra meldingsgegevens"
                         },
                         "data_description": {
                             "notify_enabled": "Meldingen inschakelen bij wijzigingen van de alarmstatus",
                             "notify_action": "Home Assistant-actie (service) om mee te melden",
                             "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden; kan leeg blijven voor Supernotify",
+                            "notify_target": "Wie of wat een melding krijgt, zoals bij elke Supernotify-melding. Laat leeg om Supernotify te laten kiezen.",
+                            "notify_custom_target": "Doelen buiten Home Assistant, zoals e-mailadressen of telefoonnummers.",
+                            "notify_deliveries": "Beperk meldingen tot deze Supernotify-bezorgingen. Laat leeg om Supernotify te laten kiezen.",
                             "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
                         }
                     },
@@ -143,13 +149,21 @@
                             "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
                             "panel_code": "Code van het alarmpaneel",
                             "calendar_armed_end_mode": "Wanneer een inschakeling via de agenda eindigt",
-                            "calendar_disarmed_end_mode": "Wanneer een uitschakeling via de agenda eindigt"
+                            "calendar_disarmed_end_mode": "Wanneer een uitschakeling via de agenda eindigt",
+                            "occupied_delay": "Vertraging nadat iemand thuiskomt",
+                            "unoccupied_delay": "Vertraging nadat iemand van huis gaat",
+                            "rate_limit_max_calls": "Snelheidslimiet - maximale wijzigingen",
+                            "rate_limit_period": "Snelheidslimiet - periode"
                         },
                         "data_description": {
                             "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hieronder in.",
                             "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden.",
                             "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
-                            "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is."
+                            "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is.",
+                            "occupied_delay": "Aantal seconden wachten nadat iemand thuiskomt voordat de alarmstatus wordt bepaald. Een handmatige wijziging in die tijd annuleert dit.",
+                            "unoccupied_delay": "Aantal seconden wachten nadat iemand van huis gaat voordat de alarmstatus wordt bepaald, zodat een korte afwezigheid of een wegvallende tracker het alarm niet inschakelt. Een handmatige wijziging in die tijd annuleert dit.",
+                            "rate_limit_max_calls": "Het maximale aantal wijzigingen van de alarmstatus dat Auto Arm binnen de periode van de snelheidslimiet uitvoert, als bescherming tegen lussen. Verdere wijzigingen in die periode worden overgeslagen.",
+                            "rate_limit_period": "Lengte van de periode, in seconden, waarover de maximale wijzigingen worden geteld."
                         }
                     }
                 }
@@ -253,12 +267,18 @@
                             "notify_enabled": "Meldingen ingeschakeld",
                             "notify_action": "Meldingsactie",
                             "notify_targets": "Meldingsdoelen",
+                            "notify_target": "Doelen",
+                            "notify_custom_target": "Aangepaste doelen",
+                            "notify_deliveries": "Bezorgingen",
                             "notify_data": "Extra meldingsgegevens"
                         },
                         "data_description": {
                             "notify_enabled": "Meldingen inschakelen bij wijzigingen van de alarmstatus",
                             "notify_action": "Home Assistant-actie (service) om mee te melden",
                             "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden; kan leeg blijven voor Supernotify",
+                            "notify_target": "Wie of wat een melding krijgt, zoals bij elke Supernotify-melding. Laat leeg om Supernotify te laten kiezen.",
+                            "notify_custom_target": "Doelen buiten Home Assistant, zoals e-mailadressen of telefoonnummers.",
+                            "notify_deliveries": "Beperk meldingen tot deze Supernotify-bezorgingen. Laat leeg om Supernotify te laten kiezen.",
                             "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
                         }
                     },
@@ -279,13 +299,21 @@
                             "panel_code": "Code van het alarmpaneel",
                             "panel_code_clear": "Opgeslagen code van het alarmpaneel verwijderen",
                             "calendar_armed_end_mode": "Wanneer een inschakeling via de agenda eindigt",
-                            "calendar_disarmed_end_mode": "Wanneer een uitschakeling via de agenda eindigt"
+                            "calendar_disarmed_end_mode": "Wanneer een uitschakeling via de agenda eindigt",
+                            "occupied_delay": "Vertraging nadat iemand thuiskomt",
+                            "unoccupied_delay": "Vertraging nadat iemand van huis gaat",
+                            "rate_limit_max_calls": "Snelheidslimiet - maximale wijzigingen",
+                            "rate_limit_period": "Snelheidslimiet - periode"
                         },
                         "data_description": {
                             "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hieronder in.",
                             "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden.",
                             "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
-                            "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is."
+                            "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is.",
+                            "occupied_delay": "Aantal seconden wachten nadat iemand thuiskomt voordat de alarmstatus wordt bepaald. Een handmatige wijziging in die tijd annuleert dit.",
+                            "unoccupied_delay": "Aantal seconden wachten nadat iemand van huis gaat voordat de alarmstatus wordt bepaald, zodat een korte afwezigheid of een wegvallende tracker het alarm niet inschakelt. Een handmatige wijziging in die tijd annuleert dit.",
+                            "rate_limit_max_calls": "Het maximale aantal wijzigingen van de alarmstatus dat Auto Arm binnen de periode van de snelheidslimiet uitvoert, als bescherming tegen lussen. Verdere wijzigingen in die periode worden overgeslagen.",
+                            "rate_limit_period": "Lengte van de periode, in seconden, waarover de maximale wijzigingen worden geteld."
                         }
                     }
                 }

@@ -66,7 +66,7 @@ If that's not quite how you like, its still a good starting place for an easy to
 
 ### YAML for Advanced Features
 
-Transition logic, advanced notifications, rate limiting, and per-calendar overrides (state patterns, poll intervals) are configured in YAML. See [Typical Configuration](configuration/examples/typical.md) for a full example.
+Transition logic, advanced notifications, and per-calendar overrides (state patterns, poll intervals) are configured in YAML. See [Typical Configuration](configuration/examples/typical.md) for a full example.
 
 !!! note "Migrating from YAML-only"
     Existing YAML configurations are automatically migrated to a config entry on restart. See [Migration Guide](configuration/migration.md) for details.
@@ -110,7 +110,7 @@ The full list of how alarm panel state can be set:
 
 To guard against loops, or other reasons why arming might be triggered too often,
 rate limiting is applied around the arm call, limited to a set number of calls within
-the past so many seconds. Configured by `rate_limit` section in config.
+the past so many seconds. Set with the **Rate limit** fields in the **Advanced** section of the options, and is 5 changes in 60 seconds unless changed.
 
 
 ## Notifications
@@ -126,7 +126,7 @@ Two notifications are sent:
 
 If [Supernotify](https://supernotify.rhizomatics.org.uk) is installed, its `supernotify.notify` action is offered first in
 the **Notification Action** list. New installs have it already selected. It takes the same fields as the YAML `data` section, such as `priority`, and adds the
-[Mobile Actions](mobile_actions.md) to disarm, reset or arm away from the notification. Leave the targets blank to let Supernotify choose who to notify.
+[Mobile Actions](mobile_actions.md) to disarm, reset or arm away from the notification. Leave the targets blank to let Supernotify choose who to notify. With Supernotify installed, the options have its own **Targets**, **Custom targets** and **Deliveries** fields in place of **Notification Targets**, and any targets already there are carried over as custom ones.
 The action chosen here is used for every notification, unless a YAML profile sets its own `service`.
 
 ### Advanced Notifications

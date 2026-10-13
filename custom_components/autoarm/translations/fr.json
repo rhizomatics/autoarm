@@ -118,12 +118,18 @@
                             "notify_enabled": "Notifications activées",
                             "notify_action": "Action de notification",
                             "notify_targets": "Destinataires de notification",
+                            "notify_target": "Cibles",
+                            "notify_custom_target": "Cibles personnalisées",
+                            "notify_deliveries": "Livraisons",
                             "notify_data": "Données de notification supplémentaires"
                         },
                         "data_description": {
                             "notify_enabled": "Activer les notifications pour les changements d'état de l'alarme",
                             "notify_action": "Action (service) Home Assistant à utiliser pour notifier",
                             "notify_targets": "Liste d'adresses ou d'entités notify à notifier, peut être laissée vide pour Supernotify",
+                            "notify_target": "Qui ou quoi notifier, comme pour toute notification Supernotify. Laissez vide pour laisser Supernotify choisir.",
+                            "notify_custom_target": "Cibles en dehors de Home Assistant, comme des adresses e-mail ou des numéros de téléphone.",
+                            "notify_deliveries": "Limiter les notifications à ces livraisons Supernotify. Laissez vide pour laisser Supernotify choisir.",
                             "notify_data": "Données supplémentaires transmises à l'action de notification, telles que des actions ou un canal pour une notification d'application mobile. Toute valeur définie ici est remplacée par une clé correspondante dans un profil de notification YAML."
                         }
                     },
@@ -143,13 +149,21 @@
                             "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
                             "panel_code": "Code de la centrale d'alarme",
                             "calendar_armed_end_mode": "À la fin d'un armement par calendrier",
-                            "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier"
+                            "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier",
+                            "occupied_delay": "Délai après l'arrivée de quelqu'un",
+                            "unoccupied_delay": "Délai après le départ de quelqu'un",
+                            "rate_limit_max_calls": "Limite de fréquence - changements maximum",
+                            "rate_limit_period": "Limite de fréquence - période"
                         },
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. Si la centrale exige un code, définissez-le ci-dessous.",
                             "panel_code": "Code qu'Auto Arm fournit aux actions de la centrale d'alarme lors de l'armement ou du désarmement, si la centrale en exige un. Il est stocké chiffré et n'est plus jamais affiché. Laissez vide pour conserver le code déjà enregistré.",
                             "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
-                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
+                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là.",
+                            "occupied_delay": "Secondes d'attente après l'arrivée de quelqu'un à la maison avant de déterminer l'état de l'alarme. Un changement manuel pendant ce temps l'annule.",
+                            "unoccupied_delay": "Secondes d'attente après le départ de quelqu'un avant de déterminer l'état de l'alarme, afin qu'une brève absence ou un traceur qui décroche n'arme pas l'alarme. Un changement manuel pendant ce temps l'annule.",
+                            "rate_limit_max_calls": "Le nombre maximal de changements d'état de l'alarme qu'Auto Arm effectuera pendant la période de limite de fréquence, pour se protéger des boucles. Les changements supplémentaires pendant cette période sont ignorés.",
+                            "rate_limit_period": "Durée de la période, en secondes, sur laquelle les changements maximum sont comptés."
                         }
                     }
                 }
@@ -253,12 +267,18 @@
                             "notify_enabled": "Notifications activées",
                             "notify_action": "Action de notification",
                             "notify_targets": "Destinataires de notification",
+                            "notify_target": "Cibles",
+                            "notify_custom_target": "Cibles personnalisées",
+                            "notify_deliveries": "Livraisons",
                             "notify_data": "Données de notification supplémentaires"
                         },
                         "data_description": {
                             "notify_enabled": "Activer les notifications pour les changements d'état de l'alarme",
                             "notify_action": "Action (service) Home Assistant à utiliser pour notifier",
                             "notify_targets": "Liste d'adresses ou d'entités notify à notifier, peut être laissée vide pour Supernotify",
+                            "notify_target": "Qui ou quoi notifier, comme pour toute notification Supernotify. Laissez vide pour laisser Supernotify choisir.",
+                            "notify_custom_target": "Cibles en dehors de Home Assistant, comme des adresses e-mail ou des numéros de téléphone.",
+                            "notify_deliveries": "Limiter les notifications à ces livraisons Supernotify. Laissez vide pour laisser Supernotify choisir.",
                             "notify_data": "Données supplémentaires transmises à l'action de notification, telles que des actions ou un canal pour une notification d'application mobile. Toute valeur définie ici est remplacée par une clé correspondante dans un profil de notification YAML."
                         }
                     },
@@ -279,13 +299,21 @@
                             "panel_code": "Code de la centrale d'alarme",
                             "panel_code_clear": "Supprimer le code enregistré de la centrale d'alarme",
                             "calendar_armed_end_mode": "À la fin d'un armement par calendrier",
-                            "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier"
+                            "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier",
+                            "occupied_delay": "Délai après l'arrivée de quelqu'un",
+                            "unoccupied_delay": "Délai après le départ de quelqu'un",
+                            "rate_limit_max_calls": "Limite de fréquence - changements maximum",
+                            "rate_limit_period": "Limite de fréquence - période"
                         },
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. Si la centrale exige un code, définissez-le ci-dessous.",
                             "panel_code": "Code qu'Auto Arm fournit aux actions de la centrale d'alarme lors de l'armement ou du désarmement, si la centrale en exige un. Il est stocké chiffré et n'est plus jamais affiché. Laissez vide pour conserver le code déjà enregistré.",
                             "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
-                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là."
+                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là.",
+                            "occupied_delay": "Secondes d'attente après l'arrivée de quelqu'un à la maison avant de déterminer l'état de l'alarme. Un changement manuel pendant ce temps l'annule.",
+                            "unoccupied_delay": "Secondes d'attente après le départ de quelqu'un avant de déterminer l'état de l'alarme, afin qu'une brève absence ou un traceur qui décroche n'arme pas l'alarme. Un changement manuel pendant ce temps l'annule.",
+                            "rate_limit_max_calls": "Le nombre maximal de changements d'état de l'alarme qu'Auto Arm effectuera pendant la période de limite de fréquence, pour se protéger des boucles. Les changements supplémentaires pendant cette période sont ignorés.",
+                            "rate_limit_period": "Durée de la période, en secondes, sur laquelle les changements maximum sont comptés."
                         }
                     }
                 }

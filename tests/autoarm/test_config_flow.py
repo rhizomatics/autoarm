@@ -354,6 +354,23 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     assert entry.options[CONF_SUNRISE_EARLIEST] == "05:30:00"
 
 
+async def test_options_flow_advanced_delays_and_rate_limit(hass: HomeAssistant, setup_autoarm: MockConfigEntry) -> None:
+    """The occupancy delays and rate limit are in the advanced section, with the defaults they had in YAML"""
+    result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
+
+    data_schema = result["data_schema"]
+    assert data_schema is not None
+    assert data_schema.schema["advanced_options"].schema({}) == {
+        "use_alarm_service": True,
+        "calendar_armed_end_mode": "auto",
+        "calendar_disarmed_end_mode": "auto",
+        "occupied_delay": 0,
+        "unoccupied_delay": 0,
+        "rate_limit_max_calls": 5,
+        "rate_limit_period": 60,
+    }
+
+
 async def test_options_flow_offers_supernotify_action(hass: HomeAssistant, setup_autoarm: MockConfigEntry) -> None:
     """supernotify.notify is offered as the notification action when Supernotify provides it."""
     hass.services.async_register("supernotify", "notify", lambda _call: None)

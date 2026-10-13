@@ -118,12 +118,18 @@
                             "notify_enabled": "启用通知",
                             "notify_action": "通知操作",
                             "notify_targets": "通知目标",
+                            "notify_target": "通知对象",
+                            "notify_custom_target": "自定义通知对象",
+                            "notify_deliveries": "投递方式",
                             "notify_data": "额外通知数据"
                         },
                         "data_description": {
                             "notify_enabled": "在警报状态发生变化时启用通知",
                             "notify_action": "用于发送通知的 Home Assistant 操作（服务）",
                             "notify_targets": "要通知的地址或通知实体列表；如使用 Supernotify 可留空",
+                            "notify_target": "要通知的人或对象，与任何 Supernotify 通知相同。留空则由 Supernotify 选择。",
+                            "notify_custom_target": "Home Assistant 之外的通知对象，例如电子邮件地址或电话号码。",
+                            "notify_deliveries": "将通知限制为这些 Supernotify 投递方式。留空则由 Supernotify 选择。",
                             "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
                         }
                     },
@@ -143,13 +149,21 @@
                             "use_alarm_service": "使用报警面板的操作更改状态",
                             "panel_code": "报警面板密码",
                             "calendar_armed_end_mode": "日历布防覆盖结束时",
-                            "calendar_disarmed_end_mode": "日历撤防覆盖结束时"
+                            "calendar_disarmed_end_mode": "日历撤防覆盖结束时",
+                            "occupied_delay": "有人到家后的延迟",
+                            "unoccupied_delay": "有人离家后的延迟",
+                            "rate_limit_max_calls": "速率限制 - 最大更改次数",
+                            "rate_limit_period": "速率限制 - 周期"
                         },
                         "data_description": {
                             "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在下方设置。",
                             "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。",
                             "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
-                            "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。"
+                            "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。",
+                            "occupied_delay": "有人到家后，在计算报警状态之前等待的秒数。在此期间的手动更改会将其取消。",
+                            "unoccupied_delay": "有人离家后，在计算报警状态之前等待的秒数，这样短暂离开或追踪器掉线就不会布防。在此期间的手动更改会将其取消。",
+                            "rate_limit_max_calls": "为防止循环，Auto Arm 在速率限制周期内最多更改报警状态的次数。该周期内超出的更改将被跳过。",
+                            "rate_limit_period": "统计最大更改次数的周期长度（秒）。"
                         }
                     }
                 }
@@ -253,12 +267,18 @@
                             "notify_enabled": "启用通知",
                             "notify_action": "通知操作",
                             "notify_targets": "通知目标",
+                            "notify_target": "通知对象",
+                            "notify_custom_target": "自定义通知对象",
+                            "notify_deliveries": "投递方式",
                             "notify_data": "额外通知数据"
                         },
                         "data_description": {
                             "notify_enabled": "在警报状态发生变化时启用通知",
                             "notify_action": "用于发送通知的 Home Assistant 操作（服务）",
                             "notify_targets": "要通知的地址或通知实体列表；如使用 Supernotify 可留空",
+                            "notify_target": "要通知的人或对象，与任何 Supernotify 通知相同。留空则由 Supernotify 选择。",
+                            "notify_custom_target": "Home Assistant 之外的通知对象，例如电子邮件地址或电话号码。",
+                            "notify_deliveries": "将通知限制为这些 Supernotify 投递方式。留空则由 Supernotify 选择。",
                             "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
                         }
                     },
@@ -279,13 +299,21 @@
                             "panel_code": "报警面板密码",
                             "panel_code_clear": "删除已存储的报警面板密码",
                             "calendar_armed_end_mode": "日历布防覆盖结束时",
-                            "calendar_disarmed_end_mode": "日历撤防覆盖结束时"
+                            "calendar_disarmed_end_mode": "日历撤防覆盖结束时",
+                            "occupied_delay": "有人到家后的延迟",
+                            "unoccupied_delay": "有人离家后的延迟",
+                            "rate_limit_max_calls": "速率限制 - 最大更改次数",
+                            "rate_limit_period": "速率限制 - 周期"
                         },
                         "data_description": {
                             "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在下方设置。",
                             "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。",
                             "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
-                            "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。"
+                            "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。",
+                            "occupied_delay": "有人到家后，在计算报警状态之前等待的秒数。在此期间的手动更改会将其取消。",
+                            "unoccupied_delay": "有人离家后，在计算报警状态之前等待的秒数，这样短暂离开或追踪器掉线就不会布防。在此期间的手动更改会将其取消。",
+                            "rate_limit_max_calls": "为防止循环，Auto Arm 在速率限制周期内最多更改报警状态的次数。该周期内超出的更改将被跳过。",
+                            "rate_limit_period": "统计最大更改次数的周期长度（秒）。"
                         }
                     }
                 }

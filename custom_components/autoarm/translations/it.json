@@ -118,12 +118,18 @@
                             "notify_enabled": "Notifiche abilitate",
                             "notify_action": "Azione di notifica",
                             "notify_targets": "Destinatari notifica",
+                            "notify_target": "Destinatari",
+                            "notify_custom_target": "Destinatari personalizzati",
+                            "notify_deliveries": "Consegne",
                             "notify_data": "Dati di notifica aggiuntivi"
                         },
                         "data_description": {
                             "notify_enabled": "Abilita le notifiche per i cambiamenti di stato dell'allarme",
                             "notify_action": "Azione (servizio) di Home Assistant da usare per notificare",
                             "notify_targets": "Elenco di indirizzi o entità notify da notificare, può essere lasciato vuoto per Supernotify",
+                            "notify_target": "Chi o cosa avvisare, come per qualsiasi notifica Supernotify. Lascia vuoto per far scegliere a Supernotify.",
+                            "notify_custom_target": "Destinatari fuori da Home Assistant, come indirizzi e-mail o numeri di telefono.",
+                            "notify_deliveries": "Limita le notifiche a queste consegne di Supernotify. Lascia vuoto per far scegliere a Supernotify.",
                             "notify_data": "Dati aggiuntivi passati all'azione di notifica, come azioni o un canale per una notifica dell'app mobile. Qualsiasi valore impostato qui viene sovrascritto da una chiave corrispondente in un profilo di notifica YAML."
                         }
                     },
@@ -143,13 +149,21 @@
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                             "panel_code": "Codice della centrale d'allarme",
                             "calendar_armed_end_mode": "Al termine di un inserimento da calendario",
-                            "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario"
+                            "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario",
+                            "occupied_delay": "Ritardo dopo l'arrivo di qualcuno a casa",
+                            "unoccupied_delay": "Ritardo dopo che qualcuno esce di casa",
+                            "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
+                            "rate_limit_period": "Limite di frequenza - periodo"
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sotto.",
                             "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato.",
                             "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
-                            "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno."
+                            "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno.",
+                            "occupied_delay": "Secondi di attesa dopo l'arrivo di qualcuno a casa prima di determinare lo stato dell'allarme. Una modifica manuale in quel tempo lo annulla.",
+                            "unoccupied_delay": "Secondi di attesa dopo che qualcuno esce di casa prima di determinare lo stato dell'allarme, così una breve assenza o un tracker che si disconnette non inserisce l'allarme. Una modifica manuale in quel tempo lo annulla.",
+                            "rate_limit_max_calls": "Il numero massimo di cambi di stato dell'allarme che Auto Arm effettua nel periodo del limite di frequenza, come protezione dai cicli. Le ulteriori modifiche in quel periodo vengono saltate.",
+                            "rate_limit_period": "Durata del periodo, in secondi, in cui vengono contate le modifiche massime."
                         }
                     }
                 }
@@ -253,12 +267,18 @@
                             "notify_enabled": "Notifiche abilitate",
                             "notify_action": "Azione di notifica",
                             "notify_targets": "Destinatari notifica",
+                            "notify_target": "Destinatari",
+                            "notify_custom_target": "Destinatari personalizzati",
+                            "notify_deliveries": "Consegne",
                             "notify_data": "Dati di notifica aggiuntivi"
                         },
                         "data_description": {
                             "notify_enabled": "Abilita le notifiche per i cambiamenti di stato dell'allarme",
                             "notify_action": "Azione (servizio) di Home Assistant da usare per notificare",
                             "notify_targets": "Elenco di indirizzi o entità notify da notificare, può essere lasciato vuoto per Supernotify",
+                            "notify_target": "Chi o cosa avvisare, come per qualsiasi notifica Supernotify. Lascia vuoto per far scegliere a Supernotify.",
+                            "notify_custom_target": "Destinatari fuori da Home Assistant, come indirizzi e-mail o numeri di telefono.",
+                            "notify_deliveries": "Limita le notifiche a queste consegne di Supernotify. Lascia vuoto per far scegliere a Supernotify.",
                             "notify_data": "Dati aggiuntivi passati all'azione di notifica, come azioni o un canale per una notifica dell'app mobile. Qualsiasi valore impostato qui viene sovrascritto da una chiave corrispondente in un profilo di notifica YAML."
                         }
                     },
@@ -279,13 +299,21 @@
                             "panel_code": "Codice della centrale d'allarme",
                             "panel_code_clear": "Rimuovi il codice salvato della centrale d'allarme",
                             "calendar_armed_end_mode": "Al termine di un inserimento da calendario",
-                            "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario"
+                            "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario",
+                            "occupied_delay": "Ritardo dopo l'arrivo di qualcuno a casa",
+                            "unoccupied_delay": "Ritardo dopo che qualcuno esce di casa",
+                            "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
+                            "rate_limit_period": "Limite di frequenza - periodo"
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sotto.",
                             "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato.",
                             "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
-                            "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno."
+                            "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno.",
+                            "occupied_delay": "Secondi di attesa dopo l'arrivo di qualcuno a casa prima di determinare lo stato dell'allarme. Una modifica manuale in quel tempo lo annulla.",
+                            "unoccupied_delay": "Secondi di attesa dopo che qualcuno esce di casa prima di determinare lo stato dell'allarme, così una breve assenza o un tracker che si disconnette non inserisce l'allarme. Una modifica manuale in quel tempo lo annulla.",
+                            "rate_limit_max_calls": "Il numero massimo di cambi di stato dell'allarme che Auto Arm effettua nel periodo del limite di frequenza, come protezione dai cicli. Le ulteriori modifiche in quel periodo vengono saltate.",
+                            "rate_limit_period": "Durata del periodo, in secondi, in cui vengono contate le modifiche massime."
                         }
                     }
                 }

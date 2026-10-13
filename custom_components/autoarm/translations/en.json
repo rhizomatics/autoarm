@@ -118,12 +118,18 @@
                             "notify_enabled": "Notifications Enabled",
                             "notify_action": "Notification Action",
                             "notify_targets": "Notification Targets",
+                            "notify_target": "Targets",
+                            "notify_custom_target": "Custom targets",
+                            "notify_deliveries": "Deliveries",
                             "notify_data": "Extra Notification Data"
                         },
                         "data_description": {
                             "notify_enabled": "Enable notifications for alarm state changes",
                             "notify_action": "Home Assistant action (service) to use to notify",
                             "notify_targets": "List of addresses or notify entities to notify, can be left blank for Supernotify",
+                            "notify_target": "Who or what to notify, as for any Supernotify notification. Leave empty for Supernotify to choose.",
+                            "notify_custom_target": "Targets outside of Home Assistant, such as e-mail addresses or phone numbers.",
+                            "notify_deliveries": "Limit notifications to these Supernotify deliveries. Leave empty for Supernotify to choose.",
                             "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
                         }
                     },
@@ -143,13 +149,21 @@
                             "use_alarm_service": "Change state using the alarm panel's actions",
                             "panel_code": "Alarm panel code",
                             "calendar_armed_end_mode": "When a calendar arming override ends",
-                            "calendar_disarmed_end_mode": "When a calendar disarming override ends"
+                            "calendar_disarmed_end_mode": "When a calendar disarming override ends",
+                            "occupied_delay": "Delay after someone arrives home",
+                            "unoccupied_delay": "Delay after someone leaves home",
+                            "rate_limit_max_calls": "Rate limit - maximum changes",
+                            "rate_limit_period": "Rate limit - period"
                         },
                         "data_description": {
                             "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. If the panel requires a code, set it below.",
                             "panel_code": "Code for Auto Arm to give the alarm panel's actions when arming or disarming, if the panel needs one. It is stored encrypted and never shown again. Leave blank to keep the code already stored.",
                             "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
-                            "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out."
+                            "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out.",
+                            "occupied_delay": "Seconds to wait after someone arrives home before working out the alarm state. A manual change in that time cancels it.",
+                            "unoccupied_delay": "Seconds to wait after someone leaves home before working out the alarm state, so a brief absence, or a tracker dropping out, doesn't arm the alarm. A manual change in that time cancels it.",
+                            "rate_limit_max_calls": "The most changes of alarm state Auto Arm will make within the rate limit period, as a guard against loops. Any more in that period are skipped.",
+                            "rate_limit_period": "Length of the period, in seconds, over which the maximum changes are counted."
                         }
                     }
                 }
@@ -253,12 +267,18 @@
                             "notify_enabled": "Notifications Enabled",
                             "notify_action": "Notification Action",
                             "notify_targets": "Notification Targets",
+                            "notify_target": "Targets",
+                            "notify_custom_target": "Custom targets",
+                            "notify_deliveries": "Deliveries",
                             "notify_data": "Extra Notification Data"
                         },
                         "data_description": {
                             "notify_enabled": "Enable notifications for alarm state changes",
                             "notify_action": "Home Assistant action (service) to use to notify",
                             "notify_targets": "List of addresses or notify entities to notify, can be left blank for Supernotify",
+                            "notify_target": "Who or what to notify, as for any Supernotify notification. Leave empty for Supernotify to choose.",
+                            "notify_custom_target": "Targets outside of Home Assistant, such as e-mail addresses or phone numbers.",
+                            "notify_deliveries": "Limit notifications to these Supernotify deliveries. Leave empty for Supernotify to choose.",
                             "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
                         }
                     },
@@ -279,13 +299,21 @@
                             "panel_code": "Alarm panel code",
                             "panel_code_clear": "Remove the stored alarm panel code",
                             "calendar_armed_end_mode": "When a calendar arming override ends",
-                            "calendar_disarmed_end_mode": "When a calendar disarming override ends"
+                            "calendar_disarmed_end_mode": "When a calendar disarming override ends",
+                            "occupied_delay": "Delay after someone arrives home",
+                            "unoccupied_delay": "Delay after someone leaves home",
+                            "rate_limit_max_calls": "Rate limit - maximum changes",
+                            "rate_limit_period": "Rate limit - period"
                         },
                         "data_description": {
                             "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. If the panel requires a code, set it below.",
                             "panel_code": "Code for Auto Arm to give the alarm panel's actions when arming or disarming, if the panel needs one. It is stored encrypted and never shown again. Leave blank to keep the code already stored.",
                             "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
-                            "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out."
+                            "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out.",
+                            "occupied_delay": "Seconds to wait after someone arrives home before working out the alarm state. A manual change in that time cancels it.",
+                            "unoccupied_delay": "Seconds to wait after someone leaves home before working out the alarm state, so a brief absence, or a tracker dropping out, doesn't arm the alarm. A manual change in that time cancels it.",
+                            "rate_limit_max_calls": "The most changes of alarm state Auto Arm will make within the rate limit period, as a guard against loops. Any more in that period are skipped.",
+                            "rate_limit_period": "Length of the period, in seconds, over which the maximum changes are counted."
                         }
                     }
                 }

@@ -4,6 +4,7 @@ from typing import Any
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import CONF_SERVICE, CONF_SOURCE, CONF_STATE, CONF_TARGET
 from homeassistant.core import Context, HomeAssistant
+from homeassistant.helpers import config_validation as cv
 
 from custom_components.autoarm.const import (
     ALARM_STATES,
@@ -28,18 +29,26 @@ class Notifier:
         notify_action: str | None,
         notify_targets: list[str] | None = None,
         notify_data: dict[str, Any] | None = None,
+        notify_target: dict[str, Any] | None = None,
+        notify_custom_target: list[str] | None = None,
+        notify_deliveries: list[str] | None = None,
     ) -> None:
         self.notify_profiles: dict[str, dict[str, Any]] = notify_profiles or {}
         self.hass: HomeAssistant = hass
         self.app_health_tracker: AppHealthTracker = app_health_tracker
         self.notify_action: str | None = notify_action
-        self.notify_targets: list[str] = notify_targets or []
+        # targets typed in, as addresses or entity ids, wherever in the options they were put
+        self.notify_targets: list[str] = list(dict.fromkeys([*(notify_targets or []), *(notify_custom_target or [])]))
+        # targets picked from Home Assistant's own entities, devices, areas and labels
+        self.notify_target: dict[str, Any] = notify_target or {}
+        self.notify_deliveries: list[str] = notify_deliveries or []
         # extra service data configured via the options UI's ObjectSelector, lowest priority so
         # YAML profile data (common or per-profile) can still override individual keys
         self.notify_data: dict[str, Any] = notify_data or {}
         if (
             (self.notify_action or self.notify_profiles.get(NOTIFY_COMMON, {}).get(CONF_SERVICE)) == "notify.send_message"
             and not self.notify_targets
+            and not self.notify_target
             and not any(profile.get(CONF_TARGET) for profile in self.notify_profiles.values())
         ):
             _LOGGER.warning(
@@ -116,11 +125,13 @@ class Notifier:
             if (merged_profile.get(CONF_SUPERNOTIFY) or supernotify_action) and merged_profile.get(CONF_SCENARIO):
                 data["apply_scenarios"] = merged_profile.get(CONF_SCENARIO)
 
+            # a profile's own targets take over from all of those chosen in the options
             notify_targets: list[str] | None = merged_profile.get(CONF_TARGET, self.notify_targets)
+            picked_target: dict[str, Any] = {} if CONF_TARGET in merged_profile else self.notify_target
             if notify_action is None:
                 _LOGGER.debug("AUTOARM Notifications disabled, no notification action")
                 return
-            if notify_action == "notify.send_message" and not notify_targets:
+            if notify_action == "notify.send_message" and not notify_targets and not picked_target:
                 _LOGGER.debug("AUTOARM Notifications disabled, no targets for notify.send_message")
                 return
 
@@ -143,18 +154,27 @@ class Notifier:
                 if supernotify_action:
                     # supernotify.notify takes the data fields at the top level
                     service_data.update(data)
+                    if self.notify_deliveries and "delivery" not in service_data:
+                        service_data["delivery"] = self.notify_deliveries
+                        service_data.setdefault("delivery_selection", "explicit")
                 elif data and notify_action != "notify.send_message":
                     # new notify entities can't handle nested data section
                     service_data["data"] = data
                 domain, action = notify_action.split(".", 1)
                 target: dict[str, Any] | None = None
-                if notify_targets:
-                    if domain == "notify" and action == "send_message":
-                        # notify.send_message is entity-based and targets via entity_id,
-                        # not a "target" key in service_data like legacy notify services
-                        target = {"entity_id": notify_targets}
-                    else:
-                        service_data["target"] = notify_targets
+                if domain == "notify" and action == "send_message":
+                    # notify.send_message is entity-based and targets via entity_id,
+                    # not a "target" key in service_data like legacy notify services
+                    target = dict(picked_target)
+                    if entity_ids := [*cv.ensure_list(picked_target.get("entity_id")), *(notify_targets or [])]:
+                        target["entity_id"] = entity_ids
+                elif supernotify_action and picked_target:
+                    # the same pair of target fields as supernotify.notify itself
+                    service_data["target"] = picked_target
+                    if notify_targets:
+                        service_data["custom_target"] = notify_targets
+                elif notify_targets:
+                    service_data["target"] = notify_targets
 
                 _LOGGER.debug("AUTOARM Notifying %s.%s with %s target=%s", domain, action, service_data, target)
                 try:

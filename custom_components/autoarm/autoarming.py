@@ -30,6 +30,7 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_STOP,
     SERVICE_RELOAD,
     STATE_HOME,
+    STATE_NOT_HOME,
     STATE_OFF,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
@@ -78,15 +79,21 @@ from .config_flow import (
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
+    CONF_NOTIFY_CUSTOM_TARGET,
     CONF_NOTIFY_DATA,
+    CONF_NOTIFY_DELIVERIES,
     CONF_NOTIFY_ENABLED,
+    CONF_NOTIFY_TARGET,
     CONF_NOTIFY_TARGETS,
     CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME,
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
+    CONF_OCCUPIED_DELAY,
     CONF_OCCUPIED_TRIGGER,
     CONF_PANEL_CODE,
     CONF_PERSON_ENTITIES,
+    CONF_RATE_LIMIT_MAX_CALLS,
+    CONF_RATE_LIMIT_SECONDS,
     CONF_SENTENCE_ARM,
     CONF_SENTENCE_DISARM,
     CONF_SUNRISE_EARLIEST,
@@ -95,10 +102,13 @@ from .config_flow import (
     CONF_SUNSET_EARLIEST,
     CONF_SUNSET_LATEST,
     CONF_SUNSET_TRIGGER,
+    CONF_UNOCCUPIED_DELAY,
     CONF_UNOCCUPIED_TRIGGER,
     CONF_USE_ALARM_SERVICE,
     DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     DEFAULT_NOTIFY_ACTION,
+    DEFAULT_RATE_LIMIT_MAX_CALLS,
+    DEFAULT_RATE_LIMIT_SECONDS,
     TIME_OF_DAY_OPTIONS,
     button_delay_option,
     button_option,
@@ -178,6 +188,8 @@ EPHEMERAL_STATES = (
 )
 ZOMBIE_STATES = ("unknown", "unavailable")
 PANEL_CODE_ISSUE = "panel_code_required"
+# options holding the seconds to wait after a person changes to each state
+OCCUPANCY_DELAY_OPTIONS = {STATE_HOME: CONF_OCCUPIED_DELAY, STATE_NOT_HOME: CONF_UNOCCUPIED_DELAY}
 NS_MOBILE_ACTIONS = "mobile_actions"
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR]
 
@@ -281,7 +293,7 @@ async def async_setup(
                 "profiles": stashed_yaml.get(CONF_NOTIFY, {}),
                 "enabled": entry.options.get(CONF_NOTIFY_ENABLED, True),
             },
-            CONF_RATE_LIMIT: stashed_yaml.get(CONF_RATE_LIMIT, {}),
+            CONF_RATE_LIMIT: _rate_limit_from_options(entry.options),
         }
         try:
             jsonized: str = json.dumps(obj=data, cls=ExtendedExtendedJSONEncoder)
@@ -321,6 +333,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: AutoArmConfigEntry) -> b
     """Set up Auto Arm from a config entry."""
     yaml_config: ConfigType = hass.data.get(YAML_DATA_KEY, {})
     _migrate_yaml_buttons(hass, entry, yaml_config)
+    _migrate_yaml_delays_and_rate_limit(hass, entry, yaml_config)
     try:
         panel_code: str | None = None
         if stored_code := entry.options.get(CONF_PANEL_CODE):
@@ -388,7 +401,6 @@ def _build_armer_from_entry(
     no_event_mode: str = entry.options.get(CONF_NO_EVENT_MODE, NO_CAL_EVENT_MODE_AUTO)
 
     # Build occupancy config
-    yaml_occupancy = yaml_config.get(CONF_OCCUPANCY, {})
     occupancy_defaults: dict[str, str] = {CONF_DAY: occupancy_default_day}
     if occupancy_default_night:
         occupancy_defaults[CONF_NIGHT] = occupancy_default_night
@@ -396,9 +408,11 @@ def _build_armer_from_entry(
         CONF_ENTITY_ID: person_entities,
         CONF_OCCUPANCY_DEFAULT: occupancy_defaults,
     }
-    yaml_delay_time = yaml_occupancy.get(CONF_DELAY_TIME) if isinstance(yaml_occupancy, dict) else None
-    if yaml_delay_time:
-        occupancy[CONF_DELAY_TIME] = yaml_delay_time
+    occupancy[CONF_DELAY_TIME] = {
+        person_state: dt.timedelta(seconds=seconds)
+        for person_state, option in OCCUPANCY_DELAY_OPTIONS.items()
+        if (seconds := entry.options.get(option, 0))
+    }
 
     # Build calendar config
     yaml_calendar_control = yaml_config.get(CONF_CALENDAR_CONTROL, {})
@@ -461,8 +475,11 @@ def _build_armer_from_entry(
         notify_enabled=entry.options.get(CONF_NOTIFY_ENABLED, False),
         notify_action=entry.options.get(CONF_NOTIFY_ACTION),
         notify_targets=entry.options.get(CONF_NOTIFY_TARGETS, []),
+        notify_target=entry.options.get(CONF_NOTIFY_TARGET),
+        notify_custom_target=entry.options.get(CONF_NOTIFY_CUSTOM_TARGET),
+        notify_deliveries=entry.options.get(CONF_NOTIFY_DELIVERIES),
         notify_data=entry.options.get(CONF_NOTIFY_DATA, {}),
-        rate_limit=yaml_config.get(CONF_RATE_LIMIT, {}),
+        rate_limit=_rate_limit_from_options(entry.options),
         calendar_config=calendar_config,
         time_of_day=time_of_day,
         transitions=yaml_config.get(CONF_TRANSITIONS),
@@ -499,6 +516,33 @@ def _migrate_yaml_buttons(hass: HomeAssistant, entry: ConfigEntry, yaml_config: 
         options[button_delay_option(str(use))] = int(delay.total_seconds()) if delay else 0
     _LOGGER.info("AUTOARM Migrated buttons from YAML to the options: %s", ", ".join(str(use) for use in yaml_buttons))
     hass.config_entries.async_update_entry(entry, options=options)
+
+
+def _migrate_yaml_delays_and_rate_limit(hass: HomeAssistant, entry: ConfigEntry, yaml_config: ConfigType) -> None:
+    """Copy the occupancy delays and rate limit from YAML into the options, the first time round"""
+    yaml_delays: dict[str, dt.timedelta] = (yaml_config.get(CONF_OCCUPANCY) or {}).get(CONF_DELAY_TIME) or {}
+    yaml_rate_limit: ConfigType = yaml_config.get(CONF_RATE_LIMIT) or {}
+    found: dict[str, int] = {
+        option: int(yaml_delays[person_state].total_seconds())
+        for person_state, option in OCCUPANCY_DELAY_OPTIONS.items()
+        if person_state in yaml_delays
+    }
+    if CONF_RATE_LIMIT_PERIOD in yaml_rate_limit:
+        found[CONF_RATE_LIMIT_SECONDS] = int(yaml_rate_limit[CONF_RATE_LIMIT_PERIOD].total_seconds())
+    if CONF_RATE_LIMIT_CALLS in yaml_rate_limit:
+        found[CONF_RATE_LIMIT_MAX_CALLS] = yaml_rate_limit[CONF_RATE_LIMIT_CALLS]
+    migrated: dict[str, int] = {option: value for option, value in found.items() if option not in entry.options}
+    if migrated:
+        _LOGGER.info("AUTOARM Migrated from YAML to the options: %s", migrated)
+        hass.config_entries.async_update_entry(entry, options={**entry.options, **migrated})
+
+
+def _rate_limit_from_options(options: Mapping[str, Any]) -> ConfigType:
+    """Rate limit as it is in YAML"""
+    return {
+        CONF_RATE_LIMIT_PERIOD: dt.timedelta(seconds=options.get(CONF_RATE_LIMIT_SECONDS, DEFAULT_RATE_LIMIT_SECONDS)),
+        CONF_RATE_LIMIT_CALLS: int(options.get(CONF_RATE_LIMIT_MAX_CALLS, DEFAULT_RATE_LIMIT_MAX_CALLS)),
+    }
 
 
 def _validated_default_calendar_mappings() -> dict[str, list[re.Pattern[str]]]:
@@ -597,6 +641,9 @@ class AlarmArmer:
         notify_action: str | None = None,
         notify_targets: list[str] | None = None,
         notify_data: ConfigType | None = None,
+        notify_target: ConfigType | None = None,
+        notify_custom_target: list[str] | None = None,
+        notify_deliveries: list[str] | None = None,
         notify_profiles: ConfigType | None = None,
         sunrise_earliest: dt.time | None = None,
         sunrise_latest: dt.time | None = None,
@@ -626,7 +673,15 @@ class AlarmArmer:
             notify_enabled = False
         if notify_enabled:
             self.notifier: Notifier | None = Notifier(
-                notify_profiles, hass, self.app_health_tracker, notify_action, notify_targets, notify_data
+                notify_profiles,
+                hass,
+                self.app_health_tracker,
+                notify_action,
+                notify_targets,
+                notify_data,
+                notify_target,
+                notify_custom_target,
+                notify_deliveries,
             )
         else:
             self.notifier = None
@@ -682,6 +737,8 @@ class AlarmArmer:
         # state the panel is being moved to by its actions, so the change isn't mistaken for a manual one
         self._service_target: AlarmControlPanelState | None = None
         self.last_change: StateChange | None = None
+        # when a delayed arm was asked for, and the state it will set, until it's done
+        self.pending_arm: tuple[dt.datetime, AlarmControlPanelState] | None = None
         self.stop_listener: Callable[[], None] | None = None
         # coalesces calendar-triggered notifications that land within calendar_notify_grace_period of each other
         self._calendar_notify_cancel: Callable[[], None] | None = None
@@ -1429,9 +1486,16 @@ class AlarmArmer:
 
     async def delayed_arm(self, triggered_at: dt.datetime, requested_at: dt.datetime | None, **kwargs: Any) -> None:
         _LOGGER.debug("AUTOARM delayed_arm at %s, requested_at: %s", triggered_at, requested_at)
+        self.pending_arm = None
         if self.is_intervention_since_request(requested_at):
             return
         await self.arm(**kwargs)
+
+    def pending_arm_state(self) -> AlarmControlPanelState | None:
+        """State a delayed arm is still going to set, unless something since has called it off"""
+        if self.pending_arm is None or self.has_intervention_since(self.pending_arm[0]):
+            return None
+        return self.pending_arm[1]
 
     async def arm(
         self,
@@ -1620,12 +1684,13 @@ class AlarmArmer:
             )
         else:
             _LOGGER.debug("AUTOARM Delayed arm %s, triggered at: %s, source%s", state, trigger_time, source)
+            self.pending_arm = (dt_util.now(), state)
 
             job = partial(
                 self.delayed_arm,
                 arming_state=state,
                 source=source,
-                requested_at=dt_util.now(),
+                requested_at=self.pending_arm[0],
                 context=context,
                 change_context=change_context,
             )
@@ -1819,6 +1884,7 @@ class AlarmArmer:
             return
         # caused now, as a delayed press notifies before the change
         context: Context = self.cause(ChangeSource.BUTTON, context=child_context(event.context))
+        called_off: AlarmControlPanelState | None = self.pending_arm_state()
         intervention = self.record_intervention(source=ChangeSource.BUTTON, state=None, context=context)
         if delay:
             self.schedule_state(dt_util.now() + delay, None, intervention, ChangeSource.BUTTON, context=context)
@@ -1830,9 +1896,23 @@ class AlarmArmer:
                     context=context,
                 )
         else:
+            state_before: AlarmControlPanelState = self.armed_state()
             await self.reset_armed_state(
                 intervention=self.record_intervention(source=ChangeSource.BUTTON, state=None, context=context), context=context
             )
+            if self.notifier and self.armed_state() == state_before:
+                # no change of state to be notified, so the press would otherwise go unanswered
+                message: str = f"Alarm reset, staying {friendly_state(state_before)}"
+                if called_off:
+                    message += f", and the change to {friendly_state(called_off)} is cancelled"
+                await self.notifier.notify(
+                    ChangeSource.BUTTON,
+                    from_state=state_before,
+                    to_state=state_before,
+                    message=message,
+                    title="Alarm reset",
+                    context=context,
+                )
 
     async def on_occupancy_change(self, event: Event[EventStateChangedData]) -> None:
         """Listen for person state events

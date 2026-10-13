@@ -118,12 +118,18 @@
                             "notify_enabled": "Notificações ativadas",
                             "notify_action": "Ação de notificação",
                             "notify_targets": "Destinos da notificação",
+                            "notify_target": "Destinos",
+                            "notify_custom_target": "Destinos personalizados",
+                            "notify_deliveries": "Entregas",
                             "notify_data": "Dados extra de notificação"
                         },
                         "data_description": {
                             "notify_enabled": "Ativar notificações para alterações do estado do alarme",
                             "notify_action": "Ação (serviço) do Home Assistant a usar para notificar",
                             "notify_targets": "Lista de endereços ou entidades de notificação a notificar; pode ficar em branco para Supernotify",
+                            "notify_target": "Quem ou o que notificar, como em qualquer notificação do Supernotify. Deixe vazio para o Supernotify escolher.",
+                            "notify_custom_target": "Destinos fora do Home Assistant, como endereços de e-mail ou números de telefone.",
+                            "notify_deliveries": "Limitar as notificações a estas entregas do Supernotify. Deixe vazio para o Supernotify escolher.",
                             "notify_data": "Dados extra passados para a ação de notificação, como ações ou um canal para uma notificação da app móvel. Qualquer valor definido aqui é substituído por uma chave correspondente num perfil de notificação YAML."
                         }
                     },
@@ -143,13 +149,21 @@
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
                             "panel_code": "Código do painel de alarme",
                             "calendar_armed_end_mode": "Quando termina um armar por calendário",
-                            "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário"
+                            "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário",
+                            "occupied_delay": "Atraso depois de alguém chegar a casa",
+                            "unoccupied_delay": "Atraso depois de alguém sair de casa",
+                            "rate_limit_max_calls": "Limite de frequência - alterações máximas",
+                            "rate_limit_period": "Limite de frequência - período"
                         },
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o abaixo.",
                             "panel_code": "Código que o Auto Arm dá às ações do painel de alarme ao armar ou desarmar, se o painel precisar de um. É guardado encriptado e nunca mais é mostrado. Deixe em branco para manter o código já guardado.",
                             "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
-                            "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém."
+                            "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém.",
+                            "occupied_delay": "Segundos de espera depois de alguém chegar a casa antes de determinar o estado do alarme. Uma alteração manual nesse tempo cancela-o.",
+                            "unoccupied_delay": "Segundos de espera depois de alguém sair de casa antes de determinar o estado do alarme, para que uma ausência breve ou um localizador que perde a ligação não arme o alarme. Uma alteração manual nesse tempo cancela-o.",
+                            "rate_limit_max_calls": "O máximo de alterações do estado do alarme que o Auto Arm fará dentro do período do limite de frequência, como proteção contra ciclos. As restantes alterações nesse período são ignoradas.",
+                            "rate_limit_period": "Duração do período, em segundos, durante o qual são contadas as alterações máximas."
                         }
                     }
                 }
@@ -253,12 +267,18 @@
                             "notify_enabled": "Notificações ativadas",
                             "notify_action": "Ação de notificação",
                             "notify_targets": "Destinos da notificação",
+                            "notify_target": "Destinos",
+                            "notify_custom_target": "Destinos personalizados",
+                            "notify_deliveries": "Entregas",
                             "notify_data": "Dados extra de notificação"
                         },
                         "data_description": {
                             "notify_enabled": "Ativar notificações para alterações do estado do alarme",
                             "notify_action": "Ação (serviço) do Home Assistant a usar para notificar",
                             "notify_targets": "Lista de endereços ou entidades de notificação a notificar; pode ficar em branco para Supernotify",
+                            "notify_target": "Quem ou o que notificar, como em qualquer notificação do Supernotify. Deixe vazio para o Supernotify escolher.",
+                            "notify_custom_target": "Destinos fora do Home Assistant, como endereços de e-mail ou números de telefone.",
+                            "notify_deliveries": "Limitar as notificações a estas entregas do Supernotify. Deixe vazio para o Supernotify escolher.",
                             "notify_data": "Dados extra passados para a ação de notificação, como ações ou um canal para uma notificação da app móvel. Qualquer valor definido aqui é substituído por uma chave correspondente num perfil de notificação YAML."
                         }
                     },
@@ -279,13 +299,21 @@
                             "panel_code": "Código do painel de alarme",
                             "panel_code_clear": "Remover o código guardado do painel de alarme",
                             "calendar_armed_end_mode": "Quando termina um armar por calendário",
-                            "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário"
+                            "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário",
+                            "occupied_delay": "Atraso depois de alguém chegar a casa",
+                            "unoccupied_delay": "Atraso depois de alguém sair de casa",
+                            "rate_limit_max_calls": "Limite de frequência - alterações máximas",
+                            "rate_limit_period": "Limite de frequência - período"
                         },
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o abaixo.",
                             "panel_code": "Código que o Auto Arm dá às ações do painel de alarme ao armar ou desarmar, se o painel precisar de um. É guardado encriptado e nunca mais é mostrado. Deixe em branco para manter o código já guardado.",
                             "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
-                            "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém."
+                            "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém.",
+                            "occupied_delay": "Segundos de espera depois de alguém chegar a casa antes de determinar o estado do alarme. Uma alteração manual nesse tempo cancela-o.",
+                            "unoccupied_delay": "Segundos de espera depois de alguém sair de casa antes de determinar o estado do alarme, para que uma ausência breve ou um localizador que perde a ligação não arme o alarme. Uma alteração manual nesse tempo cancela-o.",
+                            "rate_limit_max_calls": "O máximo de alterações do estado do alarme que o Auto Arm fará dentro do período do limite de frequência, como proteção contra ciclos. As restantes alterações nesse período são ignoradas.",
+                            "rate_limit_period": "Duração do período, em segundos, durante o qual são contadas as alterações máximas."
                         }
                     }
                 }

@@ -10,7 +10,6 @@ While core settings (alarm panel, calendars, persons, occupancy defaults) are ma
 
 - Transition conditions
 - Notification profiles
-- Rate limiting
 - Per-calendar state pattern overrides and poll intervals
 
 ## Calendar Polling

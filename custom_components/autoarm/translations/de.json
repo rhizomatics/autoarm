@@ -118,12 +118,18 @@
                             "notify_enabled": "Benachrichtigungen aktiviert",
                             "notify_action": "Benachrichtigungsaktion",
                             "notify_targets": "Benachrichtigungsempfänger",
+                            "notify_target": "Ziele",
+                            "notify_custom_target": "Benutzerdefinierte Ziele",
+                            "notify_deliveries": "Zustellungen",
                             "notify_data": "Zusätzliche Benachrichtigungsdaten"
                         },
                         "data_description": {
                             "notify_enabled": "Benachrichtigungen für Alarmzustandsänderungen aktivieren",
                             "notify_action": "Home Assistant-Aktion (Dienst) zum Senden von Benachrichtigungen",
                             "notify_targets": "Liste von Adressen oder Notify-Entitäten; kann für Supernotify leer gelassen werden",
+                            "notify_target": "Wer oder was benachrichtigt wird, wie bei jeder Supernotify-Benachrichtigung. Leer lassen, damit Supernotify wählt.",
+                            "notify_custom_target": "Ziele außerhalb von Home Assistant, etwa E-Mail-Adressen oder Telefonnummern.",
+                            "notify_deliveries": "Benachrichtigungen auf diese Supernotify-Zustellungen beschränken. Leer lassen, damit Supernotify wählt.",
                             "notify_data": "Zusätzliche Daten, die an die Benachrichtigungsaktion übergeben werden, z. B. Aktionen oder ein Kanal für eine mobile App-Benachrichtigung. Werte hier werden durch einen passenden Schlüssel in einem YAML-Benachrichtigungsprofil überschrieben."
                         }
                     },
@@ -143,13 +149,21 @@
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                             "panel_code": "Code der Alarmzentrale",
                             "calendar_armed_end_mode": "Wenn eine Kalender-Scharfschaltung endet",
-                            "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet"
+                            "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet",
+                            "occupied_delay": "Verzögerung, nachdem jemand nach Hause kommt",
+                            "unoccupied_delay": "Verzögerung, nachdem jemand das Haus verlässt",
+                            "rate_limit_max_calls": "Ratenbegrenzung - maximale Änderungen",
+                            "rate_limit_period": "Ratenbegrenzung - Zeitraum"
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn unten fest.",
                             "panel_code": "Code, den Auto Arm den Aktionen der Alarmzentrale beim Scharf- oder Unscharfschalten übergibt, falls die Zentrale einen verlangt. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um den bereits gespeicherten Code zu behalten.",
                             "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
-                            "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist."
+                            "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist.",
+                            "occupied_delay": "Sekunden, die nach der Ankunft einer Person gewartet wird, bevor der Alarmstatus ermittelt wird. Eine manuelle Änderung in dieser Zeit bricht dies ab.",
+                            "unoccupied_delay": "Sekunden, die nach dem Weggehen einer Person gewartet wird, bevor der Alarmstatus ermittelt wird, damit eine kurze Abwesenheit oder ein ausfallender Tracker den Alarm nicht scharfschaltet. Eine manuelle Änderung in dieser Zeit bricht dies ab.",
+                            "rate_limit_max_calls": "Die Höchstzahl an Änderungen des Alarmstatus, die Auto Arm innerhalb des Zeitraums der Ratenbegrenzung vornimmt, als Schutz vor Schleifen. Weitere Änderungen in diesem Zeitraum werden übersprungen.",
+                            "rate_limit_period": "Länge des Zeitraums in Sekunden, über den die maximalen Änderungen gezählt werden."
                         }
                     }
                 }
@@ -253,12 +267,18 @@
                             "notify_enabled": "Benachrichtigungen aktiviert",
                             "notify_action": "Benachrichtigungsaktion",
                             "notify_targets": "Benachrichtigungsempfänger",
+                            "notify_target": "Ziele",
+                            "notify_custom_target": "Benutzerdefinierte Ziele",
+                            "notify_deliveries": "Zustellungen",
                             "notify_data": "Zusätzliche Benachrichtigungsdaten"
                         },
                         "data_description": {
                             "notify_enabled": "Benachrichtigungen für Alarmzustandsänderungen aktivieren",
                             "notify_action": "Home Assistant-Aktion (Dienst) zum Senden von Benachrichtigungen",
                             "notify_targets": "Liste von Adressen oder Notify-Entitäten; kann für Supernotify leer gelassen werden",
+                            "notify_target": "Wer oder was benachrichtigt wird, wie bei jeder Supernotify-Benachrichtigung. Leer lassen, damit Supernotify wählt.",
+                            "notify_custom_target": "Ziele außerhalb von Home Assistant, etwa E-Mail-Adressen oder Telefonnummern.",
+                            "notify_deliveries": "Benachrichtigungen auf diese Supernotify-Zustellungen beschränken. Leer lassen, damit Supernotify wählt.",
                             "notify_data": "Zusätzliche Daten, die an die Benachrichtigungsaktion übergeben werden, z. B. Aktionen oder ein Kanal für eine mobile App-Benachrichtigung. Werte hier werden durch einen passenden Schlüssel in einem YAML-Benachrichtigungsprofil überschrieben."
                         }
                     },
@@ -279,13 +299,21 @@
                             "panel_code": "Code der Alarmzentrale",
                             "panel_code_clear": "Gespeicherten Code der Alarmzentrale entfernen",
                             "calendar_armed_end_mode": "Wenn eine Kalender-Scharfschaltung endet",
-                            "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet"
+                            "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet",
+                            "occupied_delay": "Verzögerung, nachdem jemand nach Hause kommt",
+                            "unoccupied_delay": "Verzögerung, nachdem jemand das Haus verlässt",
+                            "rate_limit_max_calls": "Ratenbegrenzung - maximale Änderungen",
+                            "rate_limit_period": "Ratenbegrenzung - Zeitraum"
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn unten fest.",
                             "panel_code": "Code, den Auto Arm den Aktionen der Alarmzentrale beim Scharf- oder Unscharfschalten übergibt, falls die Zentrale einen verlangt. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um den bereits gespeicherten Code zu behalten.",
                             "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
-                            "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist."
+                            "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist.",
+                            "occupied_delay": "Sekunden, die nach der Ankunft einer Person gewartet wird, bevor der Alarmstatus ermittelt wird. Eine manuelle Änderung in dieser Zeit bricht dies ab.",
+                            "unoccupied_delay": "Sekunden, die nach dem Weggehen einer Person gewartet wird, bevor der Alarmstatus ermittelt wird, damit eine kurze Abwesenheit oder ein ausfallender Tracker den Alarm nicht scharfschaltet. Eine manuelle Änderung in dieser Zeit bricht dies ab.",
+                            "rate_limit_max_calls": "Die Höchstzahl an Änderungen des Alarmstatus, die Auto Arm innerhalb des Zeitraums der Ratenbegrenzung vornimmt, als Schutz vor Schleifen. Weitere Änderungen in diesem Zeitraum werden übersprungen.",
+                            "rate_limit_period": "Länge des Zeitraums in Sekunden, über den die maximalen Änderungen gezählt werden."
                         }
                     }
                 }

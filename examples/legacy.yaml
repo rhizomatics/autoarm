@@ -4,7 +4,7 @@ autoarm:
     alias: Virtual control panel using Manual Alarm Control Panel integration
     entity_id: alarm_control_panel.testing
   # UI: person entities and default_state are configurable via Options
-  # YAML: delay_time remains YAML-only
+  # delay_time is copied into the Options the first time, and set there from then on
   occupancy:
     entity_id:
       - person.house_owner
@@ -67,7 +67,7 @@ autoarm:
     disarmed:
       entity_id: binary_sensor.button_middle
 
-  # YAML-only: rate limiting
+  # copied into the Options the first time, and set there from then on
   rate_limit:
     max_calls: 5
     period: 60

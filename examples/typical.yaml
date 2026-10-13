@@ -1,5 +1,5 @@
 autoarm:
-  # YAML: delay_time remains YAML-only
+  # delay_time is copied into the Options the first time, and set there from then on
   occupancy:
     delay_time:
       not_home: 180
@@ -52,7 +52,7 @@ autoarm:
     disarmed:
       entity_id: binary_sensor.button_middle
 
-  # YAML-only: rate limiting
+  # copied into the Options the first time, and set there from then on
   rate_limit:
     max_calls: 5
     period: 60

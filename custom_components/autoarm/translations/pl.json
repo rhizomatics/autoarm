@@ -118,12 +118,18 @@
                             "notify_enabled": "Powiadomienia włączone",
                             "notify_action": "Akcja powiadomienia",
                             "notify_targets": "Odbiorcy powiadomień",
+                            "notify_target": "Odbiorcy",
+                            "notify_custom_target": "Odbiorcy niestandardowi",
+                            "notify_deliveries": "Dostawy",
                             "notify_data": "Dodatkowe dane powiadomienia"
                         },
                         "data_description": {
                             "notify_enabled": "Włącz powiadomienia o zmianach stanu alarmu",
                             "notify_action": "Akcja (usługa) Home Assistant używana do powiadamiania",
                             "notify_targets": "Lista adresów lub encji powiadomień do powiadomienia; można pozostawić puste dla Supernotify",
+                            "notify_target": "Kogo lub co powiadomić, jak w każdym powiadomieniu Supernotify. Pozostaw puste, aby wybrał Supernotify.",
+                            "notify_custom_target": "Odbiorcy spoza Home Assistant, na przykład adresy e-mail lub numery telefonów.",
+                            "notify_deliveries": "Ogranicz powiadomienia do tych dostaw Supernotify. Pozostaw puste, aby wybrał Supernotify.",
                             "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML."
                         }
                     },
@@ -143,13 +149,21 @@
                             "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
                             "panel_code": "Kod panelu alarmowego",
                             "calendar_armed_end_mode": "Gdy kończy się uzbrojenie z kalendarza",
-                            "calendar_disarmed_end_mode": "Gdy kończy się rozbrojenie z kalendarza"
+                            "calendar_disarmed_end_mode": "Gdy kończy się rozbrojenie z kalendarza",
+                            "occupied_delay": "Opóźnienie po czyimś powrocie do domu",
+                            "unoccupied_delay": "Opóźnienie po czyimś wyjściu z domu",
+                            "rate_limit_max_calls": "Limit częstotliwości - maksymalna liczba zmian",
+                            "rate_limit_period": "Limit częstotliwości - okres"
                         },
                         "data_description": {
                             "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Jeśli panel wymaga kodu, ustaw go poniżej.",
                             "panel_code": "Kod, który Auto Arm przekazuje akcjom panelu alarmowego podczas uzbrajania lub rozbrajania, jeśli panel go wymaga. Jest przechowywany w postaci zaszyfrowanej i nigdy więcej nie jest wyświetlany. Pozostaw puste, aby zachować już zapisany kod.",
                             "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
-                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma."
+                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma.",
+                            "occupied_delay": "Liczba sekund oczekiwania po czyimś powrocie do domu przed ustaleniem stanu alarmu. Ręczna zmiana w tym czasie to anuluje.",
+                            "unoccupied_delay": "Liczba sekund oczekiwania po czyimś wyjściu z domu przed ustaleniem stanu alarmu, aby krótka nieobecność lub utrata połączenia przez tracker nie uzbroiła alarmu. Ręczna zmiana w tym czasie to anuluje.",
+                            "rate_limit_max_calls": "Największa liczba zmian stanu alarmu, jaką Auto Arm wykona w okresie limitu częstotliwości, jako zabezpieczenie przed pętlami. Kolejne zmiany w tym okresie są pomijane.",
+                            "rate_limit_period": "Długość okresu w sekundach, w którym liczone są maksymalne zmiany."
                         }
                     }
                 }
@@ -253,12 +267,18 @@
                             "notify_enabled": "Powiadomienia włączone",
                             "notify_action": "Akcja powiadomienia",
                             "notify_targets": "Odbiorcy powiadomień",
+                            "notify_target": "Odbiorcy",
+                            "notify_custom_target": "Odbiorcy niestandardowi",
+                            "notify_deliveries": "Dostawy",
                             "notify_data": "Dodatkowe dane powiadomienia"
                         },
                         "data_description": {
                             "notify_enabled": "Włącz powiadomienia o zmianach stanu alarmu",
                             "notify_action": "Akcja (usługa) Home Assistant używana do powiadamiania",
                             "notify_targets": "Lista adresów lub encji powiadomień do powiadomienia; można pozostawić puste dla Supernotify",
+                            "notify_target": "Kogo lub co powiadomić, jak w każdym powiadomieniu Supernotify. Pozostaw puste, aby wybrał Supernotify.",
+                            "notify_custom_target": "Odbiorcy spoza Home Assistant, na przykład adresy e-mail lub numery telefonów.",
+                            "notify_deliveries": "Ogranicz powiadomienia do tych dostaw Supernotify. Pozostaw puste, aby wybrał Supernotify.",
                             "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML."
                         }
                     },
@@ -279,13 +299,21 @@
                             "panel_code": "Kod panelu alarmowego",
                             "panel_code_clear": "Usuń zapisany kod panelu alarmowego",
                             "calendar_armed_end_mode": "Gdy kończy się uzbrojenie z kalendarza",
-                            "calendar_disarmed_end_mode": "Gdy kończy się rozbrojenie z kalendarza"
+                            "calendar_disarmed_end_mode": "Gdy kończy się rozbrojenie z kalendarza",
+                            "occupied_delay": "Opóźnienie po czyimś powrocie do domu",
+                            "unoccupied_delay": "Opóźnienie po czyimś wyjściu z domu",
+                            "rate_limit_max_calls": "Limit częstotliwości - maksymalna liczba zmian",
+                            "rate_limit_period": "Limit częstotliwości - okres"
                         },
                         "data_description": {
                             "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Jeśli panel wymaga kodu, ustaw go poniżej.",
                             "panel_code": "Kod, który Auto Arm przekazuje akcjom panelu alarmowego podczas uzbrajania lub rozbrajania, jeśli panel go wymaga. Jest przechowywany w postaci zaszyfrowanej i nigdy więcej nie jest wyświetlany. Pozostaw puste, aby zachować już zapisany kod.",
                             "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
-                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma."
+                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma.",
+                            "occupied_delay": "Liczba sekund oczekiwania po czyimś powrocie do domu przed ustaleniem stanu alarmu. Ręczna zmiana w tym czasie to anuluje.",
+                            "unoccupied_delay": "Liczba sekund oczekiwania po czyimś wyjściu z domu przed ustaleniem stanu alarmu, aby krótka nieobecność lub utrata połączenia przez tracker nie uzbroiła alarmu. Ręczna zmiana w tym czasie to anuluje.",
+                            "rate_limit_max_calls": "Największa liczba zmian stanu alarmu, jaką Auto Arm wykona w okresie limitu częstotliwości, jako zabezpieczenie przed pętlami. Kolejne zmiany w tym okresie są pomijane.",
+                            "rate_limit_period": "Długość okresu w sekundach, w którym liczone są maksymalne zmiany."
                         }
                     }
                 }

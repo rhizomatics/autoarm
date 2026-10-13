@@ -20,6 +20,7 @@ from homeassistant.helpers.selector import (
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
+    TargetSelector,
     TextSelector,
     TextSelectorConfig,
     TextSelectorType,
@@ -55,6 +56,7 @@ from .const import (
     TRIGGER_AUTO,
 )
 from .crypto import async_encrypt
+from .supernotify_api import deliveries, supernotify_available
 
 CONF_CALENDAR_ENTITIES = "calendar_entities"
 CONF_PERSON_ENTITIES = "person_entities"
@@ -68,6 +70,10 @@ CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES = "calendar_occupancy_override_states"
 CONF_CALENDAR_OCCUPANCY_ENDS_AWAY = "calendar_occupancy_ends_away"
 CONF_NOTIFY_ACTION = "notify_action"
 CONF_NOTIFY_TARGETS = "notify_targets"
+# as the `target` and `custom_target` of supernotify.notify, and the deliveries to keep to
+CONF_NOTIFY_TARGET = "notify_target"
+CONF_NOTIFY_CUSTOM_TARGET = "notify_custom_target"
+CONF_NOTIFY_DELIVERIES = "notify_deliveries"
 CONF_NOTIFY_DATA = "notify_data"
 CONF_NOTIFY_ENABLED = "notify_enabled"
 # for the dark between bedtime ending and sunrise
@@ -81,6 +87,14 @@ CONF_SUNRISE_LATEST = "sunrise_latest"
 CONF_SUNSET_EARLIEST = "sunset_earliest"
 CONF_SUNSET_LATEST = "sunset_latest"
 CONF_USE_ALARM_SERVICE = "use_alarm_service"
+# guard against loops, at most so many changes within a period of seconds
+CONF_RATE_LIMIT_MAX_CALLS = "rate_limit_max_calls"
+CONF_RATE_LIMIT_SECONDS = "rate_limit_period"
+DEFAULT_RATE_LIMIT_MAX_CALLS = 5
+DEFAULT_RATE_LIMIT_SECONDS = 60
+# seconds to wait after someone arrives or leaves before working out the state
+CONF_OCCUPIED_DELAY = "occupied_delay"
+CONF_UNOCCUPIED_DELAY = "unoccupied_delay"
 # held encrypted, see crypto
 CONF_PANEL_CODE = "panel_code"
 # only a form field, to remove the stored code, since that isn't shown to be blanked out
@@ -158,6 +172,10 @@ DEFAULT_OPTIONS: dict[str, Any] = {
     CONF_SUNSET_EARLIEST: None,
     CONF_SUNSET_LATEST: None,
     CONF_USE_ALARM_SERVICE: True,
+    CONF_OCCUPIED_DELAY: 0,
+    CONF_UNOCCUPIED_DELAY: 0,
+    CONF_RATE_LIMIT_MAX_CALLS: DEFAULT_RATE_LIMIT_MAX_CALLS,
+    CONF_RATE_LIMIT_SECONDS: DEFAULT_RATE_LIMIT_SECONDS,
     CONF_SENTENCE_ARM: True,
     CONF_SENTENCE_DISARM: False,
 }
@@ -182,14 +200,33 @@ def _top_level_fields(options: Mapping[str, Any], alarm_panel_default: str | Non
 
 def _default_notify_action(hass: HomeAssistant) -> str:
     """Notification action for a new install, Supernotify if that's already there"""
-    return SUPERNOTIFY_ACTION if hass.services.has_service("supernotify", "notify") else DEFAULT_NOTIFY_ACTION
+    return SUPERNOTIFY_ACTION if supernotify_available(hass) else DEFAULT_NOTIFY_ACTION
 
 
-def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
+async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
     """The full set of options flow sections, shared by advanced setup and the options flow."""
     notify_services = sorted(f"notify.{service}" for service in hass.services.async_services().get("notify", {}))
-    if hass.services.has_service("supernotify", "notify"):
+    notify_target_fields: dict[Any, Any]
+    if supernotify_available(hass):
         notify_services.insert(0, SUPERNOTIFY_ACTION)
+        # the same pair of target fields as supernotify.notify itself, with targets from before they were split now custom
+        typed_targets: list[str] = [*options.get(CONF_NOTIFY_TARGETS, []), *options.get(CONF_NOTIFY_CUSTOM_TARGET, [])]
+        notify_target_fields = {
+            vol.Optional(CONF_NOTIFY_TARGET, default=options.get(CONF_NOTIFY_TARGET, {})): TargetSelector(),
+            vol.Optional(CONF_NOTIFY_CUSTOM_TARGET, default=list(dict.fromkeys(typed_targets))): TextSelector(
+                TextSelectorConfig(multiple=True)
+            ),
+            # a delivery since removed from Supernotify is still shown, to be taken off
+            vol.Optional(CONF_NOTIFY_DELIVERIES, default=options.get(CONF_NOTIFY_DELIVERIES, [])): SelectSelector(
+                SelectSelectorConfig(options=await deliveries(hass), multiple=True, custom_value=True)
+            ),
+        }
+    else:
+        notify_target_fields = {
+            vol.Optional(CONF_NOTIFY_TARGETS, default=options.get(CONF_NOTIFY_TARGETS, [])): TextSelector(
+                TextSelectorConfig(multiple=True)
+            ),
+        }
 
     return {
         vol.Required("presence_options"): section(
@@ -312,10 +349,7 @@ def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any
                         mode=SelectSelectorMode.DROPDOWN,
                     )
                 ),
-                vol.Optional(
-                    CONF_NOTIFY_TARGETS,
-                    default=options.get(CONF_NOTIFY_TARGETS, []),
-                ): TextSelector(TextSelectorConfig(multiple=True)),
+                **notify_target_fields,
                 vol.Optional(
                     CONF_NOTIFY_DATA,
                     default=options.get(CONF_NOTIFY_DATA, {}),
@@ -354,6 +388,16 @@ def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any
                     CONF_CALENDAR_DISARMED_END_MODE,
                     default=options.get(CONF_CALENDAR_DISARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
                 ): _calendar_end_mode_selector(),
+                vol.Optional(CONF_OCCUPIED_DELAY, default=options.get(CONF_OCCUPIED_DELAY, 0)): _seconds_selector(),
+                vol.Optional(CONF_UNOCCUPIED_DELAY, default=options.get(CONF_UNOCCUPIED_DELAY, 0)): _seconds_selector(),
+                vol.Optional(
+                    CONF_RATE_LIMIT_MAX_CALLS,
+                    default=options.get(CONF_RATE_LIMIT_MAX_CALLS, DEFAULT_RATE_LIMIT_MAX_CALLS),
+                ): NumberSelector(NumberSelectorConfig(min=1, max=100, mode=NumberSelectorMode.BOX)),
+                vol.Optional(
+                    CONF_RATE_LIMIT_SECONDS,
+                    default=options.get(CONF_RATE_LIMIT_SECONDS, DEFAULT_RATE_LIMIT_SECONDS),
+                ): _seconds_selector(minimum=1),
             }),
             {"collapsed": True},
         ),
@@ -442,7 +486,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="advanced_setup",
             data_schema=vol.Schema({
                 **_top_level_fields(default_options),
-                **_section_fields(self.hass, default_options),
+                **await _section_fields(self.hass, default_options),
             }),
             description_placeholders=SETUP_HELP_PLACEHOLDERS,
         )
@@ -519,9 +563,11 @@ class AutoArmOptionsFlow(OptionsFlow):
             # The alarm panel entity lives in config_entry.data, not options.
             alarm_panel = data.pop(CONF_ALARM_PANEL)
             if alarm_panel != self.config_entry.data.get(CONF_ALARM_PANEL):
+                # along with the options, as one update, so there's a single reload that has both
                 self.hass.config_entries.async_update_entry(
                     self.config_entry,
                     data={**self.config_entry.data, CONF_ALARM_PANEL: alarm_panel},
+                    options=data,
                 )
 
             return self.async_create_entry(title="", data=data)
@@ -531,10 +577,14 @@ class AutoArmOptionsFlow(OptionsFlow):
             step_id="init",
             data_schema=vol.Schema({
                 **_top_level_fields(options, alarm_panel_default=self.config_entry.data.get(CONF_ALARM_PANEL, "")),
-                **_section_fields(self.hass, options),
+                **await _section_fields(self.hass, options),
             }),
             description_placeholders={"recipe_url": RECIPE_URL},
         )
+
+
+def _seconds_selector(minimum: int = 0) -> Selector[NumberSelectorConfig]:
+    return NumberSelector(NumberSelectorConfig(min=minimum, max=3600, mode=NumberSelectorMode.BOX, unit_of_measurement="s"))
 
 
 def _alarm_state_selector() -> Selector[SelectSelectorConfig]:
