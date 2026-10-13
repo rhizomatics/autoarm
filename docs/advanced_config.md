@@ -5,7 +5,7 @@
 
 ### When an Event Ends
 
-The **Advanced** section of the options has separate settings for an **armed** event ending (`armed_home`,
+The **Advanced - Calendar** section of the options has separate settings for an **armed** event ending (`armed_home`,
 `armed_away`, `armed_night`, `armed_vacation` or `armed_custom_bypass`) and a **disarmed** event ending, unless another event is still live. Each can be:
 
 | Setting                           | Armed event ends                                                                                                      | Disarmed event ends                   |
@@ -40,7 +40,7 @@ the reset button, work out the state like this:
 
 Calendar changes often arrive in pairs - one event ending right as another begins, or a burst of changes
 from re-matching after a calendar update. To avoid a flurry of notifications for what is really one change,
-calendar-sourced notifications wait for a grace period (`notify_grace_period` in YAML, default one minute)
+calendar-sourced notifications wait for a grace period (**Notification grace period** in the **Advanced - Calendar** section of the options, default one minute)
 before sending. If another calendar-sourced change lands within that window, the wait restarts and only the
 net change - from the state before the first change to the state after the last - is notified. If that nets
 out to no change at all, nothing is sent.
@@ -95,6 +95,9 @@ in the [shortcut template style](https://www.home-assistant.io/docs/scripts/cond
 |----------------------------|-----------------|----------------------------------------------------------|
 | daytime                    | bool            | The `sun` integration thinks it is daytime               |
 | night                      | bool            | The `sun` integration thinks it is nighttime             |
+| bedtime                    | bool            | A bedtime sensor is on, or an `armed_night` calendar event is live |
+| after_bedtime              | bool            | Bedtime has ended since the sun last set                 |
+| programmed_bedtime         | bool            | There is a bedtime sensor, or an `armed_night` calendar event today |
 | occupied                   | bool            | If any of the `person` entities have state `home`        |
 | at_home                    | list[str]       | List of occupancy entities at home                       |
 | not_home                   | list[str]       | List of occupancy entities not at home                   |
@@ -111,6 +114,10 @@ in the [shortcut template style](https://www.home-assistant.io/docs/scripts/cond
 | calendar_event.description | str             | Event description                                        |
 | calendar_event.location    | str             | Event location                                           |
 | occupied_daytime_state     | str             | Default state for occupied in day time                   |
+| occupied_nighttime_state   | str             | Default state for occupied between evening and bedtime   |
+| occupied_after_bedtime_state | str           | Default state for occupied between bedtime and morning   |
+
+The default conditions use `programmed_bedtime` and `after_bedtime` to pick the occupied state for the night: `armed_night` if no bedtime is programmed, `occupied_after_bedtime_state` once bedtime has ended, otherwise `occupied_nighttime_state`. Conditions of your own that replace the defaults need to do the same if they want that behaviour, as `occupied_nighttime_state` is now always the configured value.
 
 ### Advanced Notifications
 

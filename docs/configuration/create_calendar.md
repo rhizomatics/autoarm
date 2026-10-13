@@ -21,21 +21,24 @@ Use the button, or follow the manual steps:
 
 ## Configure Auto Arm
 
-!!! note "UI and YAML split"
-    Calendar entities, and what happens when an event ends, are now configured via the Auto Arm **Options** UI. Per-calendar `state_patterns` and `poll_interval`, and the top-level `notify_grace_period`, remain in YAML.
-
 Select the calendar entity in **Settings** > **Devices & Services** > **Auto Arm** > **Configure**.
 
-Then add the per-calendar details in YAML, in this example `Alarm Control` is the name of the calendar:
+Out of the box, an event named `Away`, `Home`, `Night`, `Disarmed`, `Vacation` or `Holiday` sets the matching alarm state. To choose your own names, add a **Match rule** in the **Advanced - Calendar** section of the options, each rule having
 
-```yaml
-autoarm:
-    calendar_control:
-      calendars:
-        - entity_id: calendar.alarm_control
-          state_patterns:
-              disarmed: Disarmed
-```
+- the **Calendar** it applies to
+- the **Alarm state** to set
+- one or more **Patterns**, regular expressions matched against the summary and description of each event
+
+In this example `Alarm Control` is the name of the calendar:
+
+| Calendar                 | Alarm state | Patterns   |
+|--------------------------|-------------|------------|
+| `calendar.alarm_control` | `disarmed`  | `Disarmed` |
+
+Once a calendar has a rule of its own, the default names no longer apply to that calendar.
+
+!!! note "Migrating from YAML"
+    `state_patterns` in a YAML `calendar_control` section are copied into match rules the first time, along with `notify_grace_period`, and can then be removed from YAML. There is now one **Poll interval** for all calendars, taken from the shortest `poll_interval` in YAML.
 
 This calendar is going to be used very simply to disarm the alarm during set periods, and let Auto Arm automatically handle the other times.
 
@@ -61,26 +64,17 @@ day or all the recurring entries. Similarly you can delete one day from a recurr
 You may have vacation events already on another calendar integration ( like Remote or Google Calendar ),
 or may want to add them to this one.
 
-Here's how that might look:
+Here's how that might look as match rules:
 
-```yaml
-autoarm:
-    calendar_control:
-      - entity_id: calendar.alarm_control
-        state_patterns:
-            disarmed: Disarmed
-      - entity_id: calendar.family_happenings
-        state_patterns:
-            armed_vacation:
-              - Camping Trip.*
-              - .*Holidays.*
-            armed_away:
-              - Work Trip.*
-```
+| Calendar                     | Alarm state      | Patterns                         |
+|------------------------------|------------------|----------------------------------|
+| `calendar.alarm_control`     | `disarmed`       | `Disarmed`                       |
+| `calendar.family_happenings` | `armed_vacation` | `Camping Trip.*`, `.*Holidays.*` |
+| `calendar.family_happenings` | `armed_away`     | `Work Trip.*`                    |
 
 ## What to do when no event
 
 While a calendar could have events covering every minute of every day, its much less work to only define what is needed, such as what's the right time to arm at night, or when vacations start and end.
 
-What happens when an event ends, and there's no other event live, is set in the **Advanced** section of
+What happens when an event ends, and there's no other event live, is set in the **Advanced - Calendar** section of
 the Auto Arm **Options**, separately for armed and disarmed events. See [When an Event Ends](../advanced_config.md#when-an-event-ends) for the choices.

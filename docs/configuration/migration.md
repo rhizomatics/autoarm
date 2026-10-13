@@ -17,9 +17,9 @@ Existing YAML-only installations are **automatically migrated** to a config entr
 | `occupancy.default_state.day` | YAML | UI (Options) |
 | `occupancy.default_state.night` | YAML | UI (Options) |
 | `diurnal` | YAML | UI (Options) |
-| `calendar_control.calendars[].state_patterns` | YAML | YAML (unchanged) |
-| `calendar_control.calendars[].poll_interval` | YAML | YAML (unchanged) |
-| `calendar_control.notify_grace_period` | YAML | YAML (unchanged) |
+| `calendar_control.calendars[].state_patterns` | YAML | UI Options, as match rules, copied from YAML on first start |
+| `calendar_control.calendars[].poll_interval` | YAML | UI Options, one for all calendars, the shortest in YAML copied on first start |
+| `calendar_control.notify_grace_period` | YAML | UI Options, copied from YAML on first start |
 | `transitions` | YAML | YAML (unchanged) |
 | `buttons` | YAML | UI Options, copied from YAML on first start |
 | `notify` | YAML | UI (Options). Profiles in YAML still work, but are **deprecated** and will be removed when Home Assistant 2027.4 is released |
@@ -44,7 +44,7 @@ After migration, the following YAML keys are read from the config entry and can 
 - `calendar_control.no_event_mode`
 - Calendar `entity_id` values (the entity list is managed in Options)
 
-The `buttons` and `rate_limit` sections, and `occupancy.delay_time`, are copied into the options the first time, and can then be removed. The remaining YAML sections (`transitions`, per-calendar `state_patterns` and `poll_interval`, and `calendar_control.notify_grace_period`) should be kept.
+The `buttons`, `rate_limit` and `calendar_control` sections, and `occupancy.delay_time`, are copied into the options the first time, and can then be removed. Only `transitions` needs to be kept in YAML.
 
 The `notify` section is deprecated, replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released. A repair is raised while it is still there. See [Notifications](../index.md#notifications) for the priorities and scenarios that take its place.
 

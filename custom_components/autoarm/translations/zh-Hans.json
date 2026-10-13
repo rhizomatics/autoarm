@@ -141,7 +141,7 @@
                     },
                     "time_of_day_options": {
                         "name": "高级 - 时段",
-                        "description": "用于其他报警状态的时段传感器，与就寝时间传感器一样，在开启期间设置各自的状态。传感器关闭时，将应用高级中的日历事件结束设置。",
+                        "description": "用于其他报警状态的时段传感器，与就寝时间传感器一样，在开启期间设置各自的状态。传感器关闭时，将应用“高级 - 日历”中的日历事件结束设置。",
                         "data": {
                             "time_of_day_disarmed": "撤防",
                             "time_of_day_armed_home": "在家布防",
@@ -149,13 +149,29 @@
                             "time_of_day_armed_custom_bypass": "自定义布防"
                         }
                     },
+                    "calendar_options": {
+                        "name": "高级 - 日历",
+                        "description": "日历事件结束时的处理方式，以及哪些事件设置哪种警报状态。没有匹配规则的日历使用默认规则，即名为 Away、Home、Night、Disarmed、Vacation 或 Holiday 的事件。",
+                        "data": {
+                            "calendar_armed_end_mode": "日历布防覆盖结束时",
+                            "calendar_disarmed_end_mode": "日历撤防覆盖结束时",
+                            "calendar_match_rules": "匹配规则",
+                            "calendar_poll_interval": "轮询间隔",
+                            "calendar_notify_grace": "通知宽限期"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
+                            "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。",
+                            "calendar_match_rules": "每条规则为某个日历中标题或描述与其任一模式（正则表达式）匹配的事件设置一种警报状态。某个日历的规则会替换该日历的默认规则。",
+                            "calendar_poll_interval": "每次检查各日历事件之间的分钟数。",
+                            "calendar_notify_grace": "通知日历变更前等待的秒数，以便将相隔很近的变更（例如一个事件结束时另一个事件开始）合并为一条通知发送。"
+                        }
+                    },
                     "advanced_options": {
                         "name": "高级",
                         "data": {
                             "use_alarm_service": "使用报警面板的操作更改状态",
                             "panel_code": "报警面板密码",
-                            "calendar_armed_end_mode": "日历布防覆盖结束时",
-                            "calendar_disarmed_end_mode": "日历撤防覆盖结束时",
                             "occupied_delay": "有人到家后的延迟",
                             "unoccupied_delay": "有人离家后的延迟",
                             "rate_limit_max_calls": "速率限制 - 最大更改次数",
@@ -164,8 +180,6 @@
                         "data_description": {
                             "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在下方设置。",
                             "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。",
-                            "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
-                            "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。",
                             "occupied_delay": "有人到家后，在计算报警状态之前等待的秒数。在此期间的手动更改会将其取消。",
                             "unoccupied_delay": "有人离家后，在计算报警状态之前等待的秒数，这样短暂离开或追踪器掉线就不会布防。在此期间的手动更改会将其取消。",
                             "rate_limit_max_calls": "为防止循环，Auto Arm 在速率限制周期内最多更改报警状态的次数。该周期内超出的更改将被跳过。",
@@ -174,6 +188,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "某条日历匹配规则中的模式不是有效的正则表达式。"
         },
         "abort": {
             "already_configured": "AutoArm 已配置"
@@ -296,12 +313,30 @@
                     },
                     "time_of_day_options": {
                         "name": "高级 - 时段",
-                        "description": "用于其他报警状态的时段传感器，与就寝时间传感器一样，在开启期间设置各自的状态。传感器关闭时，将应用高级中的日历事件结束设置。",
+                        "description": "用于其他报警状态的时段传感器，与就寝时间传感器一样，在开启期间设置各自的状态。传感器关闭时，将应用“高级 - 日历”中的日历事件结束设置。",
                         "data": {
                             "time_of_day_disarmed": "撤防",
                             "time_of_day_armed_home": "在家布防",
                             "time_of_day_armed_away": "离家布防",
                             "time_of_day_armed_custom_bypass": "自定义布防"
+                        }
+                    },
+                    "calendar_options": {
+                        "name": "高级 - 日历",
+                        "description": "日历事件结束时的处理方式，以及哪些事件设置哪种警报状态。没有匹配规则的日历使用默认规则，即名为 Away、Home、Night、Disarmed、Vacation 或 Holiday 的事件。",
+                        "data": {
+                            "calendar_armed_end_mode": "日历布防覆盖结束时",
+                            "calendar_disarmed_end_mode": "日历撤防覆盖结束时",
+                            "calendar_match_rules": "匹配规则",
+                            "calendar_poll_interval": "轮询间隔",
+                            "calendar_notify_grace": "通知宽限期"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
+                            "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。",
+                            "calendar_match_rules": "每条规则为某个日历中标题或描述与其任一模式（正则表达式）匹配的事件设置一种警报状态。某个日历的规则会替换该日历的默认规则。",
+                            "calendar_poll_interval": "每次检查各日历事件之间的分钟数。",
+                            "calendar_notify_grace": "通知日历变更前等待的秒数，以便将相隔很近的变更（例如一个事件结束时另一个事件开始）合并为一条通知发送。"
                         }
                     },
                     "advanced_options": {
@@ -310,8 +345,6 @@
                             "use_alarm_service": "使用报警面板的操作更改状态",
                             "panel_code": "报警面板密码",
                             "panel_code_clear": "删除已存储的报警面板密码",
-                            "calendar_armed_end_mode": "日历布防覆盖结束时",
-                            "calendar_disarmed_end_mode": "日历撤防覆盖结束时",
                             "occupied_delay": "有人到家后的延迟",
                             "unoccupied_delay": "有人离家后的延迟",
                             "rate_limit_max_calls": "速率限制 - 最大更改次数",
@@ -320,8 +353,6 @@
                         "data_description": {
                             "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在下方设置。",
                             "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。",
-                            "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
-                            "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。",
                             "occupied_delay": "有人到家后，在计算报警状态之前等待的秒数。在此期间的手动更改会将其取消。",
                             "unoccupied_delay": "有人离家后，在计算报警状态之前等待的秒数，这样短暂离开或追踪器掉线就不会布防。在此期间的手动更改会将其取消。",
                             "rate_limit_max_calls": "为防止循环，Auto Arm 在速率限制周期内最多更改报警状态的次数。该周期内超出的更改将被跳过。",
@@ -330,6 +361,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "某条日历匹配规则中的模式不是有效的正则表达式。"
         }
     },
     "selector": {
@@ -368,6 +402,13 @@
                 "alarm_panel_disarm": "撤防警报面板",
                 "alarm_panel_reset": "重置警报面板",
                 "alarm_panel_away": "警报面板离家布防"
+            }
+        },
+        "calendar_match_rule": {
+            "fields": {
+                "calendar": "日历",
+                "state": "警报状态",
+                "patterns": "模式"
             }
         }
     },
@@ -410,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "YAML 核心配置已弃用",
-            "description": "AutoArm 的核心设置（alarm_panel、occupancy、calendars）已迁移到 UI 配置项。请从您的 YAML 配置中删除这些设置，并使用 UI 进行管理。高级设置（transitions、buttons、notify、diurnal、rate_limit）可以保留在 YAML 中。"
+            "description": "AutoArm 的核心设置（alarm_panel、occupancy、calendars、buttons、diurnal、rate_limit）已迁移到 UI 配置项。请从您的 YAML 配置中删除这些设置，并使用 UI 进行管理。只有 transitions 保留在 YAML 中。notify 部分已弃用，并将在 Home Assistant 2027.4 发布时移除。"
         },
         "yaml_notify_deprecated": {
             "title": "YAML notify 配置已弃用",

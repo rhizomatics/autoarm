@@ -141,7 +141,7 @@
                     },
                     "time_of_day_options": {
                         "name": "Avancé - Moment de la journée",
-                        "description": "Capteurs de moment de la journée pour les autres états d'alarme, qui définissent leur état tant qu'ils sont actifs, comme le capteur d'heure de coucher. Lorsqu'un capteur se désactive, les réglages de fin d'événement de calendrier de la section Avancé s'appliquent.",
+                        "description": "Capteurs de moment de la journée pour les autres états d'alarme, qui définissent leur état tant qu'ils sont actifs, comme le capteur d'heure de coucher. Lorsqu'un capteur se désactive, les réglages de fin d'événement de calendrier de la section Avancé - Calendrier s'appliquent.",
                         "data": {
                             "time_of_day_disarmed": "Désarmé",
                             "time_of_day_armed_home": "Armé présence",
@@ -149,13 +149,29 @@
                             "time_of_day_armed_custom_bypass": "Armé personnalisé"
                         }
                     },
+                    "calendar_options": {
+                        "name": "Avancé - Calendrier",
+                        "description": "Ce qui se passe quand un événement de calendrier se termine, et quels événements définissent quel état d'alarme. Un calendrier sans règle de correspondance utilise celles par défaut, les événements nommés Away, Home, Night, Disarmed, Vacation ou Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "À la fin d'un armement par calendrier",
+                            "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier",
+                            "calendar_match_rules": "Règles de correspondance",
+                            "calendar_poll_interval": "Intervalle d'interrogation",
+                            "calendar_notify_grace": "Délai de grâce des notifications"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
+                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là.",
+                            "calendar_match_rules": "Chaque règle définit un état d'alarme pour les événements d'un calendrier dont le titre ou la description correspond à l'un de ses motifs, qui sont des expressions régulières. Les règles d'un calendrier remplacent celles par défaut pour ce calendrier.",
+                            "calendar_poll_interval": "Minutes entre deux vérifications des événements de chaque calendrier.",
+                            "calendar_notify_grace": "Secondes d'attente avant de notifier un changement de calendrier, afin que des changements rapprochés, comme un événement qui se termine quand un autre commence, soient envoyés en une seule notification."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Avancé",
                         "data": {
                             "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
                             "panel_code": "Code de la centrale d'alarme",
-                            "calendar_armed_end_mode": "À la fin d'un armement par calendrier",
-                            "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier",
                             "occupied_delay": "Délai après l'arrivée de quelqu'un",
                             "unoccupied_delay": "Délai après le départ de quelqu'un",
                             "rate_limit_max_calls": "Limite de fréquence - changements maximum",
@@ -164,8 +180,6 @@
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. Si la centrale exige un code, définissez-le ci-dessous.",
                             "panel_code": "Code qu'Auto Arm fournit aux actions de la centrale d'alarme lors de l'armement ou du désarmement, si la centrale en exige un. Il est stocké chiffré et n'est plus jamais affiché. Laissez vide pour conserver le code déjà enregistré.",
-                            "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
-                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là.",
                             "occupied_delay": "Secondes d'attente après l'arrivée de quelqu'un à la maison avant de déterminer l'état de l'alarme. Un changement manuel pendant ce temps l'annule.",
                             "unoccupied_delay": "Secondes d'attente après le départ de quelqu'un avant de déterminer l'état de l'alarme, afin qu'une brève absence ou un traceur qui décroche n'arme pas l'alarme. Un changement manuel pendant ce temps l'annule.",
                             "rate_limit_max_calls": "Le nombre maximal de changements d'état de l'alarme qu'Auto Arm effectuera pendant la période de limite de fréquence, pour se protéger des boucles. Les changements supplémentaires pendant cette période sont ignorés.",
@@ -174,6 +188,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Une règle de correspondance de calendrier contient un motif qui n'est pas une expression régulière valide."
         },
         "abort": {
             "already_configured": "AutoArm est déjà configuré"
@@ -296,12 +313,30 @@
                     },
                     "time_of_day_options": {
                         "name": "Avancé - Moment de la journée",
-                        "description": "Capteurs de moment de la journée pour les autres états d'alarme, qui définissent leur état tant qu'ils sont actifs, comme le capteur d'heure de coucher. Lorsqu'un capteur se désactive, les réglages de fin d'événement de calendrier de la section Avancé s'appliquent.",
+                        "description": "Capteurs de moment de la journée pour les autres états d'alarme, qui définissent leur état tant qu'ils sont actifs, comme le capteur d'heure de coucher. Lorsqu'un capteur se désactive, les réglages de fin d'événement de calendrier de la section Avancé - Calendrier s'appliquent.",
                         "data": {
                             "time_of_day_disarmed": "Désarmé",
                             "time_of_day_armed_home": "Armé présence",
                             "time_of_day_armed_away": "Armé absence",
                             "time_of_day_armed_custom_bypass": "Armé personnalisé"
+                        }
+                    },
+                    "calendar_options": {
+                        "name": "Avancé - Calendrier",
+                        "description": "Ce qui se passe quand un événement de calendrier se termine, et quels événements définissent quel état d'alarme. Un calendrier sans règle de correspondance utilise celles par défaut, les événements nommés Away, Home, Night, Disarmed, Vacation ou Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "À la fin d'un armement par calendrier",
+                            "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier",
+                            "calendar_match_rules": "Règles de correspondance",
+                            "calendar_poll_interval": "Intervalle d'interrogation",
+                            "calendar_notify_grace": "Délai de grâce des notifications"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
+                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là.",
+                            "calendar_match_rules": "Chaque règle définit un état d'alarme pour les événements d'un calendrier dont le titre ou la description correspond à l'un de ses motifs, qui sont des expressions régulières. Les règles d'un calendrier remplacent celles par défaut pour ce calendrier.",
+                            "calendar_poll_interval": "Minutes entre deux vérifications des événements de chaque calendrier.",
+                            "calendar_notify_grace": "Secondes d'attente avant de notifier un changement de calendrier, afin que des changements rapprochés, comme un événement qui se termine quand un autre commence, soient envoyés en une seule notification."
                         }
                     },
                     "advanced_options": {
@@ -310,8 +345,6 @@
                             "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
                             "panel_code": "Code de la centrale d'alarme",
                             "panel_code_clear": "Supprimer le code enregistré de la centrale d'alarme",
-                            "calendar_armed_end_mode": "À la fin d'un armement par calendrier",
-                            "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier",
                             "occupied_delay": "Délai après l'arrivée de quelqu'un",
                             "unoccupied_delay": "Délai après le départ de quelqu'un",
                             "rate_limit_max_calls": "Limite de fréquence - changements maximum",
@@ -320,8 +353,6 @@
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. Si la centrale exige un code, définissez-le ci-dessous.",
                             "panel_code": "Code qu'Auto Arm fournit aux actions de la centrale d'alarme lors de l'armement ou du désarmement, si la centrale en exige un. Il est stocké chiffré et n'est plus jamais affiché. Laissez vide pour conserver le code déjà enregistré.",
-                            "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
-                            "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là.",
                             "occupied_delay": "Secondes d'attente après l'arrivée de quelqu'un à la maison avant de déterminer l'état de l'alarme. Un changement manuel pendant ce temps l'annule.",
                             "unoccupied_delay": "Secondes d'attente après le départ de quelqu'un avant de déterminer l'état de l'alarme, afin qu'une brève absence ou un traceur qui décroche n'arme pas l'alarme. Un changement manuel pendant ce temps l'annule.",
                             "rate_limit_max_calls": "Le nombre maximal de changements d'état de l'alarme qu'Auto Arm effectuera pendant la période de limite de fréquence, pour se protéger des boucles. Les changements supplémentaires pendant cette période sont ignorés.",
@@ -330,6 +361,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Une règle de correspondance de calendrier contient un motif qui n'est pas une expression régulière valide."
         }
     },
     "selector": {
@@ -368,6 +402,13 @@
                 "alarm_panel_disarm": "Désarmer le panneau d'alarme",
                 "alarm_panel_reset": "Réinitialiser le panneau d'alarme",
                 "alarm_panel_away": "Armer le panneau d'alarme en absence"
+            }
+        },
+        "calendar_match_rule": {
+            "fields": {
+                "calendar": "Calendrier",
+                "state": "État d'alarme",
+                "patterns": "Motifs"
             }
         }
     },
@@ -410,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "La configuration YAML principale est obsolète",
-            "description": "Les paramètres principaux d'AutoArm (alarm_panel, occupancy, calendars) ont été migrés vers l'interface utilisateur. Supprimez-les de votre configuration YAML et utilisez l'interface pour les gérer. Les paramètres avancés (transitions, buttons, notify, diurnal, rate_limit) peuvent rester en YAML."
+            "description": "Les paramètres principaux d'AutoArm (alarm_panel, occupancy, calendars, buttons, diurnal, rate_limit) ont été migrés vers l'interface utilisateur. Supprimez-les de votre configuration YAML et utilisez l'interface pour les gérer. Seul transitions reste en YAML. La section notify est obsolète et sera supprimée à la sortie de Home Assistant 2027.4."
         },
         "yaml_notify_deprecated": {
             "title": "La configuration YAML notify est obsolète",

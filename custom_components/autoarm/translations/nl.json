@@ -141,7 +141,7 @@
                     },
                     "time_of_day_options": {
                         "name": "Geavanceerd - Tijdstip van de dag",
-                        "description": "Tijdstip-van-de-dag-sensoren voor de andere alarmstatussen, die hun status instellen zolang ze aan staan, net als de bedtijdsensor. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-item onder Geavanceerd.",
+                        "description": "Tijdstip-van-de-dag-sensoren voor de andere alarmstatussen, die hun status instellen zolang ze aan staan, net als de bedtijdsensor. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-item onder Geavanceerd - Agenda.",
                         "data": {
                             "time_of_day_disarmed": "Uitgeschakeld",
                             "time_of_day_armed_home": "Ingeschakeld thuis",
@@ -149,13 +149,29 @@
                             "time_of_day_armed_custom_bypass": "Ingeschakeld aangepast"
                         }
                     },
+                    "calendar_options": {
+                        "name": "Geavanceerd - Agenda",
+                        "description": "Wat er gebeurt wanneer een agenda-item eindigt, en welke items welke alarmstatus instellen. Een agenda zonder overeenkomstregels gebruikt de standaardregels, items met de naam Away, Home, Night, Disarmed, Vacation of Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "Wanneer een inschakeling via de agenda eindigt",
+                            "calendar_disarmed_end_mode": "Wanneer een uitschakeling via de agenda eindigt",
+                            "calendar_match_rules": "Overeenkomstregels",
+                            "calendar_poll_interval": "Controle-interval",
+                            "calendar_notify_grace": "Wachttijd voor meldingen"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
+                            "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is.",
+                            "calendar_match_rules": "Elke regel stelt een alarmstatus in voor de items van één agenda waarvan de titel of beschrijving overeenkomt met een van de patronen, die reguliere expressies zijn. Regels voor een agenda vervangen de standaardregels voor die agenda.",
+                            "calendar_poll_interval": "Minuten tussen controles van elke agenda op items.",
+                            "calendar_notify_grace": "Seconden wachten voordat een agendawijziging wordt gemeld, zodat wijzigingen kort na elkaar, zoals een item dat eindigt terwijl een ander begint, als één melding worden verstuurd."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Geavanceerd",
                         "data": {
                             "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
                             "panel_code": "Code van het alarmpaneel",
-                            "calendar_armed_end_mode": "Wanneer een inschakeling via de agenda eindigt",
-                            "calendar_disarmed_end_mode": "Wanneer een uitschakeling via de agenda eindigt",
                             "occupied_delay": "Vertraging nadat iemand thuiskomt",
                             "unoccupied_delay": "Vertraging nadat iemand van huis gaat",
                             "rate_limit_max_calls": "Snelheidslimiet - maximale wijzigingen",
@@ -164,8 +180,6 @@
                         "data_description": {
                             "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hieronder in.",
                             "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden.",
-                            "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
-                            "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is.",
                             "occupied_delay": "Aantal seconden wachten nadat iemand thuiskomt voordat de alarmstatus wordt bepaald. Een handmatige wijziging in die tijd annuleert dit.",
                             "unoccupied_delay": "Aantal seconden wachten nadat iemand van huis gaat voordat de alarmstatus wordt bepaald, zodat een korte afwezigheid of een wegvallende tracker het alarm niet inschakelt. Een handmatige wijziging in die tijd annuleert dit.",
                             "rate_limit_max_calls": "Het maximale aantal wijzigingen van de alarmstatus dat Auto Arm binnen de periode van de snelheidslimiet uitvoert, als bescherming tegen lussen. Verdere wijzigingen in die periode worden overgeslagen.",
@@ -174,6 +188,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Een overeenkomstregel voor een agenda heeft een patroon dat geen geldige reguliere expressie is."
         },
         "abort": {
             "already_configured": "AutoArm is al geconfigureerd"
@@ -296,12 +313,30 @@
                     },
                     "time_of_day_options": {
                         "name": "Geavanceerd - Tijdstip van de dag",
-                        "description": "Tijdstip-van-de-dag-sensoren voor de andere alarmstatussen, die hun status instellen zolang ze aan staan, net als de bedtijdsensor. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-item onder Geavanceerd.",
+                        "description": "Tijdstip-van-de-dag-sensoren voor de andere alarmstatussen, die hun status instellen zolang ze aan staan, net als de bedtijdsensor. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-item onder Geavanceerd - Agenda.",
                         "data": {
                             "time_of_day_disarmed": "Uitgeschakeld",
                             "time_of_day_armed_home": "Ingeschakeld thuis",
                             "time_of_day_armed_away": "Ingeschakeld afwezig",
                             "time_of_day_armed_custom_bypass": "Ingeschakeld aangepast"
+                        }
+                    },
+                    "calendar_options": {
+                        "name": "Geavanceerd - Agenda",
+                        "description": "Wat er gebeurt wanneer een agenda-item eindigt, en welke items welke alarmstatus instellen. Een agenda zonder overeenkomstregels gebruikt de standaardregels, items met de naam Away, Home, Night, Disarmed, Vacation of Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "Wanneer een inschakeling via de agenda eindigt",
+                            "calendar_disarmed_end_mode": "Wanneer een uitschakeling via de agenda eindigt",
+                            "calendar_match_rules": "Overeenkomstregels",
+                            "calendar_poll_interval": "Controle-interval",
+                            "calendar_notify_grace": "Wachttijd voor meldingen"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
+                            "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is.",
+                            "calendar_match_rules": "Elke regel stelt een alarmstatus in voor de items van één agenda waarvan de titel of beschrijving overeenkomt met een van de patronen, die reguliere expressies zijn. Regels voor een agenda vervangen de standaardregels voor die agenda.",
+                            "calendar_poll_interval": "Minuten tussen controles van elke agenda op items.",
+                            "calendar_notify_grace": "Seconden wachten voordat een agendawijziging wordt gemeld, zodat wijzigingen kort na elkaar, zoals een item dat eindigt terwijl een ander begint, als één melding worden verstuurd."
                         }
                     },
                     "advanced_options": {
@@ -310,8 +345,6 @@
                             "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
                             "panel_code": "Code van het alarmpaneel",
                             "panel_code_clear": "Opgeslagen code van het alarmpaneel verwijderen",
-                            "calendar_armed_end_mode": "Wanneer een inschakeling via de agenda eindigt",
-                            "calendar_disarmed_end_mode": "Wanneer een uitschakeling via de agenda eindigt",
                             "occupied_delay": "Vertraging nadat iemand thuiskomt",
                             "unoccupied_delay": "Vertraging nadat iemand van huis gaat",
                             "rate_limit_max_calls": "Snelheidslimiet - maximale wijzigingen",
@@ -320,8 +353,6 @@
                         "data_description": {
                             "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hieronder in.",
                             "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden.",
-                            "calendar_armed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt uit, of afwezig in als niemand thuis is.",
-                            "calendar_disarmed_end_mode": "Automatisch gaat op aanwezigheid en zon, of alleen op aanwezigheid op dagen dat de zonsopgang- en zonsondergangtriggers uit staan. Op aanwezigheid en zon bepaalt de status uit wie er thuis is en of het dag of nacht is. Op aanwezigheid schakelt thuis in, of afwezig als niemand thuis is.",
                             "occupied_delay": "Aantal seconden wachten nadat iemand thuiskomt voordat de alarmstatus wordt bepaald. Een handmatige wijziging in die tijd annuleert dit.",
                             "unoccupied_delay": "Aantal seconden wachten nadat iemand van huis gaat voordat de alarmstatus wordt bepaald, zodat een korte afwezigheid of een wegvallende tracker het alarm niet inschakelt. Een handmatige wijziging in die tijd annuleert dit.",
                             "rate_limit_max_calls": "Het maximale aantal wijzigingen van de alarmstatus dat Auto Arm binnen de periode van de snelheidslimiet uitvoert, als bescherming tegen lussen. Verdere wijzigingen in die periode worden overgeslagen.",
@@ -330,6 +361,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Een overeenkomstregel voor een agenda heeft een patroon dat geen geldige reguliere expressie is."
         }
     },
     "selector": {
@@ -368,6 +402,13 @@
                 "alarm_panel_disarm": "Alarmcentrale uitschakelen",
                 "alarm_panel_reset": "Alarmcentrale resetten",
                 "alarm_panel_away": "Alarmcentrale inschakelen afwezig"
+            }
+        },
+        "calendar_match_rule": {
+            "fields": {
+                "calendar": "Agenda",
+                "state": "Alarmstatus",
+                "patterns": "Patronen"
             }
         }
     },
@@ -410,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "YAML-kernconfiguratie is verouderd",
-            "description": "De kerninstellingen van AutoArm (alarm_panel, occupancy, calendars) zijn gemigreerd naar de UI-configuratie-item. Verwijder deze uit uw YAML-configuratie en gebruik de UI om ze te beheren. Geavanceerde instellingen (transitions, buttons, notify, diurnal, rate_limit) kunnen in YAML blijven staan."
+            "description": "De kerninstellingen van AutoArm (alarm_panel, occupancy, calendars, buttons, diurnal, rate_limit) zijn gemigreerd naar de UI-configuratie-item. Verwijder deze uit uw YAML-configuratie en gebruik de UI om ze te beheren. Alleen transitions blijft in YAML staan. De sectie notify is verouderd en wordt verwijderd wanneer Home Assistant 2027.4 uitkomt."
         },
         "yaml_notify_deprecated": {
             "title": "YAML-configuratie voor notify is verouderd",

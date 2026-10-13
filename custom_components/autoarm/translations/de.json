@@ -141,7 +141,7 @@
                     },
                     "time_of_day_options": {
                         "name": "Erweitert - Tageszeit",
-                        "description": "Tageszeit-Sensoren für die anderen Alarmzustände, die ihren Zustand setzen, solange sie eingeschaltet sind, genau wie der Schlafenszeit-Sensor. Wenn ein Sensor ausschaltet, gelten die Einstellungen für das Ende von Kalenderereignissen unter Erweitert.",
+                        "description": "Tageszeit-Sensoren für die anderen Alarmzustände, die ihren Zustand setzen, solange sie eingeschaltet sind, genau wie der Schlafenszeit-Sensor. Wenn ein Sensor ausschaltet, gelten die Einstellungen für das Ende von Kalenderereignissen unter Erweitert - Kalender.",
                         "data": {
                             "time_of_day_disarmed": "Unscharf",
                             "time_of_day_armed_home": "Scharf zu Hause",
@@ -149,13 +149,29 @@
                             "time_of_day_armed_custom_bypass": "Scharf benutzerdefiniert"
                         }
                     },
+                    "calendar_options": {
+                        "name": "Erweitert - Kalender",
+                        "description": "Was geschieht, wenn ein Kalenderereignis endet, und welche Ereignisse welchen Alarmzustand setzen. Ein Kalender ohne Zuordnungsregeln nutzt die Standards, Ereignisse mit dem Namen Away, Home, Night, Disarmed, Vacation oder Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "Wenn eine Kalender-Scharfschaltung endet",
+                            "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet",
+                            "calendar_match_rules": "Zuordnungsregeln",
+                            "calendar_poll_interval": "Abfrageintervall",
+                            "calendar_notify_grace": "Wartezeit für Benachrichtigungen"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
+                            "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist.",
+                            "calendar_match_rules": "Jede Regel setzt einen Alarmzustand für die Ereignisse eines Kalenders, deren Titel oder Beschreibung auf eines ihrer Muster passt; die Muster sind reguläre Ausdrücke. Regeln für einen Kalender ersetzen die Standards für diesen Kalender.",
+                            "calendar_poll_interval": "Minuten zwischen den Abfragen jedes Kalenders nach Ereignissen.",
+                            "calendar_notify_grace": "Sekunden, die vor der Benachrichtigung über eine Kalenderänderung gewartet wird, damit dicht aufeinanderfolgende Änderungen, etwa wenn ein Ereignis endet und ein anderes beginnt, als eine Benachrichtigung gesendet werden."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Erweitert",
                         "data": {
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                             "panel_code": "Code der Alarmzentrale",
-                            "calendar_armed_end_mode": "Wenn eine Kalender-Scharfschaltung endet",
-                            "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet",
                             "occupied_delay": "Verzögerung, nachdem jemand nach Hause kommt",
                             "unoccupied_delay": "Verzögerung, nachdem jemand das Haus verlässt",
                             "rate_limit_max_calls": "Ratenbegrenzung - maximale Änderungen",
@@ -164,8 +180,6 @@
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn unten fest.",
                             "panel_code": "Code, den Auto Arm den Aktionen der Alarmzentrale beim Scharf- oder Unscharfschalten übergibt, falls die Zentrale einen verlangt. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um den bereits gespeicherten Code zu behalten.",
-                            "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
-                            "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist.",
                             "occupied_delay": "Sekunden, die nach der Ankunft einer Person gewartet wird, bevor der Alarmstatus ermittelt wird. Eine manuelle Änderung in dieser Zeit bricht dies ab.",
                             "unoccupied_delay": "Sekunden, die nach dem Weggehen einer Person gewartet wird, bevor der Alarmstatus ermittelt wird, damit eine kurze Abwesenheit oder ein ausfallender Tracker den Alarm nicht scharfschaltet. Eine manuelle Änderung in dieser Zeit bricht dies ab.",
                             "rate_limit_max_calls": "Die Höchstzahl an Änderungen des Alarmstatus, die Auto Arm innerhalb des Zeitraums der Ratenbegrenzung vornimmt, als Schutz vor Schleifen. Weitere Änderungen in diesem Zeitraum werden übersprungen.",
@@ -174,6 +188,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Eine Kalender-Zuordnungsregel enthält ein Muster, das kein gültiger regulärer Ausdruck ist."
         },
         "abort": {
             "already_configured": "AutoArm ist bereits konfiguriert"
@@ -296,12 +313,30 @@
                     },
                     "time_of_day_options": {
                         "name": "Erweitert - Tageszeit",
-                        "description": "Tageszeit-Sensoren für die anderen Alarmzustände, die ihren Zustand setzen, solange sie eingeschaltet sind, genau wie der Schlafenszeit-Sensor. Wenn ein Sensor ausschaltet, gelten die Einstellungen für das Ende von Kalenderereignissen unter Erweitert.",
+                        "description": "Tageszeit-Sensoren für die anderen Alarmzustände, die ihren Zustand setzen, solange sie eingeschaltet sind, genau wie der Schlafenszeit-Sensor. Wenn ein Sensor ausschaltet, gelten die Einstellungen für das Ende von Kalenderereignissen unter Erweitert - Kalender.",
                         "data": {
                             "time_of_day_disarmed": "Unscharf",
                             "time_of_day_armed_home": "Scharf zu Hause",
                             "time_of_day_armed_away": "Scharf abwesend",
                             "time_of_day_armed_custom_bypass": "Scharf benutzerdefiniert"
+                        }
+                    },
+                    "calendar_options": {
+                        "name": "Erweitert - Kalender",
+                        "description": "Was geschieht, wenn ein Kalenderereignis endet, und welche Ereignisse welchen Alarmzustand setzen. Ein Kalender ohne Zuordnungsregeln nutzt die Standards, Ereignisse mit dem Namen Away, Home, Night, Disarmed, Vacation oder Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "Wenn eine Kalender-Scharfschaltung endet",
+                            "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet",
+                            "calendar_match_rules": "Zuordnungsregeln",
+                            "calendar_poll_interval": "Abfrageintervall",
+                            "calendar_notify_grace": "Wartezeit für Benachrichtigungen"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
+                            "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist.",
+                            "calendar_match_rules": "Jede Regel setzt einen Alarmzustand für die Ereignisse eines Kalenders, deren Titel oder Beschreibung auf eines ihrer Muster passt; die Muster sind reguläre Ausdrücke. Regeln für einen Kalender ersetzen die Standards für diesen Kalender.",
+                            "calendar_poll_interval": "Minuten zwischen den Abfragen jedes Kalenders nach Ereignissen.",
+                            "calendar_notify_grace": "Sekunden, die vor der Benachrichtigung über eine Kalenderänderung gewartet wird, damit dicht aufeinanderfolgende Änderungen, etwa wenn ein Ereignis endet und ein anderes beginnt, als eine Benachrichtigung gesendet werden."
                         }
                     },
                     "advanced_options": {
@@ -310,8 +345,6 @@
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                             "panel_code": "Code der Alarmzentrale",
                             "panel_code_clear": "Gespeicherten Code der Alarmzentrale entfernen",
-                            "calendar_armed_end_mode": "Wenn eine Kalender-Scharfschaltung endet",
-                            "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet",
                             "occupied_delay": "Verzögerung, nachdem jemand nach Hause kommt",
                             "unoccupied_delay": "Verzögerung, nachdem jemand das Haus verlässt",
                             "rate_limit_max_calls": "Ratenbegrenzung - maximale Änderungen",
@@ -320,8 +353,6 @@
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn unten fest.",
                             "panel_code": "Code, den Auto Arm den Aktionen der Alarmzentrale beim Scharf- oder Unscharfschalten übergibt, falls die Zentrale einen verlangt. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um den bereits gespeicherten Code zu behalten.",
-                            "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
-                            "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist.",
                             "occupied_delay": "Sekunden, die nach der Ankunft einer Person gewartet wird, bevor der Alarmstatus ermittelt wird. Eine manuelle Änderung in dieser Zeit bricht dies ab.",
                             "unoccupied_delay": "Sekunden, die nach dem Weggehen einer Person gewartet wird, bevor der Alarmstatus ermittelt wird, damit eine kurze Abwesenheit oder ein ausfallender Tracker den Alarm nicht scharfschaltet. Eine manuelle Änderung in dieser Zeit bricht dies ab.",
                             "rate_limit_max_calls": "Die Höchstzahl an Änderungen des Alarmstatus, die Auto Arm innerhalb des Zeitraums der Ratenbegrenzung vornimmt, als Schutz vor Schleifen. Weitere Änderungen in diesem Zeitraum werden übersprungen.",
@@ -330,6 +361,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Eine Kalender-Zuordnungsregel enthält ein Muster, das kein gültiger regulärer Ausdruck ist."
         }
     },
     "selector": {
@@ -368,6 +402,13 @@
                 "alarm_panel_disarm": "Alarmzentrale unscharf schalten",
                 "alarm_panel_reset": "Alarmzentrale zurücksetzen",
                 "alarm_panel_away": "Alarmzentrale scharf abwesend schalten"
+            }
+        },
+        "calendar_match_rule": {
+            "fields": {
+                "calendar": "Kalender",
+                "state": "Alarmzustand",
+                "patterns": "Muster"
             }
         }
     },
@@ -410,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "YAML-Kernkonfiguration ist veraltet",
-            "description": "Die AutoArm-Kerneinstellungen (alarm_panel, occupancy, calendars) wurden in den UI-Konfigurationseintrag migriert. Entferne sie aus deiner YAML-Konfiguration und verwalte sie über die Benutzeroberfläche. Erweiterte Einstellungen (transitions, buttons, notify, diurnal, rate_limit) können in YAML verbleiben."
+            "description": "Die AutoArm-Kerneinstellungen (alarm_panel, occupancy, calendars, buttons, diurnal, rate_limit) wurden in den UI-Konfigurationseintrag migriert. Entferne sie aus deiner YAML-Konfiguration und verwalte sie über die Benutzeroberfläche. Nur transitions verbleibt in YAML. Der Abschnitt notify ist veraltet und wird mit der Veröffentlichung von Home Assistant 2027.4 entfernt."
         },
         "yaml_notify_deprecated": {
             "title": "YAML-Konfiguration für notify ist veraltet",

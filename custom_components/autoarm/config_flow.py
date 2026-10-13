@@ -1,6 +1,7 @@
 """Config flow for Auto Arm integration."""
 
 import datetime as dt
+import re
 from collections.abc import Mapping
 from typing import Any
 
@@ -16,6 +17,7 @@ from homeassistant.helpers.selector import (
     NumberSelectorConfig,
     NumberSelectorMode,
     ObjectSelector,
+    ObjectSelectorConfig,
     Selector,
     SelectSelector,
     SelectSelectorConfig,
@@ -47,6 +49,7 @@ from .const import (
     CONF_OCCUPANCY_DEFAULT,
     CONF_SUNRISE,
     CONF_SUNSET,
+    DEFAULT_CALENDAR_NOTIFY_GRACE,
     DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
     NOTIFY_COMMON,
@@ -68,6 +71,16 @@ CONF_OCCUPANCY_DEFAULT_NIGHT = "occupancy_default_night"
 CONF_NO_EVENT_MODE = "no_event_mode"
 CONF_CALENDAR_ARMED_END_MODE = "calendar_armed_end_mode"
 CONF_CALENDAR_DISARMED_END_MODE = "calendar_disarmed_end_mode"
+# each a calendar, an alarm state and the patterns for the events of that calendar that set the state
+CONF_CALENDAR_MATCH_RULES = "calendar_match_rules"
+CONF_RULE_CALENDAR = "calendar"
+CONF_RULE_STATE = "state"
+CONF_RULE_PATTERNS = "patterns"
+# minutes between looking at each calendar
+CONF_CALENDAR_POLL_MINUTES = "calendar_poll_interval"
+DEFAULT_CALENDAR_POLL_MINUTES = 15
+# seconds to hold a notification of a calendar change, so that changes close together are told as one
+CONF_CALENDAR_NOTIFY_GRACE_SECONDS = "calendar_notify_grace"
 CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES = "calendar_occupancy_override_states"
 CONF_CALENDAR_OCCUPANCY_ENDS_AWAY = "calendar_occupancy_ends_away"
 CONF_NOTIFY_ACTION = "notify_action"
@@ -387,6 +400,51 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
             }),
             {"collapsed": True},
         ),
+        vol.Required("calendar_options"): section(
+            vol.Schema({
+                vol.Required(
+                    CONF_CALENDAR_ARMED_END_MODE,
+                    default=options.get(CONF_CALENDAR_ARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
+                ): _calendar_end_mode_selector(),
+                vol.Required(
+                    CONF_CALENDAR_DISARMED_END_MODE,
+                    default=options.get(CONF_CALENDAR_DISARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
+                ): _calendar_end_mode_selector(),
+                vol.Optional(
+                    CONF_CALENDAR_MATCH_RULES,
+                    default=options.get(CONF_CALENDAR_MATCH_RULES, []),
+                ): ObjectSelector(
+                    ObjectSelectorConfig(
+                        multiple=True,
+                        label_field=CONF_RULE_STATE,
+                        description_field=CONF_RULE_CALENDAR,
+                        translation_key="calendar_match_rule",
+                        fields={
+                            CONF_RULE_CALENDAR: {
+                                "selector": EntitySelector(EntitySelectorConfig(domain="calendar")),
+                                "required": True,
+                            },
+                            CONF_RULE_STATE: {"selector": _alarm_state_selector(), "required": True},
+                            CONF_RULE_PATTERNS: {
+                                "selector": TextSelector(TextSelectorConfig(multiple=True)),
+                                "required": True,
+                            },
+                        },
+                    )
+                ),
+                vol.Optional(
+                    CONF_CALENDAR_POLL_MINUTES,
+                    default=options.get(CONF_CALENDAR_POLL_MINUTES, DEFAULT_CALENDAR_POLL_MINUTES),
+                ): NumberSelector(
+                    NumberSelectorConfig(min=1, max=1440, mode=NumberSelectorMode.BOX, unit_of_measurement="min")
+                ),
+                vol.Optional(
+                    CONF_CALENDAR_NOTIFY_GRACE_SECONDS,
+                    default=options.get(CONF_CALENDAR_NOTIFY_GRACE_SECONDS, int(DEFAULT_CALENDAR_NOTIFY_GRACE.total_seconds())),
+                ): _seconds_selector(),
+            }),
+            {"collapsed": True},
+        ),
         vol.Required("advanced_options"): section(
             vol.Schema({
                 vol.Required(
@@ -402,14 +460,6 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
                     if options.get(CONF_PANEL_CODE)
                     else {}
                 ),
-                vol.Required(
-                    CONF_CALENDAR_ARMED_END_MODE,
-                    default=options.get(CONF_CALENDAR_ARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
-                ): _calendar_end_mode_selector(),
-                vol.Required(
-                    CONF_CALENDAR_DISARMED_END_MODE,
-                    default=options.get(CONF_CALENDAR_DISARMED_END_MODE, NO_CAL_EVENT_MODE_AUTO),
-                ): _calendar_end_mode_selector(),
                 **{
                     vol.Optional(option, default=options.get(option, default)): _seconds_selector()
                     for option, default in DEFAULT_OCCUPANCY_DELAYS.items()
@@ -435,6 +485,17 @@ def _flatten_sections(user_input: dict[str, Any]) -> dict[str, Any]:
         if isinstance(v, dict):
             data.update(v)
     return data
+
+
+def _pattern_errors(data: Mapping[str, Any]) -> dict[str, str]:
+    """Errors for the form if any calendar match rule has a pattern that isn't a regular expression"""
+    for rule in data.get(CONF_CALENDAR_MATCH_RULES, []):
+        for pattern in rule.get(CONF_RULE_PATTERNS, []):
+            try:
+                re.compile(pattern)
+            except re.error:
+                return {"base": "invalid_pattern"}
+    return {}
 
 
 async def _protect_panel_code(hass: HomeAssistant, data: dict[str, Any], stored: str | None = None) -> None:
@@ -491,28 +552,34 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_advanced_setup(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Handle set up with the full set of options shown up front, instead of the quick recipe's defaults."""
-        if user_input is not None:
-            data = _flatten_sections(user_input)
-            await _protect_panel_code(self.hass, data)
-            alarm_panel = data.pop(CONF_ALARM_PANEL)
-            return self.async_create_entry(
-                title="Auto Arm",
-                data={CONF_ALARM_PANEL: alarm_panel},
-                options=data,
-            )
-
-        default_options = {
+        default_options: dict[str, Any] = {
             **DEFAULT_OPTIONS,
             CONF_NOTIFY_ACTION: _default_notify_action(self.hass),
             CONF_PERSON_ENTITIES: sorted(self.hass.states.async_entity_ids("person")),
         }
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            data = _flatten_sections(user_input)
+            errors = _pattern_errors(data)
+            if not errors:
+                await _protect_panel_code(self.hass, data)
+                alarm_panel = data.pop(CONF_ALARM_PANEL)
+                return self.async_create_entry(
+                    title="Auto Arm",
+                    data={CONF_ALARM_PANEL: alarm_panel},
+                    options=data,
+                )
+            # shown again as it was filled in, to put right
+            default_options = data
+
         return self.async_show_form(
             step_id="advanced_setup",
             data_schema=vol.Schema({
-                **_top_level_fields(default_options),
+                **_top_level_fields(default_options, alarm_panel_default=default_options.get(CONF_ALARM_PANEL)),
                 **await _section_fields(self.hass, default_options),
             }),
             description_placeholders=SETUP_HELP_PLACEHOLDERS,
+            errors=errors,
         )
 
     async def async_step_import(self, import_data: dict[str, Any]) -> ConfigFlowResult:
@@ -580,30 +647,38 @@ class AutoArmOptionsFlow(OptionsFlow):
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Manage the options."""
+        options: Mapping[str, Any] = self.config_entry.options
+        alarm_panel: str = self.config_entry.data.get(CONF_ALARM_PANEL, "")
+        errors: dict[str, str] = {}
         if user_input is not None:
             data = _flatten_sections(user_input)
-            await _protect_panel_code(self.hass, data, self.config_entry.options.get(CONF_PANEL_CODE))
+            errors = _pattern_errors(data)
+            if not errors:
+                await _protect_panel_code(self.hass, data, self.config_entry.options.get(CONF_PANEL_CODE))
 
-            # The alarm panel entity lives in config_entry.data, not options.
+                # The alarm panel entity lives in config_entry.data, not options.
+                alarm_panel = data.pop(CONF_ALARM_PANEL)
+                if alarm_panel != self.config_entry.data.get(CONF_ALARM_PANEL):
+                    # along with the options, as one update, so there's a single reload that has both
+                    self.hass.config_entries.async_update_entry(
+                        self.config_entry,
+                        data={**self.config_entry.data, CONF_ALARM_PANEL: alarm_panel},
+                        options=data,
+                    )
+
+                return self.async_create_entry(title="", data=data)
+            # shown again as it was filled in, to put right, other than a panel code which stays as stored
             alarm_panel = data.pop(CONF_ALARM_PANEL)
-            if alarm_panel != self.config_entry.data.get(CONF_ALARM_PANEL):
-                # along with the options, as one update, so there's a single reload that has both
-                self.hass.config_entries.async_update_entry(
-                    self.config_entry,
-                    data={**self.config_entry.data, CONF_ALARM_PANEL: alarm_panel},
-                    options=data,
-                )
+            options = {**data, CONF_PANEL_CODE: self.config_entry.options.get(CONF_PANEL_CODE)}
 
-            return self.async_create_entry(title="", data=data)
-
-        options = self.config_entry.options
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
-                **_top_level_fields(options, alarm_panel_default=self.config_entry.data.get(CONF_ALARM_PANEL, "")),
+                **_top_level_fields(options, alarm_panel_default=alarm_panel),
                 **await _section_fields(self.hass, options),
             }),
             description_placeholders={"recipe_url": RECIPE_URL},
+            errors=errors,
         )
 
 

@@ -506,3 +506,34 @@ async def test_sensor_ignored_after_unload(hass: HomeAssistant, mock_notify: Any
     await _bedtime(hass, "on")
 
     assert panel_state(hass) == AlarmControlPanelState.ARMED_HOME
+
+
+async def test_bedtime_in_status_state_change_and_conditions(
+    local_calendar: CalendarEntity, hass: HomeAssistant, mock_notify: Any
+) -> None:
+    hass.states.async_set("person.tenant", "home")
+    hass.states.async_set("sun.sun", "below_horizon")
+    hass.states.async_set(BEDTIME, "off", BEDTIME_ATTRS)
+    hass.data[YAML_DATA_KEY] = {}
+    entry = await _setup_entry(hass, RECIPE_OPTIONS)
+    armer = entry.runtime_data
+    assert not armer.is_bedtime()
+    assert armer.status["last_calculation"].attributes["bedtime"] is False
+
+    await _bedtime(hass, "on")
+    assert panel_state(hass) == AlarmControlPanelState.ARMED_NIGHT
+    assert armer.is_bedtime()
+    assert armer.last_change.bedtime is True
+
+    await _bedtime(hass, "off")
+    assert armer.last_change.bedtime is False
+    assert armer.status["last_calculation"].attributes["bedtime"] is False
+
+    # an armed night calendar event is a bedtime too
+    now = dt_util.now()
+    await local_calendar.async_create_event(
+        dtstart=now - dt.timedelta(minutes=5), dtend=now + dt.timedelta(minutes=30), summary="Armed Night"
+    )
+    for calendar in armer.calendars:
+        await calendar.match_events()
+    assert armer.is_bedtime()

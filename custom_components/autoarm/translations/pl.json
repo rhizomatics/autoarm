@@ -141,7 +141,7 @@
                     },
                     "time_of_day_options": {
                         "name": "Zaawansowane - Pora dnia",
-                        "description": "Czujniki pory dnia dla pozostałych stanów alarmu, które ustawiają swój stan, gdy są włączone, tak jak czujnik pory snu. Gdy czujnik się wyłącza, obowiązują ustawienia zakończenia wydarzenia kalendarza z sekcji Zaawansowane.",
+                        "description": "Czujniki pory dnia dla pozostałych stanów alarmu, które ustawiają swój stan, gdy są włączone, tak jak czujnik pory snu. Gdy czujnik się wyłącza, obowiązują ustawienia zakończenia wydarzenia kalendarza z sekcji Zaawansowane - Kalendarz.",
                         "data": {
                             "time_of_day_disarmed": "Rozbrojony",
                             "time_of_day_armed_home": "Uzbrojony w domu",
@@ -149,13 +149,29 @@
                             "time_of_day_armed_custom_bypass": "Uzbrojony niestandardowo"
                         }
                     },
+                    "calendar_options": {
+                        "name": "Zaawansowane - Kalendarz",
+                        "description": "Co się dzieje po zakończeniu wydarzenia kalendarza oraz które wydarzenia ustawiają który stan alarmu. Kalendarz bez reguł dopasowania używa domyślnych, czyli wydarzeń o nazwie Away, Home, Night, Disarmed, Vacation lub Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "Gdy kończy się uzbrojenie z kalendarza",
+                            "calendar_disarmed_end_mode": "Gdy kończy się rozbrojenie z kalendarza",
+                            "calendar_match_rules": "Reguły dopasowania",
+                            "calendar_poll_interval": "Częstotliwość sprawdzania",
+                            "calendar_notify_grace": "Okres karencji powiadomień"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
+                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma.",
+                            "calendar_match_rules": "Każda reguła ustawia stan alarmu dla wydarzeń jednego kalendarza, których tytuł lub opis pasuje do któregoś z jej wzorców, będących wyrażeniami regularnymi. Reguły dla kalendarza zastępują domyślne dla tego kalendarza.",
+                            "calendar_poll_interval": "Minuty między sprawdzeniami wydarzeń w każdym kalendarzu.",
+                            "calendar_notify_grace": "Sekundy oczekiwania przed powiadomieniem o zmianie z kalendarza, aby zmiany następujące tuż po sobie, na przykład gdy jedno wydarzenie kończy się, a drugie zaczyna, były wysyłane jako jedno powiadomienie."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Zaawansowane",
                         "data": {
                             "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
                             "panel_code": "Kod panelu alarmowego",
-                            "calendar_armed_end_mode": "Gdy kończy się uzbrojenie z kalendarza",
-                            "calendar_disarmed_end_mode": "Gdy kończy się rozbrojenie z kalendarza",
                             "occupied_delay": "Opóźnienie po czyimś powrocie do domu",
                             "unoccupied_delay": "Opóźnienie po czyimś wyjściu z domu",
                             "rate_limit_max_calls": "Limit częstotliwości - maksymalna liczba zmian",
@@ -164,8 +180,6 @@
                         "data_description": {
                             "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Jeśli panel wymaga kodu, ustaw go poniżej.",
                             "panel_code": "Kod, który Auto Arm przekazuje akcjom panelu alarmowego podczas uzbrajania lub rozbrajania, jeśli panel go wymaga. Jest przechowywany w postaci zaszyfrowanej i nigdy więcej nie jest wyświetlany. Pozostaw puste, aby zachować już zapisany kod.",
-                            "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
-                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma.",
                             "occupied_delay": "Liczba sekund oczekiwania po czyimś powrocie do domu przed ustaleniem stanu alarmu. Ręczna zmiana w tym czasie to anuluje.",
                             "unoccupied_delay": "Liczba sekund oczekiwania po czyimś wyjściu z domu przed ustaleniem stanu alarmu, aby krótka nieobecność lub utrata połączenia przez tracker nie uzbroiła alarmu. Ręczna zmiana w tym czasie to anuluje.",
                             "rate_limit_max_calls": "Największa liczba zmian stanu alarmu, jaką Auto Arm wykona w okresie limitu częstotliwości, jako zabezpieczenie przed pętlami. Kolejne zmiany w tym okresie są pomijane.",
@@ -174,6 +188,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Reguła dopasowania kalendarza zawiera wzorzec, który nie jest poprawnym wyrażeniem regularnym."
         },
         "abort": {
             "already_configured": "AutoArm jest już skonfigurowany"
@@ -296,12 +313,30 @@
                     },
                     "time_of_day_options": {
                         "name": "Zaawansowane - Pora dnia",
-                        "description": "Czujniki pory dnia dla pozostałych stanów alarmu, które ustawiają swój stan, gdy są włączone, tak jak czujnik pory snu. Gdy czujnik się wyłącza, obowiązują ustawienia zakończenia wydarzenia kalendarza z sekcji Zaawansowane.",
+                        "description": "Czujniki pory dnia dla pozostałych stanów alarmu, które ustawiają swój stan, gdy są włączone, tak jak czujnik pory snu. Gdy czujnik się wyłącza, obowiązują ustawienia zakończenia wydarzenia kalendarza z sekcji Zaawansowane - Kalendarz.",
                         "data": {
                             "time_of_day_disarmed": "Rozbrojony",
                             "time_of_day_armed_home": "Uzbrojony w domu",
                             "time_of_day_armed_away": "Uzbrojony poza domem",
                             "time_of_day_armed_custom_bypass": "Uzbrojony niestandardowo"
+                        }
+                    },
+                    "calendar_options": {
+                        "name": "Zaawansowane - Kalendarz",
+                        "description": "Co się dzieje po zakończeniu wydarzenia kalendarza oraz które wydarzenia ustawiają który stan alarmu. Kalendarz bez reguł dopasowania używa domyślnych, czyli wydarzeń o nazwie Away, Home, Night, Disarmed, Vacation lub Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "Gdy kończy się uzbrojenie z kalendarza",
+                            "calendar_disarmed_end_mode": "Gdy kończy się rozbrojenie z kalendarza",
+                            "calendar_match_rules": "Reguły dopasowania",
+                            "calendar_poll_interval": "Częstotliwość sprawdzania",
+                            "calendar_notify_grace": "Okres karencji powiadomień"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
+                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma.",
+                            "calendar_match_rules": "Każda reguła ustawia stan alarmu dla wydarzeń jednego kalendarza, których tytuł lub opis pasuje do któregoś z jej wzorców, będących wyrażeniami regularnymi. Reguły dla kalendarza zastępują domyślne dla tego kalendarza.",
+                            "calendar_poll_interval": "Minuty między sprawdzeniami wydarzeń w każdym kalendarzu.",
+                            "calendar_notify_grace": "Sekundy oczekiwania przed powiadomieniem o zmianie z kalendarza, aby zmiany następujące tuż po sobie, na przykład gdy jedno wydarzenie kończy się, a drugie zaczyna, były wysyłane jako jedno powiadomienie."
                         }
                     },
                     "advanced_options": {
@@ -310,8 +345,6 @@
                             "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
                             "panel_code": "Kod panelu alarmowego",
                             "panel_code_clear": "Usuń zapisany kod panelu alarmowego",
-                            "calendar_armed_end_mode": "Gdy kończy się uzbrojenie z kalendarza",
-                            "calendar_disarmed_end_mode": "Gdy kończy się rozbrojenie z kalendarza",
                             "occupied_delay": "Opóźnienie po czyimś powrocie do domu",
                             "unoccupied_delay": "Opóźnienie po czyimś wyjściu z domu",
                             "rate_limit_max_calls": "Limit częstotliwości - maksymalna liczba zmian",
@@ -320,8 +353,6 @@
                         "data_description": {
                             "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Jeśli panel wymaga kodu, ustaw go poniżej.",
                             "panel_code": "Kod, który Auto Arm przekazuje akcjom panelu alarmowego podczas uzbrajania lub rozbrajania, jeśli panel go wymaga. Jest przechowywany w postaci zaszyfrowanej i nigdy więcej nie jest wyświetlany. Pozostaw puste, aby zachować już zapisany kod.",
-                            "calendar_armed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności rozbraja lub uzbraja poza domem, gdy nikogo nie ma.",
-                            "calendar_disarmed_end_mode": "Automatyczny kieruje się obecnością i słońcem, a w dni z wyłączonymi wyzwalaczami wschodu i zachodu słońca tylko obecnością. Według obecności i słońca ustala stan na podstawie tego, kto jest w domu i czy jest dzień, czy noc. Według obecności uzbraja w domu lub poza domem, gdy nikogo nie ma.",
                             "occupied_delay": "Liczba sekund oczekiwania po czyimś powrocie do domu przed ustaleniem stanu alarmu. Ręczna zmiana w tym czasie to anuluje.",
                             "unoccupied_delay": "Liczba sekund oczekiwania po czyimś wyjściu z domu przed ustaleniem stanu alarmu, aby krótka nieobecność lub utrata połączenia przez tracker nie uzbroiła alarmu. Ręczna zmiana w tym czasie to anuluje.",
                             "rate_limit_max_calls": "Największa liczba zmian stanu alarmu, jaką Auto Arm wykona w okresie limitu częstotliwości, jako zabezpieczenie przed pętlami. Kolejne zmiany w tym okresie są pomijane.",
@@ -330,6 +361,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Reguła dopasowania kalendarza zawiera wzorzec, który nie jest poprawnym wyrażeniem regularnym."
         }
     },
     "selector": {
@@ -368,6 +402,13 @@
                 "alarm_panel_disarm": "Rozbrój panel alarmu",
                 "alarm_panel_reset": "Zresetuj panel alarmu",
                 "alarm_panel_away": "Uzbrój panel alarmu poza domem"
+            }
+        },
+        "calendar_match_rule": {
+            "fields": {
+                "calendar": "Kalendarz",
+                "state": "Stan alarmu",
+                "patterns": "Wzorce"
             }
         }
     },
@@ -410,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "Podstawowa konfiguracja YAML jest przestarzała",
-            "description": "Podstawowe ustawienia AutoArm (alarm_panel, occupancy, calendars) zostały przeniesione do wpisu konfiguracyjnego interfejsu. Usuń je z konfiguracji YAML i zarządzaj nimi za pomocą interfejsu. Ustawienia zaawansowane (transitions, buttons, notify, diurnal, rate_limit) mogą pozostać w YAML."
+            "description": "Podstawowe ustawienia AutoArm (alarm_panel, occupancy, calendars, buttons, diurnal, rate_limit) zostały przeniesione do wpisu konfiguracyjnego interfejsu. Usuń je z konfiguracji YAML i zarządzaj nimi za pomocą interfejsu. W YAML pozostaje tylko transitions. Sekcja notify jest przestarzała i zostanie usunięta wraz z wydaniem Home Assistant 2027.4."
         },
         "yaml_notify_deprecated": {
             "title": "Konfiguracja YAML notify jest przestarzała",

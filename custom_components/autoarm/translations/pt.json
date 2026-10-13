@@ -141,7 +141,7 @@
                     },
                     "time_of_day_options": {
                         "name": "Avançado - Hora do dia",
-                        "description": "Sensores de hora do dia para os outros estados de alarme, que definem o seu estado enquanto estão ligados, tal como o sensor de hora de deitar. Quando um sensor se desliga, aplicam-se as definições de fim de evento de calendário em Avançado.",
+                        "description": "Sensores de hora do dia para os outros estados de alarme, que definem o seu estado enquanto estão ligados, tal como o sensor de hora de deitar. Quando um sensor se desliga, aplicam-se as definições de fim de evento de calendário em Avançado - Calendário.",
                         "data": {
                             "time_of_day_disarmed": "Desarmado",
                             "time_of_day_armed_home": "Armado em casa",
@@ -149,13 +149,29 @@
                             "time_of_day_armed_custom_bypass": "Armado personalizado"
                         }
                     },
+                    "calendar_options": {
+                        "name": "Avançado - Calendário",
+                        "description": "O que acontece quando um evento de calendário termina, e que eventos definem cada estado de alarme. Um calendário sem regras de correspondência usa as predefinidas, eventos chamados Away, Home, Night, Disarmed, Vacation ou Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "Quando termina um armar por calendário",
+                            "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário",
+                            "calendar_match_rules": "Regras de correspondência",
+                            "calendar_poll_interval": "Intervalo de consulta",
+                            "calendar_notify_grace": "Período de tolerância das notificações"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
+                            "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém.",
+                            "calendar_match_rules": "Cada regra define um estado de alarme para os eventos de um calendário cujo título ou descrição corresponda a algum dos seus padrões, que são expressões regulares. As regras de um calendário substituem as predefinidas para esse calendário.",
+                            "calendar_poll_interval": "Minutos entre verificações de eventos em cada calendário.",
+                            "calendar_notify_grace": "Segundos de espera antes de notificar uma alteração de calendário, para que alterações muito próximas, como um evento que termina quando outro começa, sejam enviadas como uma só notificação."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Avançado",
                         "data": {
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
                             "panel_code": "Código do painel de alarme",
-                            "calendar_armed_end_mode": "Quando termina um armar por calendário",
-                            "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário",
                             "occupied_delay": "Atraso depois de alguém chegar a casa",
                             "unoccupied_delay": "Atraso depois de alguém sair de casa",
                             "rate_limit_max_calls": "Limite de frequência - alterações máximas",
@@ -164,8 +180,6 @@
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o abaixo.",
                             "panel_code": "Código que o Auto Arm dá às ações do painel de alarme ao armar ou desarmar, se o painel precisar de um. É guardado encriptado e nunca mais é mostrado. Deixe em branco para manter o código já guardado.",
-                            "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
-                            "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém.",
                             "occupied_delay": "Segundos de espera depois de alguém chegar a casa antes de determinar o estado do alarme. Uma alteração manual nesse tempo cancela-o.",
                             "unoccupied_delay": "Segundos de espera depois de alguém sair de casa antes de determinar o estado do alarme, para que uma ausência breve ou um localizador que perde a ligação não arme o alarme. Uma alteração manual nesse tempo cancela-o.",
                             "rate_limit_max_calls": "O máximo de alterações do estado do alarme que o Auto Arm fará dentro do período do limite de frequência, como proteção contra ciclos. As restantes alterações nesse período são ignoradas.",
@@ -174,6 +188,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Uma regra de correspondência de calendário tem um padrão que não é uma expressão regular válida."
         },
         "abort": {
             "already_configured": "AutoArm já está configurado"
@@ -296,12 +313,30 @@
                     },
                     "time_of_day_options": {
                         "name": "Avançado - Hora do dia",
-                        "description": "Sensores de hora do dia para os outros estados de alarme, que definem o seu estado enquanto estão ligados, tal como o sensor de hora de deitar. Quando um sensor se desliga, aplicam-se as definições de fim de evento de calendário em Avançado.",
+                        "description": "Sensores de hora do dia para os outros estados de alarme, que definem o seu estado enquanto estão ligados, tal como o sensor de hora de deitar. Quando um sensor se desliga, aplicam-se as definições de fim de evento de calendário em Avançado - Calendário.",
                         "data": {
                             "time_of_day_disarmed": "Desarmado",
                             "time_of_day_armed_home": "Armado em casa",
                             "time_of_day_armed_away": "Armado ausente",
                             "time_of_day_armed_custom_bypass": "Armado personalizado"
+                        }
+                    },
+                    "calendar_options": {
+                        "name": "Avançado - Calendário",
+                        "description": "O que acontece quando um evento de calendário termina, e que eventos definem cada estado de alarme. Um calendário sem regras de correspondência usa as predefinidas, eventos chamados Away, Home, Night, Disarmed, Vacation ou Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "Quando termina um armar por calendário",
+                            "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário",
+                            "calendar_match_rules": "Regras de correspondência",
+                            "calendar_poll_interval": "Intervalo de consulta",
+                            "calendar_notify_grace": "Período de tolerância das notificações"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
+                            "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém.",
+                            "calendar_match_rules": "Cada regra define um estado de alarme para os eventos de um calendário cujo título ou descrição corresponda a algum dos seus padrões, que são expressões regulares. As regras de um calendário substituem as predefinidas para esse calendário.",
+                            "calendar_poll_interval": "Minutos entre verificações de eventos em cada calendário.",
+                            "calendar_notify_grace": "Segundos de espera antes de notificar uma alteração de calendário, para que alterações muito próximas, como um evento que termina quando outro começa, sejam enviadas como uma só notificação."
                         }
                     },
                     "advanced_options": {
@@ -310,8 +345,6 @@
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
                             "panel_code": "Código do painel de alarme",
                             "panel_code_clear": "Remover o código guardado do painel de alarme",
-                            "calendar_armed_end_mode": "Quando termina um armar por calendário",
-                            "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário",
                             "occupied_delay": "Atraso depois de alguém chegar a casa",
                             "unoccupied_delay": "Atraso depois de alguém sair de casa",
                             "rate_limit_max_calls": "Limite de frequência - alterações máximas",
@@ -320,8 +353,6 @@
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o abaixo.",
                             "panel_code": "Código que o Auto Arm dá às ações do painel de alarme ao armar ou desarmar, se o painel precisar de um. É guardado encriptado e nunca mais é mostrado. Deixe em branco para manter o código já guardado.",
-                            "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
-                            "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém.",
                             "occupied_delay": "Segundos de espera depois de alguém chegar a casa antes de determinar o estado do alarme. Uma alteração manual nesse tempo cancela-o.",
                             "unoccupied_delay": "Segundos de espera depois de alguém sair de casa antes de determinar o estado do alarme, para que uma ausência breve ou um localizador que perde a ligação não arme o alarme. Uma alteração manual nesse tempo cancela-o.",
                             "rate_limit_max_calls": "O máximo de alterações do estado do alarme que o Auto Arm fará dentro do período do limite de frequência, como proteção contra ciclos. As restantes alterações nesse período são ignoradas.",
@@ -330,6 +361,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Uma regra de correspondência de calendário tem um padrão que não é uma expressão regular válida."
         }
     },
     "selector": {
@@ -368,6 +402,13 @@
                 "alarm_panel_disarm": "Desarmar o painel de alarme",
                 "alarm_panel_reset": "Repor o painel de alarme",
                 "alarm_panel_away": "Armar o painel de alarme em ausente"
+            }
+        },
+        "calendar_match_rule": {
+            "fields": {
+                "calendar": "Calendário",
+                "state": "Estado de alarme",
+                "patterns": "Padrões"
             }
         }
     },
@@ -410,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "A configuração YAML principal está descontinuada",
-            "description": "As definições principais do AutoArm (alarm_panel, occupancy, calendars) foram migradas para a entrada de configuração da interface. Remova-as da sua configuração YAML e use a interface para as gerir. As definições avançadas (transitions, buttons, notify, diurnal, rate_limit) podem permanecer em YAML."
+            "description": "As definições principais do AutoArm (alarm_panel, occupancy, calendars, buttons, diurnal, rate_limit) foram migradas para a entrada de configuração da interface. Remova-as da sua configuração YAML e use a interface para as gerir. Apenas transitions permanece em YAML. A secção notify está descontinuada e será removida quando o Home Assistant 2027.4 for lançado."
         },
         "yaml_notify_deprecated": {
             "title": "A configuração YAML notify está descontinuada",

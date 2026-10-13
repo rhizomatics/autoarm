@@ -22,7 +22,7 @@ autoarm:
     pending:
       conditions:
   # UI: calendar entities and calendar end modes are configurable via Options
-  # YAML: per-calendar state_patterns and poll_interval remain here
+  # state_patterns and poll_interval are copied into the Options the first time, and set there from then on
   calendar_control:
     calendars:
       - entity_id: calendar.alarm_control

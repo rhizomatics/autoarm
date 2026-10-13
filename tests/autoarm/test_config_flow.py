@@ -199,8 +199,8 @@ async def test_user_flow_advanced_setup(hass: HomeAssistant, mock_notify: Any) -
             },
             "button_options": {"button_disarmed": ["binary_sensor.button"]},
             "assist_options": {CONF_SENTENCE_ARM: False, CONF_SENTENCE_DISARM: True},
-            "advanced_options": {
-                CONF_USE_ALARM_SERVICE: True,
+            "advanced_options": {CONF_USE_ALARM_SERVICE: True},
+            "calendar_options": {
                 CONF_CALENDAR_ARMED_END_MODE: "manual",
                 CONF_CALENDAR_DISARMED_END_MODE: "manual",
             },
@@ -316,8 +316,8 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
                 CONF_SUNSET_TRIGGER: "off",
                 CONF_SUNRISE_EARLIEST: "05:30:00",
             },
-            "advanced_options": {
-                CONF_USE_ALARM_SERVICE: True,
+            "advanced_options": {CONF_USE_ALARM_SERVICE: True},
+            "calendar_options": {
                 CONF_CALENDAR_ARMED_END_MODE: "auto_occupancy",
                 CONF_CALENDAR_DISARMED_END_MODE: "manual",
             },
@@ -362,8 +362,6 @@ async def test_options_flow_advanced_delays_and_rate_limit(hass: HomeAssistant, 
     assert data_schema is not None
     assert data_schema.schema["advanced_options"].schema({}) == {
         "use_alarm_service": True,
-        "calendar_armed_end_mode": "auto",
-        "calendar_disarmed_end_mode": "auto",
         "occupied_delay": 0,
         "unoccupied_delay": 120,
         "rate_limit_max_calls": 5,

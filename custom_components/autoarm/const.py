@@ -261,26 +261,32 @@ CONFIG_SCHEMA = vol.Schema(
     extra=vol.ALLOW_EXTRA,  # validation fails without this by trying to include all of HASS config
 )
 
+# The occupied state for the night is for the evening before bedtime, with another for after bedtime,
+# and if nothing is going to set armed night for a bedtime then the night is armed night
+NIGHT_STATE_TEMPLATE = (
+    "{% set night_state = 'armed_night' if not autoarm.programmed_bedtime else"
+    " (autoarm.occupied_after_bedtime_state if autoarm.after_bedtime else autoarm.occupied_nighttime_state) %}"
+)
 DEFAULT_TRANSITIONS: dict[str, str | list[str]] = {
     "disarmed": [
         "{{ autoarm.computed and autoarm.occupied}}",
         (
-            "{{ (autoarm.day and autoarm.occupied_daytime_state == 'disarmed') or"
-            " (autoarm.night and autoarm.occupied_nighttime_state == 'disarmed') }}"
+            NIGHT_STATE_TEMPLATE + "{{ (autoarm.day and autoarm.occupied_daytime_state == 'disarmed') or"
+            " (autoarm.night and night_state == 'disarmed') }}"
         ),
     ],
     "armed_home": [
         "{{ autoarm.computed }}",
         (
-            "{{ (autoarm.day and autoarm.occupied and autoarm.occupied_daytime_state == 'armed_home') or"
-            " ( autoarm.night and autoarm.occupied and autoarm.occupied_nighttime_state == 'armed_home' ) or"
+            NIGHT_STATE_TEMPLATE + "{{ (autoarm.day and autoarm.occupied and autoarm.occupied_daytime_state == 'armed_home') or"
+            " ( autoarm.night and autoarm.occupied and night_state == 'armed_home' ) or"
             " ( autoarm.day and autoarm.occupied is none ) }}"
         ),
     ],
     "armed_night": [
         "{{ autoarm.computed }}",
         (
-            "{{ ( autoarm.night and autoarm.occupied and autoarm.occupied_nighttime_state == 'armed_night' ) or "
+            NIGHT_STATE_TEMPLATE + "{{ ( autoarm.night and autoarm.occupied and night_state == 'armed_night' ) or "
             " ( autoarm.night and autoarm.occupied is none )}}"
         ),
     ],
@@ -301,6 +307,13 @@ class ConditionVariables:
     calendar_event: CalendarEvent | None = None
     at_home: list[str] | None = None
     not_home: list[str] | None = None
+    # a bedtime sensor is on, or an armed night calendar event is live
+    bedtime: bool = False
+    # bedtime has ended since the sun last set
+    after_bedtime: bool = False
+    # there is a bedtime sensor, or a calendar event today, to set armed night
+    programmed_bedtime: bool = True
+    occupied_after_bedtime: AlarmControlPanelState = AlarmControlPanelState.ARMED_HOME
 
     def as_dict(self) -> ConfigType:
         """Generate the field to be exposed in the context, stringifying alarm states"""
@@ -312,12 +325,16 @@ class ConditionVariables:
             "vacation": self.state == AlarmControlPanelState.ARMED_VACATION,
             "night": self.night,
             "day": not self.night,
+            "bedtime": self.bedtime,
+            "after_bedtime": self.after_bedtime,
+            "programmed_bedtime": self.programmed_bedtime,
             "bypass": self.state == AlarmControlPanelState.ARMED_CUSTOM_BYPASS,
             "manual": self.state in (AlarmControlPanelState.ARMED_VACATION, AlarmControlPanelState.ARMED_CUSTOM_BYPASS),
             "calendar_event": self.calendar_event,
             "state": str(self.state),
             "occupied_daytime_state": str(self.occupied_defaults.get(CONF_DAY, AlarmControlPanelState.DISARMED)),
             "occupied_nighttime_state": str(self.occupied_defaults.get(CONF_NIGHT, AlarmControlPanelState.ARMED_NIGHT)),
+            "occupied_after_bedtime_state": str(self.occupied_after_bedtime),
             "disarmed": self.state == AlarmControlPanelState.DISARMED,
             "computed": not self.calendar_event
             and self.state not in (AlarmControlPanelState.ARMED_VACATION, AlarmControlPanelState.ARMED_CUSTOM_BYPASS),

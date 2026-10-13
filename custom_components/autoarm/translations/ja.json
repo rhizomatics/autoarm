@@ -141,7 +141,7 @@
                     },
                     "time_of_day_options": {
                         "name": "詳細設定 - 時間帯",
-                        "description": "その他のアラーム状態用の時間帯センサーです。就寝時間センサーと同じように、オンの間その状態を設定します。センサーがオフになると、詳細設定のカレンダーイベント終了時の設定が適用されます。",
+                        "description": "その他のアラーム状態用の時間帯センサーです。就寝時間センサーと同じように、オンの間その状態を設定します。センサーがオフになると、「詳細設定 - カレンダー」のカレンダーイベント終了時の設定が適用されます。",
                         "data": {
                             "time_of_day_disarmed": "解除",
                             "time_of_day_armed_home": "在宅警戒",
@@ -149,13 +149,29 @@
                             "time_of_day_armed_custom_bypass": "カスタム警戒"
                         }
                     },
+                    "calendar_options": {
+                        "name": "詳細設定 - カレンダー",
+                        "description": "カレンダーイベントが終了したときの動作と、どのイベントがどのアラーム状態を設定するかを決めます。一致ルールのないカレンダーは既定のルール、つまり Away、Home、Night、Disarmed、Vacation、Holiday という名前のイベントを使います。",
+                        "data": {
+                            "calendar_armed_end_mode": "カレンダーによる警戒オーバーライドの終了時",
+                            "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時",
+                            "calendar_match_rules": "一致ルール",
+                            "calendar_poll_interval": "ポーリング間隔",
+                            "calendar_notify_grace": "通知の猶予時間"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは解除し、全員外出中なら外出警戒にします。",
+                            "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。",
+                            "calendar_match_rules": "各ルールは、1 つのカレンダーのイベントのうち、タイトルまたは説明がいずれかのパターン（正規表現）に一致するものにアラーム状態を設定します。カレンダーにルールがあると、そのカレンダーの既定のルールは置き換えられます。",
+                            "calendar_poll_interval": "各カレンダーのイベントを確認する間隔（分）です。",
+                            "calendar_notify_grace": "カレンダーによる変更を通知するまで待つ秒数です。あるイベントの終了と同時に別のイベントが始まる場合など、近接した変更を 1 つの通知にまとめます。"
+                        }
+                    },
                     "advanced_options": {
                         "name": "詳細設定",
                         "data": {
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
                             "panel_code": "アラームパネルのコード",
-                            "calendar_armed_end_mode": "カレンダーによる警戒オーバーライドの終了時",
-                            "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時",
                             "occupied_delay": "誰かが帰宅した後の遅延",
                             "unoccupied_delay": "誰かが外出した後の遅延",
                             "rate_limit_max_calls": "レート制限 - 最大変更回数",
@@ -164,8 +180,6 @@
                         "data_description": {
                             "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、下で設定してください。",
                             "panel_code": "パネルがコードを必要とする場合に、警戒・解除時に Auto Arm がアラームパネルのアクションへ渡すコードです。暗号化して保存され、再表示されることはありません。保存済みのコードをそのまま使う場合は空欄にしてください。",
-                            "calendar_armed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは解除し、全員外出中なら外出警戒にします。",
-                            "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。",
                             "occupied_delay": "誰かが帰宅してからアラーム状態を判定するまでの待ち時間（秒）です。その間に手動で変更すると取り消されます。",
                             "unoccupied_delay": "誰かが外出してからアラーム状態を判定するまでの待ち時間（秒）です。短時間の不在やトラッカーの切断で警戒状態にならないようにします。その間に手動で変更すると取り消されます。",
                             "rate_limit_max_calls": "ループを防ぐため、レート制限の期間内に Auto Arm が行うアラーム状態の変更の最大回数です。期間内のそれ以上の変更はスキップされます。",
@@ -174,6 +188,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "カレンダーの一致ルールに、正しい正規表現ではないパターンがあります。"
         },
         "abort": {
             "already_configured": "AutoArm はすでに設定済みです"
@@ -296,12 +313,30 @@
                     },
                     "time_of_day_options": {
                         "name": "詳細設定 - 時間帯",
-                        "description": "その他のアラーム状態用の時間帯センサーです。就寝時間センサーと同じように、オンの間その状態を設定します。センサーがオフになると、詳細設定のカレンダーイベント終了時の設定が適用されます。",
+                        "description": "その他のアラーム状態用の時間帯センサーです。就寝時間センサーと同じように、オンの間その状態を設定します。センサーがオフになると、「詳細設定 - カレンダー」のカレンダーイベント終了時の設定が適用されます。",
                         "data": {
                             "time_of_day_disarmed": "解除",
                             "time_of_day_armed_home": "在宅警戒",
                             "time_of_day_armed_away": "外出警戒",
                             "time_of_day_armed_custom_bypass": "カスタム警戒"
+                        }
+                    },
+                    "calendar_options": {
+                        "name": "詳細設定 - カレンダー",
+                        "description": "カレンダーイベントが終了したときの動作と、どのイベントがどのアラーム状態を設定するかを決めます。一致ルールのないカレンダーは既定のルール、つまり Away、Home、Night、Disarmed、Vacation、Holiday という名前のイベントを使います。",
+                        "data": {
+                            "calendar_armed_end_mode": "カレンダーによる警戒オーバーライドの終了時",
+                            "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時",
+                            "calendar_match_rules": "一致ルール",
+                            "calendar_poll_interval": "ポーリング間隔",
+                            "calendar_notify_grace": "通知の猶予時間"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは解除し、全員外出中なら外出警戒にします。",
+                            "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。",
+                            "calendar_match_rules": "各ルールは、1 つのカレンダーのイベントのうち、タイトルまたは説明がいずれかのパターン（正規表現）に一致するものにアラーム状態を設定します。カレンダーにルールがあると、そのカレンダーの既定のルールは置き換えられます。",
+                            "calendar_poll_interval": "各カレンダーのイベントを確認する間隔（分）です。",
+                            "calendar_notify_grace": "カレンダーによる変更を通知するまで待つ秒数です。あるイベントの終了と同時に別のイベントが始まる場合など、近接した変更を 1 つの通知にまとめます。"
                         }
                     },
                     "advanced_options": {
@@ -310,8 +345,6 @@
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
                             "panel_code": "アラームパネルのコード",
                             "panel_code_clear": "保存済みのアラームパネルのコードを削除する",
-                            "calendar_armed_end_mode": "カレンダーによる警戒オーバーライドの終了時",
-                            "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時",
                             "occupied_delay": "誰かが帰宅した後の遅延",
                             "unoccupied_delay": "誰かが外出した後の遅延",
                             "rate_limit_max_calls": "レート制限 - 最大変更回数",
@@ -320,8 +353,6 @@
                         "data_description": {
                             "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、下で設定してください。",
                             "panel_code": "パネルがコードを必要とする場合に、警戒・解除時に Auto Arm がアラームパネルのアクションへ渡すコードです。暗号化して保存され、再表示されることはありません。保存済みのコードをそのまま使う場合は空欄にしてください。",
-                            "calendar_armed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは解除し、全員外出中なら外出警戒にします。",
-                            "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。",
                             "occupied_delay": "誰かが帰宅してからアラーム状態を判定するまでの待ち時間（秒）です。その間に手動で変更すると取り消されます。",
                             "unoccupied_delay": "誰かが外出してからアラーム状態を判定するまでの待ち時間（秒）です。短時間の不在やトラッカーの切断で警戒状態にならないようにします。その間に手動で変更すると取り消されます。",
                             "rate_limit_max_calls": "ループを防ぐため、レート制限の期間内に Auto Arm が行うアラーム状態の変更の最大回数です。期間内のそれ以上の変更はスキップされます。",
@@ -330,6 +361,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "カレンダーの一致ルールに、正しい正規表現ではないパターンがあります。"
         }
     },
     "selector": {
@@ -368,6 +402,13 @@
                 "alarm_panel_disarm": "アラームパネルを解除",
                 "alarm_panel_reset": "アラームパネルをリセット",
                 "alarm_panel_away": "アラームパネルを外出警戒に設定"
+            }
+        },
+        "calendar_match_rule": {
+            "fields": {
+                "calendar": "カレンダー",
+                "state": "アラーム状態",
+                "patterns": "パターン"
             }
         }
     },
@@ -410,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "YAML コア設定は非推奨です",
-            "description": "AutoArm のコア設定（alarm_panel、occupancy、calendars）は UI 設定エントリに移行されました。YAML 設定から削除し、UI で管理してください。高度な設定（transitions、buttons、notify、diurnal、rate_limit）は YAML に残すことができます。"
+            "description": "AutoArm のコア設定（alarm_panel、occupancy、calendars、buttons、diurnal、rate_limit）は UI 設定エントリに移行されました。YAML 設定から削除し、UI で管理してください。YAML に残るのは transitions のみです。notify セクションは非推奨で、Home Assistant 2027.4 のリリース時に削除されます。"
         },
         "yaml_notify_deprecated": {
             "title": "YAML の notify 設定は非推奨です",

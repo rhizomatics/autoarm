@@ -141,7 +141,7 @@
                     },
                     "time_of_day_options": {
                         "name": "Avanzate - Ora del giorno",
-                        "description": "Sensori ora del giorno per gli altri stati di allarme, che impostano il proprio stato mentre sono attivi, come il sensore dell'ora di andare a dormire. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate.",
+                        "description": "Sensori ora del giorno per gli altri stati di allarme, che impostano il proprio stato mentre sono attivi, come il sensore dell'ora di andare a dormire. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate - Calendario.",
                         "data": {
                             "time_of_day_disarmed": "Disinserito",
                             "time_of_day_armed_home": "Inserito in casa",
@@ -149,13 +149,29 @@
                             "time_of_day_armed_custom_bypass": "Inserito personalizzato"
                         }
                     },
+                    "calendar_options": {
+                        "name": "Avanzate - Calendario",
+                        "description": "Cosa succede quando un evento del calendario termina, e quali eventi impostano quale stato di allarme. Un calendario senza regole di corrispondenza usa quelle predefinite, eventi chiamati Away, Home, Night, Disarmed, Vacation o Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "Al termine di un inserimento da calendario",
+                            "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario",
+                            "calendar_match_rules": "Regole di corrispondenza",
+                            "calendar_poll_interval": "Intervallo di interrogazione",
+                            "calendar_notify_grace": "Periodo di tolleranza delle notifiche"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
+                            "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno.",
+                            "calendar_match_rules": "Ogni regola imposta uno stato di allarme per gli eventi di un calendario il cui titolo o descrizione corrisponde a uno dei suoi modelli, che sono espressioni regolari. Le regole di un calendario sostituiscono quelle predefinite per quel calendario.",
+                            "calendar_poll_interval": "Minuti tra un controllo e l'altro degli eventi di ogni calendario.",
+                            "calendar_notify_grace": "Secondi di attesa prima di notificare un cambio del calendario, così che i cambi ravvicinati, come un evento che termina mentre ne inizia un altro, siano inviati come un'unica notifica."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Avanzate",
                         "data": {
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                             "panel_code": "Codice della centrale d'allarme",
-                            "calendar_armed_end_mode": "Al termine di un inserimento da calendario",
-                            "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario",
                             "occupied_delay": "Ritardo dopo l'arrivo di qualcuno a casa",
                             "unoccupied_delay": "Ritardo dopo che qualcuno esce di casa",
                             "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
@@ -164,8 +180,6 @@
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sotto.",
                             "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato.",
-                            "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
-                            "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno.",
                             "occupied_delay": "Secondi di attesa dopo l'arrivo di qualcuno a casa prima di determinare lo stato dell'allarme. Una modifica manuale in quel tempo lo annulla.",
                             "unoccupied_delay": "Secondi di attesa dopo che qualcuno esce di casa prima di determinare lo stato dell'allarme, così una breve assenza o un tracker che si disconnette non inserisce l'allarme. Una modifica manuale in quel tempo lo annulla.",
                             "rate_limit_max_calls": "Il numero massimo di cambi di stato dell'allarme che Auto Arm effettua nel periodo del limite di frequenza, come protezione dai cicli. Le ulteriori modifiche in quel periodo vengono saltate.",
@@ -174,6 +188,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Una regola di corrispondenza del calendario ha un modello che non è un'espressione regolare valida."
         },
         "abort": {
             "already_configured": "AutoArm è già configurato"
@@ -296,12 +313,30 @@
                     },
                     "time_of_day_options": {
                         "name": "Avanzate - Ora del giorno",
-                        "description": "Sensori ora del giorno per gli altri stati di allarme, che impostano il proprio stato mentre sono attivi, come il sensore dell'ora di andare a dormire. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate.",
+                        "description": "Sensori ora del giorno per gli altri stati di allarme, che impostano il proprio stato mentre sono attivi, come il sensore dell'ora di andare a dormire. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate - Calendario.",
                         "data": {
                             "time_of_day_disarmed": "Disinserito",
                             "time_of_day_armed_home": "Inserito in casa",
                             "time_of_day_armed_away": "Inserito fuori casa",
                             "time_of_day_armed_custom_bypass": "Inserito personalizzato"
+                        }
+                    },
+                    "calendar_options": {
+                        "name": "Avanzate - Calendario",
+                        "description": "Cosa succede quando un evento del calendario termina, e quali eventi impostano quale stato di allarme. Un calendario senza regole di corrispondenza usa quelle predefinite, eventi chiamati Away, Home, Night, Disarmed, Vacation o Holiday.",
+                        "data": {
+                            "calendar_armed_end_mode": "Al termine di un inserimento da calendario",
+                            "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario",
+                            "calendar_match_rules": "Regole di corrispondenza",
+                            "calendar_poll_interval": "Intervallo di interrogazione",
+                            "calendar_notify_grace": "Periodo di tolleranza delle notifiche"
+                        },
+                        "data_description": {
+                            "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
+                            "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno.",
+                            "calendar_match_rules": "Ogni regola imposta uno stato di allarme per gli eventi di un calendario il cui titolo o descrizione corrisponde a uno dei suoi modelli, che sono espressioni regolari. Le regole di un calendario sostituiscono quelle predefinite per quel calendario.",
+                            "calendar_poll_interval": "Minuti tra un controllo e l'altro degli eventi di ogni calendario.",
+                            "calendar_notify_grace": "Secondi di attesa prima di notificare un cambio del calendario, così che i cambi ravvicinati, come un evento che termina mentre ne inizia un altro, siano inviati come un'unica notifica."
                         }
                     },
                     "advanced_options": {
@@ -310,8 +345,6 @@
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                             "panel_code": "Codice della centrale d'allarme",
                             "panel_code_clear": "Rimuovi il codice salvato della centrale d'allarme",
-                            "calendar_armed_end_mode": "Al termine di un inserimento da calendario",
-                            "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario",
                             "occupied_delay": "Ritardo dopo l'arrivo di qualcuno a casa",
                             "unoccupied_delay": "Ritardo dopo che qualcuno esce di casa",
                             "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
@@ -320,8 +353,6 @@
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sotto.",
                             "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato.",
-                            "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
-                            "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno.",
                             "occupied_delay": "Secondi di attesa dopo l'arrivo di qualcuno a casa prima di determinare lo stato dell'allarme. Una modifica manuale in quel tempo lo annulla.",
                             "unoccupied_delay": "Secondi di attesa dopo che qualcuno esce di casa prima di determinare lo stato dell'allarme, così una breve assenza o un tracker che si disconnette non inserisce l'allarme. Una modifica manuale in quel tempo lo annulla.",
                             "rate_limit_max_calls": "Il numero massimo di cambi di stato dell'allarme che Auto Arm effettua nel periodo del limite di frequenza, come protezione dai cicli. Le ulteriori modifiche in quel periodo vengono saltate.",
@@ -330,6 +361,9 @@
                     }
                 }
             }
+        },
+        "error": {
+            "invalid_pattern": "Una regola di corrispondenza del calendario ha un modello che non è un'espressione regolare valida."
         }
     },
     "selector": {
@@ -368,6 +402,13 @@
                 "alarm_panel_disarm": "Disinserisci il pannello di allarme",
                 "alarm_panel_reset": "Ripristina il pannello di allarme",
                 "alarm_panel_away": "Inserisci il pannello di allarme fuori casa"
+            }
+        },
+        "calendar_match_rule": {
+            "fields": {
+                "calendar": "Calendario",
+                "state": "Stato di allarme",
+                "patterns": "Modelli"
             }
         }
     },
@@ -410,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "La configurazione YAML principale è obsoleta",
-            "description": "Le impostazioni principali di AutoArm (alarm_panel, occupancy, calendars) sono state migrate all'interfaccia utente. Rimuovile dalla tua configurazione YAML e usa l'interfaccia utente per gestirle. Le impostazioni avanzate (transitions, buttons, notify, diurnal, rate_limit) possono rimanere in YAML."
+            "description": "Le impostazioni principali di AutoArm (alarm_panel, occupancy, calendars, buttons, diurnal, rate_limit) sono state migrate all'interfaccia utente. Rimuovile dalla tua configurazione YAML e usa l'interfaccia utente per gestirle. Solo transitions rimane in YAML. La sezione notify è obsoleta e verrà rimossa al rilascio di Home Assistant 2027.4."
         },
         "yaml_notify_deprecated": {
             "title": "La configurazione YAML notify è obsoleta",

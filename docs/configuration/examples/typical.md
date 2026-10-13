@@ -16,11 +16,11 @@ With the config flow, most settings are now managed in the UI:
 | Person entities | UI (setup, options) | Which persons to track for occupancy |
 | Occupied states | UI (options, Diurnal - Sun) | Alarm state when occupied by day, after bedtime and before bedtime |
 | Times of the Day sensors | UI (options) | Sensors that set any other alarm state while on |
-| Calendar end modes | UI (options, Advanced) | What happens when an armed or disarmed calendar event ends |
+| Calendar end modes | UI (options, Advanced - Calendar) | What happens when an armed or disarmed calendar event ends |
 | Triggers | UI (options, Diurnal - Sun and Presence) | Whether sunrise, sunset and people arriving or leaving re-evaluate the state |
 | Sunrise and sunset | UI (options) | Earliest and latest times |
-| Per-calendar state patterns | YAML | Regex patterns matching calendar events to alarm states |
-| Per-calendar poll interval | YAML | How often to check each calendar |
+| Calendar match rules | UI (options, Advanced - Calendar) | Regex patterns matching calendar events to alarm states, copied from YAML if already there |
+| Calendar poll interval | UI (options, Advanced - Calendar) | How often to check the calendars |
 | Transitions | YAML | Condition templates for state transitions |
 | Buttons | UI (options, Buttons) | Physical button entities and delays, copied from YAML if already there |
 | Notifications | UI (options) | Notification service and targets, and priorities for Supernotify |

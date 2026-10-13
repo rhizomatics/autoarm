@@ -1,11 +1,12 @@
 # 2.0.0
 
+The major change reflects moving almost completely from YAML configuration, a stronger focus on simplicity and convenience, and the dropping of support for older versions of Home Assistant and Python 3.13.
+
 ## 🚨 Breaking changes
 
 Python 3.13 support removed, along with support for Home Assistant versions 2026.3 and earlier.
 
-Newer releases may work on older installations, but there will no longer
-be the automated testing to assure it.
+Newer releases may work on older installations, but there will no longer be the automated testing to assure it.
 
 Auto Arm will continue to be automatically tested against a **6 month** release range of Home Assistant.
 
@@ -93,6 +94,19 @@ None of this removes existing functionality, and all of it can be overridden or 
 - The options now say that only a simple message can be sent when Supernotify isn't available
 - The YAML `notify` section is **deprecated**, replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released
   - It still works until then, with a repair raised as a reminder
+
+### Transition Conditions
+- New `bedtime`, `after_bedtime`, `programmed_bedtime` and `occupied_after_bedtime_state` variables for transition conditions
+- The choice of occupied state for the night, by whether a bedtime is programmed and whether it has ended, is now made in the default conditions rather than behind them
+  - YAML `transitions` that use `occupied_nighttime_state` now always get the configured value, and need these variables to follow bedtime
+- `bedtime` is added to the attributes of the **Last calculation** sensor
+
+### Calendar Match Rules
+- New **Advanced - Calendar** section in the options, with the calendar end settings moved there from **Advanced**
+- **Match rules** replace the YAML `state_patterns`, each rule a calendar, an alarm state and a list of patterns
+- **Poll interval** and **Notification grace period** replace the YAML `poll_interval` and `notify_grace_period`
+  - There is now one poll interval for all calendars
+- All of these are copied from YAML `calendar_control` the first time, taking the shortest poll interval, and can then be removed from YAML
 
 ### Calendar Occupancy Override
 - New switch so that someone coming home on the last day of an `armed_away` or `armed_vacation` calendar event ends the event there and then, rather than at its end time

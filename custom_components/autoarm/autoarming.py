@@ -76,8 +76,11 @@ from .config_flow import (
     CONF_CALENDAR_ARMED_END_MODE,
     CONF_CALENDAR_DISARMED_END_MODE,
     CONF_CALENDAR_ENTITIES,
+    CONF_CALENDAR_MATCH_RULES,
+    CONF_CALENDAR_NOTIFY_GRACE_SECONDS,
     CONF_CALENDAR_OCCUPANCY_ENDS_AWAY,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
+    CONF_CALENDAR_POLL_MINUTES,
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
     CONF_NOTIFY_CUSTOM_TARGET,
@@ -95,6 +98,9 @@ from .config_flow import (
     CONF_PERSON_ENTITIES,
     CONF_RATE_LIMIT_MAX_CALLS,
     CONF_RATE_LIMIT_SECONDS,
+    CONF_RULE_CALENDAR,
+    CONF_RULE_PATTERNS,
+    CONF_RULE_STATE,
     CONF_SENTENCE_ARM,
     CONF_SENTENCE_DISARM,
     CONF_SUNRISE_EARLIEST,
@@ -107,6 +113,7 @@ from .config_flow import (
     CONF_UNOCCUPIED_TRIGGER,
     CONF_USE_ALARM_SERVICE,
     DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
+    DEFAULT_CALENDAR_POLL_MINUTES,
     DEFAULT_NOTIFY_ACTION,
     DEFAULT_OCCUPANCY_DELAYS,
     DEFAULT_RATE_LIMIT_MAX_CALLS,
@@ -154,6 +161,7 @@ from .const import (
     NOTIFY_COMMON,
     NOTIFY_PRIORITY_SOURCES,
     NOTIFY_SCHEMA,
+    PUBLIC_ALARM_STATES,
     SIGNAL_STATUS_UPDATED,
     TRIGGER_AUTO,
     TRIGGER_OFF,
@@ -362,6 +370,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: AutoArmConfigEntry) -> b
     yaml_config: ConfigType = hass.data.get(YAML_DATA_KEY, {})
     _migrate_yaml_buttons(hass, entry, yaml_config)
     _migrate_yaml_delays_and_rate_limit(hass, entry, yaml_config)
+    _migrate_yaml_calendar_control(hass, entry, yaml_config)
     try:
         panel_code: str | None = None
         if stored_code := entry.options.get(CONF_PANEL_CODE):
@@ -443,19 +452,14 @@ def _build_armer_from_entry(
     }
 
     # Build calendar config
-    yaml_calendar_control = yaml_config.get(CONF_CALENDAR_CONTROL, {})
-    yaml_calendars: list[ConfigType] = yaml_calendar_control.get(CONF_CALENDARS, []) if yaml_calendar_control else []
-    yaml_cal_by_entity: dict[str, ConfigType] = {cal[CONF_ENTITY_ID]: cal for cal in yaml_calendars if CONF_ENTITY_ID in cal}
-
-    calendar_list: list[ConfigType] = []
-    for cal_entity_id in calendar_entities:
-        yaml_override = yaml_cal_by_entity.get(cal_entity_id, {})
-        cal_config: ConfigType = {
+    calendar_list: list[ConfigType] = [
+        {
             CONF_ENTITY_ID: cal_entity_id,
-            CONF_CALENDAR_POLL_INTERVAL: yaml_override.get(CONF_CALENDAR_POLL_INTERVAL, 15),
-            CONF_CALENDAR_EVENT_STATES: yaml_override.get(CONF_CALENDAR_EVENT_STATES, _validated_default_calendar_mappings()),
+            CONF_CALENDAR_POLL_INTERVAL: int(entry.options.get(CONF_CALENDAR_POLL_MINUTES, DEFAULT_CALENDAR_POLL_MINUTES)),
+            CONF_CALENDAR_EVENT_STATES: _calendar_state_patterns(entry.options, cal_entity_id),
         }
-        calendar_list.append(cal_config)
+        for cal_entity_id in calendar_entities
+    ]
 
     time_of_day: dict[str, list[str]] = {state: entry.options.get(option, []) for option, state in TIME_OF_DAY_OPTIONS.items()}
 
@@ -466,8 +470,8 @@ def _build_armer_from_entry(
             CONF_CALENDAR_ARMED_END: entry.options.get(CONF_CALENDAR_ARMED_END_MODE, no_event_mode),
             CONF_CALENDAR_DISARMED_END: entry.options.get(CONF_CALENDAR_DISARMED_END_MODE, no_event_mode),
             CONF_CALENDARS: calendar_list,
-            CONF_CALENDAR_NOTIFY_GRACE: yaml_calendar_control.get(CONF_CALENDAR_NOTIFY_GRACE, DEFAULT_CALENDAR_NOTIFY_GRACE)
-            if yaml_calendar_control
+            CONF_CALENDAR_NOTIFY_GRACE: dt.timedelta(seconds=entry.options[CONF_CALENDAR_NOTIFY_GRACE_SECONDS])
+            if CONF_CALENDAR_NOTIFY_GRACE_SECONDS in entry.options
             else DEFAULT_CALENDAR_NOTIFY_GRACE,
         }
 
@@ -570,6 +574,54 @@ def _migrate_yaml_delays_and_rate_limit(hass: HomeAssistant, entry: ConfigEntry,
         hass.config_entries.async_update_entry(entry, options={**entry.options, **migrated})
 
 
+def _migrate_yaml_calendar_control(hass: HomeAssistant, entry: ConfigEntry, yaml_config: ConfigType) -> None:
+    """Copy the calendar match rules, poll interval and notify grace period from YAML into the options, the first time round"""
+    yaml_calendar_control: ConfigType = yaml_config.get(CONF_CALENDAR_CONTROL) or {}
+    yaml_calendars: list[ConfigType] = yaml_calendar_control.get(CONF_CALENDARS) or []
+    default_patterns: dict[str, list[str]] = _pattern_strings(_validated_default_calendar_mappings())
+    found: dict[str, Any] = {}
+    rules: list[dict[str, Any]] = [
+        {CONF_RULE_CALENDAR: calendar[CONF_ENTITY_ID], CONF_RULE_STATE: state, CONF_RULE_PATTERNS: patterns}
+        for calendar in yaml_calendars
+        # one without any state patterns of its own has been given the defaults, and keeps on getting them
+        if (state_patterns := _pattern_strings(calendar.get(CONF_CALENDAR_EVENT_STATES) or {})) != default_patterns
+        for state, patterns in state_patterns.items()
+        if state in PUBLIC_ALARM_STATES
+    ]
+    if rules:
+        found[CONF_CALENDAR_MATCH_RULES] = rules
+    if yaml_calendars:
+        # one interval now for every calendar, so that of the calendar looked at most often
+        found[CONF_CALENDAR_POLL_MINUTES] = min(
+            calendar.get(CONF_CALENDAR_POLL_INTERVAL, DEFAULT_CALENDAR_POLL_MINUTES) for calendar in yaml_calendars
+        )
+    if CONF_CALENDAR_NOTIFY_GRACE in yaml_calendar_control:
+        found[CONF_CALENDAR_NOTIFY_GRACE_SECONDS] = int(yaml_calendar_control[CONF_CALENDAR_NOTIFY_GRACE].total_seconds())
+    migrated: dict[str, Any] = {option: value for option, value in found.items() if option not in entry.options}
+    if migrated:
+        _LOGGER.info("AUTOARM Migrated calendar control from YAML to the options: %s", migrated)
+        hass.config_entries.async_update_entry(entry, options={**entry.options, **migrated})
+
+
+def _pattern_strings(state_patterns: Mapping[Any, Any]) -> dict[str, list[str]]:
+    """State patterns from YAML as they are held in the options, with plain strings"""
+    return {
+        str(state): [
+            pattern.pattern if isinstance(pattern, re.Pattern) else str(pattern) for pattern in cv.ensure_list(patterns)
+        ]
+        for state, patterns in state_patterns.items()
+    }
+
+
+def _calendar_state_patterns(options: Mapping[str, Any], calendar_entity_id: str) -> dict[str, list[str]]:
+    """Patterns by alarm state from the match rules for a calendar, or the defaults if it has no rules"""
+    state_patterns: dict[str, list[str]] = {}
+    for rule in options.get(CONF_CALENDAR_MATCH_RULES, []):
+        if rule[CONF_RULE_CALENDAR] == calendar_entity_id:
+            state_patterns.setdefault(rule[CONF_RULE_STATE], []).extend(rule[CONF_RULE_PATTERNS])
+    return state_patterns or _pattern_strings(_validated_default_calendar_mappings())
+
+
 def _rate_limit_from_options(options: Mapping[str, Any]) -> ConfigType:
     """Rate limit as it is in YAML"""
     return {
@@ -645,6 +697,7 @@ class StateChange:
     context: dict[str, Any]
     occupied: bool | None
     night: bool
+    bedtime: bool
 
 
 @dataclass
@@ -1114,6 +1167,13 @@ class AlarmArmer:
     def active_time_of_day(self) -> TrackedTimeOfDay | None:
         return next((tod for tod in self.time_of_day if tod.active), None)
 
+    def is_bedtime(self) -> bool:
+        """Is a bedtime sensor on, or an armed night calendar event live"""
+        if any(tod.active for tod in self.time_of_day if tod.arming_state == AlarmControlPanelState.ARMED_NIGHT):
+            return True
+        calendar_event: TrackedCalendarEvent | None = self.active_calendar_event()
+        return calendar_event is not None and calendar_event.arming_state == AlarmControlPanelState.ARMED_NIGHT
+
     def after_bedtime(self) -> bool:
         """Has bedtime ended since the sun last set, leaving the dark before sunrise rather than before bedtime"""
         bedtimes: list[TrackedTimeOfDay] = [
@@ -1461,6 +1521,7 @@ class AlarmArmer:
                     "active_calendar_event": deobjectify(active_calendar_event.event) if active_calendar_event else None,
                     "occupied": self.is_occupied(),
                     "night": self.is_night(),
+                    "bedtime": self.is_bedtime(),
                     "must_change_state": str(must_change_state),
                     "last_state_intervention": deobjectify(last_state_intervention),
                     "intervention": intervention.as_dict() if intervention else None,
@@ -1488,27 +1549,23 @@ class AlarmArmer:
         """Compute a new state using occupancy, sun and transition conditions
 
         A condition state stands in for the panel's own state in the conditions
-
-        The default state for the night is for the evening before bedtime, with another for after bedtime,
-        and if nothing is going to set armed night for a bedtime then the night is armed night
         """
         evaluated_state: AlarmControlPanelState | None = None
         active_calendar_event: TrackedCalendarEvent | None = self.active_calendar_event()
         night = self.is_night() if night is None else night
-        occupied_defaults: dict[str, AlarmControlPanelState] = self.occupied_defaults
-        if night and not armed_night_programmed:
-            occupied_defaults = {**occupied_defaults, CONF_NIGHT: AlarmControlPanelState.ARMED_NIGHT}
-        elif night and self.after_bedtime():
-            occupied_defaults = {**occupied_defaults, CONF_NIGHT: self.occupied_after_bedtime}
         condition_vars: ConditionVariables = ConditionVariables(
             occupied=self.is_occupied(),
             unoccupied=self.is_unoccupied(),
             night=night,
             state=condition_state or self.armed_state(),
             calendar_event=active_calendar_event.event if active_calendar_event else None,
-            occupied_defaults=occupied_defaults,
+            occupied_defaults=self.occupied_defaults,
             at_home=self.at_home(),
             not_home=self.not_home(),
+            bedtime=self.is_bedtime(),
+            after_bedtime=self.after_bedtime(),
+            programmed_bedtime=armed_night_programmed,
+            occupied_after_bedtime=self.occupied_after_bedtime,
         )
         for state, checker in self.transitions.items():
             if self.hass_api.evaluate_condition(checker, condition_vars):
@@ -1669,6 +1726,7 @@ class AlarmArmer:
                     context=change_context or {},
                     occupied=self.is_occupied(),
                     night=self.is_night(),
+                    bedtime=self.is_bedtime(),
                 )
                 self.hass_api.fire_event(
                     event_name="change",
