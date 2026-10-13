@@ -133,9 +133,9 @@
                             "notify_target": "通知する相手や対象です。Supernotify の通知と同じように指定します。空欄にすると Supernotify が選びます。",
                             "notify_custom_target": "メールアドレスや電話番号など、Home Assistant の外にある通知先です。",
                             "notify_deliveries": "通知をこれらの Supernotify の配信に限定します。空欄にすると Supernotify が選びます。",
-                            "notify_priority_scheduled": "時間帯センサー、カレンダー、日の出、日の入りによる変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
-                            "notify_priority_occupancy": "人の帰宅や外出による変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
-                            "notify_priority_manual": "アラームパネル、ボタン、モバイルアクション、音声による変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
+                            "notify_priority_scheduled": "時間帯センサー、カレンダー、日の出、日の入りによる変更の Supernotify 優先度です。",
+                            "notify_priority_occupancy": "人の帰宅や外出による変更の Supernotify 優先度です。",
+                            "notify_priority_manual": "アラームパネル、ボタン、モバイルアクション、音声による変更の Supernotify 優先度です。",
                             "notify_data": "通知アクションに渡される追加データ。モバイルアプリ通知のアクションやチャンネルなど。ここで設定した値は、YAML通知プロファイル内の一致するキーによって上書きされます。"
                         }
                     },
@@ -305,9 +305,9 @@
                             "notify_target": "通知する相手や対象です。Supernotify の通知と同じように指定します。空欄にすると Supernotify が選びます。",
                             "notify_custom_target": "メールアドレスや電話番号など、Home Assistant の外にある通知先です。",
                             "notify_deliveries": "通知をこれらの Supernotify の配信に限定します。空欄にすると Supernotify が選びます。",
-                            "notify_priority_scheduled": "時間帯センサー、カレンダー、日の出、日の入りによる変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
-                            "notify_priority_occupancy": "人の帰宅や外出による変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
-                            "notify_priority_manual": "アラームパネル、ボタン、モバイルアクション、音声による変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
+                            "notify_priority_scheduled": "時間帯センサー、カレンダー、日の出、日の入りによる変更の Supernotify 優先度です。",
+                            "notify_priority_occupancy": "人の帰宅や外出による変更の Supernotify 優先度です。",
+                            "notify_priority_manual": "アラームパネル、ボタン、モバイルアクション、音声による変更の Supernotify 優先度です。",
                             "notify_data": "通知アクションに渡される追加データ。モバイルアプリ通知のアクションやチャンネルなど。ここで設定した値は、YAML通知プロファイル内の一致するキーによって上書きされます。"
                         }
                     },

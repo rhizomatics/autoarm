@@ -53,6 +53,7 @@ from .const import (
     DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
     NOTIFY_COMMON,
+    NOTIFY_PRIORITY_DEFAULTS,
     NOTIFY_PRIORITY_SOURCES,
     PUBLIC_ALARM_STATES,
     SUN_TRIGGER_OPTIONS,
@@ -243,11 +244,10 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
             vol.Optional(CONF_NOTIFY_DELIVERIES, default=options.get(CONF_NOTIFY_DELIVERIES, [])): SelectSelector(
                 SelectSelectorConfig(options=await deliveries(hass), multiple=True, custom_value=True)
             ),
-            # left empty for Supernotify's own default priority
             **{
                 vol.Optional(
                     notify_priority_option(kind),
-                    description={"suggested_value": options.get(notify_priority_option(kind))},
+                    default=options.get(notify_priority_option(kind), NOTIFY_PRIORITY_DEFAULTS[kind]),
                 ): SelectSelector(
                     SelectSelectorConfig(
                         options=SUPERNOTIFY_PRIORITIES, mode=SelectSelectorMode.DROPDOWN, translation_key="notify_priority"

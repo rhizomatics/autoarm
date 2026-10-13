@@ -133,9 +133,9 @@
                             "notify_target": "Wie of wat een melding krijgt, zoals bij elke Supernotify-melding. Laat leeg om Supernotify te laten kiezen.",
                             "notify_custom_target": "Doelen buiten Home Assistant, zoals e-mailadressen of telefoonnummers.",
                             "notify_deliveries": "Beperk meldingen tot deze Supernotify-bezorgingen. Laat leeg om Supernotify te laten kiezen.",
-                            "notify_priority_scheduled": "Supernotify-prioriteit voor wijzigingen door een Tijden van de dag-sensor, agenda, zonsopkomst of zonsondergang. Laat leeg voor de standaard van Supernotify.",
-                            "notify_priority_occupancy": "Supernotify-prioriteit voor wijzigingen doordat mensen aankomen of vertrekken. Laat leeg voor de standaard van Supernotify.",
-                            "notify_priority_manual": "Supernotify-prioriteit voor wijzigingen op de alarmcentrale, of met een knop, mobiele actie of spraak. Laat leeg voor de standaard van Supernotify.",
+                            "notify_priority_scheduled": "Supernotify-prioriteit voor wijzigingen door een Tijden van de dag-sensor, agenda, zonsopkomst of zonsondergang.",
+                            "notify_priority_occupancy": "Supernotify-prioriteit voor wijzigingen doordat mensen aankomen of vertrekken.",
+                            "notify_priority_manual": "Supernotify-prioriteit voor wijzigingen op de alarmcentrale, of met een knop, mobiele actie of spraak.",
                             "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
                         }
                     },
@@ -305,9 +305,9 @@
                             "notify_target": "Wie of wat een melding krijgt, zoals bij elke Supernotify-melding. Laat leeg om Supernotify te laten kiezen.",
                             "notify_custom_target": "Doelen buiten Home Assistant, zoals e-mailadressen of telefoonnummers.",
                             "notify_deliveries": "Beperk meldingen tot deze Supernotify-bezorgingen. Laat leeg om Supernotify te laten kiezen.",
-                            "notify_priority_scheduled": "Supernotify-prioriteit voor wijzigingen door een Tijden van de dag-sensor, agenda, zonsopkomst of zonsondergang. Laat leeg voor de standaard van Supernotify.",
-                            "notify_priority_occupancy": "Supernotify-prioriteit voor wijzigingen doordat mensen aankomen of vertrekken. Laat leeg voor de standaard van Supernotify.",
-                            "notify_priority_manual": "Supernotify-prioriteit voor wijzigingen op de alarmcentrale, of met een knop, mobiele actie of spraak. Laat leeg voor de standaard van Supernotify.",
+                            "notify_priority_scheduled": "Supernotify-prioriteit voor wijzigingen door een Tijden van de dag-sensor, agenda, zonsopkomst of zonsondergang.",
+                            "notify_priority_occupancy": "Supernotify-prioriteit voor wijzigingen doordat mensen aankomen of vertrekken.",
+                            "notify_priority_manual": "Supernotify-prioriteit voor wijzigingen op de alarmcentrale, of met een knop, mobiele actie of spraak.",
                             "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
                         }
                     },

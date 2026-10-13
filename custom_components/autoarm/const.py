@@ -365,3 +365,4 @@ NOTIFY_PRIORITY_SOURCES: dict[str, list[ChangeSource]] = {
     "occupancy": [ChangeSource.OCCUPANCY],
     "manual": [ChangeSource.ALARM_PANEL, ChangeSource.BUTTON, ChangeSource.MOBILE, ChangeSource.VOICE],
 }
+NOTIFY_PRIORITY_DEFAULTS: dict[str, str] = {"scheduled": "low", "occupancy": "medium", "manual": "medium"}

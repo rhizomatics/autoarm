@@ -133,9 +133,9 @@
                             "notify_target": "要通知的人或对象，与任何 Supernotify 通知相同。留空则由 Supernotify 选择。",
                             "notify_custom_target": "Home Assistant 之外的通知对象，例如电子邮件地址或电话号码。",
                             "notify_deliveries": "将通知限制为这些 Supernotify 投递方式。留空则由 Supernotify 选择。",
-                            "notify_priority_scheduled": "由时段传感器、日历、日出或日落引起的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
-                            "notify_priority_occupancy": "由人员到家或离家引起的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
-                            "notify_priority_manual": "在警报面板上，或通过按钮、移动端操作或语音进行的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
+                            "notify_priority_scheduled": "由时段传感器、日历、日出或日落引起的变更所用的 Supernotify 优先级。",
+                            "notify_priority_occupancy": "由人员到家或离家引起的变更所用的 Supernotify 优先级。",
+                            "notify_priority_manual": "在警报面板上，或通过按钮、移动端操作或语音进行的变更所用的 Supernotify 优先级。",
                             "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
                         }
                     },
@@ -305,9 +305,9 @@
                             "notify_target": "要通知的人或对象，与任何 Supernotify 通知相同。留空则由 Supernotify 选择。",
                             "notify_custom_target": "Home Assistant 之外的通知对象，例如电子邮件地址或电话号码。",
                             "notify_deliveries": "将通知限制为这些 Supernotify 投递方式。留空则由 Supernotify 选择。",
-                            "notify_priority_scheduled": "由时段传感器、日历、日出或日落引起的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
-                            "notify_priority_occupancy": "由人员到家或离家引起的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
-                            "notify_priority_manual": "在警报面板上，或通过按钮、移动端操作或语音进行的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
+                            "notify_priority_scheduled": "由时段传感器、日历、日出或日落引起的变更所用的 Supernotify 优先级。",
+                            "notify_priority_occupancy": "由人员到家或离家引起的变更所用的 Supernotify 优先级。",
+                            "notify_priority_manual": "在警报面板上，或通过按钮、移动端操作或语音进行的变更所用的 Supernotify 优先级。",
                             "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
                         }
                     },

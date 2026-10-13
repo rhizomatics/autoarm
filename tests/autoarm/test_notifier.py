@@ -988,7 +988,10 @@ async def test_priorities_from_options(hass: HomeAssistant) -> None:
     await notifier.notify(ChangeSource.OCCUPANCY, AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_AWAY)
     await notifier.notify(ChangeSource.BUTTON, AlarmControlPanelState.ARMED_AWAY, AlarmControlPanelState.DISARMED)
 
-    assert [call.get("priority") for call in calls] == ["high", None]
+    await notifier.notify(ChangeSource.SUNSET, AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_NIGHT)
+
+    # those not set in the options have their defaults
+    assert [call.get("priority") for call in calls] == ["high", "medium", "low"]
 
 
 async def test_yaml_notify_section_raises_deprecation_repair(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:

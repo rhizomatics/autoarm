@@ -89,6 +89,7 @@ None of this removes existing functionality, and all of it can be overridden or 
 - A warning is logged at start up if notifications are enabled using `notify.send_message` with no **Notification Targets**, since nothing can then be sent
 - With Supernotify as the notification action
   - New **Priority** options for scheduled changes (Times of the Day sensor, calendar, sunrise, sunset), occupancy changes, and manual changes (alarm panel, button, mobile action, voice)
+    - Scheduled changes are `low` priority unless changed, the others `medium`
   - Scenarios are applied for the new alarm state, such as `autoarm-armed_away` or `autoarm-disarmed`, plus `autoarm-armed` for any armed state, for Supernotify scenarios of those names to pick up
 - Mobile action titles are now translated, and actions that would do nothing are left out, such as *Disarm* when already disarmed or *Arm Away* when already armed away
 - The options now say that only a simple message can be sent when Supernotify isn't available

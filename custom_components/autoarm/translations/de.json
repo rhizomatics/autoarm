@@ -133,9 +133,9 @@
                             "notify_target": "Wer oder was benachrichtigt wird, wie bei jeder Supernotify-Benachrichtigung. Leer lassen, damit Supernotify wählt.",
                             "notify_custom_target": "Ziele außerhalb von Home Assistant, etwa E-Mail-Adressen oder Telefonnummern.",
                             "notify_deliveries": "Benachrichtigungen auf diese Supernotify-Zustellungen beschränken. Leer lassen, damit Supernotify wählt.",
-                            "notify_priority_scheduled": "Supernotify-Priorität für Änderungen durch einen Tageszeiten-Sensor, Kalender, Sonnenaufgang oder Sonnenuntergang. Leer lassen für den Standard von Supernotify.",
-                            "notify_priority_occupancy": "Supernotify-Priorität für Änderungen durch ankommende oder gehende Personen. Leer lassen für den Standard von Supernotify.",
-                            "notify_priority_manual": "Supernotify-Priorität für Änderungen an der Alarmzentrale oder per Taste, mobiler Aktion oder Sprache. Leer lassen für den Standard von Supernotify.",
+                            "notify_priority_scheduled": "Supernotify-Priorität für Änderungen durch einen Tageszeiten-Sensor, Kalender, Sonnenaufgang oder Sonnenuntergang.",
+                            "notify_priority_occupancy": "Supernotify-Priorität für Änderungen durch ankommende oder gehende Personen.",
+                            "notify_priority_manual": "Supernotify-Priorität für Änderungen an der Alarmzentrale oder per Taste, mobiler Aktion oder Sprache.",
                             "notify_data": "Zusätzliche Daten, die an die Benachrichtigungsaktion übergeben werden, z. B. Aktionen oder ein Kanal für eine mobile App-Benachrichtigung. Werte hier werden durch einen passenden Schlüssel in einem YAML-Benachrichtigungsprofil überschrieben."
                         }
                     },
@@ -305,9 +305,9 @@
                             "notify_target": "Wer oder was benachrichtigt wird, wie bei jeder Supernotify-Benachrichtigung. Leer lassen, damit Supernotify wählt.",
                             "notify_custom_target": "Ziele außerhalb von Home Assistant, etwa E-Mail-Adressen oder Telefonnummern.",
                             "notify_deliveries": "Benachrichtigungen auf diese Supernotify-Zustellungen beschränken. Leer lassen, damit Supernotify wählt.",
-                            "notify_priority_scheduled": "Supernotify-Priorität für Änderungen durch einen Tageszeiten-Sensor, Kalender, Sonnenaufgang oder Sonnenuntergang. Leer lassen für den Standard von Supernotify.",
-                            "notify_priority_occupancy": "Supernotify-Priorität für Änderungen durch ankommende oder gehende Personen. Leer lassen für den Standard von Supernotify.",
-                            "notify_priority_manual": "Supernotify-Priorität für Änderungen an der Alarmzentrale oder per Taste, mobiler Aktion oder Sprache. Leer lassen für den Standard von Supernotify.",
+                            "notify_priority_scheduled": "Supernotify-Priorität für Änderungen durch einen Tageszeiten-Sensor, Kalender, Sonnenaufgang oder Sonnenuntergang.",
+                            "notify_priority_occupancy": "Supernotify-Priorität für Änderungen durch ankommende oder gehende Personen.",
+                            "notify_priority_manual": "Supernotify-Priorität für Änderungen an der Alarmzentrale oder per Taste, mobiler Aktion oder Sprache.",
                             "notify_data": "Zusätzliche Daten, die an die Benachrichtigungsaktion übergeben werden, z. B. Aktionen oder ein Kanal für eine mobile App-Benachrichtigung. Werte hier werden durch einen passenden Schlüssel in einem YAML-Benachrichtigungsprofil überschrieben."
                         }
                     },

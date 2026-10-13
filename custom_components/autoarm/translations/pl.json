@@ -133,9 +133,9 @@
                             "notify_target": "Kogo lub co powiadomić, jak w każdym powiadomieniu Supernotify. Pozostaw puste, aby wybrał Supernotify.",
                             "notify_custom_target": "Odbiorcy spoza Home Assistant, na przykład adresy e-mail lub numery telefonów.",
                             "notify_deliveries": "Ogranicz powiadomienia do tych dostaw Supernotify. Pozostaw puste, aby wybrał Supernotify.",
-                            "notify_priority_scheduled": "Priorytet Supernotify dla zmian wywołanych przez czujnik pór dnia, kalendarz, wschód lub zachód słońca. Pozostaw puste, aby użyć domyślnego priorytetu Supernotify.",
-                            "notify_priority_occupancy": "Priorytet Supernotify dla zmian wywołanych przyjściem lub wyjściem osób. Pozostaw puste, aby użyć domyślnego priorytetu Supernotify.",
-                            "notify_priority_manual": "Priorytet Supernotify dla zmian dokonanych na panelu alarmu albo przyciskiem, akcją mobilną lub głosem. Pozostaw puste, aby użyć domyślnego priorytetu Supernotify.",
+                            "notify_priority_scheduled": "Priorytet Supernotify dla zmian wywołanych przez czujnik pór dnia, kalendarz, wschód lub zachód słońca.",
+                            "notify_priority_occupancy": "Priorytet Supernotify dla zmian wywołanych przyjściem lub wyjściem osób.",
+                            "notify_priority_manual": "Priorytet Supernotify dla zmian dokonanych na panelu alarmu albo przyciskiem, akcją mobilną lub głosem.",
                             "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML."
                         }
                     },
@@ -305,9 +305,9 @@
                             "notify_target": "Kogo lub co powiadomić, jak w każdym powiadomieniu Supernotify. Pozostaw puste, aby wybrał Supernotify.",
                             "notify_custom_target": "Odbiorcy spoza Home Assistant, na przykład adresy e-mail lub numery telefonów.",
                             "notify_deliveries": "Ogranicz powiadomienia do tych dostaw Supernotify. Pozostaw puste, aby wybrał Supernotify.",
-                            "notify_priority_scheduled": "Priorytet Supernotify dla zmian wywołanych przez czujnik pór dnia, kalendarz, wschód lub zachód słońca. Pozostaw puste, aby użyć domyślnego priorytetu Supernotify.",
-                            "notify_priority_occupancy": "Priorytet Supernotify dla zmian wywołanych przyjściem lub wyjściem osób. Pozostaw puste, aby użyć domyślnego priorytetu Supernotify.",
-                            "notify_priority_manual": "Priorytet Supernotify dla zmian dokonanych na panelu alarmu albo przyciskiem, akcją mobilną lub głosem. Pozostaw puste, aby użyć domyślnego priorytetu Supernotify.",
+                            "notify_priority_scheduled": "Priorytet Supernotify dla zmian wywołanych przez czujnik pór dnia, kalendarz, wschód lub zachód słońca.",
+                            "notify_priority_occupancy": "Priorytet Supernotify dla zmian wywołanych przyjściem lub wyjściem osób.",
+                            "notify_priority_manual": "Priorytet Supernotify dla zmian dokonanych na panelu alarmu albo przyciskiem, akcją mobilną lub głosem.",
                             "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML."
                         }
                     },

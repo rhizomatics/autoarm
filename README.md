@@ -143,10 +143,10 @@ It offers:
 
 #### Priority
 
-- **Priority** can be set separately for three kinds of change, and left empty for Supernotify's own default
-    - **Scheduled changes** - Times of the Day sensor, calendar, sunrise or sunset
-    - **Occupancy changes** - people arriving or leaving
-    - **Manual changes** - alarm panel, button, mobile action or voice
+- **Priority** can be set separately for three kinds of change
+    - **Scheduled changes** - Times of the Day sensor, calendar, sunrise or sunset, `low` unless changed
+    - **Occupancy changes** - people arriving or leaving, `medium` unless changed
+    - **Manual changes** - alarm panel, button, mobile action or voice, `medium` unless changed
 
 #### Scenarios
 

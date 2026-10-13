@@ -159,7 +159,7 @@ from .const import (
     NO_CAL_EVENT_MODE_AUTO_SUN,
     NO_CAL_EVENT_MODE_MANUAL,
     NOTIFY_COMMON,
-    NOTIFY_PRIORITY_SOURCES,
+    NOTIFY_PRIORITY_DEFAULTS,
     NOTIFY_SCHEMA,
     PUBLIC_ALARM_STATES,
     SIGNAL_STATUS_UPDATED,
@@ -511,9 +511,7 @@ def _build_armer_from_entry(
         notify_custom_target=entry.options.get(CONF_NOTIFY_CUSTOM_TARGET),
         notify_deliveries=entry.options.get(CONF_NOTIFY_DELIVERIES),
         notify_priorities={
-            kind: entry.options[notify_priority_option(kind)]
-            for kind in NOTIFY_PRIORITY_SOURCES
-            if entry.options.get(notify_priority_option(kind))
+            kind: entry.options.get(notify_priority_option(kind), default) for kind, default in NOTIFY_PRIORITY_DEFAULTS.items()
         },
         notify_data=entry.options.get(CONF_NOTIFY_DATA, {}),
         rate_limit=_rate_limit_from_options(entry.options),

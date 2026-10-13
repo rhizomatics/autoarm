@@ -133,9 +133,9 @@
                             "notify_target": "Who or what to notify, as for any Supernotify notification. Leave empty for Supernotify to choose.",
                             "notify_custom_target": "Targets outside of Home Assistant, such as e-mail addresses or phone numbers.",
                             "notify_deliveries": "Limit notifications to these Supernotify deliveries. Leave empty for Supernotify to choose.",
-                            "notify_priority_scheduled": "Supernotify priority for changes made by a Times of the Day sensor, calendar, sunrise or sunset. Leave empty for Supernotify's default.",
-                            "notify_priority_occupancy": "Supernotify priority for changes made by people arriving or leaving. Leave empty for Supernotify's default.",
-                            "notify_priority_manual": "Supernotify priority for changes made at the alarm panel, or by a button, mobile action or voice. Leave empty for Supernotify's default.",
+                            "notify_priority_scheduled": "Supernotify priority for changes made by a Times of the Day sensor, calendar, sunrise or sunset.",
+                            "notify_priority_occupancy": "Supernotify priority for changes made by people arriving or leaving.",
+                            "notify_priority_manual": "Supernotify priority for changes made at the alarm panel, or by a button, mobile action or voice.",
                             "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
                         }
                     },
@@ -305,9 +305,9 @@
                             "notify_target": "Who or what to notify, as for any Supernotify notification. Leave empty for Supernotify to choose.",
                             "notify_custom_target": "Targets outside of Home Assistant, such as e-mail addresses or phone numbers.",
                             "notify_deliveries": "Limit notifications to these Supernotify deliveries. Leave empty for Supernotify to choose.",
-                            "notify_priority_scheduled": "Supernotify priority for changes made by a Times of the Day sensor, calendar, sunrise or sunset. Leave empty for Supernotify's default.",
-                            "notify_priority_occupancy": "Supernotify priority for changes made by people arriving or leaving. Leave empty for Supernotify's default.",
-                            "notify_priority_manual": "Supernotify priority for changes made at the alarm panel, or by a button, mobile action or voice. Leave empty for Supernotify's default.",
+                            "notify_priority_scheduled": "Supernotify priority for changes made by a Times of the Day sensor, calendar, sunrise or sunset.",
+                            "notify_priority_occupancy": "Supernotify priority for changes made by people arriving or leaving.",
+                            "notify_priority_manual": "Supernotify priority for changes made at the alarm panel, or by a button, mobile action or voice.",
                             "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
                         }
                     },
