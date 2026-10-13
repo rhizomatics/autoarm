@@ -132,7 +132,9 @@ None of this removes existing functionality, and all of it can be overridden or 
 - Added **Extra Notification Data** to the options, for extra service data such as mobile app notification actions or a channel, without needing YAML
 ## 🐛 Bug fixes
 
-- Fixed spurious notifications for the internal `pending` bookkeeping state, such as when a calendar event ends and the state is recalculated - only genuine, net state changes are now notified
+- Auto Arm no longer moves the alarm panel through `pending` to recalculate the state, such as when a calendar event ends
+  - The panel goes straight to the new state, so there is one `autoarm_change` event from the previous state rather than two via `pending`
+  - No more spurious notifications, or automations triggered by `pending`, and the panel can't be left in `pending` if the change doesn't happen
 
 
 # 1.3.0

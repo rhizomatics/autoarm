@@ -104,10 +104,10 @@ class TrackedTimeOfDay:
             "no_event_mode": end_mode,
         }
         if end_mode == NO_CAL_EVENT_MODE_AUTO_SUN:
-            # same context for the move via pending and the reset, as both are the one change
             context = self.armer.cause(ChangeSource.TOD, self.name, context)
-            await self.armer.pending_state(source=ChangeSource.TOD, change_context=change_context, context=context)
-            await self.armer.reset_armed_state(source=ChangeSource.TOD, context=context, change_context=change_context)
+            await self.armer.reset_armed_state(
+                source=ChangeSource.TOD, context=context, change_context=change_context, force=True
+            )
         elif end_mode == NO_CAL_EVENT_MODE_AUTO_OCCUPANCY:
             target_state = self.armer.occupancy_end_state(self.arming_state)
             _LOGGER.info("AUTOARM Times of day %s ended, and arming by occupancy to %s", self.entity_id, target_state)

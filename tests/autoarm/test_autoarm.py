@@ -7,7 +7,7 @@ import homeassistant.util.dt as dt_util
 import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEntity
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer, Intervention
@@ -29,33 +29,47 @@ async def test_direct_arm_preserves_panel_attributes(hass: HomeAssistant) -> Non
     assert panel.attributes.get("icon") == "mdi:alarm-panel"
 
 
-async def test_pending_round_trip_is_never_notified(hass: HomeAssistant) -> None:
-    """A pending state is internal bookkeeping - it, and any no-op round trip through it, stay silent.
-
-    Uses sunrise rather than calendar as the source, since calendar-sourced notifications are
-    coalesced over a grace period (see test_calendar_notification_coalescing) - unrelated here.
-    """
-    hass.states.async_set(entity_id=TEST_PANEL, new_state="armed_night")
-    autoarmer = AlarmArmer(hass, TEST_PANEL, use_alarm_service=False)
+async def test_forced_reset_never_sets_pending(hass: HomeAssistant, autoarmer: AlarmArmer, occupied: None, day: None) -> None:
+    """A forced reset works out the state afresh, without moving the panel through pending on the way"""
+    hass.states.async_set(entity_id=TEST_PANEL, new_state="armed_vacation")
+    await hass.async_block_till_done()
     autoarmer.notifier = AsyncMock(spec=Notifier)
+    panel_states: list[str] = []
+    hass.bus.async_listen(
+        "state_changed",
+        callback(lambda e: panel_states.append(e.data["new_state"].state) if e.data["entity_id"] == TEST_PANEL else None),
+    )
 
-    await autoarmer.pending_state(source=ChangeSource.SUNRISE)
-    autoarmer.notifier.notify.assert_not_called()
+    # not forced, so held in vacation by the transition conditions
+    await autoarmer.reset_armed_state(source=ChangeSource.SUNRISE)
+    assert autoarmer.armed_state() == AlarmControlPanelState.ARMED_VACATION
 
-    # recomputes the same state - a no-op from the user's perspective
-    await autoarmer.arm(AlarmControlPanelState.ARMED_NIGHT, source=ChangeSource.SUNRISE)
-    autoarmer.notifier.notify.assert_not_called()
+    await autoarmer.reset_armed_state(source=ChangeSource.SUNRISE, force=True)
+    await hass.async_block_till_done()
 
-    # a genuine change after pending is reported against the state before pending, not "pending"
-    await autoarmer.pending_state(source=ChangeSource.SUNRISE)
-    await autoarmer.arm(AlarmControlPanelState.DISARMED, source=ChangeSource.SUNRISE)
+    assert panel_states == ["armed_home"]
     autoarmer.notifier.notify.assert_called_once_with(
         source=ChangeSource.SUNRISE,
-        from_state=AlarmControlPanelState.ARMED_NIGHT,
-        to_state=AlarmControlPanelState.DISARMED,
+        from_state=AlarmControlPanelState.ARMED_VACATION,
+        to_state=AlarmControlPanelState.ARMED_HOME,
         context=autoarmer.notifier.notify.call_args.kwargs["context"],
         source_name=None,
     )
+
+
+async def test_forced_reset_to_same_state_is_silent(
+    hass: HomeAssistant, autoarmer: AlarmArmer, occupied: None, day: None
+) -> None:
+    hass.states.async_set(entity_id=TEST_PANEL, new_state="armed_home")
+    await hass.async_block_till_done()
+    autoarmer.notifier = AsyncMock(spec=Notifier)
+    autoarmer.last_change = None
+
+    await autoarmer.reset_armed_state(source=ChangeSource.SUNRISE, force=True)
+
+    assert autoarmer.armed_state() == AlarmControlPanelState.ARMED_HOME
+    assert autoarmer.last_change is None
+    autoarmer.notifier.notify.assert_not_called()
 
 
 async def test_calendar_notification_coalescing(hass: HomeAssistant) -> None:
@@ -147,8 +161,9 @@ async def test_day(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     assert autoarmer.is_night() is False
 
 
-async def test_on_sunset(autoarmer: AlarmArmer) -> None:
-    await autoarmer.arm(AlarmControlPanelState.PENDING)
+async def test_on_sunset(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
+    hass.states.async_set(TEST_PANEL, "pending")
+    await hass.async_block_till_done()
     await autoarmer.on_sunset()
     assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
 
@@ -158,7 +173,7 @@ async def test_on_sunset_with_earliest_constraint(
     hass: HomeAssistant,
 ) -> None:
     """Sunset fires but earliest constraint hasn't been met — deferred arm later fires."""
-    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    hass.states.async_set(TEST_PANEL, "pending")
     await hass.async_block_till_done()
     autoarmer.sunset_earliest = (dt_util.now() + dt.timedelta(seconds=2)).time()
     autoarmer.interventions = []
@@ -173,7 +188,7 @@ async def test_on_sunset_with_earliest_constraint_already_met(
     hass: HomeAssistant,
 ) -> None:
     """Sunset fires and earliest constraint is already past — arms immediately."""
-    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    hass.states.async_set(TEST_PANEL, "pending")
     await hass.async_block_till_done()
     autoarmer.sunset_earliest = (dt_util.now() - dt.timedelta(seconds=1)).time()
     autoarmer.interventions = []
@@ -181,30 +196,34 @@ async def test_on_sunset_with_earliest_constraint_already_met(
     assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
 
 
-async def test_on_sunrise(autoarmer: AlarmArmer) -> None:
-    await autoarmer.arm(AlarmControlPanelState.PENDING)
+async def test_on_sunrise(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
+    hass.states.async_set(TEST_PANEL, "pending")
+    await hass.async_block_till_done()
     assert autoarmer.armed_state() == AlarmControlPanelState.PENDING
     await autoarmer.on_sunrise()
     assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
 
 
-async def test_on_sunrise_ignored_when_sunrise_trigger_off(autoarmer: AlarmArmer) -> None:
+async def test_on_sunrise_ignored_when_sunrise_trigger_off(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     autoarmer.sunrise_trigger = TRIGGER_OFF
-    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    hass.states.async_set(TEST_PANEL, "pending")
+    await hass.async_block_till_done()
     await autoarmer.on_sunrise()
     assert autoarmer.armed_state() == AlarmControlPanelState.PENDING
 
 
-async def test_on_sunset_ignored_when_sunset_trigger_off(autoarmer: AlarmArmer) -> None:
+async def test_on_sunset_ignored_when_sunset_trigger_off(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     autoarmer.sunset_trigger = TRIGGER_OFF
-    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    hass.states.async_set(TEST_PANEL, "pending")
+    await hass.async_block_till_done()
     await autoarmer.on_sunset()
     assert autoarmer.armed_state() == AlarmControlPanelState.PENDING
 
 
-async def test_sun_triggers_are_independent(autoarmer: AlarmArmer) -> None:
+async def test_sun_triggers_are_independent(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:
     autoarmer.sunset_trigger = TRIGGER_OFF
-    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    hass.states.async_set(TEST_PANEL, "pending")
+    await hass.async_block_till_done()
     await autoarmer.on_sunrise()
     assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
 
@@ -241,7 +260,7 @@ async def test_on_sunrise_with_earliest_active_no_interventions(
     hass: HomeAssistant,
 ) -> None:
     """Sunrise fires but earliest constraint hasn't been met yet — deferred arm later fires."""
-    await autoarmer.arm(AlarmControlPanelState.PENDING)
+    hass.states.async_set(TEST_PANEL, "pending")
     await hass.async_block_till_done()
     autoarmer.sunrise_earliest = (dt_util.now() + dt.timedelta(seconds=2)).time()
     autoarmer.interventions = []

@@ -655,15 +655,12 @@ class AlarmArmer:
 
         self.actions: list[str] = actions or []
         self.unsubscribes: list[Callable[[], None]] = []
-        self.pre_pending_state: AlarmControlPanelState | None = None
         self.button_device: dict[str, str] = {}
         self.arming_in_progress: asyncio.Event = asyncio.Event()
         # change state with alarm_control_panel actions rather than setting it, for panels like Alarmo
         self.use_alarm_service: bool = use_alarm_service
         # state the panel is being moved to by its actions, so the change isn't mistaken for a manual one
         self._service_target: AlarmControlPanelState | None = None
-        # pending held by AutoArm, when using actions, since panels have no action to go to pending
-        self.virtual_pending: bool = False
         self.last_change: StateChange | None = None
         self.stop_listener: Callable[[], None] | None = None
         # coalesces calendar-triggered notifications that land within calendar_notify_grace_period of each other
@@ -1119,8 +1116,6 @@ class AlarmArmer:
         return now.hour < 12  # AM means today's sunrise is relevant
 
     def armed_state(self) -> AlarmControlPanelState:
-        if self.virtual_pending:
-            return AlarmControlPanelState.PENDING
         return self.panel_state()
 
     def panel_state(self) -> AlarmControlPanelState:
@@ -1159,24 +1154,6 @@ class AlarmArmer:
             new_attributes = new_obj.attributes
         return entity_id, old, new, new_attributes
 
-    async def pending_state(
-        self, source: ChangeSource | None, change_context: dict[str, Any] | None = None, context: Context | None = None
-    ) -> None:
-        self.pre_pending_state = self.armed_state()
-        change_context = change_context or {}
-        change_context.update({
-            "source": str(source),
-            "original_caller": change_context.get("caller"),
-            "caller": "pending_state",
-            "pre_pending_state": self.pre_pending_state,
-        })
-        await self.arm(
-            AlarmControlPanelState.PENDING,
-            source=source,
-            change_context=change_context,
-            context=context,
-        )
-
     @callback
     async def delayed_reset_armed_state(
         self, triggered_at: dt.datetime, requested_at: dt.datetime | None, **kwargs: Any
@@ -1193,10 +1170,13 @@ class AlarmArmer:
         context: Context | None = None,
         change_context: dict[str, Any] | None = None,
         night: bool | None = None,
+        force: bool = False,
     ) -> str | None:
         """Logic to automatically work out appropriate current armed state
 
         A change_context carries detail of whatever asked for the reset, such as its name, through to the change
+
+        Forcing works the state out afresh, as if the panel had none, so it isn't held by the existing state
 
         Sunrise and sunset say whether it's night, as the sun entity may not have changed state yet
         """
@@ -1218,7 +1198,7 @@ class AlarmArmer:
             existing_state = self.armed_state()
             state = existing_state
             # TODO: expose as config ( for manual disarm override ) and condition logic
-            must_change_state = existing_state is None or existing_state == AlarmControlPanelState.PENDING
+            must_change_state = force or existing_state is None or existing_state == AlarmControlPanelState.PENDING
             if self.calendars:
                 active_calendar_event = self.active_calendar_event()
                 if active_calendar_event:
@@ -1324,7 +1304,11 @@ class AlarmArmer:
                     )
                     reset_decision = "ignore_after_manual_intervention"
                     return existing_state
-            state = self.determine_state(night, armed_night_programmed=await self.armed_night_programmed())
+            state = self.determine_state(
+                night,
+                armed_night_programmed=await self.armed_night_programmed(),
+                condition_state=AlarmControlPanelState.PENDING if force else None,
+            )
             if state is not None and state != AlarmControlPanelState.PENDING and state != existing_state:
                 reset_decision = "change_state"
                 state = await self.arm(
@@ -1364,8 +1348,15 @@ class AlarmArmer:
             return True
         return False
 
-    def determine_state(self, night: bool | None = None, armed_night_programmed: bool = True) -> AlarmControlPanelState | None:
+    def determine_state(
+        self,
+        night: bool | None = None,
+        armed_night_programmed: bool = True,
+        condition_state: AlarmControlPanelState | None = None,
+    ) -> AlarmControlPanelState | None:
         """Compute a new state using occupancy, sun and transition conditions
+
+        A condition state stands in for the panel's own state in the conditions
 
         The default state for the night is for the evening before bedtime, with another for after bedtime,
         and if nothing is going to set armed night for a bedtime then the night is armed night
@@ -1382,7 +1373,7 @@ class AlarmArmer:
             occupied=self.is_occupied(),
             unoccupied=self.is_unoccupied(),
             night=night,
-            state=self.armed_state(),
+            state=condition_state or self.armed_state(),
             calendar_event=active_calendar_event.event if active_calendar_event else None,
             occupied_defaults=occupied_defaults,
             at_home=self.at_home(),
@@ -1494,18 +1485,14 @@ class AlarmArmer:
                             source,
                         )
                         return None
-                    self.virtual_pending = False
                 elif self.use_alarm_service:
-                    if arming_state != AlarmControlPanelState.PENDING:
-                        _LOGGER.warning(
-                            "AUTOARM No alarm panel action for %s on %s (source=%s), leaving state unchanged",
-                            arming_state,
-                            self.alarm_panel,
-                            source,
-                        )
-                        return None
-                    # hold pending within AutoArm rather than setting a state the panel may not support
-                    self.virtual_pending = True
+                    _LOGGER.warning(
+                        "AUTOARM No alarm panel action for %s on %s (source=%s), leaving state unchanged",
+                        arming_state,
+                        self.alarm_panel,
+                        source,
+                    )
+                    return None
                 else:
                     # Not using the service, so set the state directly.
                     attrs: dict[str, Any] = {}
@@ -1520,27 +1507,15 @@ class AlarmArmer:
                     )
 
                 _LOGGER.info("AUTOARM Setting %s from %s to %s for %s", self.alarm_panel, existing_state, arming_state, source)
-                # Pending is an internal transitional bookkeeping state, not something to surface to users:
-                # never notify about entering it, and when leaving it, report the change against the state
-                # before it started, so a pending round-trip that nets out unchanged stays silent.
-                notify_from_state: AlarmControlPanelState | None = (
-                    self.pre_pending_state if existing_state == AlarmControlPanelState.PENDING else existing_state
-                )
-                if (
-                    self.notifier
-                    and source
-                    and arming_state
-                    and arming_state != AlarmControlPanelState.PENDING
-                    and notify_from_state != arming_state
-                ):
+                if self.notifier and source and arming_state:
                     if source == ChangeSource.CALENDAR:
                         # calendar changes often come in pairs, such as one event ending right as
                         # another starts - coalesce those into a single net-change notification
-                        self._debounce_calendar_notification(notify_from_state, arming_state, context)
+                        self._debounce_calendar_notification(existing_state, arming_state, context)
                     else:
                         await self.notifier.notify(
                             source=source,
-                            from_state=notify_from_state,
+                            from_state=existing_state,
                             to_state=arming_state,
                             context=context,
                             source_name=(change_context or {}).get("summary"),
@@ -1901,7 +1876,6 @@ class AlarmArmer:
             old,
             new,
         )
-        self.virtual_pending = False
         context: Context = child_context(event.context)
         self.record_intervention(ChangeSource.ALARM_PANEL, new_state, context=context)
         if new in ZOMBIE_STATES:

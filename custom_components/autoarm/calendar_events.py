@@ -206,11 +206,11 @@ class TrackedCalendarEvent:
         }
         if end_mode == NO_CAL_EVENT_MODE_AUTO_SUN:
             _LOGGER.info("AUTOARM Calendar event %s ended, and arming state", self.id)
-            # same context for the move via pending and the reset, as both are the one change
             context = self.armer.cause(ChangeSource.CALENDAR, self.event.summary)
-            # avoid having state locked in vacation by state calculator by moving via 'Pending'
-            await self.armer.pending_state(source=ChangeSource.CALENDAR, change_context=change_context, context=context)
-            await self.armer.reset_armed_state(source=ChangeSource.CALENDAR, context=context)
+            # avoid having state locked in vacation by state calculator by forcing the reset
+            await self.armer.reset_armed_state(
+                source=ChangeSource.CALENDAR, context=context, change_context=change_context, force=True
+            )
         elif end_mode == NO_CAL_EVENT_MODE_AUTO_OCCUPANCY:
             target_state = self.armer.occupancy_end_state(self.arming_state)
             _LOGGER.info("AUTOARM Calendar event %s ended, and arming by occupancy to %s", self.id, target_state)

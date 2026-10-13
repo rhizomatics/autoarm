@@ -219,7 +219,7 @@ async def test_reset_propagates_context(hass: HomeAssistant) -> None:
     assert changes[0].context is context
 
 
-async def test_calendar_event_end_shares_context_for_pending_and_reset(hass: HomeAssistant) -> None:
+async def test_calendar_event_end_shares_context_for_cause_and_reset(hass: HomeAssistant) -> None:
     armer = AsyncMock(spec=AlarmArmer)
     armer.has_active_calendar_event = Mock(return_value=False)
     armer.resume_time_of_day = AsyncMock(return_value=False)
@@ -233,8 +233,8 @@ async def test_calendar_event_end_shares_context_for_pending_and_reset(hass: Hom
     await TrackedCalendarEvent.on_calendar_event_end(tracked, dt_util.now())
 
     armer.cause.assert_called_once_with(ChangeSource.CALENDAR, "Skiing")
-    assert armer.pending_state.call_args.kwargs["context"] is armer.cause.return_value
     assert armer.reset_armed_state.call_args.kwargs["context"] is armer.cause.return_value
+    assert armer.reset_armed_state.call_args.kwargs["force"] is True
 
 
 async def test_calendar_event_start_shares_context_for_arm_and_status(hass: HomeAssistant) -> None:

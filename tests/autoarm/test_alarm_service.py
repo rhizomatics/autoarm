@@ -117,47 +117,17 @@ async def test_exit_delay_cancelled_is_an_intervention(hass: HomeAssistant, serv
     assert intervention.state == AlarmControlPanelState.DISARMED
 
 
-async def test_pending_held_by_autoarm_not_panel(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
+async def test_forced_reset_uses_panel_actions_only(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
+    """Calendar end forces the reset so it isn't held back by an earlier manual intervention or vacation state"""
     calls = _register_panel_actions(hass)
-    panel_before = service_armer.panel_state()
-
-    assert await service_armer.arm(AlarmControlPanelState.PENDING, source=ChangeSource.CALENDAR) == "pending"
-
-    assert calls == []
-    assert service_armer.panel_state() == panel_before
-    assert service_armer.armed_state() == AlarmControlPanelState.PENDING
-
-
-async def test_pending_cleared_when_autoarm_changes_state(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
-    _register_panel_actions(hass)
-    await service_armer.arm(AlarmControlPanelState.PENDING, source=ChangeSource.CALENDAR)
-
-    assert await service_armer.arm(AlarmControlPanelState.ARMED_AWAY, source=ChangeSource.CALENDAR) == "armed_away"
-    await hass.async_block_till_done()
-
-    assert service_armer.armed_state() == AlarmControlPanelState.ARMED_AWAY
-    assert service_armer.interventions == []
-
-
-async def test_pending_cleared_by_panel_change(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
-    await service_armer.arm(AlarmControlPanelState.PENDING, source=ChangeSource.CALENDAR)
-
-    hass.states.async_set(TEST_PANEL, "armed_night")
-    await hass.async_block_till_done()
-
-    assert service_armer.armed_state() == AlarmControlPanelState.ARMED_NIGHT
-
-
-async def test_pending_forces_reset_like_direct_mode(hass: HomeAssistant, service_armer: AlarmArmer) -> None:
-    """Calendar end moves via pending so the reset isn't held back by an earlier manual intervention"""
     hass.states.async_set(TEST_PANEL, "armed_vacation")
     await hass.async_block_till_done()
     assert service_armer.last_state_intervention() is not None
 
-    await service_armer.pending_state(source=ChangeSource.CALENDAR)
-    await service_armer.reset_armed_state(source=ChangeSource.SUNRISE)
+    await service_armer.reset_armed_state(source=ChangeSource.SUNRISE, force=True)
+    await hass.async_block_till_done()
 
-    assert service_armer.pre_pending_state == AlarmControlPanelState.ARMED_VACATION
+    assert len(calls) == 1
     assert service_armer.armed_state() not in (AlarmControlPanelState.PENDING, AlarmControlPanelState.ARMED_VACATION)
 
 

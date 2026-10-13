@@ -33,7 +33,6 @@ This is controlled by **Change state using the alarm panel's actions** in the **
 - The panel mustn't need a code to arm or disarm, as Auto Arm doesn't have one to give it.
 - If the action fails, or doesn't change the state, Auto Arm leaves the panel alone rather than set the state behind the integration's back. A warning is logged.
 - An exit delay is fine: when the panel goes to `arming`, and then to the armed state, Auto Arm doesn't mistake that for someone changing it by hand.
-- Panels have no action for `pending`, so Auto Arm keeps that within itself rather than changing the panel, for example when moving on at the end of a calendar event.
 
 ### Setting the State Directly
 

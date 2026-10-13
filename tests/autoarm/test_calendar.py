@@ -211,7 +211,7 @@ async def test_calendar_terminates_early(
     assert not calendar_with_holiday_event.has_active_event()
 
 
-async def test_calendar_event_end_auto_mode_calls_pending_and_reset(
+async def test_calendar_event_end_auto_mode_forces_reset(
     calendar_with_holiday_event: TrackedCalendar, local_calendar: CalendarEntity, autoarmer: AlarmArmer
 ) -> None:
     tracked_event: TrackedCalendarEvent = next(iter(calendar_with_holiday_event.tracked_events.values()))
@@ -228,7 +228,8 @@ async def test_calendar_event_end_auto_mode_calls_pending_and_reset(
     await calendar_with_holiday_event.on_timed_poll(dt_util.now())
 
     await tracked_event.on_calendar_event_end(dt_util.now())
-    assert autoarmer.pre_pending_state == AlarmControlPanelState.ARMED_AWAY
+    assert autoarmer.status["last_calculation"].attributes["must_change_state"] == "True"
+    assert autoarmer.armed_state() != AlarmControlPanelState.PENDING
 
 
 async def test_calendar_follows_event_deleted(
