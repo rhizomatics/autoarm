@@ -23,8 +23,8 @@ With the config flow, most settings are now managed in the UI:
 | Per-calendar poll interval | YAML | How often to check each calendar |
 | Transitions | YAML | Condition templates for state transitions |
 | Buttons | UI (options, Buttons) | Physical button entities and delays, copied from YAML if already there |
-| Notifications | UI (options) | Notification service and targets |
-| Notification Profiles | YAML | Notification profile configuration |
+| Notifications | UI (options) | Notification service and targets, and priorities for Supernotify |
+| Notification Profiles | YAML | **Deprecated**, replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released |
 | Rate limit | YAML | Throttling for arm calls |
 
 ## Full YAML Example

@@ -45,6 +45,7 @@ from homeassistant.core import (
     ServiceResponse,
     State,
     SupportsResponse,
+    callback,
 )
 from homeassistant.exceptions import ConditionError, ConfigEntryNotReady, HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
@@ -113,6 +114,7 @@ from .config_flow import (
     TIME_OF_DAY_OPTIONS,
     button_delay_option,
     button_option,
+    notify_priority_option,
 )
 from .const import (
     ATTR_RESET,
@@ -150,6 +152,7 @@ from .const import (
     NO_CAL_EVENT_MODE_AUTO_SUN,
     NO_CAL_EVENT_MODE_MANUAL,
     NOTIFY_COMMON,
+    NOTIFY_PRIORITY_SOURCES,
     NOTIFY_SCHEMA,
     SIGNAL_STATUS_UPDATED,
     TRIGGER_AUTO,
@@ -189,6 +192,7 @@ EPHEMERAL_STATES = (
 )
 ZOMBIE_STATES = ("unknown", "unavailable")
 PANEL_CODE_ISSUE = "panel_code_required"
+YAML_NOTIFY_ISSUE = "yaml_notify_deprecated"
 # options holding the seconds to wait after a person changes to each state
 OCCUPANCY_DELAY_OPTIONS = {STATE_HOME: CONF_OCCUPIED_DELAY, STATE_NOT_HOME: CONF_UNOCCUPIED_DELAY}
 NS_MOBILE_ACTIONS = "mobile_actions"
@@ -212,6 +216,27 @@ _STATE_TO_ALARM_SERVICE: dict[AlarmControlPanelState, str] = {
 type AutoArmConfigEntry = ConfigEntry["AlarmArmer"]
 
 
+@callback
+def _check_yaml_notify_deprecated(hass: HomeAssistant, yaml_config: ConfigType) -> None:
+    """The YAML notify section still works, but is replaced by the Supernotify integration in the options"""
+    if CONF_NOTIFY in yaml_config:
+        _LOGGER.warning(
+            "AUTOARM The notify section of the YAML configuration is deprecated, replaced by deeper Supernotify"
+            " integration in the options, and will be removed when Home Assistant 2027.4 is released"
+        )
+        ir.async_create_issue(
+            hass,
+            DOMAIN,
+            YAML_NOTIFY_ISSUE,
+            breaks_in_ha_version="2027.4.0",
+            is_fixable=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key=YAML_NOTIFY_ISSUE,
+        )
+    else:
+        ir.async_delete_issue(hass, DOMAIN, YAML_NOTIFY_ISSUE)
+
+
 async def async_setup(
     hass: HomeAssistant,
     config: ConfigType,
@@ -220,6 +245,7 @@ async def async_setup(
     yaml_config: ConfigType = config.get(DOMAIN, {})
     if yaml_config or YAML_DATA_KEY not in hass.data:
         hass.data[YAML_DATA_KEY] = yaml_config
+    _check_yaml_notify_deprecated(hass, yaml_config)
 
     has_alarm_panel = CONF_ALARM_PANEL in yaml_config
     existing_entries = hass.config_entries.async_entries(DOMAIN)
@@ -249,6 +275,7 @@ async def async_setup(
             hass.data[YAML_DATA_KEY] = fresh_config[DOMAIN]
         else:
             hass.data[YAML_DATA_KEY] = {}
+        _check_yaml_notify_deprecated(hass, hass.data[YAML_DATA_KEY])
         entries = hass.config_entries.async_entries(DOMAIN)
         for entry in entries:
             await hass.config_entries.async_reload(entry.entry_id)
@@ -479,6 +506,11 @@ def _build_armer_from_entry(
         notify_target=entry.options.get(CONF_NOTIFY_TARGET),
         notify_custom_target=entry.options.get(CONF_NOTIFY_CUSTOM_TARGET),
         notify_deliveries=entry.options.get(CONF_NOTIFY_DELIVERIES),
+        notify_priorities={
+            kind: entry.options[notify_priority_option(kind)]
+            for kind in NOTIFY_PRIORITY_SOURCES
+            if entry.options.get(notify_priority_option(kind))
+        },
         notify_data=entry.options.get(CONF_NOTIFY_DATA, {}),
         rate_limit=_rate_limit_from_options(entry.options),
         calendar_config=calendar_config,
@@ -645,6 +677,7 @@ class AlarmArmer:
         notify_target: ConfigType | None = None,
         notify_custom_target: list[str] | None = None,
         notify_deliveries: list[str] | None = None,
+        notify_priorities: dict[str, str] | None = None,
         notify_profiles: ConfigType | None = None,
         sunrise_earliest: dt.time | None = None,
         sunrise_latest: dt.time | None = None,
@@ -683,6 +716,7 @@ class AlarmArmer:
                 notify_target,
                 notify_custom_target,
                 notify_deliveries,
+                notify_priorities,
             )
         else:
             self.notifier = None

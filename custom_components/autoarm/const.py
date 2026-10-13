@@ -95,11 +95,18 @@ NOTIFY_DEF_SCHEMA = vol.Schema({
 
 
 SUPERNOTIFY_ACTION = "supernotify.notify"
+SUPERNOTIFY_PRIORITIES: list[str] = ["critical", "high", "medium", "low", "minimum"]
+# titles are translated when sent, from the mobile_action selector in strings.json
 SUPERNOTIFY_MOBILE_ACTIONS: list[dict[str, str]] = [
-    {CONF_ACTION: "ALARM_PANEL_DISARM", "title": "Disarm Alarm Panel", "icon": "sfsymbols:bell.slash"},
-    {CONF_ACTION: "ALARM_PANEL_RESET", "title": "Reset Alarm Panel", "icon": "sfsymbols:bell"},
-    {CONF_ACTION: "ALARM_PANEL_AWAY", "title": "Arm Alarm Panel Away", "icon": "sfsymbols:airplane"},
+    {CONF_ACTION: "ALARM_PANEL_DISARM", "icon": "sfsymbols:bell.slash"},
+    {CONF_ACTION: "ALARM_PANEL_RESET", "icon": "sfsymbols:bell"},
+    {CONF_ACTION: "ALARM_PANEL_AWAY", "icon": "sfsymbols:airplane"},
 ]
+# actions that would do nothing with the alarm already in that state
+MOBILE_ACTION_STATES: dict[str, AlarmControlPanelState] = {
+    "ALARM_PANEL_DISARM": AlarmControlPanelState.DISARMED,
+    "ALARM_PANEL_AWAY": AlarmControlPanelState.ARMED_AWAY,
+}
 
 
 def _apply_notify_defaults(config: dict[str, Any]) -> dict[str, Any]:
@@ -246,7 +253,8 @@ CONFIG_SCHEMA = vol.Schema(
             vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
             vol.Optional(CONF_BUTTONS): {vol.In(BUTTON_OPTIONS): BUTTON_SCHEMA},
             vol.Optional(CONF_OCCUPANCY, default={}): OCCUPANCY_SCHEMA,
-            vol.Optional(CONF_NOTIFY, default={}): NOTIFY_SCHEMA,
+            # deprecated, replaced by the Supernotify integration in the options, to be removed with Home Assistant 2027.4
+            vol.Optional(CONF_NOTIFY): NOTIFY_SCHEMA,
             vol.Optional(CONF_RATE_LIMIT, default={}): RATE_LIMIT_SCHEMA,
         })
     },
@@ -332,3 +340,11 @@ class ChangeSource(StrEnum):
     VOICE = auto()
     STARTUP = auto()
     UNKNOWN = auto()
+
+
+# the kinds of change that can each be given their own Supernotify priority in the options
+NOTIFY_PRIORITY_SOURCES: dict[str, list[ChangeSource]] = {
+    "scheduled": [ChangeSource.TOD, ChangeSource.CALENDAR, ChangeSource.SUNRISE, ChangeSource.SUNSET],
+    "occupancy": [ChangeSource.OCCUPANCY],
+    "manual": [ChangeSource.ALARM_PANEL, ChangeSource.BUTTON, ChangeSource.MOBILE, ChangeSource.VOICE],
+}

@@ -50,9 +50,11 @@ from .const import (
     DOMAIN,
     NO_CAL_EVENT_MODE_AUTO,
     NOTIFY_COMMON,
+    NOTIFY_PRIORITY_SOURCES,
     PUBLIC_ALARM_STATES,
     SUN_TRIGGER_OPTIONS,
     SUPERNOTIFY_ACTION,
+    SUPERNOTIFY_PRIORITIES,
     TRIGGER_AUTO,
 )
 from .crypto import async_encrypt
@@ -74,6 +76,13 @@ CONF_NOTIFY_TARGETS = "notify_targets"
 CONF_NOTIFY_TARGET = "notify_target"
 CONF_NOTIFY_CUSTOM_TARGET = "notify_custom_target"
 CONF_NOTIFY_DELIVERIES = "notify_deliveries"
+
+
+def notify_priority_option(kind: str) -> str:
+    """Option holding the Supernotify priority for a kind of change, as keyed in NOTIFY_PRIORITY_SOURCES"""
+    return f"notify_priority_{kind}"
+
+
 CONF_NOTIFY_DATA = "notify_data"
 CONF_NOTIFY_ENABLED = "notify_enabled"
 # for the dark between bedtime ending and sunrise
@@ -221,6 +230,18 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
             vol.Optional(CONF_NOTIFY_DELIVERIES, default=options.get(CONF_NOTIFY_DELIVERIES, [])): SelectSelector(
                 SelectSelectorConfig(options=await deliveries(hass), multiple=True, custom_value=True)
             ),
+            # left empty for Supernotify's own default priority
+            **{
+                vol.Optional(
+                    notify_priority_option(kind),
+                    description={"suggested_value": options.get(notify_priority_option(kind))},
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=SUPERNOTIFY_PRIORITIES, mode=SelectSelectorMode.DROPDOWN, translation_key="notify_priority"
+                    )
+                )
+                for kind in NOTIFY_PRIORITY_SOURCES
+            },
         }
     else:
         notify_target_fields = {

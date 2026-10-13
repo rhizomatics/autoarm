@@ -76,6 +76,8 @@ async def test_options_offer_supernotify_fields(hass: HomeAssistant, setup_autoa
     assert delivery_selector.config["options"] == ["chime_alert"]
     # one no longer in Supernotify doesn't stop the options being saved
     assert delivery_selector(["gone", "chime_alert"]) == ["gone", "chime_alert"]
+    for kind in ("scheduled", "occupancy", "manual"):
+        assert fields[f"notify_priority_{kind}"].config["options"] == ["critical", "high", "medium", "low", "minimum"]
 
 
 async def test_options_without_supernotify_keep_plain_targets(hass: HomeAssistant, setup_autoarm: MockConfigEntry) -> None:
@@ -83,6 +85,7 @@ async def test_options_without_supernotify_keep_plain_targets(hass: HomeAssistan
 
     assert CONF_NOTIFY_TARGETS in fields
     assert not {CONF_NOTIFY_TARGET, CONF_NOTIFY_CUSTOM_TARGET, CONF_NOTIFY_DELIVERIES} & set(fields)
+    assert not any(str(field).startswith("notify_priority_") for field in fields)
 
 
 async def test_supernotify_given_targets_and_deliveries(hass: HomeAssistant) -> None:

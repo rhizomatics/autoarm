@@ -128,7 +128,26 @@ the **Notification Action** list. New installs have it already selected. It take
 [Mobile Actions](mobile_actions.md) to disarm, reset or arm away from the notification. Leave the targets blank to let Supernotify choose who to notify. With Supernotify installed, the options have its own **Targets**, **Custom targets** and **Deliveries** fields in place of **Notification Targets**, and any targets already there are carried over as custom ones.
 The action chosen here is used for every notification, unless a YAML profile sets its own `service`.
 
+Without Supernotify, only a simple title and message can be sent, to the **Notification Targets**. Priorities, mobile actions, scenarios and a choice of deliveries all need Supernotify.
+
+### Supernotify
+
+With `supernotify.notify` as the **Notification Action**:
+
+- **Priority** can be set separately for three kinds of change, and left empty for Supernotify's own default
+    - **Scheduled changes** - Times of the Day sensor, calendar, sunrise or sunset
+    - **Occupancy changes** - people arriving or leaving
+    - **Manual changes** - alarm panel, button, mobile action or voice
+- **Scenarios** are applied for the new alarm state, named `autoarm-` and the state, such as `autoarm-armed_away` or `autoarm-disarmed`, with `autoarm-armed` added for every armed state
+    - Define any of these as scenarios in Supernotify to tune the deliveries, sounds or wording for that state, the ones not defined there are ignored
+- **Mobile Actions** have their titles in the Home Assistant language, and leave out any that would do nothing, so there's no *Disarm* when the alarm has just been disarmed, nor *Arm Away* when it has just been armed away
+
+A `priority` in **Extra Notification Data** is used in place of these priorities.
+
 ### Advanced Notifications
+
+!!! warning "Deprecated"
+    The YAML `notify` section is deprecated, replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released. Use the priorities in the options, and Supernotify scenarios for the `autoarm-` scenario names, in its place. A repair is raised while it is still in the YAML configuration.
 
 More control over notifications is available using YAML configuration,
 

@@ -121,15 +121,21 @@
                             "notify_target": "Targets",
                             "notify_custom_target": "Custom targets",
                             "notify_deliveries": "Deliveries",
+                            "notify_priority_scheduled": "Priority - scheduled changes",
+                            "notify_priority_occupancy": "Priority - occupancy changes",
+                            "notify_priority_manual": "Priority - manual changes",
                             "notify_data": "Extra Notification Data"
                         },
                         "data_description": {
                             "notify_enabled": "Enable notifications for alarm state changes",
                             "notify_action": "Home Assistant action (service) to use to notify",
-                            "notify_targets": "List of addresses or notify entities to notify, can be left blank for Supernotify",
+                            "notify_targets": "List of addresses or notify entities to notify. Supernotify isn't available, so only a simple title and message can be sent, without priorities, mobile actions, scenarios or a choice of deliveries.",
                             "notify_target": "Who or what to notify, as for any Supernotify notification. Leave empty for Supernotify to choose.",
                             "notify_custom_target": "Targets outside of Home Assistant, such as e-mail addresses or phone numbers.",
                             "notify_deliveries": "Limit notifications to these Supernotify deliveries. Leave empty for Supernotify to choose.",
+                            "notify_priority_scheduled": "Supernotify priority for changes made by a Times of the Day sensor, calendar, sunrise or sunset. Leave empty for Supernotify's default.",
+                            "notify_priority_occupancy": "Supernotify priority for changes made by people arriving or leaving. Leave empty for Supernotify's default.",
+                            "notify_priority_manual": "Supernotify priority for changes made at the alarm panel, or by a button, mobile action or voice. Leave empty for Supernotify's default.",
                             "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
                         }
                     },
@@ -270,15 +276,21 @@
                             "notify_target": "Targets",
                             "notify_custom_target": "Custom targets",
                             "notify_deliveries": "Deliveries",
+                            "notify_priority_scheduled": "Priority - scheduled changes",
+                            "notify_priority_occupancy": "Priority - occupancy changes",
+                            "notify_priority_manual": "Priority - manual changes",
                             "notify_data": "Extra Notification Data"
                         },
                         "data_description": {
                             "notify_enabled": "Enable notifications for alarm state changes",
                             "notify_action": "Home Assistant action (service) to use to notify",
-                            "notify_targets": "List of addresses or notify entities to notify, can be left blank for Supernotify",
+                            "notify_targets": "List of addresses or notify entities to notify. Supernotify isn't available, so only a simple title and message can be sent, without priorities, mobile actions, scenarios or a choice of deliveries.",
                             "notify_target": "Who or what to notify, as for any Supernotify notification. Leave empty for Supernotify to choose.",
                             "notify_custom_target": "Targets outside of Home Assistant, such as e-mail addresses or phone numbers.",
                             "notify_deliveries": "Limit notifications to these Supernotify deliveries. Leave empty for Supernotify to choose.",
+                            "notify_priority_scheduled": "Supernotify priority for changes made by a Times of the Day sensor, calendar, sunrise or sunset. Leave empty for Supernotify's default.",
+                            "notify_priority_occupancy": "Supernotify priority for changes made by people arriving or leaving. Leave empty for Supernotify's default.",
+                            "notify_priority_manual": "Supernotify priority for changes made at the alarm panel, or by a button, mobile action or voice. Leave empty for Supernotify's default.",
                             "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
                         }
                     },
@@ -341,6 +353,22 @@
                 "armed_vacation": "Armed Vacation",
                 "armed_custom_bypass": "Armed Custom Bypass"
             }
+        },
+        "notify_priority": {
+            "options": {
+                "critical": "Critical",
+                "high": "High",
+                "medium": "Medium",
+                "low": "Low",
+                "minimum": "Minimum"
+            }
+        },
+        "mobile_action": {
+            "options": {
+                "alarm_panel_disarm": "Disarm Alarm Panel",
+                "alarm_panel_reset": "Reset Alarm Panel",
+                "alarm_panel_away": "Arm Alarm Panel Away"
+            }
         }
     },
     "services": {
@@ -383,6 +411,10 @@
         "yaml_core_config_deprecated": {
             "title": "YAML core configuration is deprecated",
             "description": "Core AutoArm settings (alarm_panel, occupancy, calendars) have been migrated to the UI config entry. Remove these from your YAML configuration and use the UI to manage them. Advanced settings (transitions, buttons, notify, diurnal, rate_limit) can remain in YAML."
+        },
+        "yaml_notify_deprecated": {
+            "title": "YAML notify configuration is deprecated",
+            "description": "The `notify` section of the Auto Arm YAML configuration has been replaced by deeper Supernotify integration, set up in the Notifications section of the Auto Arm options, and will be removed when Home Assistant 2027.4 is released. Move anything still needed to the options, or to Supernotify scenarios, then remove `notify` from the YAML configuration."
         },
         "panel_code_required": {
             "title": "Alarm panel needs a code",

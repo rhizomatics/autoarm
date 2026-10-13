@@ -22,7 +22,7 @@ Existing YAML-only installations are **automatically migrated** to a config entr
 | `calendar_control.notify_grace_period` | YAML | YAML (unchanged) |
 | `transitions` | YAML | YAML (unchanged) |
 | `buttons` | YAML | UI Options, copied from YAML on first start |
-| `notify` | YAML | Profiles in YAML (unchanged), Service in UI (Options) |
+| `notify` | YAML | UI (Options). Profiles in YAML still work, but are **deprecated** and will be removed when Home Assistant 2027.4 is released |
 | `rate_limit` | YAML | UI Options, copied from YAML on first start |
 | `occupancy.delay_time` | YAML | UI Options, copied from YAML on first start |
 
@@ -44,7 +44,9 @@ After migration, the following YAML keys are read from the config entry and can 
 - `calendar_control.no_event_mode`
 - Calendar `entity_id` values (the entity list is managed in Options)
 
-The `buttons` and `rate_limit` sections, and `occupancy.delay_time`, are copied into the options the first time, and can then be removed. The remaining YAML sections (`transitions`, `notify`, per-calendar `state_patterns` and `poll_interval`, and `calendar_control.notify_grace_period`) should be kept.
+The `buttons` and `rate_limit` sections, and `occupancy.delay_time`, are copied into the options the first time, and can then be removed. The remaining YAML sections (`transitions`, per-calendar `state_patterns` and `poll_interval`, and `calendar_control.notify_grace_period`) should be kept.
+
+The `notify` section is deprecated, replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released. A repair is raised while it is still there. See [Notifications](../index.md#notifications) for the priorities and scenarios that take its place.
 
 ## Coexisting Configurations
 

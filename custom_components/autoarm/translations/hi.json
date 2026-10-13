@@ -121,15 +121,21 @@
                             "notify_target": "लक्ष्य",
                             "notify_custom_target": "कस्टम लक्ष्य",
                             "notify_deliveries": "डिलीवरी",
+                            "notify_priority_scheduled": "प्राथमिकता - निर्धारित बदलाव",
+                            "notify_priority_occupancy": "प्राथमिकता - मौजूदगी के बदलाव",
+                            "notify_priority_manual": "प्राथमिकता - मैन्युअल बदलाव",
                             "notify_data": "अतिरिक्त सूचना डेटा"
                         },
                         "data_description": {
                             "notify_enabled": "अलार्म स्थिति परिवर्तन के लिए सूचनाएं सक्षम करें",
                             "notify_action": "सूचित करने के लिए उपयोग की जाने वाली Home Assistant क्रिया (सेवा)",
-                            "notify_targets": "सूचित करने के लिए पतों या सूचना इकाइयों की सूची; Supernotify के लिए खाली छोड़ा जा सकता है",
+                            "notify_targets": "सूचित करने के लिए पतों या सूचना इकाइयों की सूची। Supernotify उपलब्ध नहीं है, इसलिए केवल एक साधारण शीर्षक और संदेश भेजा जा सकता है, बिना प्राथमिकताओं, मोबाइल एक्शन, परिदृश्यों या डिलीवरी के चुनाव के।",
                             "notify_target": "किसे या किस चीज़ को सूचित करना है, किसी भी Supernotify सूचना की तरह। Supernotify को चुनने देने के लिए खाली छोड़ें।",
                             "notify_custom_target": "Home Assistant के बाहर के लक्ष्य, जैसे ई-मेल पते या फ़ोन नंबर।",
                             "notify_deliveries": "सूचनाओं को इन Supernotify डिलीवरी तक सीमित करें। Supernotify को चुनने देने के लिए खाली छोड़ें।",
+                            "notify_priority_scheduled": "दिन के समय सेंसर, कैलेंडर, सूर्योदय या सूर्यास्त से हुए बदलावों के लिए Supernotify प्राथमिकता। Supernotify के डिफ़ॉल्ट के लिए खाली छोड़ें।",
+                            "notify_priority_occupancy": "लोगों के आने या जाने से हुए बदलावों के लिए Supernotify प्राथमिकता। Supernotify के डिफ़ॉल्ट के लिए खाली छोड़ें।",
+                            "notify_priority_manual": "अलार्म पैनल पर, या बटन, मोबाइल एक्शन या आवाज़ से किए गए बदलावों के लिए Supernotify प्राथमिकता। Supernotify के डिफ़ॉल्ट के लिए खाली छोड़ें।",
                             "notify_data": "सूचना क्रिया को भेजा गया अतिरिक्त डेटा, जैसे मोबाइल ऐप सूचना के लिए क्रियाएं या चैनल। यहां सेट किया गया कोई भी मान YAML सूचना प्रोफ़ाइल में मेल खाती कुंजी द्वारा अधिलेखित कर दिया जाता है।"
                         }
                     },
@@ -270,15 +276,21 @@
                             "notify_target": "लक्ष्य",
                             "notify_custom_target": "कस्टम लक्ष्य",
                             "notify_deliveries": "डिलीवरी",
+                            "notify_priority_scheduled": "प्राथमिकता - निर्धारित बदलाव",
+                            "notify_priority_occupancy": "प्राथमिकता - मौजूदगी के बदलाव",
+                            "notify_priority_manual": "प्राथमिकता - मैन्युअल बदलाव",
                             "notify_data": "अतिरिक्त सूचना डेटा"
                         },
                         "data_description": {
                             "notify_enabled": "अलार्म स्थिति परिवर्तन के लिए सूचनाएं सक्षम करें",
                             "notify_action": "सूचित करने के लिए उपयोग की जाने वाली Home Assistant क्रिया (सेवा)",
-                            "notify_targets": "सूचित करने के लिए पतों या सूचना इकाइयों की सूची; Supernotify के लिए खाली छोड़ा जा सकता है",
+                            "notify_targets": "सूचित करने के लिए पतों या सूचना इकाइयों की सूची। Supernotify उपलब्ध नहीं है, इसलिए केवल एक साधारण शीर्षक और संदेश भेजा जा सकता है, बिना प्राथमिकताओं, मोबाइल एक्शन, परिदृश्यों या डिलीवरी के चुनाव के।",
                             "notify_target": "किसे या किस चीज़ को सूचित करना है, किसी भी Supernotify सूचना की तरह। Supernotify को चुनने देने के लिए खाली छोड़ें।",
                             "notify_custom_target": "Home Assistant के बाहर के लक्ष्य, जैसे ई-मेल पते या फ़ोन नंबर।",
                             "notify_deliveries": "सूचनाओं को इन Supernotify डिलीवरी तक सीमित करें। Supernotify को चुनने देने के लिए खाली छोड़ें।",
+                            "notify_priority_scheduled": "दिन के समय सेंसर, कैलेंडर, सूर्योदय या सूर्यास्त से हुए बदलावों के लिए Supernotify प्राथमिकता। Supernotify के डिफ़ॉल्ट के लिए खाली छोड़ें।",
+                            "notify_priority_occupancy": "लोगों के आने या जाने से हुए बदलावों के लिए Supernotify प्राथमिकता। Supernotify के डिफ़ॉल्ट के लिए खाली छोड़ें।",
+                            "notify_priority_manual": "अलार्म पैनल पर, या बटन, मोबाइल एक्शन या आवाज़ से किए गए बदलावों के लिए Supernotify प्राथमिकता। Supernotify के डिफ़ॉल्ट के लिए खाली छोड़ें।",
                             "notify_data": "सूचना क्रिया को भेजा गया अतिरिक्त डेटा, जैसे मोबाइल ऐप सूचना के लिए क्रियाएं या चैनल। यहां सेट किया गया कोई भी मान YAML सूचना प्रोफ़ाइल में मेल खाती कुंजी द्वारा अधिलेखित कर दिया जाता है।"
                         }
                     },
@@ -341,6 +353,22 @@
                 "armed_vacation": "छुट्टी सशस्त्र",
                 "armed_custom_bypass": "कस्टम सशस्त्र"
             }
+        },
+        "notify_priority": {
+            "options": {
+                "critical": "गंभीर",
+                "high": "उच्च",
+                "medium": "मध्यम",
+                "low": "निम्न",
+                "minimum": "न्यूनतम"
+            }
+        },
+        "mobile_action": {
+            "options": {
+                "alarm_panel_disarm": "अलार्म पैनल निःशस्त्र करें",
+                "alarm_panel_reset": "अलार्म पैनल रीसेट करें",
+                "alarm_panel_away": "अलार्म पैनल दूर सशस्त्र करें"
+            }
         }
     },
     "services": {
@@ -383,6 +411,10 @@
         "yaml_core_config_deprecated": {
             "title": "YAML मुख्य कॉन्फ़िगरेशन अप्रचलित है",
             "description": "मुख्य AutoArm सेटिंग्स (alarm_panel, occupancy, calendars) को UI कॉन्फ़िगरेशन एंट्री में स्थानांतरित कर दिया गया है। इन्हें अपने YAML कॉन्फ़िगरेशन से हटाएं और इन्हें प्रबंधित करने के लिए UI का उपयोग करें। उन्नत सेटिंग्स (transitions, buttons, notify, diurnal, rate_limit) YAML में बनी रह सकती हैं।"
+        },
+        "yaml_notify_deprecated": {
+            "title": "YAML notify कॉन्फ़िगरेशन अप्रचलित है",
+            "description": "Auto Arm YAML कॉन्फ़िगरेशन के `notify` अनुभाग की जगह अब गहरे Supernotify एकीकरण ने ले ली है, जो Auto Arm विकल्पों के सूचनाएँ अनुभाग में सेट होता है, और Home Assistant 2027.4 के जारी होने पर इसे हटा दिया जाएगा। जो कुछ अब भी चाहिए उसे विकल्पों में, या Supernotify परिदृश्यों में ले जाएँ, फिर YAML कॉन्फ़िगरेशन से `notify` हटा दें।"
         },
         "panel_code_required": {
             "title": "अलार्म पैनल को कोड चाहिए",

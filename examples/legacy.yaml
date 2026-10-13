@@ -72,7 +72,8 @@ autoarm:
     max_calls: 5
     period: 60
 
-  # YAML-only: notification configuration
+  # DEPRECATED: replaced by deeper Supernotify integration, set up in the Notifications section of the Options,
+  # and will be removed when Home Assistant 2027.4 is released
   notify:
     common:
       service: notify.supernotify

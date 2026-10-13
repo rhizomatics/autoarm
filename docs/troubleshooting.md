@@ -22,7 +22,7 @@
 
 ## Notifications Not Sending
 
-**Check notify profile configuration**: Notifications require at least one non-common profile to match. The `common` profile only provides base configuration (service, data) that is merged into matched profiles, with default `silent` and `normal` profiles created if no explicit ones given.
+**Check notify profile configuration**: If the deprecated YAML `notify` section is used, notifications require at least one non-common profile to match. The `common` profile only provides base configuration (service, data) that is merged into matched profiles, with default `silent` and `normal` profiles created if no explicit ones given.
 
 **Check the service name**: Ensure the notify service exists. The `notify.` prefix is stripped automatically, so `notify.mobile_app` becomes a call to the `mobile_app` service in the `notify` domain.
 
@@ -32,6 +32,7 @@ Auto Arm uses the Home Assistant repair system to report configuration problems:
 
 - **Invalid Transition Condition**: A transition condition template failed validation. Check the condition syntax in your YAML.
 - **YAML core configuration is deprecated**: Core settings have been migrated to the UI config entry. Remove the migrated keys from YAML (see the [Migration Guide](configuration/migration.md)).
+- **YAML notify configuration is deprecated**: The `notify` section has been replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released. Move what is still needed to the **Notifications** section of the options, or to Supernotify scenarios, and remove it from YAML.
 
 ## Reload After YAML Changes
 

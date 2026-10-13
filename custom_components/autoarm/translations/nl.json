@@ -121,15 +121,21 @@
                             "notify_target": "Doelen",
                             "notify_custom_target": "Aangepaste doelen",
                             "notify_deliveries": "Bezorgingen",
+                            "notify_priority_scheduled": "Prioriteit - geplande wijzigingen",
+                            "notify_priority_occupancy": "Prioriteit - aanwezigheidswijzigingen",
+                            "notify_priority_manual": "Prioriteit - handmatige wijzigingen",
                             "notify_data": "Extra meldingsgegevens"
                         },
                         "data_description": {
                             "notify_enabled": "Meldingen inschakelen bij wijzigingen van de alarmstatus",
                             "notify_action": "Home Assistant-actie (service) om mee te melden",
-                            "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden; kan leeg blijven voor Supernotify",
+                            "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden. Supernotify is niet beschikbaar, dus er kan alleen een eenvoudige titel en melding worden verstuurd, zonder prioriteiten, mobiele acties, scenario's of keuze van bezorgingen.",
                             "notify_target": "Wie of wat een melding krijgt, zoals bij elke Supernotify-melding. Laat leeg om Supernotify te laten kiezen.",
                             "notify_custom_target": "Doelen buiten Home Assistant, zoals e-mailadressen of telefoonnummers.",
                             "notify_deliveries": "Beperk meldingen tot deze Supernotify-bezorgingen. Laat leeg om Supernotify te laten kiezen.",
+                            "notify_priority_scheduled": "Supernotify-prioriteit voor wijzigingen door een Tijden van de dag-sensor, agenda, zonsopkomst of zonsondergang. Laat leeg voor de standaard van Supernotify.",
+                            "notify_priority_occupancy": "Supernotify-prioriteit voor wijzigingen doordat mensen aankomen of vertrekken. Laat leeg voor de standaard van Supernotify.",
+                            "notify_priority_manual": "Supernotify-prioriteit voor wijzigingen op de alarmcentrale, of met een knop, mobiele actie of spraak. Laat leeg voor de standaard van Supernotify.",
                             "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
                         }
                     },
@@ -270,15 +276,21 @@
                             "notify_target": "Doelen",
                             "notify_custom_target": "Aangepaste doelen",
                             "notify_deliveries": "Bezorgingen",
+                            "notify_priority_scheduled": "Prioriteit - geplande wijzigingen",
+                            "notify_priority_occupancy": "Prioriteit - aanwezigheidswijzigingen",
+                            "notify_priority_manual": "Prioriteit - handmatige wijzigingen",
                             "notify_data": "Extra meldingsgegevens"
                         },
                         "data_description": {
                             "notify_enabled": "Meldingen inschakelen bij wijzigingen van de alarmstatus",
                             "notify_action": "Home Assistant-actie (service) om mee te melden",
-                            "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden; kan leeg blijven voor Supernotify",
+                            "notify_targets": "Lijst met adressen of meldingsentiteiten om te melden. Supernotify is niet beschikbaar, dus er kan alleen een eenvoudige titel en melding worden verstuurd, zonder prioriteiten, mobiele acties, scenario's of keuze van bezorgingen.",
                             "notify_target": "Wie of wat een melding krijgt, zoals bij elke Supernotify-melding. Laat leeg om Supernotify te laten kiezen.",
                             "notify_custom_target": "Doelen buiten Home Assistant, zoals e-mailadressen of telefoonnummers.",
                             "notify_deliveries": "Beperk meldingen tot deze Supernotify-bezorgingen. Laat leeg om Supernotify te laten kiezen.",
+                            "notify_priority_scheduled": "Supernotify-prioriteit voor wijzigingen door een Tijden van de dag-sensor, agenda, zonsopkomst of zonsondergang. Laat leeg voor de standaard van Supernotify.",
+                            "notify_priority_occupancy": "Supernotify-prioriteit voor wijzigingen doordat mensen aankomen of vertrekken. Laat leeg voor de standaard van Supernotify.",
+                            "notify_priority_manual": "Supernotify-prioriteit voor wijzigingen op de alarmcentrale, of met een knop, mobiele actie of spraak. Laat leeg voor de standaard van Supernotify.",
                             "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
                         }
                     },
@@ -341,6 +353,22 @@
                 "armed_vacation": "Ingeschakeld vakantie",
                 "armed_custom_bypass": "Ingeschakeld aangepast"
             }
+        },
+        "notify_priority": {
+            "options": {
+                "critical": "Kritiek",
+                "high": "Hoog",
+                "medium": "Gemiddeld",
+                "low": "Laag",
+                "minimum": "Minimaal"
+            }
+        },
+        "mobile_action": {
+            "options": {
+                "alarm_panel_disarm": "Alarmcentrale uitschakelen",
+                "alarm_panel_reset": "Alarmcentrale resetten",
+                "alarm_panel_away": "Alarmcentrale inschakelen afwezig"
+            }
         }
     },
     "services": {
@@ -383,6 +411,10 @@
         "yaml_core_config_deprecated": {
             "title": "YAML-kernconfiguratie is verouderd",
             "description": "De kerninstellingen van AutoArm (alarm_panel, occupancy, calendars) zijn gemigreerd naar de UI-configuratie-item. Verwijder deze uit uw YAML-configuratie en gebruik de UI om ze te beheren. Geavanceerde instellingen (transitions, buttons, notify, diurnal, rate_limit) kunnen in YAML blijven staan."
+        },
+        "yaml_notify_deprecated": {
+            "title": "YAML-configuratie voor notify is verouderd",
+            "description": "De sectie `notify` van de YAML-configuratie van Auto Arm is vervangen door een diepere Supernotify-integratie, ingesteld in de sectie Meldingen van de Auto Arm-opties, en wordt verwijderd wanneer Home Assistant 2027.4 uitkomt. Verplaats wat nog nodig is naar de opties, of naar Supernotify-scenario's, en verwijder daarna `notify` uit de YAML-configuratie."
         },
         "panel_code_required": {
             "title": "Alarmpaneel heeft een code nodig",

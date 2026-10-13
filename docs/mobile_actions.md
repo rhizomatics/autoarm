@@ -38,6 +38,10 @@ actions:
     icon: sfsymbols:bell.slash
 ```
 
-This is a plain data block, not a template or script - it's merged into every notification's `data` as-is. A YAML
-[notify profile](configuration/examples/typical.md) can still override individual keys per state or source if you
-need different actions for different situations.
+This is a plain data block, not a template or script - it's merged into every notification's `data` as-is.
+
+With Supernotify as the notification action, all three actions are added without any of this, with titles in the
+Home Assistant language.
+
+Whichever way they are added, an action that would do nothing is left out of the notification, so `ALARM_PANEL_DISARM`
+isn't offered when the alarm has just been disarmed, nor `ALARM_PANEL_AWAY` when it has just been armed away.

@@ -4,9 +4,11 @@ from unittest.mock import Mock
 import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.core import HomeAssistant, ServiceCall, callback
+from homeassistant.helpers import issue_registry as ir
+from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.autoarm.autoarming import AlarmArmer
+from custom_components.autoarm.autoarming import YAML_NOTIFY_ISSUE, AlarmArmer
 from custom_components.autoarm.config_flow import CONF_NOTIFY_ACTION, CONF_NOTIFY_ENABLED, CONF_USE_ALARM_SERVICE
 from custom_components.autoarm.const import (
     CONF_ALARM_PANEL,
@@ -748,9 +750,14 @@ async def test_notify_supernotify_action_takes_data_at_top_level(hass: HomeAssis
     assert "data" not in data
     assert data["message"] == "Alarm state changed from Disarmed to Armed Away by Calendar"
     assert data["priority"] == "high"
-    assert data["apply_scenarios"] == ["security"]
+    assert data["apply_scenarios"] == ["security", "autoarm-armed_away", "autoarm-armed"]
     assert data["target"] == ["person.jey"]
-    assert data["actions"] == SUPERNOTIFY_MOBILE_ACTIONS
+    # titled from the translations, and nothing offered to arm away when that's just been done
+    assert data["actions"] == [
+        {"title": "Disarm Alarm Panel", "action": "ALARM_PANEL_DISARM", "icon": "sfsymbols:bell.slash"},
+        {"title": "Reset Alarm Panel", "action": "ALARM_PANEL_RESET", "icon": "sfsymbols:bell"},
+    ]
+    assert all("title" not in action for action in SUPERNOTIFY_MOBILE_ACTIONS)
 
 
 async def test_notify_uses_options_action_over_common_default(hass: HomeAssistant) -> None:
@@ -808,3 +815,194 @@ async def test_notify_from_options_without_yaml(hass: HomeAssistant, mock_notify
     await hass.async_block_till_done()
 
     assert len(mock_notify.calls) == 1
+
+
+def _supernotify_calls(hass: HomeAssistant) -> list[dict[str, Any]]:
+    calls: list[dict[str, Any]] = []
+    hass.services.async_register("supernotify", "notify", callback(lambda call: calls.append(dict(call.data))))
+    return calls
+
+
+@pytest.mark.parametrize(
+    ("to_state", "offered"),
+    [
+        (AlarmControlPanelState.DISARMED, ["ALARM_PANEL_RESET", "ALARM_PANEL_AWAY"]),
+        (AlarmControlPanelState.ARMED_AWAY, ["ALARM_PANEL_DISARM", "ALARM_PANEL_RESET"]),
+        (AlarmControlPanelState.ARMED_NIGHT, ["ALARM_PANEL_DISARM", "ALARM_PANEL_RESET", "ALARM_PANEL_AWAY"]),
+        (None, ["ALARM_PANEL_DISARM", "ALARM_PANEL_RESET", "ALARM_PANEL_AWAY"]),
+    ],
+)
+async def test_mobile_actions_for_the_state_already_set_are_left_out(
+    hass: HomeAssistant, to_state: AlarmControlPanelState | None, offered: list[str]
+) -> None:
+    calls = _supernotify_calls(hass)
+    notifier = Notifier({"backstop": {}}, hass, Mock(spec=AppHealthTracker), notify_action="supernotify.notify")
+
+    await notifier.notify(ChangeSource.BUTTON, AlarmControlPanelState.ARMED_HOME, to_state)
+
+    assert [action["action"] for action in calls[0]["actions"]] == offered
+
+
+async def test_mobile_action_titles_translated(hass: HomeAssistant) -> None:
+    hass.config.language = "de"
+    calls = _supernotify_calls(hass)
+    notifier = Notifier({"backstop": {}}, hass, Mock(spec=AppHealthTracker), notify_action="supernotify.notify")
+
+    await notifier.notify(ChangeSource.BUTTON, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_NIGHT)
+
+    assert [action["title"] for action in calls[0]["actions"]] == [
+        "Alarmzentrale unscharf schalten",
+        "Alarmzentrale zurücksetzen",
+        "Alarmzentrale scharf abwesend schalten",
+    ]
+
+
+async def test_mobile_actions_from_extra_data_keep_own_titles_and_are_filtered(hass: HomeAssistant) -> None:
+    calls = _supernotify_calls(hass)
+    actions: list[dict[str, str]] = [
+        {"action": "ALARM_PANEL_DISARM", "title": "Stand down"},
+        {"action": "ALARM_PANEL_AWAY", "title": "Off out"},
+        {"action": "OPEN_GARAGE", "title": "Open the garage"},
+    ]
+    notifier = Notifier(
+        {"backstop": {}},
+        hass,
+        Mock(spec=AppHealthTracker),
+        notify_action="supernotify.notify",
+        notify_data={"actions": actions},
+    )
+
+    await notifier.notify(ChangeSource.BUTTON, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.DISARMED)
+
+    assert calls[0]["actions"] == [
+        {"action": "ALARM_PANEL_AWAY", "title": "Off out"},
+        {"action": "OPEN_GARAGE", "title": "Open the garage"},
+    ]
+    assert len(actions) == 3
+
+
+@pytest.mark.parametrize(
+    ("to_state", "scenarios"),
+    [
+        (AlarmControlPanelState.ARMED_AWAY, ["autoarm-armed_away", "autoarm-armed"]),
+        (AlarmControlPanelState.ARMED_NIGHT, ["autoarm-armed_night", "autoarm-armed"]),
+        (AlarmControlPanelState.DISARMED, ["autoarm-disarmed"]),
+    ],
+)
+async def test_supernotify_given_scenarios_for_alarm_state(
+    hass: HomeAssistant, to_state: AlarmControlPanelState, scenarios: list[str]
+) -> None:
+    calls = _supernotify_calls(hass)
+    notifier = Notifier({"backstop": {}}, hass, Mock(spec=AppHealthTracker), notify_action="supernotify.notify")
+
+    await notifier.notify(ChangeSource.BUTTON, AlarmControlPanelState.ARMED_HOME, to_state)
+
+    assert calls[0]["apply_scenarios"] == scenarios
+
+
+async def test_no_state_scenarios_without_supernotify_or_state(hass: HomeAssistant) -> None:
+    calls = _supernotify_calls(hass)
+    plain_calls: list[dict[str, Any]] = []
+    hass.services.async_register("notify", "test_service", callback(lambda call: plain_calls.append(dict(call.data))))
+
+    notifier = Notifier({"backstop": {}}, hass, Mock(spec=AppHealthTracker), notify_action="supernotify.notify")
+    await notifier.notify(ChangeSource.BUTTON, message="Alarm will be reset")
+    notifier = Notifier(
+        {"backstop": {}},
+        hass,
+        Mock(spec=AppHealthTracker),
+        notify_action="notify.test_service",
+        notify_priorities={"manual": "high"},
+    )
+    await notifier.notify(ChangeSource.BUTTON, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_AWAY)
+
+    assert "apply_scenarios" not in calls[0]
+    assert plain_calls == [
+        {"message": "Alarm state changed from Armed Home to Armed Away by Button", "title": "Alarm now Armed Away"}
+    ]
+
+
+@pytest.mark.parametrize(
+    ("source", "priority"),
+    [
+        (ChangeSource.TOD, "low"),
+        (ChangeSource.CALENDAR, "low"),
+        (ChangeSource.SUNRISE, "low"),
+        (ChangeSource.SUNSET, "low"),
+        (ChangeSource.OCCUPANCY, "medium"),
+        (ChangeSource.ALARM_PANEL, "high"),
+        (ChangeSource.BUTTON, "high"),
+        (ChangeSource.STARTUP, None),
+    ],
+)
+async def test_supernotify_priority_by_kind_of_change(hass: HomeAssistant, source: ChangeSource, priority: str | None) -> None:
+    calls = _supernotify_calls(hass)
+    notifier = Notifier(
+        {"backstop": {}},
+        hass,
+        Mock(spec=AppHealthTracker),
+        notify_action="supernotify.notify",
+        notify_priorities={"scheduled": "low", "occupancy": "medium", "manual": "high"},
+    )
+
+    await notifier.notify(source, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_AWAY)
+
+    assert calls[0].get("priority") == priority
+
+
+async def test_priority_in_extra_data_or_profile_is_kept(hass: HomeAssistant) -> None:
+    calls = _supernotify_calls(hass)
+    notifier = Notifier(
+        {"backstop": {}},
+        hass,
+        Mock(spec=AppHealthTracker),
+        notify_action="supernotify.notify",
+        notify_data={"priority": "critical"},
+        notify_priorities={"manual": "low"},
+    )
+
+    await notifier.notify(ChangeSource.BUTTON, AlarmControlPanelState.ARMED_HOME, AlarmControlPanelState.ARMED_AWAY)
+
+    assert calls[0]["priority"] == "critical"
+
+
+async def test_priorities_from_options(hass: HomeAssistant) -> None:
+    calls = _supernotify_calls(hass)
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={CONF_ALARM_PANEL: TEST_PANEL},
+        options={
+            CONF_NOTIFY_ENABLED: True,
+            CONF_NOTIFY_ACTION: "supernotify.notify",
+            "notify_priority_occupancy": "high",
+        },
+    )
+    entry.add_to_hass(hass)
+    hass.data[YAML_DATA_KEY] = {}
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    calls.clear()
+
+    notifier = entry.runtime_data.notifier
+    assert notifier is not None
+    await notifier.notify(ChangeSource.OCCUPANCY, AlarmControlPanelState.DISARMED, AlarmControlPanelState.ARMED_AWAY)
+    await notifier.notify(ChangeSource.BUTTON, AlarmControlPanelState.ARMED_AWAY, AlarmControlPanelState.DISARMED)
+
+    assert [call.get("priority") for call in calls] == ["high", None]
+
+
+async def test_yaml_notify_section_raises_deprecation_repair(hass: HomeAssistant, caplog: pytest.LogCaptureFixture) -> None:
+    assert await async_setup_component(hass, DOMAIN, {DOMAIN: {"notify": {"quiet": {"data": {"priority": "low"}}}}})
+    await hass.async_block_till_done()
+
+    issue = ir.async_get(hass).async_get_issue(DOMAIN, YAML_NOTIFY_ISSUE)
+    assert issue is not None
+    assert issue.breaks_in_ha_version == "2027.4.0"
+    assert "notify section of the YAML configuration is deprecated" in caplog.text
+
+
+async def test_yaml_without_notify_section_has_no_deprecation_repair(hass: HomeAssistant) -> None:
+    assert await async_setup_component(hass, DOMAIN, {DOMAIN: {"transitions": {}}})
+    await hass.async_block_till_done()
+
+    assert ir.async_get(hass).async_get_issue(DOMAIN, YAML_NOTIFY_ISSUE) is None

@@ -121,15 +121,21 @@
                             "notify_target": "通知先",
                             "notify_custom_target": "カスタム通知先",
                             "notify_deliveries": "配信",
+                            "notify_priority_scheduled": "優先度 - スケジュールによる変更",
+                            "notify_priority_occupancy": "優先度 - 在宅状況による変更",
+                            "notify_priority_manual": "優先度 - 手動の変更",
                             "notify_data": "追加の通知データ"
                         },
                         "data_description": {
                             "notify_enabled": "アラーム状態変化の通知を有効にする",
                             "notify_action": "通知に使用する Home Assistant アクション（サービス）",
-                            "notify_targets": "通知先アドレスまたは notify エンティティのリスト（Supernotify の場合は空白可）",
+                            "notify_targets": "通知先アドレスまたは notify エンティティのリスト。Supernotify が利用できないため、送信できるのは簡単なタイトルとメッセージのみで、優先度、モバイルアクション、シナリオ、配信の選択は使えません。",
                             "notify_target": "通知する相手や対象です。Supernotify の通知と同じように指定します。空欄にすると Supernotify が選びます。",
                             "notify_custom_target": "メールアドレスや電話番号など、Home Assistant の外にある通知先です。",
                             "notify_deliveries": "通知をこれらの Supernotify の配信に限定します。空欄にすると Supernotify が選びます。",
+                            "notify_priority_scheduled": "時間帯センサー、カレンダー、日の出、日の入りによる変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
+                            "notify_priority_occupancy": "人の帰宅や外出による変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
+                            "notify_priority_manual": "アラームパネル、ボタン、モバイルアクション、音声による変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
                             "notify_data": "通知アクションに渡される追加データ。モバイルアプリ通知のアクションやチャンネルなど。ここで設定した値は、YAML通知プロファイル内の一致するキーによって上書きされます。"
                         }
                     },
@@ -270,15 +276,21 @@
                             "notify_target": "通知先",
                             "notify_custom_target": "カスタム通知先",
                             "notify_deliveries": "配信",
+                            "notify_priority_scheduled": "優先度 - スケジュールによる変更",
+                            "notify_priority_occupancy": "優先度 - 在宅状況による変更",
+                            "notify_priority_manual": "優先度 - 手動の変更",
                             "notify_data": "追加の通知データ"
                         },
                         "data_description": {
                             "notify_enabled": "アラーム状態変化の通知を有効にする",
                             "notify_action": "通知に使用する Home Assistant アクション（サービス）",
-                            "notify_targets": "通知先アドレスまたは notify エンティティのリスト（Supernotify の場合は空白可）",
+                            "notify_targets": "通知先アドレスまたは notify エンティティのリスト。Supernotify が利用できないため、送信できるのは簡単なタイトルとメッセージのみで、優先度、モバイルアクション、シナリオ、配信の選択は使えません。",
                             "notify_target": "通知する相手や対象です。Supernotify の通知と同じように指定します。空欄にすると Supernotify が選びます。",
                             "notify_custom_target": "メールアドレスや電話番号など、Home Assistant の外にある通知先です。",
                             "notify_deliveries": "通知をこれらの Supernotify の配信に限定します。空欄にすると Supernotify が選びます。",
+                            "notify_priority_scheduled": "時間帯センサー、カレンダー、日の出、日の入りによる変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
+                            "notify_priority_occupancy": "人の帰宅や外出による変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
+                            "notify_priority_manual": "アラームパネル、ボタン、モバイルアクション、音声による変更の Supernotify 優先度です。空欄にすると Supernotify の既定値になります。",
                             "notify_data": "通知アクションに渡される追加データ。モバイルアプリ通知のアクションやチャンネルなど。ここで設定した値は、YAML通知プロファイル内の一致するキーによって上書きされます。"
                         }
                     },
@@ -341,6 +353,22 @@
                 "armed_vacation": "休暇警戒",
                 "armed_custom_bypass": "カスタム警戒"
             }
+        },
+        "notify_priority": {
+            "options": {
+                "critical": "緊急",
+                "high": "高",
+                "medium": "中",
+                "low": "低",
+                "minimum": "最低"
+            }
+        },
+        "mobile_action": {
+            "options": {
+                "alarm_panel_disarm": "アラームパネルを解除",
+                "alarm_panel_reset": "アラームパネルをリセット",
+                "alarm_panel_away": "アラームパネルを外出警戒に設定"
+            }
         }
     },
     "services": {
@@ -383,6 +411,10 @@
         "yaml_core_config_deprecated": {
             "title": "YAML コア設定は非推奨です",
             "description": "AutoArm のコア設定（alarm_panel、occupancy、calendars）は UI 設定エントリに移行されました。YAML 設定から削除し、UI で管理してください。高度な設定（transitions、buttons、notify、diurnal、rate_limit）は YAML に残すことができます。"
+        },
+        "yaml_notify_deprecated": {
+            "title": "YAML の notify 設定は非推奨です",
+            "description": "Auto Arm の YAML 設定の `notify` セクションは、Auto Arm オプションの通知セクションで設定する、より深い Supernotify 連携に置き換えられ、Home Assistant 2027.4 のリリース時に削除されます。まだ必要なものはオプションまたは Supernotify のシナリオに移し、YAML 設定から `notify` を削除してください。"
         },
         "panel_code_required": {
             "title": "アラームパネルにコードが必要です",

@@ -86,6 +86,13 @@ None of this removes existing functionality, and all of it can be overridden or 
 - With Supernotify installed, the options have **Targets**, to pick people, entities, devices, areas or labels, **Custom targets** for addresses and numbers, and **Deliveries** to limit which Supernotify deliveries are used
   - These replace **Notification Targets**, and targets already set are carried over as custom targets
 - A warning is logged at start up if notifications are enabled using `notify.send_message` with no **Notification Targets**, since nothing can then be sent
+- With Supernotify as the notification action
+  - New **Priority** options for scheduled changes (Times of the Day sensor, calendar, sunrise, sunset), occupancy changes, and manual changes (alarm panel, button, mobile action, voice)
+  - Scenarios are applied for the new alarm state, such as `autoarm-armed_away` or `autoarm-disarmed`, plus `autoarm-armed` for any armed state, for Supernotify scenarios of those names to pick up
+- Mobile action titles are now translated, and actions that would do nothing are left out, such as *Disarm* when already disarmed or *Arm Away* when already armed away
+- The options now say that only a simple message can be sent when Supernotify isn't available
+- The YAML `notify` section is **deprecated**, replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released
+  - It still works until then, with a repair raised as a reminder
 
 ### Calendar Occupancy Override
 - New switch so that someone coming home on the last day of an `armed_away` or `armed_vacation` calendar event ends the event there and then, rather than at its end time

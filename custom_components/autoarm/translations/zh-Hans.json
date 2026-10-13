@@ -121,15 +121,21 @@
                             "notify_target": "通知对象",
                             "notify_custom_target": "自定义通知对象",
                             "notify_deliveries": "投递方式",
+                            "notify_priority_scheduled": "优先级 - 计划的变更",
+                            "notify_priority_occupancy": "优先级 - 在家状态变更",
+                            "notify_priority_manual": "优先级 - 手动变更",
                             "notify_data": "额外通知数据"
                         },
                         "data_description": {
                             "notify_enabled": "在警报状态发生变化时启用通知",
                             "notify_action": "用于发送通知的 Home Assistant 操作（服务）",
-                            "notify_targets": "要通知的地址或通知实体列表；如使用 Supernotify 可留空",
+                            "notify_targets": "要通知的地址或通知实体列表。Supernotify 不可用，因此只能发送简单的标题和消息，无法使用优先级、移动端操作、场景或选择投递方式。",
                             "notify_target": "要通知的人或对象，与任何 Supernotify 通知相同。留空则由 Supernotify 选择。",
                             "notify_custom_target": "Home Assistant 之外的通知对象，例如电子邮件地址或电话号码。",
                             "notify_deliveries": "将通知限制为这些 Supernotify 投递方式。留空则由 Supernotify 选择。",
+                            "notify_priority_scheduled": "由时段传感器、日历、日出或日落引起的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
+                            "notify_priority_occupancy": "由人员到家或离家引起的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
+                            "notify_priority_manual": "在警报面板上，或通过按钮、移动端操作或语音进行的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
                             "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
                         }
                     },
@@ -270,15 +276,21 @@
                             "notify_target": "通知对象",
                             "notify_custom_target": "自定义通知对象",
                             "notify_deliveries": "投递方式",
+                            "notify_priority_scheduled": "优先级 - 计划的变更",
+                            "notify_priority_occupancy": "优先级 - 在家状态变更",
+                            "notify_priority_manual": "优先级 - 手动变更",
                             "notify_data": "额外通知数据"
                         },
                         "data_description": {
                             "notify_enabled": "在警报状态发生变化时启用通知",
                             "notify_action": "用于发送通知的 Home Assistant 操作（服务）",
-                            "notify_targets": "要通知的地址或通知实体列表；如使用 Supernotify 可留空",
+                            "notify_targets": "要通知的地址或通知实体列表。Supernotify 不可用，因此只能发送简单的标题和消息，无法使用优先级、移动端操作、场景或选择投递方式。",
                             "notify_target": "要通知的人或对象，与任何 Supernotify 通知相同。留空则由 Supernotify 选择。",
                             "notify_custom_target": "Home Assistant 之外的通知对象，例如电子邮件地址或电话号码。",
                             "notify_deliveries": "将通知限制为这些 Supernotify 投递方式。留空则由 Supernotify 选择。",
+                            "notify_priority_scheduled": "由时段传感器、日历、日出或日落引起的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
+                            "notify_priority_occupancy": "由人员到家或离家引起的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
+                            "notify_priority_manual": "在警报面板上，或通过按钮、移动端操作或语音进行的变更所用的 Supernotify 优先级。留空则使用 Supernotify 的默认值。",
                             "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
                         }
                     },
@@ -341,6 +353,22 @@
                 "armed_vacation": "度假布防",
                 "armed_custom_bypass": "自定义布防"
             }
+        },
+        "notify_priority": {
+            "options": {
+                "critical": "紧急",
+                "high": "高",
+                "medium": "中",
+                "low": "低",
+                "minimum": "最低"
+            }
+        },
+        "mobile_action": {
+            "options": {
+                "alarm_panel_disarm": "撤防警报面板",
+                "alarm_panel_reset": "重置警报面板",
+                "alarm_panel_away": "警报面板离家布防"
+            }
         }
     },
     "services": {
@@ -383,6 +411,10 @@
         "yaml_core_config_deprecated": {
             "title": "YAML 核心配置已弃用",
             "description": "AutoArm 的核心设置（alarm_panel、occupancy、calendars）已迁移到 UI 配置项。请从您的 YAML 配置中删除这些设置，并使用 UI 进行管理。高级设置（transitions、buttons、notify、diurnal、rate_limit）可以保留在 YAML 中。"
+        },
+        "yaml_notify_deprecated": {
+            "title": "YAML notify 配置已弃用",
+            "description": "Auto Arm YAML 配置中的 `notify` 部分已被更深入的 Supernotify 集成取代，后者在 Auto Arm 选项的通知部分中设置，并将在 Home Assistant 2027.4 发布时移除。请将仍需要的内容移到选项或 Supernotify 场景中，然后从 YAML 配置中删除 `notify`。"
         },
         "panel_code_required": {
             "title": "报警面板需要密码",

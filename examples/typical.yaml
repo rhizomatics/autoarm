@@ -1,5 +1,5 @@
 autoarm:
-  # delay_time is copied into the Options the first time, and set there from then on
+  # MIGRATED delay_time is copied into the Options the first time, and set there from then on
   occupancy:
     delay_time:
       not_home: 180
@@ -40,7 +40,7 @@ autoarm:
           armed_away:
             - Working at Office
 
-  # buttons are copied into the UI options on first start, and can then be removed from here
+  # MIGRATED buttons are copied into the UI options on first start, and can then be removed from here
   buttons:
     reset:
       entity_id: binary_sensor.button_right
@@ -52,12 +52,13 @@ autoarm:
     disarmed:
       entity_id: binary_sensor.button_middle
 
-  # copied into the Options the first time, and set there from then on
+  # MIGRATED copied into the Options the first time, and set there from then on
   rate_limit:
     max_calls: 5
     period: 60
 
-  # YAML-only: notification configuration
+  # DEPRECATED replaced by deeper Supernotify integration, set up in the Notifications section of the Options,
+  # and will be removed when Home Assistant 2027.4 is released
   notify:
     common:
       data:

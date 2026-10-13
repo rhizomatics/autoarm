@@ -2,15 +2,19 @@ import logging
 from typing import Any
 
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
-from homeassistant.const import CONF_SERVICE, CONF_SOURCE, CONF_STATE, CONF_TARGET
+from homeassistant.const import CONF_ACTION, CONF_ACTIONS, CONF_SERVICE, CONF_SOURCE, CONF_STATE, CONF_TARGET
 from homeassistant.core import Context, HomeAssistant
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import translation
 
 from custom_components.autoarm.const import (
     ALARM_STATES,
     CONF_SCENARIO,
     CONF_SUPERNOTIFY,
+    DOMAIN,
+    MOBILE_ACTION_STATES,
     NOTIFY_COMMON,
+    NOTIFY_PRIORITY_SOURCES,
     SUPERNOTIFY_ACTION,
     SUPERNOTIFY_MOBILE_ACTIONS,
     ChangeSource,
@@ -32,6 +36,7 @@ class Notifier:
         notify_target: dict[str, Any] | None = None,
         notify_custom_target: list[str] | None = None,
         notify_deliveries: list[str] | None = None,
+        notify_priorities: dict[str, str] | None = None,
     ) -> None:
         self.notify_profiles: dict[str, dict[str, Any]] = notify_profiles or {}
         self.hass: HomeAssistant = hass
@@ -42,6 +47,8 @@ class Notifier:
         # targets picked from Home Assistant's own entities, devices, areas and labels
         self.notify_target: dict[str, Any] = notify_target or {}
         self.notify_deliveries: list[str] = notify_deliveries or []
+        # Supernotify priority for each kind of change, keyed as NOTIFY_PRIORITY_SOURCES
+        self.notify_priorities: dict[str, str] = notify_priorities or {}
         # extra service data configured via the options UI's ObjectSelector, lowest priority so
         # YAML profile data (common or per-profile) can still override individual keys
         self.notify_data: dict[str, Any] = notify_data or {}
@@ -54,6 +61,22 @@ class Notifier:
             _LOGGER.warning(
                 "AUTOARM No notifications will be sent, as notify.send_message needs Notification Targets, set in the options"
             )
+
+    async def _mobile_actions(
+        self, actions: list[dict[str, Any]], state: AlarmControlPanelState | None
+    ) -> list[dict[str, Any]]:
+        """Leave out actions for the state the alarm is already in, and give Auto Arm's own a translated title"""
+        titles: dict[str, str] = await translation.async_get_translations(
+            self.hass, self.hass.config.language, "selector", [DOMAIN]
+        )
+        selected: list[dict[str, Any]] = []
+        for action in actions:
+            action_key: str = str(action.get(CONF_ACTION))
+            if state is not None and MOBILE_ACTION_STATES.get(action_key) == state:
+                continue
+            title: str | None = titles.get(f"component.{DOMAIN}.selector.mobile_action.options.{action_key.lower()}")
+            selected.append({"title": title, **action} if title else action)
+        return selected
 
     async def notify(
         self,
@@ -121,9 +144,21 @@ class Notifier:
             )
             supernotify_action: bool = notify_action == SUPERNOTIFY_ACTION
             if supernotify_action:
-                data.setdefault("actions", SUPERNOTIFY_MOBILE_ACTIONS)
+                data.setdefault(CONF_ACTIONS, SUPERNOTIFY_MOBILE_ACTIONS)
+                # a priority in a profile or the extra data is kept
+                for kind, priority in self.notify_priorities.items():
+                    if source in NOTIFY_PRIORITY_SOURCES.get(kind, []):
+                        data.setdefault("priority", priority)
+            if isinstance(data.get(CONF_ACTIONS), list):
+                data[CONF_ACTIONS] = await self._mobile_actions(data[CONF_ACTIONS], to_state)
             if (merged_profile.get(CONF_SUPERNOTIFY) or supernotify_action) and merged_profile.get(CONF_SCENARIO):
                 data["apply_scenarios"] = merged_profile.get(CONF_SCENARIO)
+            if supernotify_action and to_state:
+                # for Supernotify scenarios to pick up, it ignores any that aren't configured there
+                state_scenarios: list[str] = [f"{DOMAIN}-{to_state}"]
+                if to_state.startswith("armed_"):
+                    state_scenarios.append(f"{DOMAIN}-armed")
+                data["apply_scenarios"] = [*cv.ensure_list(data.get("apply_scenarios")), *state_scenarios]
 
             # a profile's own targets take over from all of those chosen in the options
             notify_targets: list[str] | None = merged_profile.get(CONF_TARGET, self.notify_targets)
