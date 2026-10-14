@@ -1,1 +1,3 @@
+# Example Configurations
+
 {{ pagetree(siblings) }}
