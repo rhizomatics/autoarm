@@ -52,8 +52,8 @@ The full list of how alarm panel state can be set:
 
 All the state changes are tracked back to Auto Arm as the reason, and where possible back to the original cause.
 
-![State History](assets/images/state_history.png)
-![State History Details](assets/images/state_history_details.png)
+![State History](assets/images/state_history.png){width=400}
+![State History Details](assets/images/state_history_details.png){width=400}
 
 ## Putting into Practice
 
@@ -87,7 +87,7 @@ through the letterbox! ), see [Connect Your Home Security System to Echo Hub](ht
 
 Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agent, which doesn't use AI, matches fixed sentences. Auto Arm adds these sentences, which work by voice or in the chat. Arming, explaining and help are on unless **Arm and explain by voice** is switched off in the **Assist** section of the Auto Arm options. Disarming is off unless **Disarm by voice** is switched on.
 
-![Assist Options](assets/images/config_flow_assist.png)
+![Assist Options](assets/images/config_flow_assist.png){width=500}
 
 | Say                                  | Does                                            |
 |--------------------------------------|-------------------------------------------------|
@@ -124,7 +124,7 @@ Buttons are chosen in the **Buttons** section of the options, with any number fo
 
 A delay in seconds can be set for each, so if for example you have an *away* button next to the front door, you can give yourself a couple of minutes to exit the property before the alarm is set. The delay is zero unless set, other than for `armed_away`, which starts at 120 seconds.
 
-![Buttons Config](assets/images/config_flow_buttons.png)
+![Buttons Config](assets/images/config_flow_buttons.png){width=500}
 
 See also the [Manual MQTT Alarm Control Panel](https://www.home-assistant.io/integrations/manual_mqtt/)
 for another way to integrate physical buttons to control state.
@@ -252,7 +252,7 @@ A sunrise before the earliest time is held back until then, and the latest time 
 
 A change held back like this, or by an occupancy or button delay, is shown as deferred from its source, such as `deferred from sunrise`, in the logbook and the **Last calculation** sensor.
 
-![Diurnal Overrides in Configuration](./assets/images/config_flow_options_diurnal.png)
+![Diurnal Overrides in Configuration](./assets/images/config_flow_options_diurnal.png){width=500}
 
 ## Occupancy Control
 
@@ -271,7 +271,7 @@ One problem with device trackers is that they can be noisy, for example if someo
 
 In this *Advanced Settings* configuration, there will be a three minute wait to make sure the device tracker stable for `home`->`not_home`, and zero delay when arriving home.
 
-![Occupancy Delay Config](assets/images/config_occupancy_delay.png)
+![Occupancy Delay Config](assets/images/config_occupancy_delay.png){width=500}
 
 Occupancy checks can override recurring calendar driven alarm states if desired. In the configuration screen, select the
 alarm states for which the calendar state should be overridden. This means you can have a simple repeating `disarmed`
