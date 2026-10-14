@@ -15,8 +15,7 @@ tags:
 
 Arming has several complementary modes of operation, that can be selected and mixed as you need.
 
-Mobile Actions, Buttons and Alarm Panel changes are classed as **Manual Interventions**, and won't be overridden
-back by Auto Arm unless there's an occupancy change or other manual intervention.
+Mobile Actions, Buttons and Alarm Panel changes are classed as **Manual Interventions**, and won't be overridden back by Auto Arm unless there's an occupancy change or other manual intervention.
 
 ## Context
 
@@ -50,6 +49,11 @@ The full list of how alarm panel state can be set:
 | sunset        | HomeAssistant `sun` integration event                                     |
 | startup       | Alarm changes made as part of Auto Arm startup                            |
 | zombification | Home Assistant alarm panel got itself into a 'zombie' state and was reset |
+
+All the state changes are tracked back to Auto Arm as the reason, and where possible back to the original cause.
+
+![State History](assets/images/state_history.png)
+![State History Details](assets/images/state_history_details.png)
 
 ## Putting into Practice
 
