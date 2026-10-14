@@ -68,13 +68,12 @@ See [Automated Arming](automated_arming.md) for the various mechanisms, options 
 - [Calendar Integration](https://www.home-assistant.io/integrations/calendar/)
 - [Conditions][] - the entire rules engine runs on these
 - [Conversation](https://www.home-assistant.io/integrations/conversation/)
-- [Device Tracker Integration](https://www.home-assistant.io/integrations/device_tracker/) - Used to determine presence for home occupancy
+- [Device Tracker Integration](https://www.home-assistant.io/integrations/device_tracker/) - Used via *Person* integration to determine presence for home occupancy
 - [Notifications](https://www.home-assistant.io/integrations/notify/) - Additional support for [Supernofify](https://supernotify.rhizomatics.org.uk/latest/)
 - [Person Integration][]
-- [Repairs](https://www.home-assistant.io/integrations/repairs/)
-    - Raises repairs for invalid transition configurations
-- [Sun Integration](https://www.home-assistant.io/integrations/sun/)
-- [Times of the Day](https://www.home-assistant.io/integrations/tod/)
+- [Repairs](https://www.home-assistant.io/integrations/repairs/)- Raises repairs for invalid transition configurations
+- [Sun Integration](https://www.home-assistant.io/integrations/sun/) - The main diurnal control, always available
+- [Times of the Day](https://www.home-assistant.io/integrations/tod/) - The easiest way to set bedtime
 - [Tools](https://www.home-assistant.io/docs/tools/dev-tools/)
     - Configurable integration with UI config flow and options
     - Reloadable from the *YAML* tab

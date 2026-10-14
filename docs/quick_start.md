@@ -17,7 +17,7 @@ Auto Arm is set up using the Home Assistant Integrations page, with additional a
 
 1. Go to **Settings** > **Devices & Services** > **Add Integration** and search for **Auto Arm**.
 2. Select your **Alarm Control Panel** entity (any [Alarm Control Panel Integration][Alarm Control Panel Integrations] will work). If you don't have one, see [Create an Alarm Panel](configuration/create_panel.md).
-3. Optionally select a **Bedtime sensor**, **Calendar** and **Person** entities, as used by the [recommended recipe](./configuration/examples/recommended_recipe.md). Everyone known to Home Assistant is selected to start with.
+3. Optionally select a **Bedtime sensor**, **Calendar** and **Person** entities, as used by the [recommended recipe](configuration/examples/recommended_recipe.md). Everyone known to Home Assistant is selected to start with.
 4. Adjust defaults in **Options** at any time (calendar entities, person entities, times of the day sensors, triggers, occupancy defaults, calendar end modes).
 
 ![Configuration Options](./assets/images/config_flow_options.png)
@@ -33,3 +33,5 @@ There's a recommended [recipe](./configuration/examples/recommended_recipe.md) t
 - `ARMED_VACATION` if away on holidays
 
 If that's not quite how you like, its still a good starting place for an easy to configure, zero YAML, low maintenance setup.
+
+[Alarm Control Panel Integrations]: https://www.home-assistant.io/integrations/?search=alarm+control+panel
