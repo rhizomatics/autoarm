@@ -58,7 +58,7 @@ async def test_logbook_shows_autoarm_as_cause(
     assert panel_entry["context_event_type"] == EVENT_TRIGGERED
     assert panel_entry["context_domain"] == DOMAIN
     # the frontend shows only the name as the cause of the panel's change
-    assert panel_entry["context_name"] == "AutoArm (sunset)"
+    assert panel_entry["context_name"] == "Auto Arm (sunset)"
     assert panel_entry["context_source"] == "sunset"
 
 
