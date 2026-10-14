@@ -133,6 +133,9 @@ None of this removes existing functionality, and all of it can be overridden or 
 
 ## 📚 Documentation
   - New [Recommended Recipe](configuration/examples/recommended_recipe.md) for a complete set up that handles day/night, leaving home and extended vacations.
+  - Help and support section extended and re-organized
+  - Configuration section extended and re-organized
+  - Access for agents improved and corrected
 
 ## 📝 Other changes
 - Built and tested against Home Assistant 2026.10.0
