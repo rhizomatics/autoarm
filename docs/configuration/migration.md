@@ -46,7 +46,7 @@ After migration, the following YAML keys are read from the config entry and can 
 
 The `buttons`, `rate_limit` and `calendar_control` sections, and `occupancy.delay_time`, are copied into the options the first time, and can then be removed. Only `transitions` needs to be kept in YAML.
 
-The `notify` section is deprecated, replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released. A repair is raised while it is still there. See [Notifications](../index.md#notifications) for the priorities and scenarios that take its place.
+The `notify` section is deprecated, replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released. A repair is raised while it is still there. See [Notifications](./notifications.md) for the priorities and scenarios that take its place.
 
 ## Coexisting Configurations
 

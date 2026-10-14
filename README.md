@@ -25,6 +25,8 @@ Control Panel Integrations][], with additional support for calendar integration,
 
 Calendar, occupancy, physical buttons, diurnal and bedtime scheduling available with **zero YAML**, support for 11 languages, and everything configured from the Home Assistant settings. Advanced configuration for transition logic, and fine-tuning for notifications and other scheduling, available from optional YAML configuration.
 
+Full documentation is at [autoarm.rhizomatics.org.uk](https://autoarm.rhizomatics.org.uk), and for AI assistants as [llms.txt](https://autoarm.rhizomatics.org.uk/llms.txt) or, all in one, [llms-full.txt](https://autoarm.rhizomatics.org.uk/llms-full.txt).
+
 !!! question inline end "Why use alarm control panels?"
     A (virtual) [Manual Control Panel](https://www.home-assistant.io/integrations/manual/) is useful, even if there is no real alarm system, as a **single central state of the home**, and then use that to drive automations, notifications etc rather than littering notifications with checks for presence, time of day, vacations or similar.
 
@@ -35,132 +37,28 @@ Calendar, occupancy, physical buttons, diurnal and bedtime scheduling available 
 
 ## Setup
 
-Auto Arm is one of the default repositories on [HACS][], so there's no need to register a custom repo.
-
-Notifications will work with any HomeAssistant notification implementation, with additional support for [Supernotify](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
-
-## Configuration
-
-Auto Arm is set up using the Home Assistant Integrations page, with additional advanced configuration available via YAML.
-
-### UI Setup
-
-1. Go to **Settings** > **Devices & Services** > **Add Integration** and search for **Auto Arm**.
-2. Select your **Alarm Control Panel** entity (any [Alarm Control Panel Integration][Alarm Control Panel Integrations] will work). If you don't have one, see [Create an Alarm Panel](configuration/create_panel.md).
-3. Optionally select a **Bedtime sensor**, **Calendar** and **Person** entities, as used by the [recommended recipe](./configuration/examples/recommended_recipe.md). Everyone known to Home Assistant is selected to start with.
-4. Adjust defaults in **Options** at any time (calendar entities, person entities, times of the day sensors, triggers, occupancy defaults, calendar end modes).
-
-![Configuration Options](./assets/images/config_flow_options.png)
-
-### Typical Day / Night
-
-There's a recommended [recipe](./configuration/examples/recommended_recipe.md) to follow for a classic alarm setup:
-
-- `ARMED_NIGHT` at bedtime
-- `DISARMED` during the day
-- `ARMED_HOME` between sunset and bedtime.
-- `ARMED_AWAY` if nobody home
-- `ARMED_VACATION` if away on holidays
-
-If that's not quite how you like, its still a good starting place for an easy to configure, zero YAML, low maintenance setup.
-
-### YAML for Advanced Features
-
-Transition logic, advanced notifications, and per-calendar overrides (state patterns, poll intervals) are configured in YAML. See [Typical Configuration](configuration/examples/typical.md) for a full example.
+The [Quick Start](./quick_start.md) will get you working quickly.
 
 !!! note "Migrating from YAML-only"
     Existing YAML configurations are automatically migrated to a config entry on restart. See [Migration Guide](configuration/migration.md) for details.
 
-## Automated Arming
+## How it Works
 
-See [Automated Arming](automated_arming.md) for the various mechanisms, options and how to configure.
-
-There are 4 main things controlling arming:
+These are the checks and decisions controlling arming:
 
 - **Diurnal**
   - Is it day time or night time?
 - **Occupancy**
-  - Is everybody home? Is this a planned vacation?
+  - Is everybody home?
 - **Bedtime**
-  - Is everyone in bed, asleep or needing peace?
+  - Is it time for bed and people asleep?
+- **Plans**
+  - Is there a vacation in the calendar?
 - **Interventions**
   - Has someone hit a physical 'disarm' button?
-  - Is there a calendar event setting a specific state?
   - Is there a real alarm panel that has changed state?
 
-
-The full list of how alarm panel state can be set:
-
-| Source        | Description                                                               |
-|---------------|---------------------------------------------------------------------------|
-| calendar      | Calendar events (with optional override for selected events by occupancy) |
-| tod           | A Times of the Day sensor turning on or off, such as a daily bedtime      |
-| mobile        | Mobile action                                                             |
-| occupancy     | Occupancy calculation, e.g. automatically switching off `ARMED_AWAY`      |
-| alarm_panel   | Changes made to Alarm Control Panel outside of Auto Arm                   |
-| button        | A physical button push                                                    |
-| action        | A Home Assistant Action call (previously known as 'Service')              |
-| sunrise       | HomeAssistant `sun` integration event                                     |
-| sunset        | HomeAssistant `sun` integration event                                     |
-| startup       | Alarm changes made as part of Auto Arm startup                            |
-| zombification | Home Assistant alarm panel got itself into a 'zombie' state and was reset |
-
-
-## Throttling
-
-To guard against loops, or other reasons why arming might be triggered too often, rate limiting is applied around the arm call, limited to a set number of calls within the past so many seconds. Set with the **Rate limit** fields in the **Advanced - Other** section of the options, and is 5 changes in 60 seconds unless changed.
-
-![Rate Limit Config](./assets/images/config_rate_limit.png)
-
-## Notifications
-
-Notifications is set up via the integration settings.
-
-![Notification Options](./assets/images/config_flow_options_notifications.png)
-
-Two notifications are sent:
-
-- Alarm status has changed, by any means
-- A button has been pressed, and the arm status will be actioned with a few seconds delay
-
-### Basic Notification
-
-If Supernotify is not installed then only the standard Home Assistant [Send Message](https://www.home-assistant.io/actions/notify.send_message/) is supported, which offers only a *message* to a configured *Notify Entity*.
-
-### Supernotify
-
-If [Supernotify](https://supernotify.rhizomatics.org.uk) is installed, its `supernotify.notify` action is offered first in
-the **Notification Action** list, and is preselected on new installs have it already selected.
-
-It offers:
-
-- [Mobile Actions](mobile_actions.md) to disarm, reset or arm away from pop-up actions on the mobile app  notification.
-- Automatic targets  - leave the targets blank to let Supernotify choose who to notify based on its auto-discovery of mobile apps
-- Defined targets - Add targets from a list of Home Assistant notifiable entities, selectors like *area* or *label*, email addresses or other types like `discord` or SMS numbers that Supernotify can be configured for.
-- Voice notifications - using Alexa devices, or the `tts` integration
-- Delivery choice - custom select which deliveries you want, from a list populated automatically from what the local Supernotify can do
-- Automatic selection of Supernotift **scenarios**
-
-#### Priority
-
-- **Priority** can be set separately for three kinds of change
-    - **Scheduled changes** - Times of the Day sensor, calendar, sunrise or sunset, `low` unless changed
-    - **Occupancy changes** - people arriving or leaving, `medium` unless changed
-    - **Manual changes** - alarm panel, button, mobile action or voice, `medium` unless changed
-
-#### Scenarios
-
-**Scenarios** are automatically sent for each notification, which a name based on the new alarm state and an `autoarm-` prefix, such as `autoarm-armed_away` or `autoarm-disarmed`. For convenience, all armed states all supply a `autoarm-armed` scenario.
-
-Define any of these as [Supernotify Scenarios](https://supernotify.rhizomatics.org.uk/latest/configuration/scenarios/) to tune the deliveries, sounds, actions or wording for that state, the ones not defined there are ignored
-
-#### Mobile Actions
-
-**Mobile Actions** have their titles in the Home Assistant language, and leave out any that would do nothing, so there's no *Disarm* when the alarm has just been disarmed, nor *Arm Away* when it has just been armed away
-
-### YAML Notification Configuration
-
-This is a left-over from when everything was in YAML, and is now deprecated. The details are in the [advanced configuration](./advanced_config.md#advanced-notifications).
+See [Automated Arming](automated_arming.md) for the various mechanisms, options and how to configure.
 
 ## Home Assistant Features Supported
 
@@ -168,10 +66,10 @@ This is a left-over from when everything was in YAML, and is now deprecated. The
 - [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/)
 - [Button Integration][]
 - [Calendar Integration](https://www.home-assistant.io/integrations/calendar/)
-- [Conditions][]
+- [Conditions][] - the entire rules engine runs on these
 - [Conversation](https://www.home-assistant.io/integrations/conversation/)
-- [Device Tracker Integration](https://www.home-assistant.io/integrations/device_tracker/)
-- [Notifications](https://www.home-assistant.io/integrations/notify/)
+- [Device Tracker Integration](https://www.home-assistant.io/integrations/device_tracker/) - Used to determine presence for home occupancy
+- [Notifications](https://www.home-assistant.io/integrations/notify/) - Additional support for [Supernofify](https://supernotify.rhizomatics.org.uk/latest/)
 - [Person Integration][]
 - [Repairs](https://www.home-assistant.io/integrations/repairs/)
     - Raises repairs for invalid transition configurations

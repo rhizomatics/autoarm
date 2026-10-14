@@ -3,6 +3,12 @@
 !!! note
     Some advanced options remain YAML only, either because they are infrequently needed, or difficult to fit into a standard Home Assistant configuration screen.
 
+### Throttling
+
+To guard against loops, or other reasons why arming might be triggered too often, rate limiting is applied around the arm call, limited to a set number of calls within the past so many seconds. Set with the **Rate limit** fields in the **Advanced - Other** section of the options, and is 5 changes in 60 seconds unless changed.
+
+![Rate Limit Config](../assets/images/config_rate_limit.png)
+
 ### When an Event Ends
 
 The **Advanced - Calendar** section of the options has separate settings for an **armed** event ending (`armed_home`,
@@ -10,7 +16,7 @@ The **Advanced - Calendar** section of the options has separate settings for an 
 
 | Setting                           | Armed event ends                                                                                                      | Disarmed event ends                   |
 |-----------------------------------|-----------------------------------------------------------------------------------------------------------------------|---------------------------------------|
-| **Auto**, the default             | **By occupancy and sun** if the sunrise or sunset [trigger](automated_arming.md#triggers) is active that day, otherwise **By occupancy** | The same                              |
+| **Auto**, the default             | **By occupancy and sun** if the sunrise or sunset [trigger](../automated_arming.md#triggers) is active that day, otherwise **By occupancy** | The same                              |
 | **By occupancy and sun**          | Worked out from who's home and whether it's day or night, the same as any other reset                                 | The same                              |
 | **By occupancy**                  | Disarms, or arms away if everyone is out                                                                              | Arms home, or away if everyone is out |
 | **Manual**                        | Goes back to the state before the event                                                                               | The same                              |

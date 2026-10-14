@@ -6,11 +6,11 @@ Auto Arm supports only one alarm control panel per installation.
 
 ## YAML for Advanced Features
 
-While core settings (alarm panel, calendars, persons, occupancy defaults) are managed via the UI config flow, advanced features require YAML configuration:
+Everything needed is now migrated into Home Assistant's web based configuration settings. YAML configuration will be
+automatically migrated into the new visual config. Two things that remain YAML only are:
 
-- Transition conditions
-- Notification profiles
-- Per-calendar state pattern overrides and poll intervals
+- Transition conditions (effectively the rules engine)
+- Notification profiles (now deprecated)
 
 ## Calendar Polling
 

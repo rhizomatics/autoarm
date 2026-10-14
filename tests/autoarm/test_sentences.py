@@ -92,6 +92,12 @@ async def test_unknown_command(autoarmer: AlarmArmer) -> None:
     assert "doesn't know" in await async_respond(autoarmer, "dance", Context())
 
 
+async def test_help_points_at_docs(autoarmer: AlarmArmer) -> None:
+    assert (
+        await async_respond(autoarmer, "help", Context()) == "Help on using Auto Arm is at https://autoarm.rhizomatics.org.uk"
+    )
+
+
 async def test_why_before_any_change(hass: HomeAssistant) -> None:
     hass.states.async_set(TEST_PANEL, "disarmed")
     armer = AlarmArmer(hass, TEST_PANEL)

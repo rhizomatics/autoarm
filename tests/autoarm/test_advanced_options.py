@@ -21,6 +21,7 @@ from custom_components.autoarm.const import (
     CONF_RATE_LIMIT,
     CONF_RATE_LIMIT_CALLS,
     CONF_RATE_LIMIT_PERIOD,
+    CONFIG_SCHEMA,
     DOMAIN,
     YAML_DATA_KEY,
 )
@@ -120,3 +121,24 @@ async def test_yaml_not_migrated_over_options(hass: HomeAssistant, mock_notify: 
     # only what isn't already in the options comes over
     assert entry.options[CONF_RATE_LIMIT_SECONDS] == 90
     assert entry.runtime_data.occupied_delay == {}
+
+
+async def test_yaml_defaults_not_migrated(hass: HomeAssistant, mock_notify: Any) -> None:
+    """A YAML config without occupancy or rate limit brings no defaults of its own over to the options"""
+    yaml_config = CONFIG_SCHEMA({DOMAIN: {}})[DOMAIN]
+    assert yaml_config == {}
+
+    entry = await _setup_entry(hass, {}, yaml_config)
+
+    assert CONF_RATE_LIMIT_MAX_CALLS not in entry.options
+    assert CONF_RATE_LIMIT_SECONDS not in entry.options
+    assert entry.runtime_data.rate_limiter.max_calls == 5
+
+
+async def test_yaml_partial_rate_limit_migrated_alone(hass: HomeAssistant, mock_notify: Any) -> None:
+    yaml_config = CONFIG_SCHEMA({DOMAIN: {CONF_RATE_LIMIT: {CONF_RATE_LIMIT_CALLS: 3}}})[DOMAIN]
+
+    entry = await _setup_entry(hass, {}, yaml_config)
+
+    assert entry.options[CONF_RATE_LIMIT_MAX_CALLS] == 3
+    assert CONF_RATE_LIMIT_SECONDS not in entry.options

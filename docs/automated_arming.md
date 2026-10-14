@@ -1,3 +1,16 @@
+---
+title: Automated Arming
+description: The various methods which can drive changes in alarm state
+tags:
+- diurnal
+- calendar
+- tod
+- bedtime
+- occupancy
+- button
+- presence
+- mobile_actions
+---
 # Automated Arming
 
 Arming has several complementary modes of operation, that can be selected and mixed as you need.
@@ -19,6 +32,26 @@ Here is a quick reminder of how Home Assistant intends armed states to be used, 
 | `disarmed`            | The alarm is off. Sensors are not being monitored.   |
 
 (There are also some other ephemeral or problem states needed for dealing with real alarm systems).
+
+## How Alarm Panel State Gets Changed
+
+The full list of how alarm panel state can be set:
+
+| Source        | Description                                                               |
+|---------------|---------------------------------------------------------------------------|
+| calendar      | Calendar events (with optional override for selected events by occupancy) |
+| tod           | A Times of the Day sensor turning on or off, such as a daily bedtime      |
+| mobile        | Mobile action                                                             |
+| occupancy     | Occupancy calculation, e.g. automatically switching off `ARMED_AWAY`      |
+| alarm_panel   | Changes made to Alarm Control Panel outside of Auto Arm                   |
+| button        | A physical button push                                                    |
+| action        | A Home Assistant Action call (previously known as 'Service')              |
+| sunrise       | HomeAssistant `sun` integration event                                     |
+| sunset        | HomeAssistant `sun` integration event                                     |
+| startup       | Alarm changes made as part of Auto Arm startup                            |
+| zombification | Home Assistant alarm panel got itself into a 'zombie' state and was reset |
+
+## Putting into Practice
 
 So a typical day, when the house is occupied, using the [recommended recipe](configuration/examples/recommended_recipe.md) could be:
 
@@ -48,7 +81,9 @@ through the letterbox! ), see [Connect Your Home Security System to Echo Hub](ht
     Limited to English. Feedback, and suggested wording for other languages, is welcome on
     [GitHub issues](https://github.com/rhizomatics/autoarm/issues).
 
-Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agent, which doesn't use AI, matches fixed sentences. Auto Arm adds these sentences, which work by voice or in the chat. Arming and explaining are on unless **Arm and explain by voice** is switched off in the **Assist** section of the Auto Arm options. Disarming is off unless **Disarm by voice** is switched on.
+Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agent, which doesn't use AI, matches fixed sentences. Auto Arm adds these sentences, which work by voice or in the chat. Arming, explaining and help are on unless **Arm and explain by voice** is switched off in the **Assist** section of the Auto Arm options. Disarming is off unless **Disarm by voice** is switched on.
+
+![Assist Options](assets/images/config_flow_assist.png)
 
 | Say                                  | Does                                            |
 |--------------------------------------|-------------------------------------------------|
@@ -58,6 +93,8 @@ Home Assistant's own [Assist](https://www.home-assistant.io/voice_control/) agen
 | "Disarm the alarm"                   | Disarms, only if **Disarm by voice** is on      |
 | "Why is the alarm armed?"            | Says who or what last changed it, when, and why |
 | "What changed the alarm?"            | The same                                        |
+| "How do I get help on Auto Arm?"     | Gives the link to this documentation            |
+| "I need help with Auto Arm"          | The same                                        |
 
 "Alarm", "security system" and "burglar alarm" all work. These sentences take priority over Assist's own alarm sentences, so arming or disarming by voice goes through Auto Arm and counts as a *Manual Intervention*, like a button.
 
@@ -95,7 +132,7 @@ Example Cheap 433Mhz Buttons Using RFLink
 
 ## Mobile Action Control
 
-This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](mobile_actions.md) for more information, and the [Contextual Mobile Actions Recipe](https://supernotify.rhizomatics.org.uk/recipes/contextual_mobile_actions/) for a nice way to do this in [Supernotify](https://supernotify.rhizomatics.org.uk) where only the appropriate actions are shown.
+This works similar to the buttons, except its driven by [Actionable Notifications](https://companion.home-assistant.io/docs/notifications/actionable-notifications/). See [Mobile Actions](configuration/mobile_actions.md) for more information, and the [Contextual Mobile Actions Recipe](https://supernotify.rhizomatics.org.uk/recipes/contextual_mobile_actions/) for a nice way to do this in [Supernotify](https://supernotify.rhizomatics.org.uk) where only the appropriate actions are shown.
 
 These can be added to any notification, so for example noisy PIR alerts can be quickly squelched by disarming the alarm.
 
@@ -139,7 +176,7 @@ While the sensor is on:
 - If everyone is out, the alarm is `armed_away` instead, and goes to the sensor's state when someone comes home, and back to `armed_away` if they all leave again. This applies to the states chosen under **Advanced - Occupancy** in the options, which by default is all but `armed_custom_bypass`.
 - A live calendar event takes priority. The sensor turning on or off during the event changes nothing, and if the sensor is still on when the event ends, the alarm goes to the sensor's state. So there's no need to switch a bedtime sensor off for a vacation that's in the calendar.
 
-When the sensor turns off, becomes unavailable or is removed, the period ends and the [calendar event end settings](advanced_config.md#when-an-event-ends) decide the new state. **Auto** here means **By occupancy**, other than for a [bedtime](#bedtime) sensor, where it's worked out from occupancy and the sun.
+When the sensor turns off, becomes unavailable or is removed, the period ends and the [calendar event end settings](configuration/advanced_config.md#when-an-event-ends) decide the new state. **Auto** here means **By occupancy**, other than for a [bedtime](#bedtime) sensor, where it's worked out from occupancy and the sun.
 
 ### Bedtime
 
@@ -175,7 +212,7 @@ Triggers decide what can start a re-evaluation of the alarm state. They change *
 **Auto** switches the trigger off on any day with a `disarmed`, `armed_home` or `armed_night` [Calendar Control] event starting, ending or running that day, since those events replace day and night arming. Events for other states, such as `armed_away` or `armed_vacation`, leave the trigger on. This suits a calendar that handles particular days, such as a night out or working from home, while sunrise and sunset take over on ordinary
 days.
 
-Every arrival or departure re-evaluates, not just the house becoming occupied or empty, since [Transition Conditions](advanced_config.md#algorithm-conditions) can depend on who in particular is home. When that doesn't change the alarm state, nothing happens.
+Every arrival or departure re-evaluates, not just the house becoming occupied or empty, since [Transition Conditions](configuration/advanced_config.md#algorithm-conditions) can depend on who in particular is home. When that doesn't change the alarm state, nothing happens.
 
 ## Diurnal Control
 
@@ -215,9 +252,6 @@ A change held back like this, or by an occupancy or button delay, is shown as de
 
 ## Occupancy Control
 
-!!! note "Configuration split"
-    Person entities, occupancy `default_state` and the delays after someone arrives or leaves are configured via the Auto Arm **Options** UI.
-
 The people who live at the property can be defined as [Person Integration][] entities [Person Entities]() in the `occupancy` configuration, and used to derive an `occupied` value for [Automated Transitions]. This works best with the Companion App on a mobile phone, although other [Device Tracker Integrations](https://www.home-assistant.io/integrations/?cat=device-tracker)
 can work, such as a home network `device_tracker`.
 
@@ -242,7 +276,7 @@ alarm states for which the calendar state should be overridden. This means you c
 Separately, the **Coming home ends away and vacation events on their last day** switch, in the same
 **Advanced - Occupancy** section, lets an arrival finish an `armed_away` or `armed_vacation` event early.
 It's on by default. When someone comes home on the day the event is due to end, the event ends
-there and then, and the alarm goes to whatever is set for [when an event ends](advanced_config.md#when-an-event-ends), so getting back
+there and then, and the alarm goes to whatever is set for [when an event ends](configuration/advanced_config.md#when-an-event-ends), so getting back
 from a trip a few hours ahead of the calendar doesn't mean walking into an armed house. It applies to one-off as well as recurring events.
 It takes someone actually arriving that day, a change from away to home, so a person who is always shown as home, for example without
 location sharing switched on, doesn't end the event.

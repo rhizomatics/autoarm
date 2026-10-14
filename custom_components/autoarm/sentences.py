@@ -3,7 +3,7 @@
 The built-in agent doesn't use an AI model, it matches fixed sentences, so AutoArm registers a few
 of its own, the same way an automation with a conversation trigger does. These take priority over
 the built-in agent's own alarm sentences, so a change by voice counts as a manual intervention.
-English only for now. Arming and explaining are on by default, disarming is switched on separately in the options,
+English only for now. Arming, explaining and help are on by default, disarming is switched on separately in the options,
 since anyone who can talk to Assist could then disarm the alarm.
 """
 
@@ -28,6 +28,7 @@ _LOGGER = logging.getLogger(__name__)
 
 # hassil sentence templates - (a|b) is a choice, [a] is optional
 ALARM = "[the] (alarm|security system|burglar alarm)"
+AUTOARM = "(auto arm|autoarm)"
 SENTENCES: dict[str, list[str]] = {
     AlarmControlPanelState.ARMED_AWAY: [f"arm {ALARM}", f"arm {ALARM} [in|to] away [mode]", f"set {ALARM} to away [mode]"],
     AlarmControlPanelState.ARMED_HOME: [f"arm {ALARM} [in|to] home [mode]", f"set {ALARM} to home [mode]"],
@@ -42,7 +43,13 @@ SENTENCES: dict[str, list[str]] = {
         f"why (was|has) {ALARM} [been] (armed|disarmed|changed|set)",
         f"(what|who) (armed|disarmed|changed|set) {ALARM}",
     ],
+    "help": [
+        f"how [do i|can i|to] (get help|find help|use) [on|with|for|using] {AUTOARM}",
+        f"i need help [on|with|for|using] {AUTOARM}",
+        f"help [me] [on|with|for|using] {AUTOARM}",
+    ],
 }
+DOCS_URL = "https://autoarm.rhizomatics.org.uk"
 
 SPOKEN_STATES: dict[AlarmControlPanelState, str] = {
     AlarmControlPanelState.ARMED_AWAY: "armed away",
@@ -112,6 +119,8 @@ async def async_respond(armer: AlarmArmer, command: str, context: HAContext) -> 
     """Carry out a command, returning what to say back"""
     if command == "why":
         return explain(armer)
+    if command == "help":
+        return f"Help on using Auto Arm is at {DOCS_URL}"
     state: AlarmControlPanelState | None = alarm_state_as_enum(command)
     if state is None:
         return f"AutoArm doesn't know the command {command}"

@@ -49,8 +49,8 @@ plugins:
         AutoArm is a Home Assistant custom integration that arms and disarms an Alarm Control
         Panel automatically, from who's home, sunrise and sunset, and calendar events, with
         physical buttons, mobile actionable notifications and Assist voice commands for manual
-        changes. Core settings are made in the UI, and advanced ones such as transition
-        conditions, buttons and notification profiles in YAML.
+        changes. Everything is set in the UI, including buttons, other than advanced options such
+        as transition conditions and notification profiles, which are in YAML.
       full_output: llms-full.txt
       sections:
         Start here:
@@ -59,11 +59,9 @@ plugins:
         Configuration:
           # fnmatch's * also matches /, so this picks up configuration/examples/ too
           - configuration/*.md
-        Using AutoArm:
-          - mobile_actions.md: Arming and disarming from mobile actionable notifications
         Help:
-          - troubleshooting.md: Diagnosing arming, calendar and notification problems
-          - known_limitations.md: What AutoArm doesn't do, or does with caveats
+          - help/troubleshooting.md: Diagnosing arming, calendar and notification problems
+          - help/known_limitations.md: What AutoArm doesn't do, or does with caveats
         # changelog, roadmap and developer pages left out - old or planned behaviour an agent would
         # take as current
   - minify:

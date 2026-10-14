@@ -1,10 +1,18 @@
-# Troubleshooting
+---
+tags:
+  - faq
+  - support
+  - help
+title: Frequently Asked Questions
+description: Answers to support queries
+---
+# Frequently Asked Questions
 
-## Alarm State Not Changing
+## Why is Alarm State Not Changing?
 
 **Check the initialized sensor**: Look at `binary_sensor.autoarm_initialized`, on the Auto Arm device in **Settings** > **Devices & Services**. If it's off, there is a configuration issue, and its attributes show which stage of setup failed. `sensor.autoarm_failures` counts setup and runtime errors.
 
-**Check the alarm panel's actions**: Auto Arm arms and disarms using the panel's actions. If the panel needs a code that Auto Arm hasn't been given, a repair is raised, and if the action is rejected, a warning is logged and the panel is left alone. See [Create Panel](configuration/create_panel.md#how-auto-arm-changes-the-panel).
+**Check the alarm panel's actions**: Auto Arm arms and disarms using the panel's actions. If the panel needs a code that Auto Arm hasn't been given, a repair is raised, and if the action is rejected, a warning is logged and the panel is left alone. See [Create Panel](../configuration/create_panel.md#how-auto-arm-changes-the-panel).
 
 **Check the last calculation sensor**: `sensor.autoarm_last_calculation` shows when Auto Arm last worked out the state, with attributes for what it decided and why, such as `reset_decision`.
 
@@ -12,7 +20,7 @@
 
 **Check transition conditions**: Open Settings > System > Repairs to see if any transition conditions have validation errors. Fix the conditions in your YAML configuration and reload.
 
-## Calendar Events Not Detected
+## Why are Calendar Events Not Detected?
 
 **Check poll interval**: Calendar events are detected by polling. If events are very short, increase the poll interval or ensure events span at least 15 minutes.
 
@@ -20,32 +28,8 @@
 
 **Check the last calendar event sensor**: Look at `sensor.autoarm_last_calendar_event`, on the Auto Arm device, for the most recently detected event.
 
-## Notifications Not Sending
+## Why are Notifications Not Sending?
 
 **Check notify profile configuration**: If the deprecated YAML `notify` section is used, notifications require at least one non-common profile to match. The `common` profile only provides base configuration (service, data) that is merged into matched profiles, with default `silent` and `normal` profiles created if no explicit ones given.
 
 **Check the service name**: Ensure the notify service exists. The `notify.` prefix is stripped automatically, so `notify.mobile_app` becomes a call to the `mobile_app` service in the `notify` domain.
-
-## Repair Issues
-
-Auto Arm uses the Home Assistant repair system to report configuration problems:
-
-- **Invalid Transition Condition**: A transition condition template failed validation. Check the condition syntax in your YAML.
-- **YAML core configuration is deprecated**: Core settings have been migrated to the UI config entry. Remove the migrated keys from YAML (see the [Migration Guide](configuration/migration.md)).
-- **YAML notify configuration is deprecated**: The `notify` section has been replaced by deeper Supernotify integration in the options, and will be removed when Home Assistant 2027.4 is released. Move what is still needed to the **Notifications** section of the options, or to Supernotify scenarios, and remove it from YAML.
-
-## Reload After YAML Changes
-
-After modifying YAML configuration (transitions, buttons, notify, etc.), call the `autoarm.reload` service or restart Home Assistant for changes to take effect.
-
-## Debug Logging
-
-Enable debug logging for Auto Arm to see detailed operation logs:
-
-```yaml
-logger:
-  logs:
-    custom_components.autoarm: debug
-```
-
-All Auto Arm log messages use the `AUTOARM` prefix for easy filtering.

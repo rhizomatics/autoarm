@@ -211,8 +211,8 @@ CONF_RATE_LIMIT = "rate_limit"
 CONF_RATE_LIMIT_CALLS = "max_calls"
 CONF_RATE_LIMIT_PERIOD = "period"
 RATE_LIMIT_SCHEMA = vol.Schema({
-    vol.Optional(CONF_RATE_LIMIT_PERIOD, default=60): vol.All(cv.time_period, cv.positive_timedelta),
-    vol.Optional(CONF_RATE_LIMIT_CALLS, default=6): cv.positive_int,
+    vol.Optional(CONF_RATE_LIMIT_PERIOD): vol.All(cv.time_period, cv.positive_timedelta),
+    vol.Optional(CONF_RATE_LIMIT_CALLS): cv.positive_int,
 })
 
 CONF_OCCUPANCY = "occupancy"
@@ -220,10 +220,8 @@ CONF_DAY = "day"
 CONF_NIGHT = "night"
 CONF_OCCUPANCY_DEFAULT = "default_state"
 OCCUPANCY_SCHEMA = vol.Schema({
-    vol.Required(CONF_ENTITY_ID, default=[]): vol.All(cv.ensure_list, [cv.entity_id]),
-    vol.Optional(CONF_OCCUPANCY_DEFAULT, default={CONF_DAY: AlarmControlPanelState.ARMED_HOME}): {
-        vol.In([CONF_DAY, CONF_NIGHT]): vol.In(ALARM_STATES)
-    },
+    vol.Optional(CONF_ENTITY_ID): vol.All(cv.ensure_list, [cv.entity_id]),
+    vol.Optional(CONF_OCCUPANCY_DEFAULT): {vol.In([CONF_DAY, CONF_NIGHT]): vol.In(ALARM_STATES)},
     vol.Optional(CONF_DELAY_TIME): {vol.In([STATE_HOME, STATE_NOT_HOME]): vol.All(cv.time_period, cv.positive_timedelta)},
 })
 
@@ -252,10 +250,10 @@ CONFIG_SCHEMA = vol.Schema(
             vol.Optional(CONF_TRANSITIONS): {vol.In(ALARM_STATES): TRANSITION_SCHEMA},
             vol.Optional(CONF_CALENDAR_CONTROL): CALENDAR_CONTROL_SCHEMA,
             vol.Optional(CONF_BUTTONS): {vol.In(BUTTON_OPTIONS): BUTTON_SCHEMA},
-            vol.Optional(CONF_OCCUPANCY, default={}): OCCUPANCY_SCHEMA,
+            vol.Optional(CONF_OCCUPANCY): OCCUPANCY_SCHEMA,
             # deprecated, replaced by the Supernotify integration in the options, to be removed with Home Assistant 2027.4
             vol.Optional(CONF_NOTIFY): NOTIFY_SCHEMA,
-            vol.Optional(CONF_RATE_LIMIT, default={}): RATE_LIMIT_SCHEMA,
+            vol.Optional(CONF_RATE_LIMIT): RATE_LIMIT_SCHEMA,
         })
     },
     extra=vol.ALLOW_EXTRA,  # validation fails without this by trying to include all of HASS config

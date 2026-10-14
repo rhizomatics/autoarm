@@ -77,4 +77,4 @@ Here's how that might look as match rules:
 While a calendar could have events covering every minute of every day, its much less work to only define what is needed, such as what's the right time to arm at night, or when vacations start and end.
 
 What happens when an event ends, and there's no other event live, is set in the **Advanced - Calendar** section of
-the Auto Arm **Options**, separately for armed and disarmed events. See [When an Event Ends](../advanced_config.md#when-an-event-ends) for the choices.
+the Auto Arm **Options**, separately for armed and disarmed events. See [When an Event Ends](./advanced_config.md#when-an-event-ends) for the choices.
