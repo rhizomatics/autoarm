@@ -140,6 +140,7 @@ None of this removes existing functionality, and all of it can be overridden or 
 ## 📝 Other changes
 - Built and tested against Home Assistant 2026.10.0
 - Context for the *Logbook* and *Activity* views in Home Assistant improved
+- `strings.json` removed from build in line with [Home Assistant standards](https://developers.home-assistant.io/docs/internationalization/custom_integration)
 - Compatibility added for the Voluptuous->Probatio change in recent versions of Home Assistant while maintaining backward compatibility
 
 # 1.4.0
