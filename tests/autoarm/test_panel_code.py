@@ -2,6 +2,7 @@ import logging
 from typing import Any
 
 import pytest
+import voluptuous as vol
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import entity_registry as er
@@ -30,8 +31,8 @@ def _panel_actions(hass: HomeAssistant) -> list[ServiceCall]:
     return calls
 
 
-async def _save_options(hass: HomeAssistant, entry: MockConfigEntry, advanced: dict[str, Any]) -> Any:
-    """Go through the options flow, leaving everything but the advanced section as it is"""
+async def _save_options(hass: HomeAssistant, entry: MockConfigEntry, code_fields: dict[str, Any]) -> Any:
+    """Go through the options flow, leaving everything but the alarm panel code fields as it is"""
     result = await hass.config_entries.options.async_init(entry.entry_id)
     schema = result["data_schema"]
     assert schema is not None
@@ -40,12 +41,14 @@ async def _save_options(hass: HomeAssistant, entry: MockConfigEntry, advanced: d
         {
             CONF_ALARM_PANEL: TEST_PANEL,
             **{str(key): {} for key in schema.schema if str(key).endswith("_options")},
-            "advanced_options": advanced,
+            **code_fields,
         },
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
     await hass.async_block_till_done()
-    return schema.schema["advanced_options"].schema
+    return vol.Schema({
+        key: value for key, value in schema.schema.items() if str(key) in (CONF_PANEL_CODE, CONF_PANEL_CODE_CLEAR)
+    })
 
 
 async def test_code_round_trip(hass: HomeAssistant) -> None:

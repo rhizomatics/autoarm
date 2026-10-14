@@ -77,7 +77,7 @@ async def async_setup_entry(
 
 
 class AutoArmSensor(AutoArmEntity, SensorEntity):
-    entity_description: AutoArmSensorEntityDescription
+    entity_description: AutoArmSensorEntityDescription  # ty: ignore[invalid-mutable-override]
 
     def __init__(self, armer: AlarmArmer, entry: AutoArmConfigEntry, description: AutoArmSensorEntityDescription) -> None:
         super().__init__(armer, entry, Platform.SENSOR, description)

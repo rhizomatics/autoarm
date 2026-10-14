@@ -32,53 +32,26 @@
                     "alarm_panel": "Te beheren alarmcentrale",
                     "time_of_day_armed_night": "Bedtijd - Tijdstip-van-de-dag-sensor",
                     "calendar_entities": "Bezetting - Agenda's",
-                    "person_entities": "Aanwezigheid - Personen voor aanwezigheid-gebaseerd inschakelen"
+                    "person_entities": "Aanwezigheid - Personen voor aanwezigheid-gebaseerd inschakelen",
+                    "panel_code": "Code van het alarmpaneel"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht. Nog geen bedtijdsensor? [Maak er een]({bedtime_help_url}), of ga naar Instellingen → Apparaten en diensten → Hulpmiddelen → **+ Hulpmiddel aanmaken** → **Tijdstip van de dag**. Geef hem een naam en stel een Na/Voor-tijd in voor uw gebruikelijke bedtijd.",
                     "alarm_panel": "Nog geen alarmpaneel? [Maak een virtueel paneel]({alarm_panel_help_url}), of ga in Home Assistant naar Instellingen → Apparaten en diensten → Hulpmiddelen → **+ Hulpmiddel aanmaken** → Sjabloon → **Alarmcentrale**. Geef het een naam en bevestig; alle andere velden zijn optioneel.",
                     "calendar_entities": "Agenda's zijn nodig voor de status Ingeschakeld vakantie, of als aanwezigheid niet beschikbaar of onbetrouwbaar is om de bezetting te bepalen. Agenda's kunnen ook elke ingeschakelde status instellen, en zo andere regelingen op basis van zon, bedtijd of bezetting overschrijven. Nog geen agenda? [Maak een lokale agenda]({calendar_help_url}), of ga naar Instellingen → Apparaten en diensten → **+ Integratie toevoegen** → **Lokale agenda**. Geef hem een naam en laat 'Lege agenda aanmaken' geselecteerd.",
-                    "person_entities": "Of al deze personen wel of niet thuis zijn bepaalt de statussen Ingeschakeld afwezig, Ingeschakeld thuis en Uitgeschakeld. Mist er iemand? [Voeg een nieuwe persoon toe]({person_help_url}), of ga naar Instellingen → Personen → **+ Persoon toevoegen**. Geef diegene een naam; koppelen aan een gebruikersaccount is optioneel."
+                    "person_entities": "Of al deze personen wel of niet thuis zijn bepaalt de statussen Ingeschakeld afwezig, Ingeschakeld thuis en Uitgeschakeld. Mist er iemand? [Voeg een nieuwe persoon toe]({person_help_url}), of ga naar Instellingen → Personen → **+ Persoon toevoegen**. Geef diegene een naam; koppelen aan een gebruikersaccount is optioneel.",
+                    "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden."
                 },
                 "sections": {
-                    "presence_options": {
-                        "name": "Aanwezigheid",
+                    "assist_options": {
+                        "name": "Spraakassistent",
                         "data": {
-                            "occupied_trigger": "Iemand komt thuis",
-                            "unoccupied_trigger": "Iemand vertrekt",
-                            "calendar_occupancy_override_states": "Alarmstatussen uit de agenda die aanwezigheid mag overschrijven",
-                            "calendar_occupancy_ends_away": "Thuiskomen beëindigt afwezigheids- en vakantie-items op hun laatste dag"
+                            "sentence_arm": "Inschakelen en uitleggen met spraak",
+                            "sentence_disarm": "Uitschakelen met spraak"
                         },
                         "data_description": {
-                            "occupied_trigger": "Alarmstatus herbeoordelen wanneer iemand thuiskomt",
-                            "unoccupied_trigger": "Alarmstatus herbeoordelen wanneer iemand vertrekt",
-                            "calendar_occupancy_override_states": "Wanneer een agenda-item een van deze statussen instelt, kunnen aanwezigheidswijzigingen (aankomsten en vertrekken) de alarmstatus nog steeds bijwerken. Als de agenda bijvoorbeeld Uitgeschakeld aangeeft maar iedereen vertrekt, schakelt het over naar Ingeschakeld Afwezig.",
-                            "calendar_occupancy_ends_away": "Wanneer iemand thuiskomt op de dag dat een agenda-item voor Ingeschakeld afwezig of Ingeschakeld vakantie afloopt, eindigt het item op dat moment in plaats van op de eindtijd, en gaat het alarm naar de status die is ingesteld voor het einde van een agenda-item. Geldt voor eenmalige en voor terugkerende items."
-                        }
-                    },
-                    "sun_options": {
-                        "name": "Dag en nacht - Zon",
-                        "description": "De ochtend is zonsopgang, en de avond zonsondergang, elk binnen zijn vroegste en laatste tijdstip gehouden. De triggers bepalen de alarmstatus opnieuw in de ochtend en de avond, en worden tijdens bedtijd genegeerd. Automatisch schakelt een trigger uit op dagen met een agenda-item voor Uitgeschakeld, Ingeschakeld thuis of Ingeschakeld nacht. De vroegste en laatste tijdstippen zijn vooral nuttig als er geen tijdstip-van-de-dag-sensor of agenda voor bedtijd wordt gebruikt.",
-                        "data": {
-                            "occupancy_default_day": "Status bij aanwezigheid tussen ochtend en avond",
-                            "occupancy_default_after_bedtime": "Status bij aanwezigheid tussen bedtijd en ochtend",
-                            "occupancy_default_night": "Status bij aanwezigheid tussen avond en bedtijd",
-                            "sunrise_trigger": "Ochtend - trigger",
-                            "sunrise_earliest": "Ochtend - Vroegst",
-                            "sunrise_latest": "Ochtend - Laatst",
-                            "sunset_trigger": "Avond - trigger",
-                            "sunset_earliest": "Avond - Vroegst",
-                            "sunset_latest": "Avond - Laatst"
-                        },
-                        "data_description": {
-                            "occupancy_default_after_bedtime": "Voor als bedtijd vóór de ochtend eindigt. Heeft geen nut zonder bedtijdsensor.",
-                            "occupancy_default_night": "Stel dit in op Ingeschakeld thuis als standaard vóór bedtijd als een tijdstip-van-de-dag-sensor of agenda Ingeschakeld nacht instelt voor bedtijd, zoals in het [aanbevolen recept]({recipe_url}). Als die dag niets Ingeschakeld nacht instelt voor bedtijd, geen bedtijdsensor en geen agenda-item, is het vanaf de avond Ingeschakeld nacht.",
-                            "sunrise_trigger": "De alarmstatus opnieuw bepalen in de ochtend",
-                            "sunrise_earliest": "De ochtend is niet eerder dan dit tijdstip, hoe vroeg de zon ook opkomt",
-                            "sunrise_latest": "De ochtend is niet later dan dit tijdstip, hoe laat de zon ook opkomt",
-                            "sunset_trigger": "De alarmstatus opnieuw bepalen in de avond",
-                            "sunset_earliest": "De avond is niet eerder dan dit tijdstip, hoe vroeg de zon ook ondergaat",
-                            "sunset_latest": "De avond is niet later dan dit tijdstip, hoe laat de zon ook ondergaat"
+                            "sentence_arm": "Engelse zinnen voor de ingebouwde Assist-agent van Home Assistant, zoals 'arm the alarm', 'arm the alarm in night mode' en 'why is the alarm armed'.",
+                            "sentence_disarm": "Voegt 'disarm the alarm' toe. Waarschuwing: er wordt geen code gevraagd, dus iedereen die met Assist kan praten, via een spraaksatelliet of in de chat, kan het alarm uitschakelen."
                         }
                     },
                     "button_options": {
@@ -99,17 +72,6 @@
                             "button_armed_vacation_delay": "Ingeschakeld vakantie - vertraging",
                             "button_armed_custom_bypass": "Ingeschakeld aangepast",
                             "button_armed_custom_bypass_delay": "Ingeschakeld aangepast - vertraging"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Spraakassistent",
-                        "data": {
-                            "sentence_arm": "Inschakelen en uitleggen met spraak",
-                            "sentence_disarm": "Uitschakelen met spraak"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Engelse zinnen voor de ingebouwde Assist-agent van Home Assistant, zoals 'arm the alarm', 'arm the alarm in night mode' en 'why is the alarm armed'.",
-                            "sentence_disarm": "Voegt 'disarm the alarm' toe. Waarschuwing: er wordt geen code gevraagd, dus iedereen die met Assist kan praten, via een spraaksatelliet of in de chat, kan het alarm uitschakelen."
                         }
                     },
                     "notify_options": {
@@ -139,16 +101,6 @@
                             "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Geavanceerd - Tijdstip van de dag",
-                        "description": "Tijdstip-van-de-dag-sensoren voor de andere alarmstatussen, die hun status instellen zolang ze aan staan, net als de bedtijdsensor. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-item onder Geavanceerd - Agenda.",
-                        "data": {
-                            "time_of_day_disarmed": "Uitgeschakeld",
-                            "time_of_day_armed_home": "Ingeschakeld thuis",
-                            "time_of_day_armed_away": "Ingeschakeld afwezig",
-                            "time_of_day_armed_custom_bypass": "Ingeschakeld aangepast"
-                        }
-                    },
                     "calendar_options": {
                         "name": "Geavanceerd - Agenda",
                         "description": "Wat er gebeurt wanneer een agenda-item eindigt, en welke items welke alarmstatus instellen. Een agenda zonder overeenkomstregels gebruikt de standaardregels, items met de naam Away, Home, Night, Disarmed, Vacation of Holiday.",
@@ -167,23 +119,71 @@
                             "calendar_notify_grace": "Seconden wachten voordat een agendawijziging wordt gemeld, zodat wijzigingen kort na elkaar, zoals een item dat eindigt terwijl een ander begint, als één melding worden verstuurd."
                         }
                     },
+                    "sun_options": {
+                        "name": "Geavanceerd - Dag en nacht",
+                        "description": "De ochtend is zonsopgang, en de avond zonsondergang, elk binnen zijn vroegste en laatste tijdstip gehouden. De triggers bepalen de alarmstatus opnieuw in de ochtend en de avond, en worden tijdens bedtijd genegeerd. Automatisch schakelt een trigger uit op dagen met een agenda-item voor Uitgeschakeld, Ingeschakeld thuis of Ingeschakeld nacht. De vroegste en laatste tijdstippen zijn vooral nuttig als er geen tijdstip-van-de-dag-sensor of agenda voor bedtijd wordt gebruikt.",
+                        "data": {
+                            "occupancy_default_day": "Status bij aanwezigheid tussen ochtend en avond",
+                            "occupancy_default_after_bedtime": "Status bij aanwezigheid tussen bedtijd en ochtend",
+                            "occupancy_default_night": "Status bij aanwezigheid tussen avond en bedtijd",
+                            "sunrise_trigger": "Ochtend - trigger",
+                            "sunrise_earliest": "Ochtend - Vroegst",
+                            "sunrise_latest": "Ochtend - Laatst",
+                            "sunset_trigger": "Avond - trigger",
+                            "sunset_earliest": "Avond - Vroegst",
+                            "sunset_latest": "Avond - Laatst"
+                        },
+                        "data_description": {
+                            "occupancy_default_after_bedtime": "Voor als bedtijd vóór de ochtend eindigt. Heeft geen nut zonder bedtijdsensor.",
+                            "occupancy_default_night": "Stel dit in op Ingeschakeld thuis als standaard vóór bedtijd als een tijdstip-van-de-dag-sensor of agenda Ingeschakeld nacht instelt voor bedtijd, zoals in het [aanbevolen recept]({recipe_url}). Als die dag niets Ingeschakeld nacht instelt voor bedtijd, geen bedtijdsensor en geen agenda-item, is het vanaf de avond Ingeschakeld nacht.",
+                            "sunrise_trigger": "De alarmstatus opnieuw bepalen in de ochtend",
+                            "sunrise_earliest": "De ochtend is niet eerder dan dit tijdstip, hoe vroeg de zon ook opkomt",
+                            "sunrise_latest": "De ochtend is niet later dan dit tijdstip, hoe laat de zon ook opkomt",
+                            "sunset_trigger": "De alarmstatus opnieuw bepalen in de avond",
+                            "sunset_earliest": "De avond is niet eerder dan dit tijdstip, hoe vroeg de zon ook ondergaat",
+                            "sunset_latest": "De avond is niet later dan dit tijdstip, hoe laat de zon ook ondergaat"
+                        }
+                    },
+                    "presence_options": {
+                        "name": "Geavanceerd - Bezetting",
+                        "data": {
+                            "occupied_trigger": "Iemand komt thuis",
+                            "unoccupied_trigger": "Iemand vertrekt",
+                            "calendar_occupancy_override_states": "Alarmstatussen uit de agenda die aanwezigheid mag overschrijven",
+                            "calendar_occupancy_ends_away": "Thuiskomen beëindigt afwezigheids- en vakantie-items op hun laatste dag",
+                            "occupied_delay": "Vertraging nadat iemand thuiskomt",
+                            "unoccupied_delay": "Vertraging nadat iemand van huis gaat"
+                        },
+                        "data_description": {
+                            "occupied_trigger": "Alarmstatus herbeoordelen wanneer iemand thuiskomt",
+                            "unoccupied_trigger": "Alarmstatus herbeoordelen wanneer iemand vertrekt",
+                            "calendar_occupancy_override_states": "Wanneer een agenda-item een van deze statussen instelt, kunnen aanwezigheidswijzigingen (aankomsten en vertrekken) de alarmstatus nog steeds bijwerken. Als de agenda bijvoorbeeld Uitgeschakeld aangeeft maar iedereen vertrekt, schakelt het over naar Ingeschakeld Afwezig.",
+                            "calendar_occupancy_ends_away": "Wanneer iemand thuiskomt op de dag dat een agenda-item voor Ingeschakeld afwezig of Ingeschakeld vakantie afloopt, eindigt het item op dat moment in plaats van op de eindtijd, en gaat het alarm naar de status die is ingesteld voor het einde van een agenda-item. Geldt voor eenmalige en voor terugkerende items.",
+                            "occupied_delay": "Aantal seconden wachten nadat iemand thuiskomt voordat de alarmstatus wordt bepaald. Een handmatige wijziging in die tijd annuleert dit.",
+                            "unoccupied_delay": "Aantal seconden wachten nadat iemand van huis gaat voordat de alarmstatus wordt bepaald, zodat een korte afwezigheid of een wegvallende tracker het alarm niet inschakelt. Een handmatige wijziging in die tijd annuleert dit."
+                        }
+                    },
                     "advanced_options": {
-                        "name": "Geavanceerd",
+                        "name": "Geavanceerd - Overig",
                         "data": {
                             "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
-                            "panel_code": "Code van het alarmpaneel",
-                            "occupied_delay": "Vertraging nadat iemand thuiskomt",
-                            "unoccupied_delay": "Vertraging nadat iemand van huis gaat",
                             "rate_limit_max_calls": "Snelheidslimiet - maximale wijzigingen",
                             "rate_limit_period": "Snelheidslimiet - periode"
                         },
                         "data_description": {
-                            "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hieronder in.",
-                            "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden.",
-                            "occupied_delay": "Aantal seconden wachten nadat iemand thuiskomt voordat de alarmstatus wordt bepaald. Een handmatige wijziging in die tijd annuleert dit.",
-                            "unoccupied_delay": "Aantal seconden wachten nadat iemand van huis gaat voordat de alarmstatus wordt bepaald, zodat een korte afwezigheid of een wegvallende tracker het alarm niet inschakelt. Een handmatige wijziging in die tijd annuleert dit.",
+                            "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hierboven in.",
                             "rate_limit_max_calls": "Het maximale aantal wijzigingen van de alarmstatus dat Auto Arm binnen de periode van de snelheidslimiet uitvoert, als bescherming tegen lussen. Verdere wijzigingen in die periode worden overgeslagen.",
                             "rate_limit_period": "Lengte van de periode, in seconden, waarover de maximale wijzigingen worden geteld."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Geavanceerd - Tijdstip van de dag",
+                        "description": "Tijdstip-van-de-dag-sensoren voor de andere alarmstatussen, die hun status instellen zolang ze aan staan, net als de bedtijdsensor. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-item onder Geavanceerd - Agenda.",
+                        "data": {
+                            "time_of_day_disarmed": "Uitgeschakeld",
+                            "time_of_day_armed_home": "Ingeschakeld thuis",
+                            "time_of_day_armed_away": "Ingeschakeld afwezig",
+                            "time_of_day_armed_custom_bypass": "Ingeschakeld aangepast"
                         }
                     }
                 }
@@ -205,52 +205,26 @@
                     "alarm_panel": "Te beheren alarmcentrale",
                     "time_of_day_armed_night": "Bedtijd - Tijdstip-van-de-dag-sensor",
                     "calendar_entities": "Bezetting - Agenda's",
-                    "person_entities": "Aanwezigheid - Personen voor aanwezigheid-gebaseerd inschakelen"
+                    "person_entities": "Aanwezigheid - Personen voor aanwezigheid-gebaseerd inschakelen",
+                    "panel_code": "Code van het alarmpaneel",
+                    "panel_code_clear": "Opgeslagen code van het alarmpaneel verwijderen"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht.",
                     "calendar_entities": "Agenda's zijn nodig voor de status Ingeschakeld vakantie, of als aanwezigheid niet beschikbaar of onbetrouwbaar is om de bezetting te bepalen. Agenda's kunnen ook elke ingeschakelde status instellen, en zo andere regelingen op basis van zon, bedtijd of bezetting overschrijven.",
-                    "person_entities": "Of al deze personen wel of niet thuis zijn bepaalt de statussen Ingeschakeld afwezig, Ingeschakeld thuis en Uitgeschakeld."
+                    "person_entities": "Of al deze personen wel of niet thuis zijn bepaalt de statussen Ingeschakeld afwezig, Ingeschakeld thuis en Uitgeschakeld.",
+                    "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden."
                 },
                 "sections": {
-                    "presence_options": {
-                        "name": "Aanwezigheid",
+                    "assist_options": {
+                        "name": "Spraakassistent",
                         "data": {
-                            "occupied_trigger": "Iemand komt thuis",
-                            "unoccupied_trigger": "Iemand vertrekt",
-                            "calendar_occupancy_override_states": "Alarmstatussen uit de agenda die aanwezigheid mag overschrijven",
-                            "calendar_occupancy_ends_away": "Thuiskomen beëindigt afwezigheids- en vakantie-items op hun laatste dag"
+                            "sentence_arm": "Inschakelen en uitleggen met spraak",
+                            "sentence_disarm": "Uitschakelen met spraak"
                         },
                         "data_description": {
-                            "occupied_trigger": "Alarmstatus herbeoordelen wanneer iemand thuiskomt",
-                            "unoccupied_trigger": "Alarmstatus herbeoordelen wanneer iemand vertrekt",
-                            "calendar_occupancy_override_states": "Wanneer een agenda-item een van deze statussen instelt, kunnen aanwezigheidswijzigingen (aankomsten en vertrekken) de alarmstatus nog steeds bijwerken. Als de agenda bijvoorbeeld Uitgeschakeld aangeeft maar iedereen vertrekt, schakelt het over naar Ingeschakeld Afwezig.",
-                            "calendar_occupancy_ends_away": "Wanneer iemand thuiskomt op de dag dat een agenda-item voor Ingeschakeld afwezig of Ingeschakeld vakantie afloopt, eindigt het item op dat moment in plaats van op de eindtijd, en gaat het alarm naar de status die is ingesteld voor het einde van een agenda-item. Geldt voor eenmalige en voor terugkerende items."
-                        }
-                    },
-                    "sun_options": {
-                        "name": "Dag en nacht - Zon",
-                        "description": "De ochtend is zonsopgang, en de avond zonsondergang, elk binnen zijn vroegste en laatste tijdstip gehouden. De triggers bepalen de alarmstatus opnieuw in de ochtend en de avond, en worden tijdens bedtijd genegeerd. Automatisch schakelt een trigger uit op dagen met een agenda-item voor Uitgeschakeld, Ingeschakeld thuis of Ingeschakeld nacht. De vroegste en laatste tijdstippen zijn vooral nuttig als er geen tijdstip-van-de-dag-sensor of agenda voor bedtijd wordt gebruikt.",
-                        "data": {
-                            "occupancy_default_day": "Status bij aanwezigheid tussen ochtend en avond",
-                            "occupancy_default_after_bedtime": "Status bij aanwezigheid tussen bedtijd en ochtend",
-                            "occupancy_default_night": "Status bij aanwezigheid tussen avond en bedtijd",
-                            "sunrise_trigger": "Ochtend - trigger",
-                            "sunrise_earliest": "Ochtend - Vroegst",
-                            "sunrise_latest": "Ochtend - Laatst",
-                            "sunset_trigger": "Avond - trigger",
-                            "sunset_earliest": "Avond - Vroegst",
-                            "sunset_latest": "Avond - Laatst"
-                        },
-                        "data_description": {
-                            "occupancy_default_after_bedtime": "Voor als bedtijd vóór de ochtend eindigt. Heeft geen nut zonder bedtijdsensor.",
-                            "occupancy_default_night": "Stel dit in op Ingeschakeld thuis als standaard vóór bedtijd als een tijdstip-van-de-dag-sensor of agenda Ingeschakeld nacht instelt voor bedtijd, zoals in het [aanbevolen recept]({recipe_url}). Als die dag niets Ingeschakeld nacht instelt voor bedtijd, geen bedtijdsensor en geen agenda-item, is het vanaf de avond Ingeschakeld nacht.",
-                            "sunrise_trigger": "De alarmstatus opnieuw bepalen in de ochtend",
-                            "sunrise_earliest": "De ochtend is niet eerder dan dit tijdstip, hoe vroeg de zon ook opkomt",
-                            "sunrise_latest": "De ochtend is niet later dan dit tijdstip, hoe laat de zon ook opkomt",
-                            "sunset_trigger": "De alarmstatus opnieuw bepalen in de avond",
-                            "sunset_earliest": "De avond is niet eerder dan dit tijdstip, hoe vroeg de zon ook ondergaat",
-                            "sunset_latest": "De avond is niet later dan dit tijdstip, hoe laat de zon ook ondergaat"
+                            "sentence_arm": "Engelse zinnen voor de ingebouwde Assist-agent van Home Assistant, zoals 'arm the alarm', 'arm the alarm in night mode' en 'why is the alarm armed'.",
+                            "sentence_disarm": "Voegt 'disarm the alarm' toe. Waarschuwing: er wordt geen code gevraagd, dus iedereen die met Assist kan praten, via een spraaksatelliet of in de chat, kan het alarm uitschakelen."
                         }
                     },
                     "button_options": {
@@ -271,17 +245,6 @@
                             "button_armed_vacation_delay": "Ingeschakeld vakantie - vertraging",
                             "button_armed_custom_bypass": "Ingeschakeld aangepast",
                             "button_armed_custom_bypass_delay": "Ingeschakeld aangepast - vertraging"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Spraakassistent",
-                        "data": {
-                            "sentence_arm": "Inschakelen en uitleggen met spraak",
-                            "sentence_disarm": "Uitschakelen met spraak"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Engelse zinnen voor de ingebouwde Assist-agent van Home Assistant, zoals 'arm the alarm', 'arm the alarm in night mode' en 'why is the alarm armed'.",
-                            "sentence_disarm": "Voegt 'disarm the alarm' toe. Waarschuwing: er wordt geen code gevraagd, dus iedereen die met Assist kan praten, via een spraaksatelliet of in de chat, kan het alarm uitschakelen."
                         }
                     },
                     "notify_options": {
@@ -311,16 +274,6 @@
                             "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Geavanceerd - Tijdstip van de dag",
-                        "description": "Tijdstip-van-de-dag-sensoren voor de andere alarmstatussen, die hun status instellen zolang ze aan staan, net als de bedtijdsensor. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-item onder Geavanceerd - Agenda.",
-                        "data": {
-                            "time_of_day_disarmed": "Uitgeschakeld",
-                            "time_of_day_armed_home": "Ingeschakeld thuis",
-                            "time_of_day_armed_away": "Ingeschakeld afwezig",
-                            "time_of_day_armed_custom_bypass": "Ingeschakeld aangepast"
-                        }
-                    },
                     "calendar_options": {
                         "name": "Geavanceerd - Agenda",
                         "description": "Wat er gebeurt wanneer een agenda-item eindigt, en welke items welke alarmstatus instellen. Een agenda zonder overeenkomstregels gebruikt de standaardregels, items met de naam Away, Home, Night, Disarmed, Vacation of Holiday.",
@@ -339,24 +292,71 @@
                             "calendar_notify_grace": "Seconden wachten voordat een agendawijziging wordt gemeld, zodat wijzigingen kort na elkaar, zoals een item dat eindigt terwijl een ander begint, als één melding worden verstuurd."
                         }
                     },
+                    "sun_options": {
+                        "name": "Geavanceerd - Dag en nacht",
+                        "description": "De ochtend is zonsopgang, en de avond zonsondergang, elk binnen zijn vroegste en laatste tijdstip gehouden. De triggers bepalen de alarmstatus opnieuw in de ochtend en de avond, en worden tijdens bedtijd genegeerd. Automatisch schakelt een trigger uit op dagen met een agenda-item voor Uitgeschakeld, Ingeschakeld thuis of Ingeschakeld nacht. De vroegste en laatste tijdstippen zijn vooral nuttig als er geen tijdstip-van-de-dag-sensor of agenda voor bedtijd wordt gebruikt.",
+                        "data": {
+                            "occupancy_default_day": "Status bij aanwezigheid tussen ochtend en avond",
+                            "occupancy_default_after_bedtime": "Status bij aanwezigheid tussen bedtijd en ochtend",
+                            "occupancy_default_night": "Status bij aanwezigheid tussen avond en bedtijd",
+                            "sunrise_trigger": "Ochtend - trigger",
+                            "sunrise_earliest": "Ochtend - Vroegst",
+                            "sunrise_latest": "Ochtend - Laatst",
+                            "sunset_trigger": "Avond - trigger",
+                            "sunset_earliest": "Avond - Vroegst",
+                            "sunset_latest": "Avond - Laatst"
+                        },
+                        "data_description": {
+                            "occupancy_default_after_bedtime": "Voor als bedtijd vóór de ochtend eindigt. Heeft geen nut zonder bedtijdsensor.",
+                            "occupancy_default_night": "Stel dit in op Ingeschakeld thuis als standaard vóór bedtijd als een tijdstip-van-de-dag-sensor of agenda Ingeschakeld nacht instelt voor bedtijd, zoals in het [aanbevolen recept]({recipe_url}). Als die dag niets Ingeschakeld nacht instelt voor bedtijd, geen bedtijdsensor en geen agenda-item, is het vanaf de avond Ingeschakeld nacht.",
+                            "sunrise_trigger": "De alarmstatus opnieuw bepalen in de ochtend",
+                            "sunrise_earliest": "De ochtend is niet eerder dan dit tijdstip, hoe vroeg de zon ook opkomt",
+                            "sunrise_latest": "De ochtend is niet later dan dit tijdstip, hoe laat de zon ook opkomt",
+                            "sunset_trigger": "De alarmstatus opnieuw bepalen in de avond",
+                            "sunset_earliest": "De avond is niet eerder dan dit tijdstip, hoe vroeg de zon ook ondergaat",
+                            "sunset_latest": "De avond is niet later dan dit tijdstip, hoe laat de zon ook ondergaat"
+                        }
+                    },
+                    "presence_options": {
+                        "name": "Geavanceerd - Bezetting",
+                        "data": {
+                            "occupied_trigger": "Iemand komt thuis",
+                            "unoccupied_trigger": "Iemand vertrekt",
+                            "calendar_occupancy_override_states": "Alarmstatussen uit de agenda die aanwezigheid mag overschrijven",
+                            "calendar_occupancy_ends_away": "Thuiskomen beëindigt afwezigheids- en vakantie-items op hun laatste dag",
+                            "occupied_delay": "Vertraging nadat iemand thuiskomt",
+                            "unoccupied_delay": "Vertraging nadat iemand van huis gaat"
+                        },
+                        "data_description": {
+                            "occupied_trigger": "Alarmstatus herbeoordelen wanneer iemand thuiskomt",
+                            "unoccupied_trigger": "Alarmstatus herbeoordelen wanneer iemand vertrekt",
+                            "calendar_occupancy_override_states": "Wanneer een agenda-item een van deze statussen instelt, kunnen aanwezigheidswijzigingen (aankomsten en vertrekken) de alarmstatus nog steeds bijwerken. Als de agenda bijvoorbeeld Uitgeschakeld aangeeft maar iedereen vertrekt, schakelt het over naar Ingeschakeld Afwezig.",
+                            "calendar_occupancy_ends_away": "Wanneer iemand thuiskomt op de dag dat een agenda-item voor Ingeschakeld afwezig of Ingeschakeld vakantie afloopt, eindigt het item op dat moment in plaats van op de eindtijd, en gaat het alarm naar de status die is ingesteld voor het einde van een agenda-item. Geldt voor eenmalige en voor terugkerende items.",
+                            "occupied_delay": "Aantal seconden wachten nadat iemand thuiskomt voordat de alarmstatus wordt bepaald. Een handmatige wijziging in die tijd annuleert dit.",
+                            "unoccupied_delay": "Aantal seconden wachten nadat iemand van huis gaat voordat de alarmstatus wordt bepaald, zodat een korte afwezigheid of een wegvallende tracker het alarm niet inschakelt. Een handmatige wijziging in die tijd annuleert dit."
+                        }
+                    },
                     "advanced_options": {
-                        "name": "Geavanceerd",
+                        "name": "Geavanceerd - Overig",
                         "data": {
                             "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
-                            "panel_code": "Code van het alarmpaneel",
-                            "panel_code_clear": "Opgeslagen code van het alarmpaneel verwijderen",
-                            "occupied_delay": "Vertraging nadat iemand thuiskomt",
-                            "unoccupied_delay": "Vertraging nadat iemand van huis gaat",
                             "rate_limit_max_calls": "Snelheidslimiet - maximale wijzigingen",
                             "rate_limit_period": "Snelheidslimiet - periode"
                         },
                         "data_description": {
-                            "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hieronder in.",
-                            "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden.",
-                            "occupied_delay": "Aantal seconden wachten nadat iemand thuiskomt voordat de alarmstatus wordt bepaald. Een handmatige wijziging in die tijd annuleert dit.",
-                            "unoccupied_delay": "Aantal seconden wachten nadat iemand van huis gaat voordat de alarmstatus wordt bepaald, zodat een korte afwezigheid of een wegvallende tracker het alarm niet inschakelt. Een handmatige wijziging in die tijd annuleert dit.",
+                            "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hierboven in.",
                             "rate_limit_max_calls": "Het maximale aantal wijzigingen van de alarmstatus dat Auto Arm binnen de periode van de snelheidslimiet uitvoert, als bescherming tegen lussen. Verdere wijzigingen in die periode worden overgeslagen.",
                             "rate_limit_period": "Lengte van de periode, in seconden, waarover de maximale wijzigingen worden geteld."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Geavanceerd - Tijdstip van de dag",
+                        "description": "Tijdstip-van-de-dag-sensoren voor de andere alarmstatussen, die hun status instellen zolang ze aan staan, net als de bedtijdsensor. Wanneer een sensor uitgaat, gelden de instellingen voor het einde van een agenda-item onder Geavanceerd - Agenda.",
+                        "data": {
+                            "time_of_day_disarmed": "Uitgeschakeld",
+                            "time_of_day_armed_home": "Ingeschakeld thuis",
+                            "time_of_day_armed_away": "Ingeschakeld afwezig",
+                            "time_of_day_armed_custom_bypass": "Ingeschakeld aangepast"
                         }
                     }
                 }

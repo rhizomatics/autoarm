@@ -32,53 +32,26 @@
                     "alarm_panel": "管理するアラームコントロールパネル",
                     "time_of_day_armed_night": "就寝時間 - 時間帯センサー",
                     "calendar_entities": "在室 - カレンダー",
-                    "person_entities": "在宅 - 在室ベースの警戒に使用する人物"
+                    "person_entities": "在宅 - 在室ベースの警戒に使用する人物",
+                    "panel_code": "アラームパネルのコード"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "毎日の就寝時間にオンになる時間帯センサーです。オンの間、アラームは夜間警戒に保たれます。 まだ就寝時間センサーがありませんか? [作成する]({bedtime_help_url})か、設定 → デバイスとサービス → ヘルパー → **+ ヘルパーを作成** → **時間帯** に進んでください。名前を付けて、通常の就寝時間帯のAfter/Beforeを設定してください。",
                     "alarm_panel": "まだアラームパネルがありませんか? [仮想のものを作成]({alarm_panel_help_url})するか、Home Assistant で 設定 → デバイスとサービス → ヘルパー → **+ ヘルパーを作成** → テンプレート → **アラームコントロールパネル** に進んでください。名前を付けて送信してください。他のフィールドはすべて省略可能です。",
                     "calendar_entities": "カレンダーは休暇警戒の状態に必要です。また、在宅情報が利用できない、または在室の判断に信頼できない場合にも必要です。カレンダーは任意の警戒状態を設定できるため、昼夜、就寝時間、在室による他の制御をオーバーライドできます。 まだカレンダーがありませんか? [ローカルカレンダーを作成]({calendar_help_url})するか、設定 → デバイスとサービス → **+ 統合を追加** → **ローカルカレンダー** に進んでください。名前を付けて、「空のカレンダーを作成」を選択したままにしてください。",
-                    "person_entities": "これらの人物が全員在宅かどうかによって、外出警戒、在宅警戒、解除の状態が決まります。 誰か足りませんか? [新しい人物を追加]({person_help_url})するか、設定 → 人物 → **+ 人物を追加** に進んでください。名前を付けてください。ユーザーアカウントとの連携は省略可能です。"
+                    "person_entities": "これらの人物が全員在宅かどうかによって、外出警戒、在宅警戒、解除の状態が決まります。 誰か足りませんか? [新しい人物を追加]({person_help_url})するか、設定 → 人物 → **+ 人物を追加** に進んでください。名前を付けてください。ユーザーアカウントとの連携は省略可能です。",
+                    "panel_code": "パネルがコードを必要とする場合に、警戒・解除時に Auto Arm がアラームパネルのアクションへ渡すコードです。暗号化して保存され、再表示されることはありません。保存済みのコードをそのまま使う場合は空欄にしてください。"
                 },
                 "sections": {
-                    "presence_options": {
-                        "name": "在宅",
+                    "assist_options": {
+                        "name": "音声アシスタント",
                         "data": {
-                            "occupied_trigger": "誰かが帰宅",
-                            "unoccupied_trigger": "誰かが外出",
-                            "calendar_occupancy_override_states": "在宅状況がオーバーライドできるカレンダーによるアラーム状態",
-                            "calendar_occupancy_ends_away": "帰宅すると、外出と休暇のイベントを最終日に終了する"
+                            "sentence_arm": "音声で警戒と理由の説明",
+                            "sentence_disarm": "音声で解除"
                         },
                         "data_description": {
-                            "occupied_trigger": "人が帰宅したときにアラーム状態を再評価する",
-                            "unoccupied_trigger": "人が外出したときにアラーム状態を再評価する",
-                            "calendar_occupancy_override_states": "カレンダーイベントがこれらの状態のいずれかを設定した場合、在室状況の変化（到着・出発）によってアラーム状態を更新できます。例えば、カレンダーが「解除」と設定していても全員が外出した場合、「外出モード」に切り替わります。",
-                            "calendar_occupancy_ends_away": "外出警戒または休暇警戒のカレンダーイベントが終了する予定の日に誰かが帰宅すると、イベントは終了時刻を待たずにその時点で終了し、アラームはカレンダーイベント終了時に設定された状態になります。単発のイベントにも繰り返しイベントにも適用されます。"
-                        }
-                    },
-                    "sun_options": {
-                        "name": "昼夜 - 太陽",
-                        "description": "朝は日の出、夕方は日の入りで、それぞれ最早・最遅の時刻の範囲内に保たれます。トリガーは朝と夕方にアラーム状態を再評価し、就寝時間中は無視されます。自動は、解除、在宅警戒、夜間警戒のカレンダーイベントがある日はトリガーをオフにします。最早・最遅の時刻は、就寝時間に時間帯センサーもカレンダーも使わない場合に最も役立ちます。",
-                        "data": {
-                            "occupancy_default_day": "朝から夕方までの在室時の状態",
-                            "occupancy_default_after_bedtime": "就寝時間から朝までの在室時の状態",
-                            "occupancy_default_night": "夕方から就寝時間までの在室時の状態",
-                            "sunrise_trigger": "朝 - トリガー",
-                            "sunrise_earliest": "朝 - 最早",
-                            "sunrise_latest": "朝 - 最遅",
-                            "sunset_trigger": "夕方 - トリガー",
-                            "sunset_earliest": "夕方 - 最早",
-                            "sunset_latest": "夕方 - 最遅"
-                        },
-                        "data_description": {
-                            "occupancy_default_after_bedtime": "就寝時間が朝より前に終わる場合の状態です。就寝時間センサーがなければ使われません。",
-                            "occupancy_default_night": "[おすすめレシピ]({recipe_url})のように、時間帯センサーまたはカレンダーで就寝時間に夜間警戒を設定している場合は、就寝前のデフォルトとして在宅警戒に設定してください。 その日に就寝時間の夜間警戒を設定するものが、就寝時間センサーにもカレンダーイベントにもない場合は、夕方から夜間警戒になります。",
-                            "sunrise_trigger": "朝にアラーム状態を再評価する",
-                            "sunrise_earliest": "日の出がどれだけ早くても、朝はこの時刻より早くなりません",
-                            "sunrise_latest": "日の出がどれだけ遅くても、朝はこの時刻より遅くなりません",
-                            "sunset_trigger": "夕方にアラーム状態を再評価する",
-                            "sunset_earliest": "日の入りがどれだけ早くても、夕方はこの時刻より早くなりません",
-                            "sunset_latest": "日の入りがどれだけ遅くても、夕方はこの時刻より遅くなりません"
+                            "sentence_arm": "Home Assistant の組み込み Assist エージェント用の英語の文（'arm the alarm'、'arm the alarm in night mode'、'why is the alarm armed' など）。",
+                            "sentence_disarm": "'disarm the alarm' を追加します。警告: コードは求められないため、音声サテライトやチャットで Assist に話しかけられる人は誰でもアラームを解除できます。"
                         }
                     },
                     "button_options": {
@@ -99,17 +72,6 @@
                             "button_armed_vacation_delay": "休暇警戒 - 遅延",
                             "button_armed_custom_bypass": "カスタム警戒",
                             "button_armed_custom_bypass_delay": "カスタム警戒 - 遅延"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "音声アシスタント",
-                        "data": {
-                            "sentence_arm": "音声で警戒と理由の説明",
-                            "sentence_disarm": "音声で解除"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Home Assistant の組み込み Assist エージェント用の英語の文（'arm the alarm'、'arm the alarm in night mode'、'why is the alarm armed' など）。",
-                            "sentence_disarm": "'disarm the alarm' を追加します。警告: コードは求められないため、音声サテライトやチャットで Assist に話しかけられる人は誰でもアラームを解除できます。"
                         }
                     },
                     "notify_options": {
@@ -139,16 +101,6 @@
                             "notify_data": "通知アクションに渡される追加データ。モバイルアプリ通知のアクションやチャンネルなど。ここで設定した値は、YAML通知プロファイル内の一致するキーによって上書きされます。"
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "詳細設定 - 時間帯",
-                        "description": "その他のアラーム状態用の時間帯センサーです。就寝時間センサーと同じように、オンの間その状態を設定します。センサーがオフになると、「詳細設定 - カレンダー」のカレンダーイベント終了時の設定が適用されます。",
-                        "data": {
-                            "time_of_day_disarmed": "解除",
-                            "time_of_day_armed_home": "在宅警戒",
-                            "time_of_day_armed_away": "外出警戒",
-                            "time_of_day_armed_custom_bypass": "カスタム警戒"
-                        }
-                    },
                     "calendar_options": {
                         "name": "詳細設定 - カレンダー",
                         "description": "カレンダーイベントが終了したときの動作と、どのイベントがどのアラーム状態を設定するかを決めます。一致ルールのないカレンダーは既定のルール、つまり Away、Home、Night、Disarmed、Vacation、Holiday という名前のイベントを使います。",
@@ -167,23 +119,71 @@
                             "calendar_notify_grace": "カレンダーによる変更を通知するまで待つ秒数です。あるイベントの終了と同時に別のイベントが始まる場合など、近接した変更を 1 つの通知にまとめます。"
                         }
                     },
+                    "sun_options": {
+                        "name": "詳細設定 - 昼夜",
+                        "description": "朝は日の出、夕方は日の入りで、それぞれ最早・最遅の時刻の範囲内に保たれます。トリガーは朝と夕方にアラーム状態を再評価し、就寝時間中は無視されます。自動は、解除、在宅警戒、夜間警戒のカレンダーイベントがある日はトリガーをオフにします。最早・最遅の時刻は、就寝時間に時間帯センサーもカレンダーも使わない場合に最も役立ちます。",
+                        "data": {
+                            "occupancy_default_day": "朝から夕方までの在室時の状態",
+                            "occupancy_default_after_bedtime": "就寝時間から朝までの在室時の状態",
+                            "occupancy_default_night": "夕方から就寝時間までの在室時の状態",
+                            "sunrise_trigger": "朝 - トリガー",
+                            "sunrise_earliest": "朝 - 最早",
+                            "sunrise_latest": "朝 - 最遅",
+                            "sunset_trigger": "夕方 - トリガー",
+                            "sunset_earliest": "夕方 - 最早",
+                            "sunset_latest": "夕方 - 最遅"
+                        },
+                        "data_description": {
+                            "occupancy_default_after_bedtime": "就寝時間が朝より前に終わる場合の状態です。就寝時間センサーがなければ使われません。",
+                            "occupancy_default_night": "[おすすめレシピ]({recipe_url})のように、時間帯センサーまたはカレンダーで就寝時間に夜間警戒を設定している場合は、就寝前のデフォルトとして在宅警戒に設定してください。 その日に就寝時間の夜間警戒を設定するものが、就寝時間センサーにもカレンダーイベントにもない場合は、夕方から夜間警戒になります。",
+                            "sunrise_trigger": "朝にアラーム状態を再評価する",
+                            "sunrise_earliest": "日の出がどれだけ早くても、朝はこの時刻より早くなりません",
+                            "sunrise_latest": "日の出がどれだけ遅くても、朝はこの時刻より遅くなりません",
+                            "sunset_trigger": "夕方にアラーム状態を再評価する",
+                            "sunset_earliest": "日の入りがどれだけ早くても、夕方はこの時刻より早くなりません",
+                            "sunset_latest": "日の入りがどれだけ遅くても、夕方はこの時刻より遅くなりません"
+                        }
+                    },
+                    "presence_options": {
+                        "name": "詳細設定 - 在室",
+                        "data": {
+                            "occupied_trigger": "誰かが帰宅",
+                            "unoccupied_trigger": "誰かが外出",
+                            "calendar_occupancy_override_states": "在宅状況がオーバーライドできるカレンダーによるアラーム状態",
+                            "calendar_occupancy_ends_away": "帰宅すると、外出と休暇のイベントを最終日に終了する",
+                            "occupied_delay": "誰かが帰宅した後の遅延",
+                            "unoccupied_delay": "誰かが外出した後の遅延"
+                        },
+                        "data_description": {
+                            "occupied_trigger": "人が帰宅したときにアラーム状態を再評価する",
+                            "unoccupied_trigger": "人が外出したときにアラーム状態を再評価する",
+                            "calendar_occupancy_override_states": "カレンダーイベントがこれらの状態のいずれかを設定した場合、在室状況の変化（到着・出発）によってアラーム状態を更新できます。例えば、カレンダーが「解除」と設定していても全員が外出した場合、「外出モード」に切り替わります。",
+                            "calendar_occupancy_ends_away": "外出警戒または休暇警戒のカレンダーイベントが終了する予定の日に誰かが帰宅すると、イベントは終了時刻を待たずにその時点で終了し、アラームはカレンダーイベント終了時に設定された状態になります。単発のイベントにも繰り返しイベントにも適用されます。",
+                            "occupied_delay": "誰かが帰宅してからアラーム状態を判定するまでの待ち時間（秒）です。その間に手動で変更すると取り消されます。",
+                            "unoccupied_delay": "誰かが外出してからアラーム状態を判定するまでの待ち時間（秒）です。短時間の不在やトラッカーの切断で警戒状態にならないようにします。その間に手動で変更すると取り消されます。"
+                        }
+                    },
                     "advanced_options": {
-                        "name": "詳細設定",
+                        "name": "詳細設定 - その他",
                         "data": {
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
-                            "panel_code": "アラームパネルのコード",
-                            "occupied_delay": "誰かが帰宅した後の遅延",
-                            "unoccupied_delay": "誰かが外出した後の遅延",
                             "rate_limit_max_calls": "レート制限 - 最大変更回数",
                             "rate_limit_period": "レート制限 - 期間"
                         },
                         "data_description": {
-                            "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、下で設定してください。",
-                            "panel_code": "パネルがコードを必要とする場合に、警戒・解除時に Auto Arm がアラームパネルのアクションへ渡すコードです。暗号化して保存され、再表示されることはありません。保存済みのコードをそのまま使う場合は空欄にしてください。",
-                            "occupied_delay": "誰かが帰宅してからアラーム状態を判定するまでの待ち時間（秒）です。その間に手動で変更すると取り消されます。",
-                            "unoccupied_delay": "誰かが外出してからアラーム状態を判定するまでの待ち時間（秒）です。短時間の不在やトラッカーの切断で警戒状態にならないようにします。その間に手動で変更すると取り消されます。",
+                            "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、上で設定してください。",
                             "rate_limit_max_calls": "ループを防ぐため、レート制限の期間内に Auto Arm が行うアラーム状態の変更の最大回数です。期間内のそれ以上の変更はスキップされます。",
                             "rate_limit_period": "最大変更回数を数える期間の長さ（秒）です。"
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "詳細設定 - 時間帯",
+                        "description": "その他のアラーム状態用の時間帯センサーです。就寝時間センサーと同じように、オンの間その状態を設定します。センサーがオフになると、「詳細設定 - カレンダー」のカレンダーイベント終了時の設定が適用されます。",
+                        "data": {
+                            "time_of_day_disarmed": "解除",
+                            "time_of_day_armed_home": "在宅警戒",
+                            "time_of_day_armed_away": "外出警戒",
+                            "time_of_day_armed_custom_bypass": "カスタム警戒"
                         }
                     }
                 }
@@ -205,52 +205,26 @@
                     "alarm_panel": "管理するアラームコントロールパネル",
                     "time_of_day_armed_night": "就寝時間 - 時間帯センサー",
                     "calendar_entities": "在室 - カレンダー",
-                    "person_entities": "在宅 - 在室ベースの警戒に使用する人物"
+                    "person_entities": "在宅 - 在室ベースの警戒に使用する人物",
+                    "panel_code": "アラームパネルのコード",
+                    "panel_code_clear": "保存済みのアラームパネルのコードを削除する"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "毎日の就寝時間にオンになる時間帯センサーです。オンの間、アラームは夜間警戒に保たれます。",
                     "calendar_entities": "カレンダーは休暇警戒の状態に必要です。また、在宅情報が利用できない、または在室の判断に信頼できない場合にも必要です。カレンダーは任意の警戒状態を設定できるため、昼夜、就寝時間、在室による他の制御をオーバーライドできます。",
-                    "person_entities": "これらの人物が全員在宅かどうかによって、外出警戒、在宅警戒、解除の状態が決まります。"
+                    "person_entities": "これらの人物が全員在宅かどうかによって、外出警戒、在宅警戒、解除の状態が決まります。",
+                    "panel_code": "パネルがコードを必要とする場合に、警戒・解除時に Auto Arm がアラームパネルのアクションへ渡すコードです。暗号化して保存され、再表示されることはありません。保存済みのコードをそのまま使う場合は空欄にしてください。"
                 },
                 "sections": {
-                    "presence_options": {
-                        "name": "在宅",
+                    "assist_options": {
+                        "name": "音声アシスタント",
                         "data": {
-                            "occupied_trigger": "誰かが帰宅",
-                            "unoccupied_trigger": "誰かが外出",
-                            "calendar_occupancy_override_states": "在宅状況がオーバーライドできるカレンダーによるアラーム状態",
-                            "calendar_occupancy_ends_away": "帰宅すると、外出と休暇のイベントを最終日に終了する"
+                            "sentence_arm": "音声で警戒と理由の説明",
+                            "sentence_disarm": "音声で解除"
                         },
                         "data_description": {
-                            "occupied_trigger": "人が帰宅したときにアラーム状態を再評価する",
-                            "unoccupied_trigger": "人が外出したときにアラーム状態を再評価する",
-                            "calendar_occupancy_override_states": "カレンダーイベントがこれらの状態のいずれかを設定した場合、在室状況の変化（到着・出発）によってアラーム状態を更新できます。例えば、カレンダーが「解除」と設定していても全員が外出した場合、「外出モード」に切り替わります。",
-                            "calendar_occupancy_ends_away": "外出警戒または休暇警戒のカレンダーイベントが終了する予定の日に誰かが帰宅すると、イベントは終了時刻を待たずにその時点で終了し、アラームはカレンダーイベント終了時に設定された状態になります。単発のイベントにも繰り返しイベントにも適用されます。"
-                        }
-                    },
-                    "sun_options": {
-                        "name": "昼夜 - 太陽",
-                        "description": "朝は日の出、夕方は日の入りで、それぞれ最早・最遅の時刻の範囲内に保たれます。トリガーは朝と夕方にアラーム状態を再評価し、就寝時間中は無視されます。自動は、解除、在宅警戒、夜間警戒のカレンダーイベントがある日はトリガーをオフにします。最早・最遅の時刻は、就寝時間に時間帯センサーもカレンダーも使わない場合に最も役立ちます。",
-                        "data": {
-                            "occupancy_default_day": "朝から夕方までの在室時の状態",
-                            "occupancy_default_after_bedtime": "就寝時間から朝までの在室時の状態",
-                            "occupancy_default_night": "夕方から就寝時間までの在室時の状態",
-                            "sunrise_trigger": "朝 - トリガー",
-                            "sunrise_earliest": "朝 - 最早",
-                            "sunrise_latest": "朝 - 最遅",
-                            "sunset_trigger": "夕方 - トリガー",
-                            "sunset_earliest": "夕方 - 最早",
-                            "sunset_latest": "夕方 - 最遅"
-                        },
-                        "data_description": {
-                            "occupancy_default_after_bedtime": "就寝時間が朝より前に終わる場合の状態です。就寝時間センサーがなければ使われません。",
-                            "occupancy_default_night": "[おすすめレシピ]({recipe_url})のように、時間帯センサーまたはカレンダーで就寝時間に夜間警戒を設定している場合は、就寝前のデフォルトとして在宅警戒に設定してください。 その日に就寝時間の夜間警戒を設定するものが、就寝時間センサーにもカレンダーイベントにもない場合は、夕方から夜間警戒になります。",
-                            "sunrise_trigger": "朝にアラーム状態を再評価する",
-                            "sunrise_earliest": "日の出がどれだけ早くても、朝はこの時刻より早くなりません",
-                            "sunrise_latest": "日の出がどれだけ遅くても、朝はこの時刻より遅くなりません",
-                            "sunset_trigger": "夕方にアラーム状態を再評価する",
-                            "sunset_earliest": "日の入りがどれだけ早くても、夕方はこの時刻より早くなりません",
-                            "sunset_latest": "日の入りがどれだけ遅くても、夕方はこの時刻より遅くなりません"
+                            "sentence_arm": "Home Assistant の組み込み Assist エージェント用の英語の文（'arm the alarm'、'arm the alarm in night mode'、'why is the alarm armed' など）。",
+                            "sentence_disarm": "'disarm the alarm' を追加します。警告: コードは求められないため、音声サテライトやチャットで Assist に話しかけられる人は誰でもアラームを解除できます。"
                         }
                     },
                     "button_options": {
@@ -271,17 +245,6 @@
                             "button_armed_vacation_delay": "休暇警戒 - 遅延",
                             "button_armed_custom_bypass": "カスタム警戒",
                             "button_armed_custom_bypass_delay": "カスタム警戒 - 遅延"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "音声アシスタント",
-                        "data": {
-                            "sentence_arm": "音声で警戒と理由の説明",
-                            "sentence_disarm": "音声で解除"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Home Assistant の組み込み Assist エージェント用の英語の文（'arm the alarm'、'arm the alarm in night mode'、'why is the alarm armed' など）。",
-                            "sentence_disarm": "'disarm the alarm' を追加します。警告: コードは求められないため、音声サテライトやチャットで Assist に話しかけられる人は誰でもアラームを解除できます。"
                         }
                     },
                     "notify_options": {
@@ -311,16 +274,6 @@
                             "notify_data": "通知アクションに渡される追加データ。モバイルアプリ通知のアクションやチャンネルなど。ここで設定した値は、YAML通知プロファイル内の一致するキーによって上書きされます。"
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "詳細設定 - 時間帯",
-                        "description": "その他のアラーム状態用の時間帯センサーです。就寝時間センサーと同じように、オンの間その状態を設定します。センサーがオフになると、「詳細設定 - カレンダー」のカレンダーイベント終了時の設定が適用されます。",
-                        "data": {
-                            "time_of_day_disarmed": "解除",
-                            "time_of_day_armed_home": "在宅警戒",
-                            "time_of_day_armed_away": "外出警戒",
-                            "time_of_day_armed_custom_bypass": "カスタム警戒"
-                        }
-                    },
                     "calendar_options": {
                         "name": "詳細設定 - カレンダー",
                         "description": "カレンダーイベントが終了したときの動作と、どのイベントがどのアラーム状態を設定するかを決めます。一致ルールのないカレンダーは既定のルール、つまり Away、Home、Night、Disarmed、Vacation、Holiday という名前のイベントを使います。",
@@ -339,24 +292,71 @@
                             "calendar_notify_grace": "カレンダーによる変更を通知するまで待つ秒数です。あるイベントの終了と同時に別のイベントが始まる場合など、近接した変更を 1 つの通知にまとめます。"
                         }
                     },
+                    "sun_options": {
+                        "name": "詳細設定 - 昼夜",
+                        "description": "朝は日の出、夕方は日の入りで、それぞれ最早・最遅の時刻の範囲内に保たれます。トリガーは朝と夕方にアラーム状態を再評価し、就寝時間中は無視されます。自動は、解除、在宅警戒、夜間警戒のカレンダーイベントがある日はトリガーをオフにします。最早・最遅の時刻は、就寝時間に時間帯センサーもカレンダーも使わない場合に最も役立ちます。",
+                        "data": {
+                            "occupancy_default_day": "朝から夕方までの在室時の状態",
+                            "occupancy_default_after_bedtime": "就寝時間から朝までの在室時の状態",
+                            "occupancy_default_night": "夕方から就寝時間までの在室時の状態",
+                            "sunrise_trigger": "朝 - トリガー",
+                            "sunrise_earliest": "朝 - 最早",
+                            "sunrise_latest": "朝 - 最遅",
+                            "sunset_trigger": "夕方 - トリガー",
+                            "sunset_earliest": "夕方 - 最早",
+                            "sunset_latest": "夕方 - 最遅"
+                        },
+                        "data_description": {
+                            "occupancy_default_after_bedtime": "就寝時間が朝より前に終わる場合の状態です。就寝時間センサーがなければ使われません。",
+                            "occupancy_default_night": "[おすすめレシピ]({recipe_url})のように、時間帯センサーまたはカレンダーで就寝時間に夜間警戒を設定している場合は、就寝前のデフォルトとして在宅警戒に設定してください。 その日に就寝時間の夜間警戒を設定するものが、就寝時間センサーにもカレンダーイベントにもない場合は、夕方から夜間警戒になります。",
+                            "sunrise_trigger": "朝にアラーム状態を再評価する",
+                            "sunrise_earliest": "日の出がどれだけ早くても、朝はこの時刻より早くなりません",
+                            "sunrise_latest": "日の出がどれだけ遅くても、朝はこの時刻より遅くなりません",
+                            "sunset_trigger": "夕方にアラーム状態を再評価する",
+                            "sunset_earliest": "日の入りがどれだけ早くても、夕方はこの時刻より早くなりません",
+                            "sunset_latest": "日の入りがどれだけ遅くても、夕方はこの時刻より遅くなりません"
+                        }
+                    },
+                    "presence_options": {
+                        "name": "詳細設定 - 在室",
+                        "data": {
+                            "occupied_trigger": "誰かが帰宅",
+                            "unoccupied_trigger": "誰かが外出",
+                            "calendar_occupancy_override_states": "在宅状況がオーバーライドできるカレンダーによるアラーム状態",
+                            "calendar_occupancy_ends_away": "帰宅すると、外出と休暇のイベントを最終日に終了する",
+                            "occupied_delay": "誰かが帰宅した後の遅延",
+                            "unoccupied_delay": "誰かが外出した後の遅延"
+                        },
+                        "data_description": {
+                            "occupied_trigger": "人が帰宅したときにアラーム状態を再評価する",
+                            "unoccupied_trigger": "人が外出したときにアラーム状態を再評価する",
+                            "calendar_occupancy_override_states": "カレンダーイベントがこれらの状態のいずれかを設定した場合、在室状況の変化（到着・出発）によってアラーム状態を更新できます。例えば、カレンダーが「解除」と設定していても全員が外出した場合、「外出モード」に切り替わります。",
+                            "calendar_occupancy_ends_away": "外出警戒または休暇警戒のカレンダーイベントが終了する予定の日に誰かが帰宅すると、イベントは終了時刻を待たずにその時点で終了し、アラームはカレンダーイベント終了時に設定された状態になります。単発のイベントにも繰り返しイベントにも適用されます。",
+                            "occupied_delay": "誰かが帰宅してからアラーム状態を判定するまでの待ち時間（秒）です。その間に手動で変更すると取り消されます。",
+                            "unoccupied_delay": "誰かが外出してからアラーム状態を判定するまでの待ち時間（秒）です。短時間の不在やトラッカーの切断で警戒状態にならないようにします。その間に手動で変更すると取り消されます。"
+                        }
+                    },
                     "advanced_options": {
-                        "name": "詳細設定",
+                        "name": "詳細設定 - その他",
                         "data": {
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
-                            "panel_code": "アラームパネルのコード",
-                            "panel_code_clear": "保存済みのアラームパネルのコードを削除する",
-                            "occupied_delay": "誰かが帰宅した後の遅延",
-                            "unoccupied_delay": "誰かが外出した後の遅延",
                             "rate_limit_max_calls": "レート制限 - 最大変更回数",
                             "rate_limit_period": "レート制限 - 期間"
                         },
                         "data_description": {
-                            "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、下で設定してください。",
-                            "panel_code": "パネルがコードを必要とする場合に、警戒・解除時に Auto Arm がアラームパネルのアクションへ渡すコードです。暗号化して保存され、再表示されることはありません。保存済みのコードをそのまま使う場合は空欄にしてください。",
-                            "occupied_delay": "誰かが帰宅してからアラーム状態を判定するまでの待ち時間（秒）です。その間に手動で変更すると取り消されます。",
-                            "unoccupied_delay": "誰かが外出してからアラーム状態を判定するまでの待ち時間（秒）です。短時間の不在やトラッカーの切断で警戒状態にならないようにします。その間に手動で変更すると取り消されます。",
+                            "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、上で設定してください。",
                             "rate_limit_max_calls": "ループを防ぐため、レート制限の期間内に Auto Arm が行うアラーム状態の変更の最大回数です。期間内のそれ以上の変更はスキップされます。",
                             "rate_limit_period": "最大変更回数を数える期間の長さ（秒）です。"
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "詳細設定 - 時間帯",
+                        "description": "その他のアラーム状態用の時間帯センサーです。就寝時間センサーと同じように、オンの間その状態を設定します。センサーがオフになると、「詳細設定 - カレンダー」のカレンダーイベント終了時の設定が適用されます。",
+                        "data": {
+                            "time_of_day_disarmed": "解除",
+                            "time_of_day_armed_home": "在宅警戒",
+                            "time_of_day_armed_away": "外出警戒",
+                            "time_of_day_armed_custom_bypass": "カスタム警戒"
                         }
                     }
                 }

@@ -228,7 +228,7 @@ def _default_notify_action(hass: HomeAssistant) -> str:
 
 
 async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
-    """The full set of options flow sections, shared by advanced setup and the options flow."""
+    """The alarm panel code and the full set of options flow sections, shared by advanced setup and the options flow."""
     notify_services = sorted(f"notify.{service}" for service in hass.services.async_services().get("notify", {}))
     notify_target_fields: dict[Any, Any]
     if supernotify_available(hass):
@@ -264,71 +264,19 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
         }
 
     return {
-        vol.Required("presence_options"): section(
+        # never filled in with the stored code, so that isn't sent back out to a browser
+        vol.Optional(CONF_PANEL_CODE): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD, autocomplete="off")),
+        **({vol.Optional(CONF_PANEL_CODE_CLEAR, default=False): BooleanSelector()} if options.get(CONF_PANEL_CODE) else {}),
+        vol.Required("assist_options"): section(
             vol.Schema({
                 vol.Required(
-                    CONF_OCCUPIED_TRIGGER,
-                    default=options.get(CONF_OCCUPIED_TRIGGER, True),
+                    CONF_SENTENCE_ARM,
+                    default=options.get(CONF_SENTENCE_ARM, True),
                 ): BooleanSelector(),
                 vol.Required(
-                    CONF_UNOCCUPIED_TRIGGER,
-                    default=options.get(CONF_UNOCCUPIED_TRIGGER, True),
+                    CONF_SENTENCE_DISARM,
+                    default=options.get(CONF_SENTENCE_DISARM, False),
                 ): BooleanSelector(),
-                vol.Optional(
-                    CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
-                    default=options.get(CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES),
-                ): SelectSelector(
-                    SelectSelectorConfig(
-                        options=PUBLIC_ALARM_STATES,
-                        multiple=True,
-                        mode=SelectSelectorMode.LIST,
-                    )
-                ),
-                vol.Required(
-                    CONF_CALENDAR_OCCUPANCY_ENDS_AWAY,
-                    default=options.get(CONF_CALENDAR_OCCUPANCY_ENDS_AWAY, True),
-                ): BooleanSelector(),
-            }),
-            {"collapsed": True},
-        ),
-        vol.Required("sun_options"): section(
-            vol.Schema({
-                vol.Optional(
-                    CONF_OCCUPANCY_DEFAULT_DAY,
-                    default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "disarmed"),
-                ): _alarm_state_selector(),
-                vol.Optional(
-                    CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME,
-                    default=options.get(CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME, "armed_home"),
-                ): _alarm_state_selector(),
-                vol.Optional(
-                    CONF_OCCUPANCY_DEFAULT_NIGHT,
-                    description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")},
-                ): _alarm_state_selector(),
-                vol.Required(
-                    CONF_SUNRISE_TRIGGER,
-                    default=options.get(CONF_SUNRISE_TRIGGER, TRIGGER_AUTO),
-                ): _sun_trigger_selector(),
-                vol.Optional(
-                    CONF_SUNRISE_EARLIEST,
-                    description={"suggested_value": options.get(CONF_SUNRISE_EARLIEST)},
-                ): TimeSelector(),
-                vol.Optional(
-                    CONF_SUNRISE_LATEST,
-                    description={"suggested_value": options.get(CONF_SUNRISE_LATEST)},
-                ): TimeSelector(),
-                vol.Required(
-                    CONF_SUNSET_TRIGGER,
-                    default=options.get(CONF_SUNSET_TRIGGER, TRIGGER_AUTO),
-                ): _sun_trigger_selector(),
-                vol.Optional(
-                    CONF_SUNSET_EARLIEST,
-                    description={"suggested_value": options.get(CONF_SUNSET_EARLIEST)},
-                ): TimeSelector(),
-                vol.Optional(
-                    CONF_SUNSET_LATEST,
-                    description={"suggested_value": options.get(CONF_SUNSET_LATEST)},
-                ): TimeSelector(),
             }),
             {"collapsed": True},
         ),
@@ -354,20 +302,6 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
             }),
             {"collapsed": True},
         ),
-        vol.Required("assist_options"): section(
-            vol.Schema({
-                vol.Required(
-                    CONF_SENTENCE_ARM,
-                    default=options.get(CONF_SENTENCE_ARM, True),
-                ): BooleanSelector(),
-                vol.Required(
-                    CONF_SENTENCE_DISARM,
-                    default=options.get(CONF_SENTENCE_DISARM, False),
-                ): BooleanSelector(),
-            }),
-            {"collapsed": True},
-        ),
-        # above the advanced sections, like the "then do" actions at the bottom of an automation
         vol.Required("notify_options"): section(
             vol.Schema({
                 vol.Required(
@@ -389,14 +323,6 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
                     CONF_NOTIFY_DATA,
                     default=options.get(CONF_NOTIFY_DATA, {}),
                 ): ObjectSelector(),
-            }),
-            {"collapsed": True},
-        ),
-        vol.Required("time_of_day_options"): section(
-            vol.Schema({
-                vol.Optional(option, default=options.get(option, [])): _time_of_day_selector()
-                for option in TIME_OF_DAY_OPTIONS
-                if option != CONF_BEDTIME_ENTITIES
             }),
             {"collapsed": True},
         ),
@@ -445,25 +371,84 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
             }),
             {"collapsed": True},
         ),
+        vol.Required("sun_options"): section(
+            vol.Schema({
+                vol.Optional(
+                    CONF_OCCUPANCY_DEFAULT_DAY,
+                    default=options.get(CONF_OCCUPANCY_DEFAULT_DAY, "disarmed"),
+                ): _alarm_state_selector(),
+                vol.Optional(
+                    CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME,
+                    default=options.get(CONF_OCCUPANCY_DEFAULT_AFTER_BEDTIME, "armed_home"),
+                ): _alarm_state_selector(),
+                vol.Optional(
+                    CONF_OCCUPANCY_DEFAULT_NIGHT,
+                    description={"suggested_value": options.get(CONF_OCCUPANCY_DEFAULT_NIGHT, "armed_night")},
+                ): _alarm_state_selector(),
+                vol.Required(
+                    CONF_SUNRISE_TRIGGER,
+                    default=options.get(CONF_SUNRISE_TRIGGER, TRIGGER_AUTO),
+                ): _sun_trigger_selector(),
+                vol.Optional(
+                    CONF_SUNRISE_EARLIEST,
+                    description={"suggested_value": options.get(CONF_SUNRISE_EARLIEST)},
+                ): TimeSelector(),
+                vol.Optional(
+                    CONF_SUNRISE_LATEST,
+                    description={"suggested_value": options.get(CONF_SUNRISE_LATEST)},
+                ): TimeSelector(),
+                vol.Required(
+                    CONF_SUNSET_TRIGGER,
+                    default=options.get(CONF_SUNSET_TRIGGER, TRIGGER_AUTO),
+                ): _sun_trigger_selector(),
+                vol.Optional(
+                    CONF_SUNSET_EARLIEST,
+                    description={"suggested_value": options.get(CONF_SUNSET_EARLIEST)},
+                ): TimeSelector(),
+                vol.Optional(
+                    CONF_SUNSET_LATEST,
+                    description={"suggested_value": options.get(CONF_SUNSET_LATEST)},
+                ): TimeSelector(),
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("presence_options"): section(
+            vol.Schema({
+                vol.Required(
+                    CONF_OCCUPIED_TRIGGER,
+                    default=options.get(CONF_OCCUPIED_TRIGGER, True),
+                ): BooleanSelector(),
+                vol.Required(
+                    CONF_UNOCCUPIED_TRIGGER,
+                    default=options.get(CONF_UNOCCUPIED_TRIGGER, True),
+                ): BooleanSelector(),
+                vol.Optional(
+                    CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
+                    default=options.get(CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES, DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES),
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=PUBLIC_ALARM_STATES,
+                        multiple=True,
+                        mode=SelectSelectorMode.LIST,
+                    )
+                ),
+                vol.Required(
+                    CONF_CALENDAR_OCCUPANCY_ENDS_AWAY,
+                    default=options.get(CONF_CALENDAR_OCCUPANCY_ENDS_AWAY, True),
+                ): BooleanSelector(),
+                **{
+                    vol.Optional(option, default=options.get(option, default)): _seconds_selector()
+                    for option, default in DEFAULT_OCCUPANCY_DELAYS.items()
+                },
+            }),
+            {"collapsed": True},
+        ),
         vol.Required("advanced_options"): section(
             vol.Schema({
                 vol.Required(
                     CONF_USE_ALARM_SERVICE,
                     default=options.get(CONF_USE_ALARM_SERVICE, True),
                 ): BooleanSelector(),
-                # never filled in with the stored code, so that isn't sent back out to a browser
-                vol.Optional(CONF_PANEL_CODE): TextSelector(
-                    TextSelectorConfig(type=TextSelectorType.PASSWORD, autocomplete="off")
-                ),
-                **(
-                    {vol.Optional(CONF_PANEL_CODE_CLEAR, default=False): BooleanSelector()}
-                    if options.get(CONF_PANEL_CODE)
-                    else {}
-                ),
-                **{
-                    vol.Optional(option, default=options.get(option, default)): _seconds_selector()
-                    for option, default in DEFAULT_OCCUPANCY_DELAYS.items()
-                },
                 vol.Optional(
                     CONF_RATE_LIMIT_MAX_CALLS,
                     default=options.get(CONF_RATE_LIMIT_MAX_CALLS, DEFAULT_RATE_LIMIT_MAX_CALLS),
@@ -472,6 +457,14 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
                     CONF_RATE_LIMIT_SECONDS,
                     default=options.get(CONF_RATE_LIMIT_SECONDS, DEFAULT_RATE_LIMIT_SECONDS),
                 ): _seconds_selector(minimum=1),
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("time_of_day_options"): section(
+            vol.Schema({
+                vol.Optional(option, default=options.get(option, [])): _time_of_day_selector()
+                for option in TIME_OF_DAY_OPTIONS
+                if option != CONF_BEDTIME_ENTITIES
             }),
             {"collapsed": True},
         ),

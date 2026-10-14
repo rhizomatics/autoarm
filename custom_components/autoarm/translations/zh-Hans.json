@@ -32,53 +32,26 @@
                     "alarm_panel": "要管理的警报控制面板",
                     "time_of_day_armed_night": "就寝时间 - 时段传感器",
                     "calendar_entities": "占用 - 日历",
-                    "person_entities": "在家状态 - 用于基于在家状态布防的人员"
+                    "person_entities": "在家状态 - 用于基于在家状态布防的人员",
+                    "panel_code": "报警面板密码"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间,警报保持在夜间布防。 还没有就寝时间传感器?[创建一个]({bedtime_help_url}),或前往 设置 → 设备与服务 → 辅助 → **+ 创建辅助** → **时段**。为其命名,并为平常的就寝时间设置起止时间。",
                     "alarm_panel": "还没有警报面板?[创建一个虚拟面板]({alarm_panel_help_url}),或在 Home Assistant 中前往 设置 → 设备与服务 → 辅助 → **+ 创建辅助** → 模板 → **警报控制面板**。为其命名并提交;其余字段均为可选。",
                     "calendar_entities": "度假布防状态需要日历;当在家状态不可用或不足以可靠判断是否有人时,也需要日历。日历还可以设置任何布防状态,因此可以覆盖其他基于日出日落、就寝时间或在家状态的控制。 还没有日历?[创建本地日历]({calendar_help_url}),或前往 设置 → 设备与服务 → **+ 添加集成** → **本地日历**。为其命名,并保持选中“创建空日历”。",
-                    "person_entities": "这些人员是否全部在家,决定离家布防、在家布防和撤防状态。 少了谁?[添加新成员]({person_help_url}),或前往 设置 → 人员 → **+ 添加人员**。为其命名;关联用户账户为可选项。"
+                    "person_entities": "这些人员是否全部在家,决定离家布防、在家布防和撤防状态。 少了谁?[添加新成员]({person_help_url}),或前往 设置 → 人员 → **+ 添加人员**。为其命名;关联用户账户为可选项。",
+                    "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。"
                 },
                 "sections": {
-                    "presence_options": {
-                        "name": "在家状态",
+                    "assist_options": {
+                        "name": "语音助手",
                         "data": {
-                            "occupied_trigger": "有人回家",
-                            "unoccupied_trigger": "有人离家",
-                            "calendar_occupancy_override_states": "在家状态可以覆盖的日历警报状态",
-                            "calendar_occupancy_ends_away": "回家时在最后一天结束离家和度假事件"
+                            "sentence_arm": "语音布防和解释",
+                            "sentence_disarm": "语音撤防"
                         },
                         "data_description": {
-                            "occupied_trigger": "有人回家时重新计算警报状态",
-                            "unoccupied_trigger": "有人离家时重新计算警报状态",
-                            "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。",
-                            "calendar_occupancy_ends_away": "当有人在离家布防或度假布防日历事件预定结束的当天回家时，事件会立即结束，而不是等到结束时间，警报将切换到为日历事件结束所设置的状态。适用于一次性事件和重复事件。"
-                        }
-                    },
-                    "sun_options": {
-                        "name": "昼夜 - 太阳",
-                        "description": "早晨即日出,傍晚即日落,各自限定在其最早和最晚时间之内。触发器在早晨和傍晚重新评估警报状态,就寝时间内会被忽略。自动会在有撤防、在家布防或夜间布防日历事件的日子关闭触发器。在就寝时间不使用时段传感器或日历时,最早和最晚时间最有用。",
-                        "data": {
-                            "occupancy_default_day": "早晨到傍晚之间有人在家时的状态",
-                            "occupancy_default_after_bedtime": "就寝时间到早晨之间有人在家时的状态",
-                            "occupancy_default_night": "傍晚到就寝时间之间有人在家时的状态",
-                            "sunrise_trigger": "早晨 - 触发器",
-                            "sunrise_earliest": "早晨 - 最早",
-                            "sunrise_latest": "早晨 - 最晚",
-                            "sunset_trigger": "傍晚 - 触发器",
-                            "sunset_earliest": "傍晚 - 最早",
-                            "sunset_latest": "傍晚 - 最晚"
-                        },
-                        "data_description": {
-                            "occupancy_default_after_bedtime": "用于就寝时间在早晨之前结束的情况。没有就寝时间传感器时不起作用。",
-                            "occupancy_default_night": "如果由时段传感器或日历在就寝时间设置夜间布防（如[推荐方案]({recipe_url})），请将此项设为在家布防，作为就寝前的默认状态。 如果当天没有任何设置在就寝时间进入夜间布防,既没有就寝时间传感器也没有日历事件,则从傍晚起即为夜间布防。",
-                            "sunrise_trigger": "在早晨重新评估警报状态",
-                            "sunrise_earliest": "无论日出多早,早晨都不早于此时间",
-                            "sunrise_latest": "无论日出多晚,早晨都不晚于此时间",
-                            "sunset_trigger": "在傍晚重新评估警报状态",
-                            "sunset_earliest": "无论日落多早,傍晚都不早于此时间",
-                            "sunset_latest": "无论日落多晚,傍晚都不晚于此时间"
+                            "sentence_arm": "用于 Home Assistant 内置 Assist 代理的英语语句，例如 'arm the alarm'、'arm the alarm in night mode' 和 'why is the alarm armed'。",
+                            "sentence_disarm": "添加 'disarm the alarm'。警告：不会要求输入密码，因此任何能通过语音卫星或聊天与 Assist 对话的人都可以撤防警报。"
                         }
                     },
                     "button_options": {
@@ -99,17 +72,6 @@
                             "button_armed_vacation_delay": "度假布防 - 延迟",
                             "button_armed_custom_bypass": "自定义布防",
                             "button_armed_custom_bypass_delay": "自定义布防 - 延迟"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "语音助手",
-                        "data": {
-                            "sentence_arm": "语音布防和解释",
-                            "sentence_disarm": "语音撤防"
-                        },
-                        "data_description": {
-                            "sentence_arm": "用于 Home Assistant 内置 Assist 代理的英语语句，例如 'arm the alarm'、'arm the alarm in night mode' 和 'why is the alarm armed'。",
-                            "sentence_disarm": "添加 'disarm the alarm'。警告：不会要求输入密码，因此任何能通过语音卫星或聊天与 Assist 对话的人都可以撤防警报。"
                         }
                     },
                     "notify_options": {
@@ -139,16 +101,6 @@
                             "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "高级 - 时段",
-                        "description": "用于其他报警状态的时段传感器，与就寝时间传感器一样，在开启期间设置各自的状态。传感器关闭时，将应用“高级 - 日历”中的日历事件结束设置。",
-                        "data": {
-                            "time_of_day_disarmed": "撤防",
-                            "time_of_day_armed_home": "在家布防",
-                            "time_of_day_armed_away": "离家布防",
-                            "time_of_day_armed_custom_bypass": "自定义布防"
-                        }
-                    },
                     "calendar_options": {
                         "name": "高级 - 日历",
                         "description": "日历事件结束时的处理方式，以及哪些事件设置哪种警报状态。没有匹配规则的日历使用默认规则，即名为 Away、Home、Night、Disarmed、Vacation 或 Holiday 的事件。",
@@ -167,23 +119,71 @@
                             "calendar_notify_grace": "通知日历变更前等待的秒数，以便将相隔很近的变更（例如一个事件结束时另一个事件开始）合并为一条通知发送。"
                         }
                     },
+                    "sun_options": {
+                        "name": "高级 - 昼夜",
+                        "description": "早晨即日出,傍晚即日落,各自限定在其最早和最晚时间之内。触发器在早晨和傍晚重新评估警报状态,就寝时间内会被忽略。自动会在有撤防、在家布防或夜间布防日历事件的日子关闭触发器。在就寝时间不使用时段传感器或日历时,最早和最晚时间最有用。",
+                        "data": {
+                            "occupancy_default_day": "早晨到傍晚之间有人在家时的状态",
+                            "occupancy_default_after_bedtime": "就寝时间到早晨之间有人在家时的状态",
+                            "occupancy_default_night": "傍晚到就寝时间之间有人在家时的状态",
+                            "sunrise_trigger": "早晨 - 触发器",
+                            "sunrise_earliest": "早晨 - 最早",
+                            "sunrise_latest": "早晨 - 最晚",
+                            "sunset_trigger": "傍晚 - 触发器",
+                            "sunset_earliest": "傍晚 - 最早",
+                            "sunset_latest": "傍晚 - 最晚"
+                        },
+                        "data_description": {
+                            "occupancy_default_after_bedtime": "用于就寝时间在早晨之前结束的情况。没有就寝时间传感器时不起作用。",
+                            "occupancy_default_night": "如果由时段传感器或日历在就寝时间设置夜间布防（如[推荐方案]({recipe_url})），请将此项设为在家布防，作为就寝前的默认状态。 如果当天没有任何设置在就寝时间进入夜间布防,既没有就寝时间传感器也没有日历事件,则从傍晚起即为夜间布防。",
+                            "sunrise_trigger": "在早晨重新评估警报状态",
+                            "sunrise_earliest": "无论日出多早,早晨都不早于此时间",
+                            "sunrise_latest": "无论日出多晚,早晨都不晚于此时间",
+                            "sunset_trigger": "在傍晚重新评估警报状态",
+                            "sunset_earliest": "无论日落多早,傍晚都不早于此时间",
+                            "sunset_latest": "无论日落多晚,傍晚都不晚于此时间"
+                        }
+                    },
+                    "presence_options": {
+                        "name": "高级 - 占用",
+                        "data": {
+                            "occupied_trigger": "有人回家",
+                            "unoccupied_trigger": "有人离家",
+                            "calendar_occupancy_override_states": "在家状态可以覆盖的日历警报状态",
+                            "calendar_occupancy_ends_away": "回家时在最后一天结束离家和度假事件",
+                            "occupied_delay": "有人到家后的延迟",
+                            "unoccupied_delay": "有人离家后的延迟"
+                        },
+                        "data_description": {
+                            "occupied_trigger": "有人回家时重新计算警报状态",
+                            "unoccupied_trigger": "有人离家时重新计算警报状态",
+                            "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。",
+                            "calendar_occupancy_ends_away": "当有人在离家布防或度假布防日历事件预定结束的当天回家时，事件会立即结束，而不是等到结束时间，警报将切换到为日历事件结束所设置的状态。适用于一次性事件和重复事件。",
+                            "occupied_delay": "有人到家后，在计算报警状态之前等待的秒数。在此期间的手动更改会将其取消。",
+                            "unoccupied_delay": "有人离家后，在计算报警状态之前等待的秒数，这样短暂离开或追踪器掉线就不会布防。在此期间的手动更改会将其取消。"
+                        }
+                    },
                     "advanced_options": {
-                        "name": "高级",
+                        "name": "高级 - 其他",
                         "data": {
                             "use_alarm_service": "使用报警面板的操作更改状态",
-                            "panel_code": "报警面板密码",
-                            "occupied_delay": "有人到家后的延迟",
-                            "unoccupied_delay": "有人离家后的延迟",
                             "rate_limit_max_calls": "速率限制 - 最大更改次数",
                             "rate_limit_period": "速率限制 - 周期"
                         },
                         "data_description": {
-                            "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在下方设置。",
-                            "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。",
-                            "occupied_delay": "有人到家后，在计算报警状态之前等待的秒数。在此期间的手动更改会将其取消。",
-                            "unoccupied_delay": "有人离家后，在计算报警状态之前等待的秒数，这样短暂离开或追踪器掉线就不会布防。在此期间的手动更改会将其取消。",
+                            "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在上方设置。",
                             "rate_limit_max_calls": "为防止循环，Auto Arm 在速率限制周期内最多更改报警状态的次数。该周期内超出的更改将被跳过。",
                             "rate_limit_period": "统计最大更改次数的周期长度（秒）。"
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "高级 - 时段",
+                        "description": "用于其他报警状态的时段传感器，与就寝时间传感器一样，在开启期间设置各自的状态。传感器关闭时，将应用“高级 - 日历”中的日历事件结束设置。",
+                        "data": {
+                            "time_of_day_disarmed": "撤防",
+                            "time_of_day_armed_home": "在家布防",
+                            "time_of_day_armed_away": "离家布防",
+                            "time_of_day_armed_custom_bypass": "自定义布防"
                         }
                     }
                 }
@@ -205,52 +205,26 @@
                     "alarm_panel": "要管理的警报控制面板",
                     "time_of_day_armed_night": "就寝时间 - 时段传感器",
                     "calendar_entities": "占用 - 日历",
-                    "person_entities": "在家状态 - 用于基于在家状态布防的人员"
+                    "person_entities": "在家状态 - 用于基于在家状态布防的人员",
+                    "panel_code": "报警面板密码",
+                    "panel_code_clear": "删除已存储的报警面板密码"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间,警报保持在夜间布防。",
                     "calendar_entities": "度假布防状态需要日历;当在家状态不可用或不足以可靠判断是否有人时,也需要日历。日历还可以设置任何布防状态,因此可以覆盖其他基于日出日落、就寝时间或在家状态的控制。",
-                    "person_entities": "这些人员是否全部在家,决定离家布防、在家布防和撤防状态。"
+                    "person_entities": "这些人员是否全部在家,决定离家布防、在家布防和撤防状态。",
+                    "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。"
                 },
                 "sections": {
-                    "presence_options": {
-                        "name": "在家状态",
+                    "assist_options": {
+                        "name": "语音助手",
                         "data": {
-                            "occupied_trigger": "有人回家",
-                            "unoccupied_trigger": "有人离家",
-                            "calendar_occupancy_override_states": "在家状态可以覆盖的日历警报状态",
-                            "calendar_occupancy_ends_away": "回家时在最后一天结束离家和度假事件"
+                            "sentence_arm": "语音布防和解释",
+                            "sentence_disarm": "语音撤防"
                         },
                         "data_description": {
-                            "occupied_trigger": "有人回家时重新计算警报状态",
-                            "unoccupied_trigger": "有人离家时重新计算警报状态",
-                            "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。",
-                            "calendar_occupancy_ends_away": "当有人在离家布防或度假布防日历事件预定结束的当天回家时，事件会立即结束，而不是等到结束时间，警报将切换到为日历事件结束所设置的状态。适用于一次性事件和重复事件。"
-                        }
-                    },
-                    "sun_options": {
-                        "name": "昼夜 - 太阳",
-                        "description": "早晨即日出,傍晚即日落,各自限定在其最早和最晚时间之内。触发器在早晨和傍晚重新评估警报状态,就寝时间内会被忽略。自动会在有撤防、在家布防或夜间布防日历事件的日子关闭触发器。在就寝时间不使用时段传感器或日历时,最早和最晚时间最有用。",
-                        "data": {
-                            "occupancy_default_day": "早晨到傍晚之间有人在家时的状态",
-                            "occupancy_default_after_bedtime": "就寝时间到早晨之间有人在家时的状态",
-                            "occupancy_default_night": "傍晚到就寝时间之间有人在家时的状态",
-                            "sunrise_trigger": "早晨 - 触发器",
-                            "sunrise_earliest": "早晨 - 最早",
-                            "sunrise_latest": "早晨 - 最晚",
-                            "sunset_trigger": "傍晚 - 触发器",
-                            "sunset_earliest": "傍晚 - 最早",
-                            "sunset_latest": "傍晚 - 最晚"
-                        },
-                        "data_description": {
-                            "occupancy_default_after_bedtime": "用于就寝时间在早晨之前结束的情况。没有就寝时间传感器时不起作用。",
-                            "occupancy_default_night": "如果由时段传感器或日历在就寝时间设置夜间布防（如[推荐方案]({recipe_url})），请将此项设为在家布防，作为就寝前的默认状态。 如果当天没有任何设置在就寝时间进入夜间布防,既没有就寝时间传感器也没有日历事件,则从傍晚起即为夜间布防。",
-                            "sunrise_trigger": "在早晨重新评估警报状态",
-                            "sunrise_earliest": "无论日出多早,早晨都不早于此时间",
-                            "sunrise_latest": "无论日出多晚,早晨都不晚于此时间",
-                            "sunset_trigger": "在傍晚重新评估警报状态",
-                            "sunset_earliest": "无论日落多早,傍晚都不早于此时间",
-                            "sunset_latest": "无论日落多晚,傍晚都不晚于此时间"
+                            "sentence_arm": "用于 Home Assistant 内置 Assist 代理的英语语句，例如 'arm the alarm'、'arm the alarm in night mode' 和 'why is the alarm armed'。",
+                            "sentence_disarm": "添加 'disarm the alarm'。警告：不会要求输入密码，因此任何能通过语音卫星或聊天与 Assist 对话的人都可以撤防警报。"
                         }
                     },
                     "button_options": {
@@ -271,17 +245,6 @@
                             "button_armed_vacation_delay": "度假布防 - 延迟",
                             "button_armed_custom_bypass": "自定义布防",
                             "button_armed_custom_bypass_delay": "自定义布防 - 延迟"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "语音助手",
-                        "data": {
-                            "sentence_arm": "语音布防和解释",
-                            "sentence_disarm": "语音撤防"
-                        },
-                        "data_description": {
-                            "sentence_arm": "用于 Home Assistant 内置 Assist 代理的英语语句，例如 'arm the alarm'、'arm the alarm in night mode' 和 'why is the alarm armed'。",
-                            "sentence_disarm": "添加 'disarm the alarm'。警告：不会要求输入密码，因此任何能通过语音卫星或聊天与 Assist 对话的人都可以撤防警报。"
                         }
                     },
                     "notify_options": {
@@ -311,16 +274,6 @@
                             "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "高级 - 时段",
-                        "description": "用于其他报警状态的时段传感器，与就寝时间传感器一样，在开启期间设置各自的状态。传感器关闭时，将应用“高级 - 日历”中的日历事件结束设置。",
-                        "data": {
-                            "time_of_day_disarmed": "撤防",
-                            "time_of_day_armed_home": "在家布防",
-                            "time_of_day_armed_away": "离家布防",
-                            "time_of_day_armed_custom_bypass": "自定义布防"
-                        }
-                    },
                     "calendar_options": {
                         "name": "高级 - 日历",
                         "description": "日历事件结束时的处理方式，以及哪些事件设置哪种警报状态。没有匹配规则的日历使用默认规则，即名为 Away、Home、Night、Disarmed、Vacation 或 Holiday 的事件。",
@@ -339,24 +292,71 @@
                             "calendar_notify_grace": "通知日历变更前等待的秒数，以便将相隔很近的变更（例如一个事件结束时另一个事件开始）合并为一条通知发送。"
                         }
                     },
+                    "sun_options": {
+                        "name": "高级 - 昼夜",
+                        "description": "早晨即日出,傍晚即日落,各自限定在其最早和最晚时间之内。触发器在早晨和傍晚重新评估警报状态,就寝时间内会被忽略。自动会在有撤防、在家布防或夜间布防日历事件的日子关闭触发器。在就寝时间不使用时段传感器或日历时,最早和最晚时间最有用。",
+                        "data": {
+                            "occupancy_default_day": "早晨到傍晚之间有人在家时的状态",
+                            "occupancy_default_after_bedtime": "就寝时间到早晨之间有人在家时的状态",
+                            "occupancy_default_night": "傍晚到就寝时间之间有人在家时的状态",
+                            "sunrise_trigger": "早晨 - 触发器",
+                            "sunrise_earliest": "早晨 - 最早",
+                            "sunrise_latest": "早晨 - 最晚",
+                            "sunset_trigger": "傍晚 - 触发器",
+                            "sunset_earliest": "傍晚 - 最早",
+                            "sunset_latest": "傍晚 - 最晚"
+                        },
+                        "data_description": {
+                            "occupancy_default_after_bedtime": "用于就寝时间在早晨之前结束的情况。没有就寝时间传感器时不起作用。",
+                            "occupancy_default_night": "如果由时段传感器或日历在就寝时间设置夜间布防（如[推荐方案]({recipe_url})），请将此项设为在家布防，作为就寝前的默认状态。 如果当天没有任何设置在就寝时间进入夜间布防,既没有就寝时间传感器也没有日历事件,则从傍晚起即为夜间布防。",
+                            "sunrise_trigger": "在早晨重新评估警报状态",
+                            "sunrise_earliest": "无论日出多早,早晨都不早于此时间",
+                            "sunrise_latest": "无论日出多晚,早晨都不晚于此时间",
+                            "sunset_trigger": "在傍晚重新评估警报状态",
+                            "sunset_earliest": "无论日落多早,傍晚都不早于此时间",
+                            "sunset_latest": "无论日落多晚,傍晚都不晚于此时间"
+                        }
+                    },
+                    "presence_options": {
+                        "name": "高级 - 占用",
+                        "data": {
+                            "occupied_trigger": "有人回家",
+                            "unoccupied_trigger": "有人离家",
+                            "calendar_occupancy_override_states": "在家状态可以覆盖的日历警报状态",
+                            "calendar_occupancy_ends_away": "回家时在最后一天结束离家和度假事件",
+                            "occupied_delay": "有人到家后的延迟",
+                            "unoccupied_delay": "有人离家后的延迟"
+                        },
+                        "data_description": {
+                            "occupied_trigger": "有人回家时重新计算警报状态",
+                            "unoccupied_trigger": "有人离家时重新计算警报状态",
+                            "calendar_occupancy_override_states": "当日历事件设置为其中一种状态时，在家状态的变化（到达和离开）仍然可以更新警报状态。例如，如果日历显示为“撤防”，但所有人都离开了，状态将切换为“外出布防”。",
+                            "calendar_occupancy_ends_away": "当有人在离家布防或度假布防日历事件预定结束的当天回家时，事件会立即结束，而不是等到结束时间，警报将切换到为日历事件结束所设置的状态。适用于一次性事件和重复事件。",
+                            "occupied_delay": "有人到家后，在计算报警状态之前等待的秒数。在此期间的手动更改会将其取消。",
+                            "unoccupied_delay": "有人离家后，在计算报警状态之前等待的秒数，这样短暂离开或追踪器掉线就不会布防。在此期间的手动更改会将其取消。"
+                        }
+                    },
                     "advanced_options": {
-                        "name": "高级",
+                        "name": "高级 - 其他",
                         "data": {
                             "use_alarm_service": "使用报警面板的操作更改状态",
-                            "panel_code": "报警面板密码",
-                            "panel_code_clear": "删除已存储的报警面板密码",
-                            "occupied_delay": "有人到家后的延迟",
-                            "unoccupied_delay": "有人离家后的延迟",
                             "rate_limit_max_calls": "速率限制 - 最大更改次数",
                             "rate_limit_period": "速率限制 - 周期"
                         },
                         "data_description": {
-                            "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在下方设置。",
-                            "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。",
-                            "occupied_delay": "有人到家后，在计算报警状态之前等待的秒数。在此期间的手动更改会将其取消。",
-                            "unoccupied_delay": "有人离家后，在计算报警状态之前等待的秒数，这样短暂离开或追踪器掉线就不会布防。在此期间的手动更改会将其取消。",
+                            "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在上方设置。",
                             "rate_limit_max_calls": "为防止循环，Auto Arm 在速率限制周期内最多更改报警状态的次数。该周期内超出的更改将被跳过。",
                             "rate_limit_period": "统计最大更改次数的周期长度（秒）。"
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "高级 - 时段",
+                        "description": "用于其他报警状态的时段传感器，与就寝时间传感器一样，在开启期间设置各自的状态。传感器关闭时，将应用“高级 - 日历”中的日历事件结束设置。",
+                        "data": {
+                            "time_of_day_disarmed": "撤防",
+                            "time_of_day_armed_home": "在家布防",
+                            "time_of_day_armed_away": "离家布防",
+                            "time_of_day_armed_custom_bypass": "自定义布防"
                         }
                     }
                 }

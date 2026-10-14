@@ -14,10 +14,10 @@ With the config flow, most settings are now managed in the UI:
 | Bedtime sensor | UI (setup, options) | Times of the Day sensor for `armed_night`, see [Recommended Recipe](recommended_recipe.md) |
 | Calendar entities | UI (setup, options) | Which calendars to use |
 | Person entities | UI (setup, options) | Which persons to track for occupancy |
-| Occupied states | UI (options, Diurnal - Sun) | Alarm state when occupied by day, after bedtime and before bedtime |
+| Occupied states | UI (options, Advanced - Diurnal) | Alarm state when occupied by day, after bedtime and before bedtime |
 | Times of the Day sensors | UI (options) | Sensors that set any other alarm state while on |
 | Calendar end modes | UI (options, Advanced - Calendar) | What happens when an armed or disarmed calendar event ends |
-| Triggers | UI (options, Diurnal - Sun and Presence) | Whether sunrise, sunset and people arriving or leaving re-evaluate the state |
+| Triggers | UI (options, Advanced - Diurnal and Advanced - Occupancy) | Whether sunrise, sunset and people arriving or leaving re-evaluate the state |
 | Sunrise and sunset | UI (options) | Earliest and latest times |
 | Calendar match rules | UI (options, Advanced - Calendar) | Regex patterns matching calendar events to alarm states, copied from YAML if already there |
 | Calendar poll interval | UI (options, Advanced - Calendar) | How often to check the calendars |

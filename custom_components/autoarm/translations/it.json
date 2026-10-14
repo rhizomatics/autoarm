@@ -32,53 +32,26 @@
                     "alarm_panel": "Pannello di controllo allarme da gestire",
                     "time_of_day_armed_night": "Ora di dormire - Sensore ora del giorno",
                     "calendar_entities": "Occupazione - Calendari",
-                    "person_entities": "Presenza - Persone per l'inserimento basato sulla presenza"
+                    "person_entities": "Presenza - Persone per l'inserimento basato sulla presenza",
+                    "panel_code": "Codice della centrale d'allarme"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte. Non hai ancora un sensore dell'ora di andare a dormire? [Creane uno]({bedtime_help_url}), oppure vai su Impostazioni → Dispositivi e servizi → Ausiliari → **+ Crea ausiliario** → **Ora del giorno**. Dagli un nome e imposta un orario di inizio/fine per la tua solita ora di andare a dormire.",
                     "alarm_panel": "Non hai ancora un pannello di allarme? [Creane uno virtuale]({alarm_panel_help_url}), oppure in Home Assistant vai su Impostazioni → Dispositivi e servizi → Ausiliari → **+ Crea ausiliario** → Template → **Pannello di controllo allarme**. Dagli un nome e invia; tutti gli altri campi sono opzionali.",
                     "calendar_entities": "I calendari servono per lo stato Inserito vacanza, o se la presenza non è disponibile o è inaffidabile per determinare l'occupazione. I calendari possono anche impostare qualsiasi stato inserito, quindi possono sovrascrivere gli altri controlli basati su sole, ora di dormire o occupazione. Non hai ancora un calendario? [Crea un calendario locale]({calendar_help_url}), oppure vai su Impostazioni → Dispositivi e servizi → **+ Aggiungi integrazione** → **Calendario locale**. Dagli un nome e lascia selezionato 'Crea calendario vuoto'.",
-                    "person_entities": "Il fatto che tutte queste persone siano o meno in casa determina gli stati Inserito fuori casa, Inserito in casa e Disinserito. Manca qualcuno? [Aggiungi una nuova persona]({person_help_url}), oppure vai su Impostazioni → Persone → **+ Aggiungi persona**. Dagli un nome; collegare un account utente è opzionale."
+                    "person_entities": "Il fatto che tutte queste persone siano o meno in casa determina gli stati Inserito fuori casa, Inserito in casa e Disinserito. Manca qualcuno? [Aggiungi una nuova persona]({person_help_url}), oppure vai su Impostazioni → Persone → **+ Aggiungi persona**. Dagli un nome; collegare un account utente è opzionale.",
+                    "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato."
                 },
                 "sections": {
-                    "presence_options": {
-                        "name": "Presenza",
+                    "assist_options": {
+                        "name": "Assistente vocale",
                         "data": {
-                            "occupied_trigger": "Qualcuno arriva a casa",
-                            "unoccupied_trigger": "Qualcuno esce di casa",
-                            "calendar_occupancy_override_states": "Stati di allarme da calendario che la presenza può sovrascrivere",
-                            "calendar_occupancy_ends_away": "Il rientro a casa termina gli eventi di assenza e vacanza nel loro ultimo giorno"
+                            "sentence_arm": "Inserire e spiegare a voce",
+                            "sentence_disarm": "Disinserire a voce"
                         },
                         "data_description": {
-                            "occupied_trigger": "Rivalutare lo stato dell'allarme quando una persona arriva a casa",
-                            "unoccupied_trigger": "Rivalutare lo stato dell'allarme quando una persona esce di casa",
-                            "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa.",
-                            "calendar_occupancy_ends_away": "Quando qualcuno rientra a casa nel giorno in cui deve terminare un evento di calendario Inserito fuori casa o Inserito vacanza, l'evento termina in quel momento anziché all'orario di fine, e l'allarme passa allo stato impostato per la fine di un evento di calendario. Vale sia per gli eventi singoli sia per quelli ricorrenti."
-                        }
-                    },
-                    "sun_options": {
-                        "name": "Diurno - Sole",
-                        "description": "La mattina è l'alba, e la sera il tramonto, ciascuna mantenuta entro i suoi orari minimo e massimo. Gli attivatori rivalutano lo stato dell'allarme alla mattina e alla sera, e vengono ignorati durante l'ora di dormire. Automatico disattiva un attivatore nei giorni con un evento di calendario Disinserito, Inserito in casa o Inserito notte. Gli orari minimo e massimo sono utili soprattutto quando per l'ora di dormire non si usa un sensore ora del giorno né un calendario.",
-                        "data": {
-                            "occupancy_default_day": "Stato quando occupato tra mattina e sera",
-                            "occupancy_default_after_bedtime": "Stato quando occupato tra l'ora di dormire e la mattina",
-                            "occupancy_default_night": "Stato quando occupato tra la sera e l'ora di dormire",
-                            "sunrise_trigger": "Mattina - attivatore",
-                            "sunrise_earliest": "Mattina - Prima",
-                            "sunrise_latest": "Mattina - Ultima",
-                            "sunset_trigger": "Sera - attivatore",
-                            "sunset_earliest": "Sera - Prima",
-                            "sunset_latest": "Sera - Ultima"
-                        },
-                        "data_description": {
-                            "occupancy_default_after_bedtime": "Per quando l'ora di dormire termina prima della mattina. Non ha effetto senza un sensore dell'ora di andare a dormire.",
-                            "occupancy_default_night": "Impostalo su Inserito in casa come valore predefinito prima di andare a dormire se un sensore ora del giorno o un calendario imposta Inserito notte all'ora di andare a dormire, come nella [ricetta consigliata]({recipe_url}). Se quel giorno nulla imposta Inserito notte per l'ora di dormire, né un sensore dell'ora di andare a dormire né un evento di calendario, è Inserito notte dalla sera.",
-                            "sunrise_trigger": "Rivaluta lo stato dell'allarme alla mattina",
-                            "sunrise_earliest": "La mattina non è prima di questa ora, per quanto presto sorga il sole",
-                            "sunrise_latest": "La mattina non è dopo questa ora, per quanto tardi sorga il sole",
-                            "sunset_trigger": "Rivaluta lo stato dell'allarme alla sera",
-                            "sunset_earliest": "La sera non è prima di questa ora, per quanto presto tramonti il sole",
-                            "sunset_latest": "La sera non è dopo questa ora, per quanto tardi tramonti il sole"
+                            "sentence_arm": "Frasi in inglese per l'agente Assist integrato di Home Assistant, come 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
+                            "sentence_disarm": "Aggiunge 'disarm the alarm'. Attenzione: non viene chiesto alcun codice, quindi chiunque possa parlare con Assist, da un satellite vocale o nella chat, potrà disinserire l'allarme."
                         }
                     },
                     "button_options": {
@@ -99,17 +72,6 @@
                             "button_armed_vacation_delay": "Inserito vacanza - ritardo",
                             "button_armed_custom_bypass": "Inserito personalizzato",
                             "button_armed_custom_bypass_delay": "Inserito personalizzato - ritardo"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Assistente vocale",
-                        "data": {
-                            "sentence_arm": "Inserire e spiegare a voce",
-                            "sentence_disarm": "Disinserire a voce"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Frasi in inglese per l'agente Assist integrato di Home Assistant, come 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
-                            "sentence_disarm": "Aggiunge 'disarm the alarm'. Attenzione: non viene chiesto alcun codice, quindi chiunque possa parlare con Assist, da un satellite vocale o nella chat, potrà disinserire l'allarme."
                         }
                     },
                     "notify_options": {
@@ -139,16 +101,6 @@
                             "notify_data": "Dati aggiuntivi passati all'azione di notifica, come azioni o un canale per una notifica dell'app mobile. Qualsiasi valore impostato qui viene sovrascritto da una chiave corrispondente in un profilo di notifica YAML."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Avanzate - Ora del giorno",
-                        "description": "Sensori ora del giorno per gli altri stati di allarme, che impostano il proprio stato mentre sono attivi, come il sensore dell'ora di andare a dormire. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate - Calendario.",
-                        "data": {
-                            "time_of_day_disarmed": "Disinserito",
-                            "time_of_day_armed_home": "Inserito in casa",
-                            "time_of_day_armed_away": "Inserito fuori casa",
-                            "time_of_day_armed_custom_bypass": "Inserito personalizzato"
-                        }
-                    },
                     "calendar_options": {
                         "name": "Avanzate - Calendario",
                         "description": "Cosa succede quando un evento del calendario termina, e quali eventi impostano quale stato di allarme. Un calendario senza regole di corrispondenza usa quelle predefinite, eventi chiamati Away, Home, Night, Disarmed, Vacation o Holiday.",
@@ -167,23 +119,71 @@
                             "calendar_notify_grace": "Secondi di attesa prima di notificare un cambio del calendario, così che i cambi ravvicinati, come un evento che termina mentre ne inizia un altro, siano inviati come un'unica notifica."
                         }
                     },
+                    "sun_options": {
+                        "name": "Avanzate - Diurno",
+                        "description": "La mattina è l'alba, e la sera il tramonto, ciascuna mantenuta entro i suoi orari minimo e massimo. Gli attivatori rivalutano lo stato dell'allarme alla mattina e alla sera, e vengono ignorati durante l'ora di dormire. Automatico disattiva un attivatore nei giorni con un evento di calendario Disinserito, Inserito in casa o Inserito notte. Gli orari minimo e massimo sono utili soprattutto quando per l'ora di dormire non si usa un sensore ora del giorno né un calendario.",
+                        "data": {
+                            "occupancy_default_day": "Stato quando occupato tra mattina e sera",
+                            "occupancy_default_after_bedtime": "Stato quando occupato tra l'ora di dormire e la mattina",
+                            "occupancy_default_night": "Stato quando occupato tra la sera e l'ora di dormire",
+                            "sunrise_trigger": "Mattina - attivatore",
+                            "sunrise_earliest": "Mattina - Prima",
+                            "sunrise_latest": "Mattina - Ultima",
+                            "sunset_trigger": "Sera - attivatore",
+                            "sunset_earliest": "Sera - Prima",
+                            "sunset_latest": "Sera - Ultima"
+                        },
+                        "data_description": {
+                            "occupancy_default_after_bedtime": "Per quando l'ora di dormire termina prima della mattina. Non ha effetto senza un sensore dell'ora di andare a dormire.",
+                            "occupancy_default_night": "Impostalo su Inserito in casa come valore predefinito prima di andare a dormire se un sensore ora del giorno o un calendario imposta Inserito notte all'ora di andare a dormire, come nella [ricetta consigliata]({recipe_url}). Se quel giorno nulla imposta Inserito notte per l'ora di dormire, né un sensore dell'ora di andare a dormire né un evento di calendario, è Inserito notte dalla sera.",
+                            "sunrise_trigger": "Rivaluta lo stato dell'allarme alla mattina",
+                            "sunrise_earliest": "La mattina non è prima di questa ora, per quanto presto sorga il sole",
+                            "sunrise_latest": "La mattina non è dopo questa ora, per quanto tardi sorga il sole",
+                            "sunset_trigger": "Rivaluta lo stato dell'allarme alla sera",
+                            "sunset_earliest": "La sera non è prima di questa ora, per quanto presto tramonti il sole",
+                            "sunset_latest": "La sera non è dopo questa ora, per quanto tardi tramonti il sole"
+                        }
+                    },
+                    "presence_options": {
+                        "name": "Avanzate - Occupazione",
+                        "data": {
+                            "occupied_trigger": "Qualcuno arriva a casa",
+                            "unoccupied_trigger": "Qualcuno esce di casa",
+                            "calendar_occupancy_override_states": "Stati di allarme da calendario che la presenza può sovrascrivere",
+                            "calendar_occupancy_ends_away": "Il rientro a casa termina gli eventi di assenza e vacanza nel loro ultimo giorno",
+                            "occupied_delay": "Ritardo dopo l'arrivo di qualcuno a casa",
+                            "unoccupied_delay": "Ritardo dopo che qualcuno esce di casa"
+                        },
+                        "data_description": {
+                            "occupied_trigger": "Rivalutare lo stato dell'allarme quando una persona arriva a casa",
+                            "unoccupied_trigger": "Rivalutare lo stato dell'allarme quando una persona esce di casa",
+                            "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa.",
+                            "calendar_occupancy_ends_away": "Quando qualcuno rientra a casa nel giorno in cui deve terminare un evento di calendario Inserito fuori casa o Inserito vacanza, l'evento termina in quel momento anziché all'orario di fine, e l'allarme passa allo stato impostato per la fine di un evento di calendario. Vale sia per gli eventi singoli sia per quelli ricorrenti.",
+                            "occupied_delay": "Secondi di attesa dopo l'arrivo di qualcuno a casa prima di determinare lo stato dell'allarme. Una modifica manuale in quel tempo lo annulla.",
+                            "unoccupied_delay": "Secondi di attesa dopo che qualcuno esce di casa prima di determinare lo stato dell'allarme, così una breve assenza o un tracker che si disconnette non inserisce l'allarme. Una modifica manuale in quel tempo lo annulla."
+                        }
+                    },
                     "advanced_options": {
-                        "name": "Avanzate",
+                        "name": "Avanzate - Altro",
                         "data": {
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
-                            "panel_code": "Codice della centrale d'allarme",
-                            "occupied_delay": "Ritardo dopo l'arrivo di qualcuno a casa",
-                            "unoccupied_delay": "Ritardo dopo che qualcuno esce di casa",
                             "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
                             "rate_limit_period": "Limite di frequenza - periodo"
                         },
                         "data_description": {
-                            "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sotto.",
-                            "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato.",
-                            "occupied_delay": "Secondi di attesa dopo l'arrivo di qualcuno a casa prima di determinare lo stato dell'allarme. Una modifica manuale in quel tempo lo annulla.",
-                            "unoccupied_delay": "Secondi di attesa dopo che qualcuno esce di casa prima di determinare lo stato dell'allarme, così una breve assenza o un tracker che si disconnette non inserisce l'allarme. Una modifica manuale in quel tempo lo annulla.",
+                            "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sopra.",
                             "rate_limit_max_calls": "Il numero massimo di cambi di stato dell'allarme che Auto Arm effettua nel periodo del limite di frequenza, come protezione dai cicli. Le ulteriori modifiche in quel periodo vengono saltate.",
                             "rate_limit_period": "Durata del periodo, in secondi, in cui vengono contate le modifiche massime."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Avanzate - Ora del giorno",
+                        "description": "Sensori ora del giorno per gli altri stati di allarme, che impostano il proprio stato mentre sono attivi, come il sensore dell'ora di andare a dormire. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate - Calendario.",
+                        "data": {
+                            "time_of_day_disarmed": "Disinserito",
+                            "time_of_day_armed_home": "Inserito in casa",
+                            "time_of_day_armed_away": "Inserito fuori casa",
+                            "time_of_day_armed_custom_bypass": "Inserito personalizzato"
                         }
                     }
                 }
@@ -205,52 +205,26 @@
                     "alarm_panel": "Pannello di controllo allarme da gestire",
                     "time_of_day_armed_night": "Ora di dormire - Sensore ora del giorno",
                     "calendar_entities": "Occupazione - Calendari",
-                    "person_entities": "Presenza - Persone per l'inserimento basato sulla presenza"
+                    "person_entities": "Presenza - Persone per l'inserimento basato sulla presenza",
+                    "panel_code": "Codice della centrale d'allarme",
+                    "panel_code_clear": "Rimuovi il codice salvato della centrale d'allarme"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte.",
                     "calendar_entities": "I calendari servono per lo stato Inserito vacanza, o se la presenza non è disponibile o è inaffidabile per determinare l'occupazione. I calendari possono anche impostare qualsiasi stato inserito, quindi possono sovrascrivere gli altri controlli basati su sole, ora di dormire o occupazione.",
-                    "person_entities": "Il fatto che tutte queste persone siano o meno in casa determina gli stati Inserito fuori casa, Inserito in casa e Disinserito."
+                    "person_entities": "Il fatto che tutte queste persone siano o meno in casa determina gli stati Inserito fuori casa, Inserito in casa e Disinserito.",
+                    "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato."
                 },
                 "sections": {
-                    "presence_options": {
-                        "name": "Presenza",
+                    "assist_options": {
+                        "name": "Assistente vocale",
                         "data": {
-                            "occupied_trigger": "Qualcuno arriva a casa",
-                            "unoccupied_trigger": "Qualcuno esce di casa",
-                            "calendar_occupancy_override_states": "Stati di allarme da calendario che la presenza può sovrascrivere",
-                            "calendar_occupancy_ends_away": "Il rientro a casa termina gli eventi di assenza e vacanza nel loro ultimo giorno"
+                            "sentence_arm": "Inserire e spiegare a voce",
+                            "sentence_disarm": "Disinserire a voce"
                         },
                         "data_description": {
-                            "occupied_trigger": "Rivalutare lo stato dell'allarme quando una persona arriva a casa",
-                            "unoccupied_trigger": "Rivalutare lo stato dell'allarme quando una persona esce di casa",
-                            "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa.",
-                            "calendar_occupancy_ends_away": "Quando qualcuno rientra a casa nel giorno in cui deve terminare un evento di calendario Inserito fuori casa o Inserito vacanza, l'evento termina in quel momento anziché all'orario di fine, e l'allarme passa allo stato impostato per la fine di un evento di calendario. Vale sia per gli eventi singoli sia per quelli ricorrenti."
-                        }
-                    },
-                    "sun_options": {
-                        "name": "Diurno - Sole",
-                        "description": "La mattina è l'alba, e la sera il tramonto, ciascuna mantenuta entro i suoi orari minimo e massimo. Gli attivatori rivalutano lo stato dell'allarme alla mattina e alla sera, e vengono ignorati durante l'ora di dormire. Automatico disattiva un attivatore nei giorni con un evento di calendario Disinserito, Inserito in casa o Inserito notte. Gli orari minimo e massimo sono utili soprattutto quando per l'ora di dormire non si usa un sensore ora del giorno né un calendario.",
-                        "data": {
-                            "occupancy_default_day": "Stato quando occupato tra mattina e sera",
-                            "occupancy_default_after_bedtime": "Stato quando occupato tra l'ora di dormire e la mattina",
-                            "occupancy_default_night": "Stato quando occupato tra la sera e l'ora di dormire",
-                            "sunrise_trigger": "Mattina - attivatore",
-                            "sunrise_earliest": "Mattina - Prima",
-                            "sunrise_latest": "Mattina - Ultima",
-                            "sunset_trigger": "Sera - attivatore",
-                            "sunset_earliest": "Sera - Prima",
-                            "sunset_latest": "Sera - Ultima"
-                        },
-                        "data_description": {
-                            "occupancy_default_after_bedtime": "Per quando l'ora di dormire termina prima della mattina. Non ha effetto senza un sensore dell'ora di andare a dormire.",
-                            "occupancy_default_night": "Impostalo su Inserito in casa come valore predefinito prima di andare a dormire se un sensore ora del giorno o un calendario imposta Inserito notte all'ora di andare a dormire, come nella [ricetta consigliata]({recipe_url}). Se quel giorno nulla imposta Inserito notte per l'ora di dormire, né un sensore dell'ora di andare a dormire né un evento di calendario, è Inserito notte dalla sera.",
-                            "sunrise_trigger": "Rivaluta lo stato dell'allarme alla mattina",
-                            "sunrise_earliest": "La mattina non è prima di questa ora, per quanto presto sorga il sole",
-                            "sunrise_latest": "La mattina non è dopo questa ora, per quanto tardi sorga il sole",
-                            "sunset_trigger": "Rivaluta lo stato dell'allarme alla sera",
-                            "sunset_earliest": "La sera non è prima di questa ora, per quanto presto tramonti il sole",
-                            "sunset_latest": "La sera non è dopo questa ora, per quanto tardi tramonti il sole"
+                            "sentence_arm": "Frasi in inglese per l'agente Assist integrato di Home Assistant, come 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
+                            "sentence_disarm": "Aggiunge 'disarm the alarm'. Attenzione: non viene chiesto alcun codice, quindi chiunque possa parlare con Assist, da un satellite vocale o nella chat, potrà disinserire l'allarme."
                         }
                     },
                     "button_options": {
@@ -271,17 +245,6 @@
                             "button_armed_vacation_delay": "Inserito vacanza - ritardo",
                             "button_armed_custom_bypass": "Inserito personalizzato",
                             "button_armed_custom_bypass_delay": "Inserito personalizzato - ritardo"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Assistente vocale",
-                        "data": {
-                            "sentence_arm": "Inserire e spiegare a voce",
-                            "sentence_disarm": "Disinserire a voce"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Frasi in inglese per l'agente Assist integrato di Home Assistant, come 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
-                            "sentence_disarm": "Aggiunge 'disarm the alarm'. Attenzione: non viene chiesto alcun codice, quindi chiunque possa parlare con Assist, da un satellite vocale o nella chat, potrà disinserire l'allarme."
                         }
                     },
                     "notify_options": {
@@ -311,16 +274,6 @@
                             "notify_data": "Dati aggiuntivi passati all'azione di notifica, come azioni o un canale per una notifica dell'app mobile. Qualsiasi valore impostato qui viene sovrascritto da una chiave corrispondente in un profilo di notifica YAML."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Avanzate - Ora del giorno",
-                        "description": "Sensori ora del giorno per gli altri stati di allarme, che impostano il proprio stato mentre sono attivi, come il sensore dell'ora di andare a dormire. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate - Calendario.",
-                        "data": {
-                            "time_of_day_disarmed": "Disinserito",
-                            "time_of_day_armed_home": "Inserito in casa",
-                            "time_of_day_armed_away": "Inserito fuori casa",
-                            "time_of_day_armed_custom_bypass": "Inserito personalizzato"
-                        }
-                    },
                     "calendar_options": {
                         "name": "Avanzate - Calendario",
                         "description": "Cosa succede quando un evento del calendario termina, e quali eventi impostano quale stato di allarme. Un calendario senza regole di corrispondenza usa quelle predefinite, eventi chiamati Away, Home, Night, Disarmed, Vacation o Holiday.",
@@ -339,24 +292,71 @@
                             "calendar_notify_grace": "Secondi di attesa prima di notificare un cambio del calendario, così che i cambi ravvicinati, come un evento che termina mentre ne inizia un altro, siano inviati come un'unica notifica."
                         }
                     },
+                    "sun_options": {
+                        "name": "Avanzate - Diurno",
+                        "description": "La mattina è l'alba, e la sera il tramonto, ciascuna mantenuta entro i suoi orari minimo e massimo. Gli attivatori rivalutano lo stato dell'allarme alla mattina e alla sera, e vengono ignorati durante l'ora di dormire. Automatico disattiva un attivatore nei giorni con un evento di calendario Disinserito, Inserito in casa o Inserito notte. Gli orari minimo e massimo sono utili soprattutto quando per l'ora di dormire non si usa un sensore ora del giorno né un calendario.",
+                        "data": {
+                            "occupancy_default_day": "Stato quando occupato tra mattina e sera",
+                            "occupancy_default_after_bedtime": "Stato quando occupato tra l'ora di dormire e la mattina",
+                            "occupancy_default_night": "Stato quando occupato tra la sera e l'ora di dormire",
+                            "sunrise_trigger": "Mattina - attivatore",
+                            "sunrise_earliest": "Mattina - Prima",
+                            "sunrise_latest": "Mattina - Ultima",
+                            "sunset_trigger": "Sera - attivatore",
+                            "sunset_earliest": "Sera - Prima",
+                            "sunset_latest": "Sera - Ultima"
+                        },
+                        "data_description": {
+                            "occupancy_default_after_bedtime": "Per quando l'ora di dormire termina prima della mattina. Non ha effetto senza un sensore dell'ora di andare a dormire.",
+                            "occupancy_default_night": "Impostalo su Inserito in casa come valore predefinito prima di andare a dormire se un sensore ora del giorno o un calendario imposta Inserito notte all'ora di andare a dormire, come nella [ricetta consigliata]({recipe_url}). Se quel giorno nulla imposta Inserito notte per l'ora di dormire, né un sensore dell'ora di andare a dormire né un evento di calendario, è Inserito notte dalla sera.",
+                            "sunrise_trigger": "Rivaluta lo stato dell'allarme alla mattina",
+                            "sunrise_earliest": "La mattina non è prima di questa ora, per quanto presto sorga il sole",
+                            "sunrise_latest": "La mattina non è dopo questa ora, per quanto tardi sorga il sole",
+                            "sunset_trigger": "Rivaluta lo stato dell'allarme alla sera",
+                            "sunset_earliest": "La sera non è prima di questa ora, per quanto presto tramonti il sole",
+                            "sunset_latest": "La sera non è dopo questa ora, per quanto tardi tramonti il sole"
+                        }
+                    },
+                    "presence_options": {
+                        "name": "Avanzate - Occupazione",
+                        "data": {
+                            "occupied_trigger": "Qualcuno arriva a casa",
+                            "unoccupied_trigger": "Qualcuno esce di casa",
+                            "calendar_occupancy_override_states": "Stati di allarme da calendario che la presenza può sovrascrivere",
+                            "calendar_occupancy_ends_away": "Il rientro a casa termina gli eventi di assenza e vacanza nel loro ultimo giorno",
+                            "occupied_delay": "Ritardo dopo l'arrivo di qualcuno a casa",
+                            "unoccupied_delay": "Ritardo dopo che qualcuno esce di casa"
+                        },
+                        "data_description": {
+                            "occupied_trigger": "Rivalutare lo stato dell'allarme quando una persona arriva a casa",
+                            "unoccupied_trigger": "Rivalutare lo stato dell'allarme quando una persona esce di casa",
+                            "calendar_occupancy_override_states": "Quando un evento del calendario imposta uno di questi stati, i cambiamenti di presenza (arrivi e partenze) possono ancora aggiornare lo stato dell'allarme. Ad esempio, se il calendario indica Disinserito ma tutti escono, passerà a Inserito Fuori Casa.",
+                            "calendar_occupancy_ends_away": "Quando qualcuno rientra a casa nel giorno in cui deve terminare un evento di calendario Inserito fuori casa o Inserito vacanza, l'evento termina in quel momento anziché all'orario di fine, e l'allarme passa allo stato impostato per la fine di un evento di calendario. Vale sia per gli eventi singoli sia per quelli ricorrenti.",
+                            "occupied_delay": "Secondi di attesa dopo l'arrivo di qualcuno a casa prima di determinare lo stato dell'allarme. Una modifica manuale in quel tempo lo annulla.",
+                            "unoccupied_delay": "Secondi di attesa dopo che qualcuno esce di casa prima di determinare lo stato dell'allarme, così una breve assenza o un tracker che si disconnette non inserisce l'allarme. Una modifica manuale in quel tempo lo annulla."
+                        }
+                    },
                     "advanced_options": {
-                        "name": "Avanzate",
+                        "name": "Avanzate - Altro",
                         "data": {
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
-                            "panel_code": "Codice della centrale d'allarme",
-                            "panel_code_clear": "Rimuovi il codice salvato della centrale d'allarme",
-                            "occupied_delay": "Ritardo dopo l'arrivo di qualcuno a casa",
-                            "unoccupied_delay": "Ritardo dopo che qualcuno esce di casa",
                             "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
                             "rate_limit_period": "Limite di frequenza - periodo"
                         },
                         "data_description": {
-                            "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sotto.",
-                            "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato.",
-                            "occupied_delay": "Secondi di attesa dopo l'arrivo di qualcuno a casa prima di determinare lo stato dell'allarme. Una modifica manuale in quel tempo lo annulla.",
-                            "unoccupied_delay": "Secondi di attesa dopo che qualcuno esce di casa prima di determinare lo stato dell'allarme, così una breve assenza o un tracker che si disconnette non inserisce l'allarme. Una modifica manuale in quel tempo lo annulla.",
+                            "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sopra.",
                             "rate_limit_max_calls": "Il numero massimo di cambi di stato dell'allarme che Auto Arm effettua nel periodo del limite di frequenza, come protezione dai cicli. Le ulteriori modifiche in quel periodo vengono saltate.",
                             "rate_limit_period": "Durata del periodo, in secondi, in cui vengono contate le modifiche massime."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Avanzate - Ora del giorno",
+                        "description": "Sensori ora del giorno per gli altri stati di allarme, che impostano il proprio stato mentre sono attivi, come il sensore dell'ora di andare a dormire. Quando un sensore si disattiva, si applicano le impostazioni di fine evento del calendario in Avanzate - Calendario.",
+                        "data": {
+                            "time_of_day_disarmed": "Disinserito",
+                            "time_of_day_armed_home": "Inserito in casa",
+                            "time_of_day_armed_away": "Inserito fuori casa",
+                            "time_of_day_armed_custom_bypass": "Inserito personalizzato"
                         }
                     }
                 }

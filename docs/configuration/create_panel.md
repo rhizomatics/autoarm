@@ -28,7 +28,7 @@ Auto Arm changes the panel's state by calling its actions, `alarm_control_panel.
 a *manual* panel, and for integrations that do more than hold a state when armed or disarmed, such as
 [Alarmo](https://github.com/nielsfaber/alarmo), which arms its child areas when its master panel is armed.
 
-This is controlled by **Change state using the alarm panel's actions** in the **Advanced** section of the Auto Arm options, which is on for new installs.
+This is controlled by **Change state using the alarm panel's actions** in the **Advanced - Other** section of the Auto Arm options, which is on for new installs.
 
 - If the panel needs a code to arm or disarm, give Auto Arm one, see [Panels That Need a Code](#panels-that-need-a-code).
 - If the action fails, or doesn't change the state, Auto Arm leaves the panel alone rather than set the state behind the integration's back. A warning is logged.
@@ -39,7 +39,7 @@ This is controlled by **Change state using the alarm panel's actions** in the **
 Some alarm panels want a code before they will arm or disarm. Auto Arm raises a repair in **Settings** > **Repairs**
 when the panel is set up that way and there is no code for it to use. There are three ways to deal with it:
 
-- Set **Alarm panel code** in the **Advanced** section of the Auto Arm options, and Auto Arm passes it to the panel's actions.
+- Set **Alarm panel code** in the Auto Arm options, just above the sections, and Auto Arm passes it to the panel's actions.
 - Set a default code for the alarm panel entity in Home Assistant, from the entity's own settings. Home Assistant then
   supplies it to every action called without a code, not only those from Auto Arm.
 - Switch the code requirement off in the panel's own integration.

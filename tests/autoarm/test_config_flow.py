@@ -355,18 +355,38 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
 
 
 async def test_options_flow_advanced_delays_and_rate_limit(hass: HomeAssistant, setup_autoarm: MockConfigEntry) -> None:
-    """The occupancy delays and rate limit are in the advanced section, with the defaults they had in YAML"""
+    """The occupancy delays and rate limit are in the advanced sections, with the defaults they had in YAML"""
     result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
 
     data_schema = result["data_schema"]
     assert data_schema is not None
     assert data_schema.schema["advanced_options"].schema({}) == {
         "use_alarm_service": True,
-        "occupied_delay": 0,
-        "unoccupied_delay": 120,
         "rate_limit_max_calls": 5,
         "rate_limit_period": 60,
     }
+    presence_defaults = data_schema.schema["presence_options"].schema({})
+    assert presence_defaults["occupied_delay"] == 0
+    assert presence_defaults["unoccupied_delay"] == 120
+
+
+async def test_options_flow_field_and_section_order(hass: HomeAssistant, setup_autoarm: MockConfigEntry) -> None:
+    """The alarm panel code is last before the sections, then the everyday sections, then the advanced ones"""
+    result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
+
+    data_schema = result["data_schema"]
+    assert data_schema is not None
+    assert [str(key) for key in data_schema.schema][4:] == [
+        "panel_code",
+        "assist_options",
+        "button_options",
+        "notify_options",
+        "calendar_options",
+        "sun_options",
+        "presence_options",
+        "advanced_options",
+        "time_of_day_options",
+    ]
 
 
 async def test_options_flow_offers_supernotify_action(hass: HomeAssistant, setup_autoarm: MockConfigEntry) -> None:

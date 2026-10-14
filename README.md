@@ -108,7 +108,7 @@ The full list of how alarm panel state can be set:
 
 ## Throttling
 
-To guard against loops, or other reasons why arming might be triggered too often, rate limiting is applied around the arm call, limited to a set number of calls within the past so many seconds. Set with the **Rate limit** fields in the **Advanced** section of the options, and is 5 changes in 60 seconds unless changed.
+To guard against loops, or other reasons why arming might be triggered too often, rate limiting is applied around the arm call, limited to a set number of calls within the past so many seconds. Set with the **Rate limit** fields in the **Advanced - Other** section of the options, and is 5 changes in 60 seconds unless changed.
 
 ![Rate Limit Config](./assets/images/config_rate_limit.png)
 

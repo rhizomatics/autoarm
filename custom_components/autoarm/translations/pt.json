@@ -32,53 +32,26 @@
                     "alarm_panel": "Painel de controlo de alarme a gerir",
                     "time_of_day_armed_night": "Hora de deitar - Sensor de hora do dia",
                     "calendar_entities": "Ocupação - Calendários",
-                    "person_entities": "Presença - Pessoas para armar com base na ocupação"
+                    "person_entities": "Presença - Pessoas para armar com base na ocupação",
+                    "panel_code": "Código do painel de alarme"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Um sensor de hora do dia que está ligado todos os dias à hora de deitar. Enquanto está ligado, o alarme mantém-se em Armado noite. Ainda não tem sensor de hora de deitar? [Crie um]({bedtime_help_url}), ou vá a Definições → Dispositivos e serviços → Auxiliares → **+ Criar auxiliar** → **Hora do dia**. Dê-lhe um nome e defina uma hora de início/fim para a sua hora habitual de deitar.",
                     "alarm_panel": "Ainda não tem painel de alarme? [Crie um virtual]({alarm_panel_help_url}), ou no Home Assistant vá a Definições → Dispositivos e serviços → Auxiliares → **+ Criar auxiliar** → Modelo → **Painel de controlo de alarme**. Dê-lhe um nome e envie; todos os outros campos são opcionais.",
                     "calendar_entities": "Os calendários são necessários para o estado Armado férias, ou se a presença estiver indisponível ou não for fiável para determinar a ocupação. Os calendários também podem definir qualquer estado armado, pelo que podem substituir outros controlos por sol, hora de deitar ou ocupação. Ainda não tem calendário? [Crie um calendário local]({calendar_help_url}), ou vá a Definições → Dispositivos e serviços → **+ Adicionar integração** → **Calendário local**. Dê-lhe um nome e deixe 'Criar calendário vazio' selecionado.",
-                    "person_entities": "O facto de todas estas pessoas estarem ou não em casa determina os estados Armado ausente, Armado em casa e Desarmado. Falta alguém? [Adicione uma nova pessoa]({person_help_url}), ou vá a Definições → Pessoas → **+ Adicionar pessoa**. Dê-lhe um nome; associar uma conta de utilizador é opcional."
+                    "person_entities": "O facto de todas estas pessoas estarem ou não em casa determina os estados Armado ausente, Armado em casa e Desarmado. Falta alguém? [Adicione uma nova pessoa]({person_help_url}), ou vá a Definições → Pessoas → **+ Adicionar pessoa**. Dê-lhe um nome; associar uma conta de utilizador é opcional.",
+                    "panel_code": "Código que o Auto Arm dá às ações do painel de alarme ao armar ou desarmar, se o painel precisar de um. É guardado encriptado e nunca mais é mostrado. Deixe em branco para manter o código já guardado."
                 },
                 "sections": {
-                    "presence_options": {
-                        "name": "Presença",
+                    "assist_options": {
+                        "name": "Assistente de voz",
                         "data": {
-                            "occupied_trigger": "Alguém chega a casa",
-                            "unoccupied_trigger": "Alguém sai de casa",
-                            "calendar_occupancy_override_states": "Estados de alarme do calendário que a presença pode substituir",
-                            "calendar_occupancy_ends_away": "Chegar a casa termina os eventos de ausência e de férias no seu último dia"
+                            "sentence_arm": "Armar e explicar por voz",
+                            "sentence_disarm": "Desarmar por voz"
                         },
                         "data_description": {
-                            "occupied_trigger": "Reavaliar o estado do alarme quando alguém chega a casa",
-                            "unoccupied_trigger": "Reavaliar o estado do alarme quando alguém sai de casa",
-                            "calendar_occupancy_override_states": "Quando um evento do calendário define um destes estados, as alterações de ocupação (chegadas e saídas) ainda podem atualizar o estado do alarme. Por exemplo, se o calendário indicar Desarmado mas todos saírem, mudará para Armado Fora.",
-                            "calendar_occupancy_ends_away": "Quando alguém chega a casa no dia em que um evento de calendário Armado ausente ou Armado férias deve terminar, o evento termina nesse momento em vez de na sua hora de fim, e o alarme passa para o estado definido para quando um evento de calendário termina. Aplica-se tanto a eventos únicos como a recorrentes."
-                        }
-                    },
-                    "sun_options": {
-                        "name": "Diurno - Sol",
-                        "description": "A manhã é o nascer do sol, e o fim do dia o pôr do sol, cada um mantido dentro das suas horas mais cedo e mais tarde. Os acionadores reavaliam o estado do alarme de manhã e ao fim do dia, e são ignorados durante a hora de deitar. Automático desliga um acionador nos dias com um evento de calendário Desarmado, Armado em casa ou Armado noite. As horas mais cedo e mais tarde são mais úteis quando não se usa um sensor de hora do dia nem um calendário para a hora de deitar.",
-                        "data": {
-                            "occupancy_default_day": "Estado quando ocupado entre a manhã e o fim do dia",
-                            "occupancy_default_after_bedtime": "Estado quando ocupado entre a hora de deitar e a manhã",
-                            "occupancy_default_night": "Estado quando ocupado entre o fim do dia e a hora de deitar",
-                            "sunrise_trigger": "Manhã - acionador",
-                            "sunrise_earliest": "Manhã - Mais cedo",
-                            "sunrise_latest": "Manhã - Mais tarde",
-                            "sunset_trigger": "Fim do dia - acionador",
-                            "sunset_earliest": "Fim do dia - Mais cedo",
-                            "sunset_latest": "Fim do dia - Mais tarde"
-                        },
-                        "data_description": {
-                            "occupancy_default_after_bedtime": "Para quando a hora de deitar termina antes da manhã. Não tem efeito sem um sensor de hora de deitar.",
-                            "occupancy_default_night": "Defina como Armado em casa como predefinição antes da hora de deitar se um sensor de hora do dia ou um calendário definir Armado noite para a hora de deitar, como na [receita recomendada]({recipe_url}). Se nesse dia nada definir Armado noite para a hora de deitar, nem um sensor de hora de deitar nem um evento de calendário, é Armado noite a partir do fim do dia.",
-                            "sunrise_trigger": "Reavaliar o estado do alarme de manhã",
-                            "sunrise_earliest": "A manhã não é antes desta hora, por mais cedo que o sol nasça",
-                            "sunrise_latest": "A manhã não é depois desta hora, por mais tarde que o sol nasça",
-                            "sunset_trigger": "Reavaliar o estado do alarme ao fim do dia",
-                            "sunset_earliest": "O fim do dia não é antes desta hora, por mais cedo que o sol se ponha",
-                            "sunset_latest": "O fim do dia não é depois desta hora, por mais tarde que o sol se ponha"
+                            "sentence_arm": "Frases em inglês para o agente Assist integrado do Home Assistant, como 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
+                            "sentence_disarm": "Adiciona 'disarm the alarm'. Aviso: nenhum código é pedido, por isso qualquer pessoa que fale com o Assist, num satélite de voz ou no chat, poderá desarmar o alarme."
                         }
                     },
                     "button_options": {
@@ -99,17 +72,6 @@
                             "button_armed_vacation_delay": "Armado férias - atraso",
                             "button_armed_custom_bypass": "Armado personalizado",
                             "button_armed_custom_bypass_delay": "Armado personalizado - atraso"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Assistente de voz",
-                        "data": {
-                            "sentence_arm": "Armar e explicar por voz",
-                            "sentence_disarm": "Desarmar por voz"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Frases em inglês para o agente Assist integrado do Home Assistant, como 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
-                            "sentence_disarm": "Adiciona 'disarm the alarm'. Aviso: nenhum código é pedido, por isso qualquer pessoa que fale com o Assist, num satélite de voz ou no chat, poderá desarmar o alarme."
                         }
                     },
                     "notify_options": {
@@ -139,16 +101,6 @@
                             "notify_data": "Dados extra passados para a ação de notificação, como ações ou um canal para uma notificação da app móvel. Qualquer valor definido aqui é substituído por uma chave correspondente num perfil de notificação YAML."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Avançado - Hora do dia",
-                        "description": "Sensores de hora do dia para os outros estados de alarme, que definem o seu estado enquanto estão ligados, tal como o sensor de hora de deitar. Quando um sensor se desliga, aplicam-se as definições de fim de evento de calendário em Avançado - Calendário.",
-                        "data": {
-                            "time_of_day_disarmed": "Desarmado",
-                            "time_of_day_armed_home": "Armado em casa",
-                            "time_of_day_armed_away": "Armado ausente",
-                            "time_of_day_armed_custom_bypass": "Armado personalizado"
-                        }
-                    },
                     "calendar_options": {
                         "name": "Avançado - Calendário",
                         "description": "O que acontece quando um evento de calendário termina, e que eventos definem cada estado de alarme. Um calendário sem regras de correspondência usa as predefinidas, eventos chamados Away, Home, Night, Disarmed, Vacation ou Holiday.",
@@ -167,23 +119,71 @@
                             "calendar_notify_grace": "Segundos de espera antes de notificar uma alteração de calendário, para que alterações muito próximas, como um evento que termina quando outro começa, sejam enviadas como uma só notificação."
                         }
                     },
+                    "sun_options": {
+                        "name": "Avançado - Diurno",
+                        "description": "A manhã é o nascer do sol, e o fim do dia o pôr do sol, cada um mantido dentro das suas horas mais cedo e mais tarde. Os acionadores reavaliam o estado do alarme de manhã e ao fim do dia, e são ignorados durante a hora de deitar. Automático desliga um acionador nos dias com um evento de calendário Desarmado, Armado em casa ou Armado noite. As horas mais cedo e mais tarde são mais úteis quando não se usa um sensor de hora do dia nem um calendário para a hora de deitar.",
+                        "data": {
+                            "occupancy_default_day": "Estado quando ocupado entre a manhã e o fim do dia",
+                            "occupancy_default_after_bedtime": "Estado quando ocupado entre a hora de deitar e a manhã",
+                            "occupancy_default_night": "Estado quando ocupado entre o fim do dia e a hora de deitar",
+                            "sunrise_trigger": "Manhã - acionador",
+                            "sunrise_earliest": "Manhã - Mais cedo",
+                            "sunrise_latest": "Manhã - Mais tarde",
+                            "sunset_trigger": "Fim do dia - acionador",
+                            "sunset_earliest": "Fim do dia - Mais cedo",
+                            "sunset_latest": "Fim do dia - Mais tarde"
+                        },
+                        "data_description": {
+                            "occupancy_default_after_bedtime": "Para quando a hora de deitar termina antes da manhã. Não tem efeito sem um sensor de hora de deitar.",
+                            "occupancy_default_night": "Defina como Armado em casa como predefinição antes da hora de deitar se um sensor de hora do dia ou um calendário definir Armado noite para a hora de deitar, como na [receita recomendada]({recipe_url}). Se nesse dia nada definir Armado noite para a hora de deitar, nem um sensor de hora de deitar nem um evento de calendário, é Armado noite a partir do fim do dia.",
+                            "sunrise_trigger": "Reavaliar o estado do alarme de manhã",
+                            "sunrise_earliest": "A manhã não é antes desta hora, por mais cedo que o sol nasça",
+                            "sunrise_latest": "A manhã não é depois desta hora, por mais tarde que o sol nasça",
+                            "sunset_trigger": "Reavaliar o estado do alarme ao fim do dia",
+                            "sunset_earliest": "O fim do dia não é antes desta hora, por mais cedo que o sol se ponha",
+                            "sunset_latest": "O fim do dia não é depois desta hora, por mais tarde que o sol se ponha"
+                        }
+                    },
+                    "presence_options": {
+                        "name": "Avançado - Ocupação",
+                        "data": {
+                            "occupied_trigger": "Alguém chega a casa",
+                            "unoccupied_trigger": "Alguém sai de casa",
+                            "calendar_occupancy_override_states": "Estados de alarme do calendário que a presença pode substituir",
+                            "calendar_occupancy_ends_away": "Chegar a casa termina os eventos de ausência e de férias no seu último dia",
+                            "occupied_delay": "Atraso depois de alguém chegar a casa",
+                            "unoccupied_delay": "Atraso depois de alguém sair de casa"
+                        },
+                        "data_description": {
+                            "occupied_trigger": "Reavaliar o estado do alarme quando alguém chega a casa",
+                            "unoccupied_trigger": "Reavaliar o estado do alarme quando alguém sai de casa",
+                            "calendar_occupancy_override_states": "Quando um evento do calendário define um destes estados, as alterações de ocupação (chegadas e saídas) ainda podem atualizar o estado do alarme. Por exemplo, se o calendário indicar Desarmado mas todos saírem, mudará para Armado Fora.",
+                            "calendar_occupancy_ends_away": "Quando alguém chega a casa no dia em que um evento de calendário Armado ausente ou Armado férias deve terminar, o evento termina nesse momento em vez de na sua hora de fim, e o alarme passa para o estado definido para quando um evento de calendário termina. Aplica-se tanto a eventos únicos como a recorrentes.",
+                            "occupied_delay": "Segundos de espera depois de alguém chegar a casa antes de determinar o estado do alarme. Uma alteração manual nesse tempo cancela-o.",
+                            "unoccupied_delay": "Segundos de espera depois de alguém sair de casa antes de determinar o estado do alarme, para que uma ausência breve ou um localizador que perde a ligação não arme o alarme. Uma alteração manual nesse tempo cancela-o."
+                        }
+                    },
                     "advanced_options": {
-                        "name": "Avançado",
+                        "name": "Avançado - Outros",
                         "data": {
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
-                            "panel_code": "Código do painel de alarme",
-                            "occupied_delay": "Atraso depois de alguém chegar a casa",
-                            "unoccupied_delay": "Atraso depois de alguém sair de casa",
                             "rate_limit_max_calls": "Limite de frequência - alterações máximas",
                             "rate_limit_period": "Limite de frequência - período"
                         },
                         "data_description": {
-                            "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o abaixo.",
-                            "panel_code": "Código que o Auto Arm dá às ações do painel de alarme ao armar ou desarmar, se o painel precisar de um. É guardado encriptado e nunca mais é mostrado. Deixe em branco para manter o código já guardado.",
-                            "occupied_delay": "Segundos de espera depois de alguém chegar a casa antes de determinar o estado do alarme. Uma alteração manual nesse tempo cancela-o.",
-                            "unoccupied_delay": "Segundos de espera depois de alguém sair de casa antes de determinar o estado do alarme, para que uma ausência breve ou um localizador que perde a ligação não arme o alarme. Uma alteração manual nesse tempo cancela-o.",
+                            "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o acima.",
                             "rate_limit_max_calls": "O máximo de alterações do estado do alarme que o Auto Arm fará dentro do período do limite de frequência, como proteção contra ciclos. As restantes alterações nesse período são ignoradas.",
                             "rate_limit_period": "Duração do período, em segundos, durante o qual são contadas as alterações máximas."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Avançado - Hora do dia",
+                        "description": "Sensores de hora do dia para os outros estados de alarme, que definem o seu estado enquanto estão ligados, tal como o sensor de hora de deitar. Quando um sensor se desliga, aplicam-se as definições de fim de evento de calendário em Avançado - Calendário.",
+                        "data": {
+                            "time_of_day_disarmed": "Desarmado",
+                            "time_of_day_armed_home": "Armado em casa",
+                            "time_of_day_armed_away": "Armado ausente",
+                            "time_of_day_armed_custom_bypass": "Armado personalizado"
                         }
                     }
                 }
@@ -205,52 +205,26 @@
                     "alarm_panel": "Painel de controlo de alarme a gerir",
                     "time_of_day_armed_night": "Hora de deitar - Sensor de hora do dia",
                     "calendar_entities": "Ocupação - Calendários",
-                    "person_entities": "Presença - Pessoas para armar com base na ocupação"
+                    "person_entities": "Presença - Pessoas para armar com base na ocupação",
+                    "panel_code": "Código do painel de alarme",
+                    "panel_code_clear": "Remover o código guardado do painel de alarme"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Um sensor de hora do dia que está ligado todos os dias à hora de deitar. Enquanto está ligado, o alarme mantém-se em Armado noite.",
                     "calendar_entities": "Os calendários são necessários para o estado Armado férias, ou se a presença estiver indisponível ou não for fiável para determinar a ocupação. Os calendários também podem definir qualquer estado armado, pelo que podem substituir outros controlos por sol, hora de deitar ou ocupação.",
-                    "person_entities": "O facto de todas estas pessoas estarem ou não em casa determina os estados Armado ausente, Armado em casa e Desarmado."
+                    "person_entities": "O facto de todas estas pessoas estarem ou não em casa determina os estados Armado ausente, Armado em casa e Desarmado.",
+                    "panel_code": "Código que o Auto Arm dá às ações do painel de alarme ao armar ou desarmar, se o painel precisar de um. É guardado encriptado e nunca mais é mostrado. Deixe em branco para manter o código já guardado."
                 },
                 "sections": {
-                    "presence_options": {
-                        "name": "Presença",
+                    "assist_options": {
+                        "name": "Assistente de voz",
                         "data": {
-                            "occupied_trigger": "Alguém chega a casa",
-                            "unoccupied_trigger": "Alguém sai de casa",
-                            "calendar_occupancy_override_states": "Estados de alarme do calendário que a presença pode substituir",
-                            "calendar_occupancy_ends_away": "Chegar a casa termina os eventos de ausência e de férias no seu último dia"
+                            "sentence_arm": "Armar e explicar por voz",
+                            "sentence_disarm": "Desarmar por voz"
                         },
                         "data_description": {
-                            "occupied_trigger": "Reavaliar o estado do alarme quando alguém chega a casa",
-                            "unoccupied_trigger": "Reavaliar o estado do alarme quando alguém sai de casa",
-                            "calendar_occupancy_override_states": "Quando um evento do calendário define um destes estados, as alterações de ocupação (chegadas e saídas) ainda podem atualizar o estado do alarme. Por exemplo, se o calendário indicar Desarmado mas todos saírem, mudará para Armado Fora.",
-                            "calendar_occupancy_ends_away": "Quando alguém chega a casa no dia em que um evento de calendário Armado ausente ou Armado férias deve terminar, o evento termina nesse momento em vez de na sua hora de fim, e o alarme passa para o estado definido para quando um evento de calendário termina. Aplica-se tanto a eventos únicos como a recorrentes."
-                        }
-                    },
-                    "sun_options": {
-                        "name": "Diurno - Sol",
-                        "description": "A manhã é o nascer do sol, e o fim do dia o pôr do sol, cada um mantido dentro das suas horas mais cedo e mais tarde. Os acionadores reavaliam o estado do alarme de manhã e ao fim do dia, e são ignorados durante a hora de deitar. Automático desliga um acionador nos dias com um evento de calendário Desarmado, Armado em casa ou Armado noite. As horas mais cedo e mais tarde são mais úteis quando não se usa um sensor de hora do dia nem um calendário para a hora de deitar.",
-                        "data": {
-                            "occupancy_default_day": "Estado quando ocupado entre a manhã e o fim do dia",
-                            "occupancy_default_after_bedtime": "Estado quando ocupado entre a hora de deitar e a manhã",
-                            "occupancy_default_night": "Estado quando ocupado entre o fim do dia e a hora de deitar",
-                            "sunrise_trigger": "Manhã - acionador",
-                            "sunrise_earliest": "Manhã - Mais cedo",
-                            "sunrise_latest": "Manhã - Mais tarde",
-                            "sunset_trigger": "Fim do dia - acionador",
-                            "sunset_earliest": "Fim do dia - Mais cedo",
-                            "sunset_latest": "Fim do dia - Mais tarde"
-                        },
-                        "data_description": {
-                            "occupancy_default_after_bedtime": "Para quando a hora de deitar termina antes da manhã. Não tem efeito sem um sensor de hora de deitar.",
-                            "occupancy_default_night": "Defina como Armado em casa como predefinição antes da hora de deitar se um sensor de hora do dia ou um calendário definir Armado noite para a hora de deitar, como na [receita recomendada]({recipe_url}). Se nesse dia nada definir Armado noite para a hora de deitar, nem um sensor de hora de deitar nem um evento de calendário, é Armado noite a partir do fim do dia.",
-                            "sunrise_trigger": "Reavaliar o estado do alarme de manhã",
-                            "sunrise_earliest": "A manhã não é antes desta hora, por mais cedo que o sol nasça",
-                            "sunrise_latest": "A manhã não é depois desta hora, por mais tarde que o sol nasça",
-                            "sunset_trigger": "Reavaliar o estado do alarme ao fim do dia",
-                            "sunset_earliest": "O fim do dia não é antes desta hora, por mais cedo que o sol se ponha",
-                            "sunset_latest": "O fim do dia não é depois desta hora, por mais tarde que o sol se ponha"
+                            "sentence_arm": "Frases em inglês para o agente Assist integrado do Home Assistant, como 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
+                            "sentence_disarm": "Adiciona 'disarm the alarm'. Aviso: nenhum código é pedido, por isso qualquer pessoa que fale com o Assist, num satélite de voz ou no chat, poderá desarmar o alarme."
                         }
                     },
                     "button_options": {
@@ -271,17 +245,6 @@
                             "button_armed_vacation_delay": "Armado férias - atraso",
                             "button_armed_custom_bypass": "Armado personalizado",
                             "button_armed_custom_bypass_delay": "Armado personalizado - atraso"
-                        }
-                    },
-                    "assist_options": {
-                        "name": "Assistente de voz",
-                        "data": {
-                            "sentence_arm": "Armar e explicar por voz",
-                            "sentence_disarm": "Desarmar por voz"
-                        },
-                        "data_description": {
-                            "sentence_arm": "Frases em inglês para o agente Assist integrado do Home Assistant, como 'arm the alarm', 'arm the alarm in night mode' e 'why is the alarm armed'.",
-                            "sentence_disarm": "Adiciona 'disarm the alarm'. Aviso: nenhum código é pedido, por isso qualquer pessoa que fale com o Assist, num satélite de voz ou no chat, poderá desarmar o alarme."
                         }
                     },
                     "notify_options": {
@@ -311,16 +274,6 @@
                             "notify_data": "Dados extra passados para a ação de notificação, como ações ou um canal para uma notificação da app móvel. Qualquer valor definido aqui é substituído por uma chave correspondente num perfil de notificação YAML."
                         }
                     },
-                    "time_of_day_options": {
-                        "name": "Avançado - Hora do dia",
-                        "description": "Sensores de hora do dia para os outros estados de alarme, que definem o seu estado enquanto estão ligados, tal como o sensor de hora de deitar. Quando um sensor se desliga, aplicam-se as definições de fim de evento de calendário em Avançado - Calendário.",
-                        "data": {
-                            "time_of_day_disarmed": "Desarmado",
-                            "time_of_day_armed_home": "Armado em casa",
-                            "time_of_day_armed_away": "Armado ausente",
-                            "time_of_day_armed_custom_bypass": "Armado personalizado"
-                        }
-                    },
                     "calendar_options": {
                         "name": "Avançado - Calendário",
                         "description": "O que acontece quando um evento de calendário termina, e que eventos definem cada estado de alarme. Um calendário sem regras de correspondência usa as predefinidas, eventos chamados Away, Home, Night, Disarmed, Vacation ou Holiday.",
@@ -339,24 +292,71 @@
                             "calendar_notify_grace": "Segundos de espera antes de notificar uma alteração de calendário, para que alterações muito próximas, como um evento que termina quando outro começa, sejam enviadas como uma só notificação."
                         }
                     },
+                    "sun_options": {
+                        "name": "Avançado - Diurno",
+                        "description": "A manhã é o nascer do sol, e o fim do dia o pôr do sol, cada um mantido dentro das suas horas mais cedo e mais tarde. Os acionadores reavaliam o estado do alarme de manhã e ao fim do dia, e são ignorados durante a hora de deitar. Automático desliga um acionador nos dias com um evento de calendário Desarmado, Armado em casa ou Armado noite. As horas mais cedo e mais tarde são mais úteis quando não se usa um sensor de hora do dia nem um calendário para a hora de deitar.",
+                        "data": {
+                            "occupancy_default_day": "Estado quando ocupado entre a manhã e o fim do dia",
+                            "occupancy_default_after_bedtime": "Estado quando ocupado entre a hora de deitar e a manhã",
+                            "occupancy_default_night": "Estado quando ocupado entre o fim do dia e a hora de deitar",
+                            "sunrise_trigger": "Manhã - acionador",
+                            "sunrise_earliest": "Manhã - Mais cedo",
+                            "sunrise_latest": "Manhã - Mais tarde",
+                            "sunset_trigger": "Fim do dia - acionador",
+                            "sunset_earliest": "Fim do dia - Mais cedo",
+                            "sunset_latest": "Fim do dia - Mais tarde"
+                        },
+                        "data_description": {
+                            "occupancy_default_after_bedtime": "Para quando a hora de deitar termina antes da manhã. Não tem efeito sem um sensor de hora de deitar.",
+                            "occupancy_default_night": "Defina como Armado em casa como predefinição antes da hora de deitar se um sensor de hora do dia ou um calendário definir Armado noite para a hora de deitar, como na [receita recomendada]({recipe_url}). Se nesse dia nada definir Armado noite para a hora de deitar, nem um sensor de hora de deitar nem um evento de calendário, é Armado noite a partir do fim do dia.",
+                            "sunrise_trigger": "Reavaliar o estado do alarme de manhã",
+                            "sunrise_earliest": "A manhã não é antes desta hora, por mais cedo que o sol nasça",
+                            "sunrise_latest": "A manhã não é depois desta hora, por mais tarde que o sol nasça",
+                            "sunset_trigger": "Reavaliar o estado do alarme ao fim do dia",
+                            "sunset_earliest": "O fim do dia não é antes desta hora, por mais cedo que o sol se ponha",
+                            "sunset_latest": "O fim do dia não é depois desta hora, por mais tarde que o sol se ponha"
+                        }
+                    },
+                    "presence_options": {
+                        "name": "Avançado - Ocupação",
+                        "data": {
+                            "occupied_trigger": "Alguém chega a casa",
+                            "unoccupied_trigger": "Alguém sai de casa",
+                            "calendar_occupancy_override_states": "Estados de alarme do calendário que a presença pode substituir",
+                            "calendar_occupancy_ends_away": "Chegar a casa termina os eventos de ausência e de férias no seu último dia",
+                            "occupied_delay": "Atraso depois de alguém chegar a casa",
+                            "unoccupied_delay": "Atraso depois de alguém sair de casa"
+                        },
+                        "data_description": {
+                            "occupied_trigger": "Reavaliar o estado do alarme quando alguém chega a casa",
+                            "unoccupied_trigger": "Reavaliar o estado do alarme quando alguém sai de casa",
+                            "calendar_occupancy_override_states": "Quando um evento do calendário define um destes estados, as alterações de ocupação (chegadas e saídas) ainda podem atualizar o estado do alarme. Por exemplo, se o calendário indicar Desarmado mas todos saírem, mudará para Armado Fora.",
+                            "calendar_occupancy_ends_away": "Quando alguém chega a casa no dia em que um evento de calendário Armado ausente ou Armado férias deve terminar, o evento termina nesse momento em vez de na sua hora de fim, e o alarme passa para o estado definido para quando um evento de calendário termina. Aplica-se tanto a eventos únicos como a recorrentes.",
+                            "occupied_delay": "Segundos de espera depois de alguém chegar a casa antes de determinar o estado do alarme. Uma alteração manual nesse tempo cancela-o.",
+                            "unoccupied_delay": "Segundos de espera depois de alguém sair de casa antes de determinar o estado do alarme, para que uma ausência breve ou um localizador que perde a ligação não arme o alarme. Uma alteração manual nesse tempo cancela-o."
+                        }
+                    },
                     "advanced_options": {
-                        "name": "Avançado",
+                        "name": "Avançado - Outros",
                         "data": {
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
-                            "panel_code": "Código do painel de alarme",
-                            "panel_code_clear": "Remover o código guardado do painel de alarme",
-                            "occupied_delay": "Atraso depois de alguém chegar a casa",
-                            "unoccupied_delay": "Atraso depois de alguém sair de casa",
                             "rate_limit_max_calls": "Limite de frequência - alterações máximas",
                             "rate_limit_period": "Limite de frequência - período"
                         },
                         "data_description": {
-                            "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o abaixo.",
-                            "panel_code": "Código que o Auto Arm dá às ações do painel de alarme ao armar ou desarmar, se o painel precisar de um. É guardado encriptado e nunca mais é mostrado. Deixe em branco para manter o código já guardado.",
-                            "occupied_delay": "Segundos de espera depois de alguém chegar a casa antes de determinar o estado do alarme. Uma alteração manual nesse tempo cancela-o.",
-                            "unoccupied_delay": "Segundos de espera depois de alguém sair de casa antes de determinar o estado do alarme, para que uma ausência breve ou um localizador que perde a ligação não arme o alarme. Uma alteração manual nesse tempo cancela-o.",
+                            "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o acima.",
                             "rate_limit_max_calls": "O máximo de alterações do estado do alarme que o Auto Arm fará dentro do período do limite de frequência, como proteção contra ciclos. As restantes alterações nesse período são ignoradas.",
                             "rate_limit_period": "Duração do período, em segundos, durante o qual são contadas as alterações máximas."
+                        }
+                    },
+                    "time_of_day_options": {
+                        "name": "Avançado - Hora do dia",
+                        "description": "Sensores de hora do dia para os outros estados de alarme, que definem o seu estado enquanto estão ligados, tal como o sensor de hora de deitar. Quando um sensor se desliga, aplicam-se as definições de fim de evento de calendário em Avançado - Calendário.",
+                        "data": {
+                            "time_of_day_disarmed": "Desarmado",
+                            "time_of_day_armed_home": "Armado em casa",
+                            "time_of_day_armed_away": "Armado ausente",
+                            "time_of_day_armed_custom_bypass": "Armado personalizado"
                         }
                     }
                 }
