@@ -1,5 +1,5 @@
 {
-    "title": "AutoArm",
+    "title": "Auto Arm",
     "config": {
         "step": {
             "user": {
@@ -441,7 +441,7 @@
     },
     "exceptions": {
         "not_loaded": {
-            "message": "AutoArm isn't loaded"
+            "message": "Auto Arm isn't loaded"
         }
     },
     "issues": {
@@ -451,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "YAML core configuration is deprecated",
-            "description": "Core AutoArm settings (alarm_panel, occupancy, calendars, buttons, diurnal, rate_limit) have been migrated to the UI config entry. Remove these from your YAML configuration and use the UI to manage them. Only transitions remain in YAML. The notify section is deprecated, and will be removed when Home Assistant 2027.4 is released."
+            "description": "Core Auto Arm settings (alarm_panel, occupancy, calendars, buttons, diurnal, rate_limit) have been migrated to the UI config entry. Remove these from your YAML configuration and use the UI to manage them. Only transitions remain in YAML. The notify section is deprecated, and will be removed when Home Assistant 2027.4 is released."
         },
         "yaml_notify_deprecated": {
             "title": "YAML notify configuration is deprecated",

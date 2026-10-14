@@ -1,9 +1,9 @@
 {
-    "title": "AutoArm",
+    "title": "Auto Arm",
     "config": {
         "step": {
             "user": {
-                "title": "AutoArm のセットアップ",
+                "title": "Auto Arm のセットアップ",
                 "description": "クイックセットアップは[おすすめレシピ]({recipe_url})に沿って、アラームパネルとそれが使うエンティティだけを聞きます。残りは適切な初期値が使われます。詳細設定では、最初からすべてのオプションを表示します。",
                 "menu_options": {
                     "quick_setup": "クイックセットアップ(おすすめ)",
@@ -11,7 +11,7 @@
                 }
             },
             "quick_setup": {
-                "title": "AutoArm のセットアップ",
+                "title": "Auto Arm のセットアップ",
                 "description": "[おすすめレシピ]({recipe_url})に沿った設定です。就寝時間センサー、休暇用カレンダー、全員外出時の警戒を使います。必須なのはアラームパネルだけで、残りは後から追加できます。",
                 "data": {
                     "alarm_panel": "管理するアラームコントロールパネル",
@@ -27,7 +27,7 @@
                 }
             },
             "advanced_setup": {
-                "title": "AutoArm のセットアップ — 詳細",
+                "title": "Auto Arm のセットアップ — 詳細",
                 "data": {
                     "alarm_panel": "管理するアラームコントロールパネル",
                     "time_of_day_armed_night": "就寝時間 - 時間帯センサー",
@@ -193,13 +193,13 @@
             "invalid_pattern": "カレンダーの一致ルールに、正しい正規表現ではないパターンがあります。"
         },
         "abort": {
-            "already_configured": "AutoArm はすでに設定済みです"
+            "already_configured": "Auto Arm はすでに設定済みです"
         }
     },
     "options": {
         "step": {
             "init": {
-                "title": "AutoArm オプション",
+                "title": "Auto Arm オプション",
                 "description": "就寝時間センサー、カレンダー、人物の組み合わせ方は[おすすめレシピ]({recipe_url})で説明しています。",
                 "data": {
                     "alarm_panel": "管理するアラームコントロールパネル",
@@ -415,7 +415,7 @@
     "services": {
         "reload": {
             "name": "リロード",
-            "description": "AutoArm の設定を再読み込みします。"
+            "description": "Auto Arm の設定を再読み込みします。"
         }
     },
     "entity": {
@@ -441,7 +441,7 @@
     },
     "exceptions": {
         "not_loaded": {
-            "message": "AutoArm が読み込まれていません"
+            "message": "Auto Arm が読み込まれていません"
         }
     },
     "issues": {
@@ -451,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "YAML コア設定は非推奨です",
-            "description": "AutoArm のコア設定（alarm_panel、occupancy、calendars、buttons、diurnal、rate_limit）は UI 設定エントリに移行されました。YAML 設定から削除し、UI で管理してください。YAML に残るのは transitions のみです。notify セクションは非推奨で、Home Assistant 2027.4 のリリース時に削除されます。"
+            "description": "Auto Arm のコア設定（alarm_panel、occupancy、calendars、buttons、diurnal、rate_limit）は UI 設定エントリに移行されました。YAML 設定から削除し、UI で管理してください。YAML に残るのは transitions のみです。notify セクションは非推奨で、Home Assistant 2027.4 のリリース時に削除されます。"
         },
         "yaml_notify_deprecated": {
             "title": "YAML の notify 設定は非推奨です",

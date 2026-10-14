@@ -1,5 +1,5 @@
 {
-    "title": "AutoArm",
+    "title": "Auto Arm",
     "config": {
         "step": {
             "user": {
@@ -193,7 +193,7 @@
             "invalid_pattern": "某条日历匹配规则中的模式不是有效的正则表达式。"
         },
         "abort": {
-            "already_configured": "AutoArm 已配置"
+            "already_configured": "Auto Arm 已配置"
         }
     },
     "options": {
@@ -441,7 +441,7 @@
     },
     "exceptions": {
         "not_loaded": {
-            "message": "AutoArm 未加载"
+            "message": "Auto Arm 未加载"
         }
     },
     "issues": {
@@ -451,7 +451,7 @@
         },
         "yaml_core_config_deprecated": {
             "title": "YAML 核心配置已弃用",
-            "description": "AutoArm 的核心设置（alarm_panel、occupancy、calendars、buttons、diurnal、rate_limit）已迁移到 UI 配置项。请从您的 YAML 配置中删除这些设置，并使用 UI 进行管理。只有 transitions 保留在 YAML 中。notify 部分已弃用，并将在 Home Assistant 2027.4 发布时移除。"
+            "description": "Auto Arm 的核心设置（alarm_panel、occupancy、calendars、buttons、diurnal、rate_limit）已迁移到 UI 配置项。请从您的 YAML 配置中删除这些设置，并使用 UI 进行管理。只有 transitions 保留在 YAML 中。notify 部分已弃用，并将在 Home Assistant 2027.4 发布时移除。"
         },
         "yaml_notify_deprecated": {
             "title": "YAML notify 配置已弃用",

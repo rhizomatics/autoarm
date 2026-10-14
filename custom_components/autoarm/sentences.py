@@ -123,7 +123,7 @@ async def async_respond(armer: AlarmArmer, command: str, context: HAContext) -> 
         return f"Help on using Auto Arm is at {DOCS_URL}"
     state: AlarmControlPanelState | None = alarm_state_as_enum(command)
     if state is None:
-        return f"AutoArm doesn't know the command {command}"
+        return f"Auto Arm doesn't know the command {command}"
     if armer.armed_state() == state:
         return f"The alarm is already {_say(state)}"
     armer.record_intervention(source=ChangeSource.VOICE, state=state, context=context)
@@ -154,7 +154,7 @@ def explain(armer: AlarmArmer) -> str:
     elif change is not None and (change.to_state == state or state == AlarmControlPanelState.ARMING):
         reason = _reason(change)
         reply.append(
-            f"AutoArm set it to {_say(change.to_state)} at {_when(change.created_at)}{' ' + reason if reason else ''}."
+            f"Auto Arm set it to {_say(change.to_state)} at {_when(change.created_at)}{' ' + reason if reason else ''}."
         )
         if change.source in COMPUTED_SOURCES:
             reply.append(_situation(change))

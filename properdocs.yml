@@ -1,4 +1,4 @@
-site_name: Home Assistant AutoArm
+site_name: Home Assistant Auto Arm
 site_url: https://autoarm.rhizomatics.org.uk
 site_description: Automated alarm control panel arming and disarming for Home Assistant
 
@@ -46,7 +46,7 @@ plugins:
       base_url: https://autoarm.rhizomatics.org.uk/
       preprocess: docgen/llms_preprocess.py
       markdown_description: >-
-        AutoArm is a Home Assistant custom integration that arms and disarms an Alarm Control
+        Auto Arm is a Home Assistant custom integration that arms and disarms an Alarm Control
         Panel automatically, from who's home, sunrise and sunset, and calendar events, with
         physical buttons, mobile actionable notifications and Assist voice commands for manual
         changes. Everything is set in the UI, including buttons, other than advanced options such
@@ -61,7 +61,7 @@ plugins:
           - configuration/*.md
         Help:
           - help/troubleshooting.md: Diagnosing arming, calendar and notification problems
-          - help/known_limitations.md: What AutoArm doesn't do, or does with caveats
+          - help/known_limitations.md: What Auto Arm doesn't do, or does with caveats
         # changelog, roadmap and developer pages left out - old or planned behaviour an agent would
         # take as current
   - minify:

@@ -1,5 +1,5 @@
 {
-    "title": "AutoArm",
+    "title": "Auto Arm",
     "config": {
         "step": {
             "user": {
@@ -193,13 +193,13 @@
             "invalid_pattern": "Eine Kalender-Zuordnungsregel enthält ein Muster, das kein gültiger regulärer Ausdruck ist."
         },
         "abort": {
-            "already_configured": "AutoArm ist bereits konfiguriert"
+            "already_configured": "Auto Arm ist bereits konfiguriert"
         }
     },
     "options": {
         "step": {
             "init": {
-                "title": "AutoArm-Optionen",
+                "title": "Auto Arm-Optionen",
                 "description": "Das [empfohlene Rezept]({recipe_url}) erklärt, wie Schlafenszeit-Sensor, Kalender und Personen zusammenwirken.",
                 "data": {
                     "alarm_panel": "Zu verwaltende Alarmzentrale",
@@ -441,7 +441,7 @@
     },
     "exceptions": {
         "not_loaded": {
-            "message": "AutoArm ist nicht geladen"
+            "message": "Auto Arm ist nicht geladen"
         }
     },
     "issues": {

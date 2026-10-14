@@ -1,5 +1,5 @@
 {
-    "title": "AutoArm",
+    "title": "Auto Arm",
     "config": {
         "step": {
             "user": {
@@ -193,7 +193,7 @@
             "invalid_pattern": "Una regola di corrispondenza del calendario ha un modello che non è un'espressione regolare valida."
         },
         "abort": {
-            "already_configured": "AutoArm è già configurato"
+            "already_configured": "Auto Arm è già configurato"
         }
     },
     "options": {
@@ -441,7 +441,7 @@
     },
     "exceptions": {
         "not_loaded": {
-            "message": "AutoArm non è caricato"
+            "message": "Auto Arm non è caricato"
         }
     },
     "issues": {

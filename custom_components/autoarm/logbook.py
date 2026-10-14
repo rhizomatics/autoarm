@@ -34,7 +34,7 @@ def async_describe_events(
             cause = f"deferred from {cause}"
         return {
             # the cause is in the name, as it's all the logbook shows of this event against the panel's change
-            LOGBOOK_ENTRY_NAME: f"AutoArm ({cause})",
+            LOGBOOK_ENTRY_NAME: f"Auto Arm ({cause})",
             LOGBOOK_ENTRY_MESSAGE: f"triggered by {cause}",
             LOGBOOK_ENTRY_SOURCE: cause,
             LOGBOOK_ENTRY_ENTITY_ID: data.get(ATTR_ENTITY_ID),

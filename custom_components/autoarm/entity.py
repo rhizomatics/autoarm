@@ -23,7 +23,7 @@ class AutoArmEntity(Entity):
         self.entity_id = f"{platform}.{DOMAIN}_{description.key}"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
-            name="AutoArm",
+            name="Auto Arm",
             manufacturer="Rhizomatics",
             entry_type=DeviceEntryType.SERVICE,
         )

@@ -1,5 +1,5 @@
 {
-    "title": "AutoArm",
+    "title": "Auto Arm",
     "config": {
         "step": {
             "user": {
@@ -193,7 +193,7 @@
             "invalid_pattern": "किसी कैलेंडर मिलान नियम में ऐसा पैटर्न है जो मान्य रेगुलर एक्सप्रेशन नहीं है।"
         },
         "abort": {
-            "already_configured": "AutoArm पहले से ही कॉन्फ़िगर है"
+            "already_configured": "Auto Arm पहले से ही कॉन्फ़िगर है"
         }
     },
     "options": {
@@ -441,7 +441,7 @@
     },
     "exceptions": {
         "not_loaded": {
-            "message": "AutoArm लोड नहीं है"
+            "message": "Auto Arm लोड नहीं है"
         }
     },
     "issues": {

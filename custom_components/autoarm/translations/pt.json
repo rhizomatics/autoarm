@@ -1,5 +1,5 @@
 {
-    "title": "AutoArm",
+    "title": "Auto Arm",
     "config": {
         "step": {
             "user": {
@@ -193,7 +193,7 @@
             "invalid_pattern": "Uma regra de correspondência de calendário tem um padrão que não é uma expressão regular válida."
         },
         "abort": {
-            "already_configured": "AutoArm já está configurado"
+            "already_configured": "Auto Arm já está configurado"
         }
     },
     "options": {

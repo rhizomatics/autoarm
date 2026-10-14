@@ -1,5 +1,5 @@
 {
-    "title": "AutoArm",
+    "title": "Auto Arm",
     "config": {
         "step": {
             "user": {
@@ -193,7 +193,7 @@
             "invalid_pattern": "Een overeenkomstregel voor een agenda heeft een patroon dat geen geldige reguliere expressie is."
         },
         "abort": {
-            "already_configured": "AutoArm is al geconfigureerd"
+            "already_configured": "Auto Arm is al geconfigureerd"
         }
     },
     "options": {
@@ -441,7 +441,7 @@
     },
     "exceptions": {
         "not_loaded": {
-            "message": "AutoArm is niet geladen"
+            "message": "Auto Arm is niet geladen"
         }
     },
     "issues": {

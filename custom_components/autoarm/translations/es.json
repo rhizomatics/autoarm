@@ -1,5 +1,5 @@
 {
-    "title": "AutoArm",
+    "title": "Auto Arm",
     "config": {
         "step": {
             "user": {
@@ -193,7 +193,7 @@
             "invalid_pattern": "Una regla de coincidencia de calendario tiene un patrón que no es una expresión regular válida."
         },
         "abort": {
-            "already_configured": "AutoArm ya está configurado"
+            "already_configured": "Auto Arm ya está configurado"
         }
     },
     "options": {
@@ -441,7 +441,7 @@
     },
     "exceptions": {
         "not_loaded": {
-            "message": "AutoArm no está cargado"
+            "message": "Auto Arm no está cargado"
         }
     },
     "issues": {
