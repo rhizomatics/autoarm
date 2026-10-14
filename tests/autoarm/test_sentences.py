@@ -113,7 +113,7 @@ async def test_why_after_occupancy_change(hass: HomeAssistant, autoarmer: AlarmA
     when = dt_util.now().strftime("%H:%M")
 
     assert explain(autoarmer) == (
-        f"The alarm is armed away. AutoArm set it to armed away at {when} after a change in who's home."
+        f"The alarm is armed away. Auto Arm set it to armed away at {when} after a change in who's home."
         " Everyone was out, and it was daytime."
     )
 
@@ -157,7 +157,7 @@ async def test_why_without_known_source(hass: HomeAssistant, autoarmer: AlarmArm
     await autoarmer.arm(AlarmControlPanelState.ARMED_HOME)
     when = dt_util.now().strftime("%H:%M")
 
-    assert explain(autoarmer) == f"The alarm is armed home. AutoArm set it to armed home at {when}."
+    assert explain(autoarmer) == f"The alarm is armed home. Auto Arm set it to armed home at {when}."
 
 
 async def test_why_after_panel_change(hass: HomeAssistant, autoarmer: AlarmArmer) -> None:

@@ -26,7 +26,7 @@ async def test_describes_source(hass: HomeAssistant) -> None:
     described = _describer(hass)(Mock(data={"entity_id": "alarm_control_panel.home", "source": "sunset", "summary": None}))
 
     assert described == {
-        "name": "AutoArm (sunset)",
+        "name": "Auto Arm (sunset)",
         "message": "triggered by sunset",
         "source": "sunset",
         "entity_id": "alarm_control_panel.home",
@@ -38,7 +38,7 @@ async def test_describes_calendar_event(hass: HomeAssistant) -> None:
         Mock(data={"entity_id": "alarm_control_panel.home", "source": "calendar", "summary": "Skiing"})
     )
 
-    assert described["name"] == "AutoArm (calendar event Skiing)"
+    assert described["name"] == "Auto Arm (calendar event Skiing)"
     assert described["message"] == "triggered by calendar event Skiing"
     assert described["source"] == "calendar event Skiing"
 
@@ -46,7 +46,7 @@ async def test_describes_calendar_event(hass: HomeAssistant) -> None:
 async def test_describes_time_of_day_sensor(hass: HomeAssistant) -> None:
     described = _describer(hass)(Mock(data={"entity_id": "alarm_control_panel.home", "source": "tod", "summary": "Bedtime"}))
 
-    assert described["name"] == "AutoArm (times of the day sensor Bedtime)"
+    assert described["name"] == "Auto Arm (times of the day sensor Bedtime)"
     assert described["message"] == "triggered by times of the day sensor Bedtime"
     assert described["source"] == "times of the day sensor Bedtime"
 
@@ -56,5 +56,5 @@ async def test_describes_deferred_source(hass: HomeAssistant) -> None:
         Mock(data={"entity_id": "alarm_control_panel.home", "source": "sunrise", "summary": None, "deferred": True})
     )
 
-    assert described["name"] == "AutoArm (deferred from sunrise)"
+    assert described["name"] == "Auto Arm (deferred from sunrise)"
     assert described["message"] == "triggered by deferred from sunrise"
