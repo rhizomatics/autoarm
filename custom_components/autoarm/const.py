@@ -96,7 +96,7 @@ NOTIFY_DEF_SCHEMA = vol.Schema({
 
 SUPERNOTIFY_ACTION = "supernotify.notify"
 SUPERNOTIFY_PRIORITIES: list[str] = ["critical", "high", "medium", "low", "minimum"]
-# titles are translated when sent, from the mobile_action selector in strings.json
+# titles are translated when sent, from the mobile_action selector in translations json
 SUPERNOTIFY_MOBILE_ACTIONS: list[dict[str, str]] = [
     {CONF_ACTION: "ALARM_PANEL_DISARM", "icon": "sfsymbols:bell.slash"},
     {CONF_ACTION: "ALARM_PANEL_RESET", "icon": "sfsymbols:bell"},

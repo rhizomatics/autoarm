@@ -19,7 +19,7 @@ Review all recently changed code, tests, configuration, and documentation agains
 2. **Categorize Changes**: Group changes into:
    - **Code** (entity platforms, config flows, coordinators, services, etc.)
    - **Tests** (unit tests, integration tests, fixtures)
-   - **Configuration** (manifest.json, strings.json, const.py, HACS metadata)
+   - **Configuration** (manifest.json, translation json files, const.py, HACS metadata)
    - **Documentation** (properdocs content, README, inline docstrings)
 
 3. **Evaluate Against IQS Platinum Requirements**: For each category, check against the full IQS checklist. Key areas include:

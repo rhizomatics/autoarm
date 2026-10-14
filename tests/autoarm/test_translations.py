@@ -1,12 +1,11 @@
-"""Tests that all translation files match the structure of strings.json."""
+"""Tests that all translation files match the structure of en.json."""
 
 import json
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import pytest
 
-STRINGS_PATH = Path("custom_components/autoarm/strings.json")
 TRANSLATIONS_DIR = Path("custom_components/autoarm/translations")
 EXPECTED_LOCALES = {"en", "de", "fr", "it", "ja", "es", "hi", "nl", "pl", "pt", "zh-Hans"}
 
@@ -53,11 +52,6 @@ LOCALE_COGNATE_PATHS: dict[str, set[str]] = {
 
 
 @pytest.fixture(scope="module")
-def strings() -> dict[str, str]:
-    return cast("dict[str,str]", json.loads(STRINGS_PATH.read_text()))
-
-
-@pytest.fixture(scope="module")
 def translations() -> dict[str, dict[str, Any]]:
     result = {}
     for path in TRANSLATIONS_DIR.glob("*.json"):
@@ -70,18 +64,18 @@ def test_all_locales_present(translations: dict[str, dict[str, Any]]) -> None:
     assert translations.keys() >= EXPECTED_LOCALES, f"Missing locales: {EXPECTED_LOCALES - translations.keys()}"
 
 
-@pytest.mark.parametrize("locale", sorted(EXPECTED_LOCALES))
-def test_translation_keys_match_strings(locale: str, strings: dict[str, Any], translations: dict[str, dict[str, Any]]) -> None:
-    """Every translation has exactly the same keys as strings.json."""
+@pytest.mark.parametrize("locale", sorted(EXPECTED_LOCALES - {"en"}))
+def test_translation_keys_match_english(locale: str, translations: dict[str, dict[str, Any]]) -> None:
+    """Every translation has exactly the same keys as en.json."""
     assert locale in translations, f"Translation file {locale}.json not found"
-    strings_paths = _key_paths(strings)
+    en_paths = _key_paths(translations["en"])
     locale_paths = _key_paths(translations[locale])
 
-    missing = strings_paths - locale_paths
-    extra = locale_paths - strings_paths
+    missing = en_paths - locale_paths
+    extra = locale_paths - en_paths
 
     assert not missing, f"{locale}.json is missing keys: {sorted(missing)}"
-    assert not extra, f"{locale}.json has extra keys not in strings.json: {sorted(extra)}"
+    assert not extra, f"{locale}.json has extra keys not in en.json: {sorted(extra)}"
 
 
 @pytest.mark.parametrize("locale", sorted(EXPECTED_LOCALES - {"en"}))
