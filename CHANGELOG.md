@@ -1,6 +1,6 @@
 # 2.0.0
 
-The major change reflects moving almost completely from YAML configuration, a stronger focus on simplicity and convenience, and the dropping of support for older versions of Home Assistant and Python 3.13.
+The major change reflects extending the UI configuration so **zero YAML** required (existing YAML is auto migrated, and its still possible to override the rules engine in YAML), a stronger focus on **simplicity and convenience** with a new standard recipe, and the dropping of support for older versions of Home Assistant and Python 3.13.
 
 ## 🚨 Breaking changes
 
