@@ -69,7 +69,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ## Project Context
 
 The project uses Ruff for formatting and linting, uv for dependency management,
-mypy for type checking, pytest for unit and integration testing, and codespell for spell checking. It is anticipated that type checking will move to [ty](https://github.com/astral-sh/ty) when it is production ready.
+mypy for type checking, pytest for unit and integration testing, and codespell for spell checking. It is anticipated that type checking will move solely to [ty](https://github.com/astral-sh/ty) when it is production ready.
 
 Documentation uses properdocs with the MaterialX theme, and is published using Github Pages with a
 custom domain of autoarm.rhizomatics.org.
