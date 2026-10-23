@@ -21,7 +21,7 @@
 
 
 Automate the arming and disarming of the built-in Home Assistant [Alarm
-Control Panel Integrations][], with additional support for calendar integration, occupancy-driven arming and disarming, manual override via remote control buttons, mobile push actionable notifications and [Frigate Profile Switching](./configuration/frigate.md).
+Control Panel Integrations][], with additional support for calendar integration, occupancy-driven arming and disarming, manual override via remote control buttons, mobile push actionable notifications and [Frigate Profile Switching](https://autoarm.rhizomatics.org.uk/configuration/frigate/).
 
 Calendar, occupancy, physical buttons, diurnal and bedtime scheduling available with **zero YAML**, support for 11 languages, and everything configured from the Home Assistant settings. Advanced configuration for transition logic, and fine-tuning for notifications and other scheduling, available from optional YAML configuration.
 
@@ -37,10 +37,10 @@ Full documentation is at [autoarm.rhizomatics.org.uk](https://autoarm.rhizomatic
 
 ## Setup
 
-The [Quick Start](./quick_start.md) will get you working quickly.
+The [Quick Start](https://autoarm.rhizomatics.org.uk/quick_start/) will get you working quickly.
 
 !!! note "Migrating from YAML-only"
-    Existing YAML configurations are automatically migrated to a config entry on restart. See [Migration Guide](configuration/migration.md) for details.
+    Existing YAML configurations are automatically migrated to a config entry on restart. See [Migration Guide](https://autoarm.rhizomatics.org.uk/configuration/migration/) for details.
 
 ## How it Works
 
@@ -58,7 +58,7 @@ These are the checks and decisions controlling arming:
   - Has someone hit a physical 'disarm' button?
   - Is there a real alarm panel that has changed state?
 
-See [Automated Arming](automated_arming.md) for the various mechanisms, options and how to configure.
+See [Automated Arming](https://autoarm.rhizomatics.org.uk/automated_arming/) for the various mechanisms, options and how to configure.
 
 ## Home Assistant Features Supported
 
