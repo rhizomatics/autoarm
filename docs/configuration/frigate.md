@@ -1,4 +1,4 @@
-# Frigate Profiles
+# Frigate Profile Switching
 
 Auto Arm can switch the active [Frigate Profile](https://docs.frigate.video/configuration/profiles/) as the
 alarm state changes. For example, your cameras could record and send notifications only while the alarm is

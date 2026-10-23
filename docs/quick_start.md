@@ -35,3 +35,11 @@ There's a recommended [recipe](./configuration/examples/recommended_recipe.md) t
 If that's not quite how you like, its still a good starting place for an easy to configure, zero YAML, low maintenance setup.
 
 [Alarm Control Panel Integrations]: https://www.home-assistant.io/integrations/?search=alarm+control+panel
+
+## Frigate
+
+Set up [Frigate Profiles](https://docs.frigate.video/configuration/profiles/) for the alarm states you want to tune the configuration.
+
+Easiest thing is to create a `disarmed` profile to reduce noisy alerts. Switch on Frigate integration in the Auto Arm integration settings.
+
+More on how to configure and use it at [Frigate Profile Switching](configuration/frigate.md).
