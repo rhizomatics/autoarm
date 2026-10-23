@@ -4,10 +4,13 @@ Auto Arm can switch the active [Frigate Profile](https://docs.frigate.video/conf
 alarm state changes. For example, your cameras could record and send notifications only while the alarm is
 `armed_away`, or skip detection on indoor cameras while `disarmed`.
 
+!!! info
+    Even if you never use alarm panels for anything else, Auto Arm is the easiest way to manage Frigate profiles based on occupancy, calendar events, sun state or physical buttons.
+
 ![Frigate Enable](../assets/images/frigate_enable.png){width=500}
 
-This needs Frigate 0.18 or later, and the [Frigate integration](https://docs.frigate.video/integrations/home-assistant/),
-which provides a **Profile** select entity once at least one profile is defined in Frigate.
+This needs Frigate 0.18 or later, and the [Frigate Integration](https://docs.frigate.video/integrations/home-assistant/),
+which provides a **Profile** select entity (once at least one profile is defined in Frigate).
 
 ## Set up the Profiles in Frigate
 
@@ -50,27 +53,29 @@ Frigate profile by name, ignoring case:
 | `Disarmed`, `armed`      | `armed_away`  | `armed`       |
 | `armed`, `armed_night`   | `armed_night` | `armed_night` |
 | `armed`, `armed_night`   | `armed_home`  | `armed`       |
-| `quiet`                  | `armed_home`  | no profile    |
+| `quiet`                  | `armed_home`  | base config   |
 
 A profile named `armed` covers all the armed states, unless one has a profile of its own name.
 
 ### Overriding the Matches
 
-The **Advanced - Frigate** section of the Options is only needed to change the matches:
+The **Advanced - Frigate** section of the Options is only needed to change the matches, if more than one alarm state goes to the same profile, or if you have a complex Frigate setup and need to override the profile selector.
 
-- **Frigate profile select**: only needed with more than one Frigate server, otherwise the Frigate integration's
-  Profile select is found automatically
 - a profile for each alarm state, filled in with the profile matched by name, to change to another of
   Frigate's profiles, or one typed in
+- **Frigate profile select**, at the bottom: only needed with more than one Frigate server, otherwise the
+  Frigate integration's Profile select is always used
 
 ![Frigate Configure](../assets/images/frigate_configure.png){width=500}
 
-Clear a state, or choose **No profile**, to keep Frigate on its base config for that state. Once the Options are
-saved, the profiles are kept as they are, so a state cleared isn't matched again, and a profile added to Frigate
-later is only matched when chosen in the Options.
+Clear a state, or choose **Base Config**, to keep Frigate on its base config for that state.
+
+Only the changes you make are saved. States left as filled in go on being matched by name, so a profile added
+to Frigate later is used without coming back to the Options. A state you clear, or change, stays as you set it,
+even after Home Assistant restarts.
 
 Whenever the alarm panel moves to a state with a profile, whatever changed it, Frigate is switched to that
-profile. Any other alarm state switches Frigate back to no profile, so the cameras use their base config.
+profile. Any other alarm state switches Frigate back to its base config.
 
 Some states leave the profile as it is:
 
@@ -81,5 +86,18 @@ Auto Arm also brings Frigate up to date when Home Assistant starts, and when the
 available again after Frigate has been offline. It doesn't switch back a profile you choose by hand in Frigate.
 It only changes the profile again when the alarm state next changes.
 
-If the profile given for an alarm state isn't in Frigate, Auto Arm logs a warning and switches Frigate
-back to no profile, its base config.
+If the profile given for an alarm state isn't in Frigate, Auto Arm logs a warning and switches Frigate back to its base config.
+
+## Other Ways to Switch
+
+### Home Assistant Select Entity
+
+You can also change the profile selection via the Home Assistant `select.frigate_profile` entity.
+
+![Frigate Profile Select](../assets/images/frigate_select_entity.png){width=500}
+
+### From Frigate
+
+Frigate shows the current profile at the bottom of the screen, and clicking on it leads to the switching page, which also has controls to add/edit/delete profiles.
+
+![Frigate Current Profile](../assets/images/frigate_profile_current.png){width=400}

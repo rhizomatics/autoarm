@@ -171,13 +171,13 @@
                         "name": "詳細設定 - Frigate",
                         "description": "上で有効にしたときの Frigate プロファイル の上書き設定。各アラーム状態には、大文字と小文字を区別せず同じ名前のプロファイルが、なければすべての警戒状態に armed という名前のプロファイルがあらかじめ入力されます。いずれかを変更するか、空にするとその状態で Frigate を基本設定のままにします。",
                         "data": {
-                            "frigate_profile_entity": "Frigate プロファイル選択",
                             "frigate_profile_disarmed": "解除",
                             "frigate_profile_armed_home": "在宅警戒",
                             "frigate_profile_armed_away": "外出警戒",
                             "frigate_profile_armed_night": "夜間警戒",
                             "frigate_profile_armed_vacation": "休暇警戒",
-                            "frigate_profile_armed_custom_bypass": "カスタム警戒"
+                            "frigate_profile_armed_custom_bypass": "カスタム警戒",
+                            "frigate_profile_entity": "Frigate プロファイル選択"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Frigate サーバーが複数ある場合にのみ必要です。それ以外は Frigate 統合のプロファイル選択を使います。"
@@ -362,13 +362,13 @@
                         "name": "詳細設定 - Frigate",
                         "description": "上で有効にしたときの Frigate プロファイル の上書き設定。各アラーム状態には、大文字と小文字を区別せず同じ名前のプロファイルが、なければすべての警戒状態に armed という名前のプロファイルがあらかじめ入力されます。いずれかを変更するか、空にするとその状態で Frigate を基本設定のままにします。",
                         "data": {
-                            "frigate_profile_entity": "Frigate プロファイル選択",
                             "frigate_profile_disarmed": "解除",
                             "frigate_profile_armed_home": "在宅警戒",
                             "frigate_profile_armed_away": "外出警戒",
                             "frigate_profile_armed_night": "夜間警戒",
                             "frigate_profile_armed_vacation": "休暇警戒",
-                            "frigate_profile_armed_custom_bypass": "カスタム警戒"
+                            "frigate_profile_armed_custom_bypass": "カスタム警戒",
+                            "frigate_profile_entity": "Frigate プロファイル選択"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Frigate サーバーが複数ある場合にのみ必要です。それ以外は Frigate 統合のプロファイル選択を使います。"
@@ -451,7 +451,7 @@
         },
         "frigate_profile": {
             "options": {
-                "none": "プロファイルなし"
+                "none": "基本設定"
             }
         }
     },

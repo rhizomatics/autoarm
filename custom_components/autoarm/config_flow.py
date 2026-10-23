@@ -496,19 +496,15 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
 
 
 def _frigate_section(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
-    """Overrides for Frigate profiles, the select where there's more than one Frigate, and profiles not matched by name"""
+    """Overrides for Frigate profiles, the profiles matched by name, and the select where there's more than one Frigate"""
     if not _frigate_available(hass, options):
         return {}
-    profiles: list[str] = frigate_profiles(hass, options.get(CONF_FRIGATE_PROFILE_ENTITY))
+    profiles: list[str] = _matchable_profiles(hass, options)
     # no profile, for a state cleared, then those in Frigate, others can be typed in while Frigate is down
     profile_choices: list[str] = [FRIGATE_NO_PROFILE, *profiles]
     return {
         vol.Required("frigate_options"): section(
             vol.Schema({
-                vol.Optional(
-                    CONF_FRIGATE_PROFILE_ENTITY,
-                    description={"suggested_value": options.get(CONF_FRIGATE_PROFILE_ENTITY)},
-                ): EntitySelector(EntitySelectorConfig(domain="select", integration="frigate")),
                 **{
                     # filled in by name until saved, so a profile cleared stays cleared
                     vol.Optional(
@@ -526,19 +522,34 @@ def _frigate_section(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[An
                     )
                     for option, state in FRIGATE_PROFILE_OPTIONS.items()
                 },
+                # last, as only an override for more than one Frigate server
+                vol.Optional(
+                    CONF_FRIGATE_PROFILE_ENTITY,
+                    description={"suggested_value": options.get(CONF_FRIGATE_PROFILE_ENTITY)},
+                ): EntitySelector(EntitySelectorConfig(domain="select", integration="frigate")),
             }),
             {"collapsed": True},
         ),
     }
 
 
-def _settle_frigate_profiles(data: dict[str, Any]) -> None:
-    """Keep a state cleared as no profile, so it isn't matched by name again, or drop the profiles while switched off"""
-    for option in FRIGATE_PROFILE_OPTIONS:
-        if not data.get(CONF_FRIGATE_ENABLED):
-            data.pop(option, None)
-        elif not data.get(option):
-            data[option] = FRIGATE_NO_PROFILE
+def _matchable_profiles(hass: HomeAssistant, options: Mapping[str, Any]) -> list[str]:
+    """Profiles of the select that will be used, the Frigate integration's own unless overridden"""
+    return frigate_profiles(hass, options.get(CONF_FRIGATE_PROFILE_ENTITY) or next(iter(frigate_profile_selects(hass)), None))
+
+
+def _settle_frigate_profiles(hass: HomeAssistant, data: dict[str, Any]) -> None:
+    """Keep only the profiles that differ from those matched by name, so the rest go on being matched as Frigate changes
+
+    A state cleared, where there's a match, is kept as no profile so it isn't matched again
+    """
+    if not _frigate_available(hass, data):
+        return
+    profiles: list[str] = _matchable_profiles(hass, data)
+    for option, state in FRIGATE_PROFILE_OPTIONS.items():
+        chosen: str = data.pop(option, None) or FRIGATE_NO_PROFILE
+        if chosen != (match_profile(state, profiles) or FRIGATE_NO_PROFILE):
+            data[option] = chosen
 
 
 def _flatten_sections(user_input: dict[str, Any]) -> dict[str, Any]:
@@ -626,7 +637,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             data = _flatten_sections(user_input)
-            _settle_frigate_profiles(data)
+            _settle_frigate_profiles(self.hass, data)
             errors = _pattern_errors(data)
             if not errors:
                 await _protect_panel_code(self.hass, data)
@@ -723,7 +734,7 @@ class AutoArmOptionsFlow(OptionsFlow):
         errors: dict[str, str] = {}
         if user_input is not None:
             data = _flatten_sections(user_input)
-            _settle_frigate_profiles(data)
+            _settle_frigate_profiles(self.hass, data)
             errors = _pattern_errors(data)
             if not errors:
                 await _protect_panel_code(self.hass, data, self.config_entry.options.get(CONF_PANEL_CODE))

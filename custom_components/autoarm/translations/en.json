@@ -171,13 +171,13 @@
                         "name": "Advanced - Frigate",
                         "description": "Overrides for Frigate profiles, when switched on above. Each alarm state is filled in with the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Change any of these, or clear one to keep Frigate on its base config for that state.",
                         "data": {
-                            "frigate_profile_entity": "Frigate profile select",
                             "frigate_profile_disarmed": "Disarmed",
                             "frigate_profile_armed_home": "Armed Home",
                             "frigate_profile_armed_away": "Armed Away",
                             "frigate_profile_armed_night": "Armed Night",
                             "frigate_profile_armed_vacation": "Armed Vacation",
-                            "frigate_profile_armed_custom_bypass": "Armed Custom Bypass"
+                            "frigate_profile_armed_custom_bypass": "Armed Custom Bypass",
+                            "frigate_profile_entity": "Frigate profile select"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Only needed with more than one Frigate server, otherwise the Profile select of the Frigate integration is used."
@@ -362,13 +362,13 @@
                         "name": "Advanced - Frigate",
                         "description": "Overrides for Frigate profiles, when switched on above. Each alarm state is filled in with the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Change any of these, or clear one to keep Frigate on its base config for that state.",
                         "data": {
-                            "frigate_profile_entity": "Frigate profile select",
                             "frigate_profile_disarmed": "Disarmed",
                             "frigate_profile_armed_home": "Armed Home",
                             "frigate_profile_armed_away": "Armed Away",
                             "frigate_profile_armed_night": "Armed Night",
                             "frigate_profile_armed_vacation": "Armed Vacation",
-                            "frigate_profile_armed_custom_bypass": "Armed Custom Bypass"
+                            "frigate_profile_armed_custom_bypass": "Armed Custom Bypass",
+                            "frigate_profile_entity": "Frigate profile select"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Only needed with more than one Frigate server, otherwise the Profile select of the Frigate integration is used."
@@ -451,7 +451,7 @@
         },
         "frigate_profile": {
             "options": {
-                "none": "No profile"
+                "none": "Base Config"
             }
         }
     },

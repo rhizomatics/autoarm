@@ -171,13 +171,13 @@
                         "name": "Geavanceerd - Frigate",
                         "description": "Aanpassingen voor Frigate-profielen, als die hierboven zijn ingeschakeld. Elke alarmstatus wordt vooraf ingevuld met het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Wijzig deze, of maak er een leeg om Frigate in die status op de basisconfiguratie te houden.",
                         "data": {
-                            "frigate_profile_entity": "Frigate-profielselectie",
                             "frigate_profile_disarmed": "Uitgeschakeld",
                             "frigate_profile_armed_home": "Ingeschakeld thuis",
                             "frigate_profile_armed_away": "Ingeschakeld afwezig",
                             "frigate_profile_armed_night": "Ingeschakeld nacht",
                             "frigate_profile_armed_vacation": "Ingeschakeld vakantie",
-                            "frigate_profile_armed_custom_bypass": "Ingeschakeld aangepast"
+                            "frigate_profile_armed_custom_bypass": "Ingeschakeld aangepast",
+                            "frigate_profile_entity": "Frigate-profielselectie"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Alleen nodig met meer dan één Frigate-server, anders wordt de profielselectie van de Frigate-integratie gebruikt."
@@ -362,13 +362,13 @@
                         "name": "Geavanceerd - Frigate",
                         "description": "Aanpassingen voor Frigate-profielen, als die hierboven zijn ingeschakeld. Elke alarmstatus wordt vooraf ingevuld met het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Wijzig deze, of maak er een leeg om Frigate in die status op de basisconfiguratie te houden.",
                         "data": {
-                            "frigate_profile_entity": "Frigate-profielselectie",
                             "frigate_profile_disarmed": "Uitgeschakeld",
                             "frigate_profile_armed_home": "Ingeschakeld thuis",
                             "frigate_profile_armed_away": "Ingeschakeld afwezig",
                             "frigate_profile_armed_night": "Ingeschakeld nacht",
                             "frigate_profile_armed_vacation": "Ingeschakeld vakantie",
-                            "frigate_profile_armed_custom_bypass": "Ingeschakeld aangepast"
+                            "frigate_profile_armed_custom_bypass": "Ingeschakeld aangepast",
+                            "frigate_profile_entity": "Frigate-profielselectie"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Alleen nodig met meer dan één Frigate-server, anders wordt de profielselectie van de Frigate-integratie gebruikt."
@@ -451,7 +451,7 @@
         },
         "frigate_profile": {
             "options": {
-                "none": "Geen profiel"
+                "none": "Basisconfiguratie"
             }
         }
     },

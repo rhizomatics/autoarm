@@ -171,13 +171,13 @@
                         "name": "उन्नत - Frigate",
                         "description": "Frigate प्रोफ़ाइल के लिए बदलाव, जब ऊपर चालू हों। हर अलार्म स्थिति में उसी नाम की प्रोफ़ाइल पहले से भरी जाती है (अक्षरों के छोटे-बड़े होने को अनदेखा करते हुए), अन्यथा सभी आर्म्ड स्थितियों के लिए armed नाम की प्रोफ़ाइल। इनमें से कोई भी बदलें, या उस स्थिति में Frigate को उसके मूल कॉन्फ़िगरेशन पर रखने के लिए उसे खाली करें।",
                         "data": {
-                            "frigate_profile_entity": "Frigate प्रोफ़ाइल चयन",
                             "frigate_profile_disarmed": "निःशस्त्र",
                             "frigate_profile_armed_home": "घर सशस्त्र",
                             "frigate_profile_armed_away": "दूर सशस्त्र",
                             "frigate_profile_armed_night": "रात सशस्त्र",
                             "frigate_profile_armed_vacation": "छुट्टी सशस्त्र",
-                            "frigate_profile_armed_custom_bypass": "कस्टम सशस्त्र"
+                            "frigate_profile_armed_custom_bypass": "कस्टम सशस्त्र",
+                            "frigate_profile_entity": "Frigate प्रोफ़ाइल चयन"
                         },
                         "data_description": {
                             "frigate_profile_entity": "केवल एक से अधिक Frigate सर्वर होने पर आवश्यक, अन्यथा Frigate इंटीग्रेशन का प्रोफ़ाइल चयन उपयोग होता है।"
@@ -362,13 +362,13 @@
                         "name": "उन्नत - Frigate",
                         "description": "Frigate प्रोफ़ाइल के लिए बदलाव, जब ऊपर चालू हों। हर अलार्म स्थिति में उसी नाम की प्रोफ़ाइल पहले से भरी जाती है (अक्षरों के छोटे-बड़े होने को अनदेखा करते हुए), अन्यथा सभी आर्म्ड स्थितियों के लिए armed नाम की प्रोफ़ाइल। इनमें से कोई भी बदलें, या उस स्थिति में Frigate को उसके मूल कॉन्फ़िगरेशन पर रखने के लिए उसे खाली करें।",
                         "data": {
-                            "frigate_profile_entity": "Frigate प्रोफ़ाइल चयन",
                             "frigate_profile_disarmed": "निःशस्त्र",
                             "frigate_profile_armed_home": "घर सशस्त्र",
                             "frigate_profile_armed_away": "दूर सशस्त्र",
                             "frigate_profile_armed_night": "रात सशस्त्र",
                             "frigate_profile_armed_vacation": "छुट्टी सशस्त्र",
-                            "frigate_profile_armed_custom_bypass": "कस्टम सशस्त्र"
+                            "frigate_profile_armed_custom_bypass": "कस्टम सशस्त्र",
+                            "frigate_profile_entity": "Frigate प्रोफ़ाइल चयन"
                         },
                         "data_description": {
                             "frigate_profile_entity": "केवल एक से अधिक Frigate सर्वर होने पर आवश्यक, अन्यथा Frigate इंटीग्रेशन का प्रोफ़ाइल चयन उपयोग होता है।"
@@ -451,7 +451,7 @@
         },
         "frigate_profile": {
             "options": {
-                "none": "कोई प्रोफ़ाइल नहीं"
+                "none": "मूल कॉन्फ़िगरेशन"
             }
         }
     },

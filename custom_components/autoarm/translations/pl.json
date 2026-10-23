@@ -171,13 +171,13 @@
                         "name": "Zaawansowane - Frigate",
                         "description": "Zmiany dla profili Frigate, gdy są włączone powyżej. Każdy stan alarmu jest wstępnie wypełniany profilem o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilem o nazwie armed dla wszystkich stanów uzbrojenia. Zmień dowolny z nich lub wyczyść, aby w tym stanie Frigate pozostał przy konfiguracji podstawowej.",
                         "data": {
-                            "frigate_profile_entity": "Wybór profilu Frigate",
                             "frigate_profile_disarmed": "Rozbrojony",
                             "frigate_profile_armed_home": "Uzbrojony w domu",
                             "frigate_profile_armed_away": "Uzbrojony poza domem",
                             "frigate_profile_armed_night": "Uzbrojony na noc",
                             "frigate_profile_armed_vacation": "Uzbrojony na urlop",
-                            "frigate_profile_armed_custom_bypass": "Uzbrojony niestandardowo"
+                            "frigate_profile_armed_custom_bypass": "Uzbrojony niestandardowo",
+                            "frigate_profile_entity": "Wybór profilu Frigate"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Potrzebne tylko przy więcej niż jednym serwerze Frigate, w przeciwnym razie używany jest wybór profilu z integracji Frigate."
@@ -362,13 +362,13 @@
                         "name": "Zaawansowane - Frigate",
                         "description": "Zmiany dla profili Frigate, gdy są włączone powyżej. Każdy stan alarmu jest wstępnie wypełniany profilem o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilem o nazwie armed dla wszystkich stanów uzbrojenia. Zmień dowolny z nich lub wyczyść, aby w tym stanie Frigate pozostał przy konfiguracji podstawowej.",
                         "data": {
-                            "frigate_profile_entity": "Wybór profilu Frigate",
                             "frigate_profile_disarmed": "Rozbrojony",
                             "frigate_profile_armed_home": "Uzbrojony w domu",
                             "frigate_profile_armed_away": "Uzbrojony poza domem",
                             "frigate_profile_armed_night": "Uzbrojony na noc",
                             "frigate_profile_armed_vacation": "Uzbrojony na urlop",
-                            "frigate_profile_armed_custom_bypass": "Uzbrojony niestandardowo"
+                            "frigate_profile_armed_custom_bypass": "Uzbrojony niestandardowo",
+                            "frigate_profile_entity": "Wybór profilu Frigate"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Potrzebne tylko przy więcej niż jednym serwerze Frigate, w przeciwnym razie używany jest wybór profilu z integracji Frigate."
@@ -451,7 +451,7 @@
         },
         "frigate_profile": {
             "options": {
-                "none": "Brak profilu"
+                "none": "Konfiguracja podstawowa"
             }
         }
     },

@@ -171,13 +171,13 @@
                         "name": "Avanzate - Frigate",
                         "description": "Personalizzazioni dei profili Frigate, quando attivati sopra. Ogni stato dell'allarme è precompilato con il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure con un profilo chiamato armed per tutti gli stati inseriti. Modificali, o svuotane uno per mantenere Frigate sulla configurazione di base in quello stato.",
                         "data": {
-                            "frigate_profile_entity": "Selezione profilo Frigate",
                             "frigate_profile_disarmed": "Disinserito",
                             "frigate_profile_armed_home": "Inserito in casa",
                             "frigate_profile_armed_away": "Inserito fuori casa",
                             "frigate_profile_armed_night": "Inserito notte",
                             "frigate_profile_armed_vacation": "Inserito vacanza",
-                            "frigate_profile_armed_custom_bypass": "Inserito personalizzato"
+                            "frigate_profile_armed_custom_bypass": "Inserito personalizzato",
+                            "frigate_profile_entity": "Selezione profilo Frigate"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Necessario solo con più di un server Frigate, altrimenti si usa la selezione del profilo dell'integrazione Frigate."
@@ -362,13 +362,13 @@
                         "name": "Avanzate - Frigate",
                         "description": "Personalizzazioni dei profili Frigate, quando attivati sopra. Ogni stato dell'allarme è precompilato con il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure con un profilo chiamato armed per tutti gli stati inseriti. Modificali, o svuotane uno per mantenere Frigate sulla configurazione di base in quello stato.",
                         "data": {
-                            "frigate_profile_entity": "Selezione profilo Frigate",
                             "frigate_profile_disarmed": "Disinserito",
                             "frigate_profile_armed_home": "Inserito in casa",
                             "frigate_profile_armed_away": "Inserito fuori casa",
                             "frigate_profile_armed_night": "Inserito notte",
                             "frigate_profile_armed_vacation": "Inserito vacanza",
-                            "frigate_profile_armed_custom_bypass": "Inserito personalizzato"
+                            "frigate_profile_armed_custom_bypass": "Inserito personalizzato",
+                            "frigate_profile_entity": "Selezione profilo Frigate"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Necessario solo con più di un server Frigate, altrimenti si usa la selezione del profilo dell'integrazione Frigate."
@@ -451,7 +451,7 @@
         },
         "frigate_profile": {
             "options": {
-                "none": "Nessun profilo"
+                "none": "Configurazione di base"
             }
         }
     },

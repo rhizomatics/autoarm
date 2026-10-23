@@ -171,13 +171,13 @@
                         "name": "高级 - Frigate",
                         "description": "在上方开启时，对 Frigate 配置文件 的覆盖设置。每个警报状态会预先填入同名配置文件（不区分大小写），否则所有布防状态填入名为 armed 的配置文件。可修改其中任何一项，或清空某项让 Frigate 在该状态下保持基础配置。",
                         "data": {
-                            "frigate_profile_entity": "Frigate 配置文件选择",
                             "frigate_profile_disarmed": "撤防",
                             "frigate_profile_armed_home": "在家布防",
                             "frigate_profile_armed_away": "离家布防",
                             "frigate_profile_armed_night": "夜间布防",
                             "frigate_profile_armed_vacation": "度假布防",
-                            "frigate_profile_armed_custom_bypass": "自定义布防"
+                            "frigate_profile_armed_custom_bypass": "自定义布防",
+                            "frigate_profile_entity": "Frigate 配置文件选择"
                         },
                         "data_description": {
                             "frigate_profile_entity": "仅在有多个 Frigate 服务器时需要，否则使用 Frigate 集成的配置文件选择实体。"
@@ -362,13 +362,13 @@
                         "name": "高级 - Frigate",
                         "description": "在上方开启时，对 Frigate 配置文件 的覆盖设置。每个警报状态会预先填入同名配置文件（不区分大小写），否则所有布防状态填入名为 armed 的配置文件。可修改其中任何一项，或清空某项让 Frigate 在该状态下保持基础配置。",
                         "data": {
-                            "frigate_profile_entity": "Frigate 配置文件选择",
                             "frigate_profile_disarmed": "撤防",
                             "frigate_profile_armed_home": "在家布防",
                             "frigate_profile_armed_away": "离家布防",
                             "frigate_profile_armed_night": "夜间布防",
                             "frigate_profile_armed_vacation": "度假布防",
-                            "frigate_profile_armed_custom_bypass": "自定义布防"
+                            "frigate_profile_armed_custom_bypass": "自定义布防",
+                            "frigate_profile_entity": "Frigate 配置文件选择"
                         },
                         "data_description": {
                             "frigate_profile_entity": "仅在有多个 Frigate 服务器时需要，否则使用 Frigate 集成的配置文件选择实体。"
@@ -451,7 +451,7 @@
         },
         "frigate_profile": {
             "options": {
-                "none": "无配置文件"
+                "none": "基础配置"
             }
         }
     },

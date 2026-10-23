@@ -171,13 +171,13 @@
                         "name": "Erweitert - Frigate",
                         "description": "Abweichungen für Frigate-Profile, wenn oben eingeschaltet. Jeder Alarmzustand wird mit dem gleichnamigen Profil vorbelegt, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände mit einem Profil namens armed. Ändere diese, oder leere eines, um Frigate in diesem Zustand bei seiner Basiskonfiguration zu lassen.",
                         "data": {
-                            "frigate_profile_entity": "Frigate-Profilauswahl",
                             "frigate_profile_disarmed": "Unscharf",
                             "frigate_profile_armed_home": "Scharf zu Hause",
                             "frigate_profile_armed_away": "Scharf abwesend",
                             "frigate_profile_armed_night": "Scharf Nacht",
                             "frigate_profile_armed_vacation": "Scharf Urlaub",
-                            "frigate_profile_armed_custom_bypass": "Scharf benutzerdefiniert"
+                            "frigate_profile_armed_custom_bypass": "Scharf benutzerdefiniert",
+                            "frigate_profile_entity": "Frigate-Profilauswahl"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Nur bei mehr als einem Frigate-Server nötig, sonst wird die Profilauswahl der Frigate-Integration verwendet."
@@ -362,13 +362,13 @@
                         "name": "Erweitert - Frigate",
                         "description": "Abweichungen für Frigate-Profile, wenn oben eingeschaltet. Jeder Alarmzustand wird mit dem gleichnamigen Profil vorbelegt, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände mit einem Profil namens armed. Ändere diese, oder leere eines, um Frigate in diesem Zustand bei seiner Basiskonfiguration zu lassen.",
                         "data": {
-                            "frigate_profile_entity": "Frigate-Profilauswahl",
                             "frigate_profile_disarmed": "Unscharf",
                             "frigate_profile_armed_home": "Scharf zu Hause",
                             "frigate_profile_armed_away": "Scharf abwesend",
                             "frigate_profile_armed_night": "Scharf Nacht",
                             "frigate_profile_armed_vacation": "Scharf Urlaub",
-                            "frigate_profile_armed_custom_bypass": "Scharf benutzerdefiniert"
+                            "frigate_profile_armed_custom_bypass": "Scharf benutzerdefiniert",
+                            "frigate_profile_entity": "Frigate-Profilauswahl"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Nur bei mehr als einem Frigate-Server nötig, sonst wird die Profilauswahl der Frigate-Integration verwendet."
@@ -451,7 +451,7 @@
         },
         "frigate_profile": {
             "options": {
-                "none": "Kein Profil"
+                "none": "Basiskonfiguration"
             }
         }
     },

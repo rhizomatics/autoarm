@@ -171,13 +171,13 @@
                         "name": "Avançado - Frigate",
                         "description": "Ajustes para os perfis do Frigate, quando ativados acima. Cada estado de alarme é preenchido com o perfil com o mesmo nome, sem distinguir maiúsculas, ou então com um perfil chamado armed para todos os estados armados. Altere qualquer um deles, ou limpe um para manter o Frigate na sua configuração base nesse estado.",
                         "data": {
-                            "frigate_profile_entity": "Seleção de perfil do Frigate",
                             "frigate_profile_disarmed": "Desarmado",
                             "frigate_profile_armed_home": "Armado em casa",
                             "frigate_profile_armed_away": "Armado ausente",
                             "frigate_profile_armed_night": "Armado noite",
                             "frigate_profile_armed_vacation": "Armado férias",
-                            "frigate_profile_armed_custom_bypass": "Armado personalizado"
+                            "frigate_profile_armed_custom_bypass": "Armado personalizado",
+                            "frigate_profile_entity": "Seleção de perfil do Frigate"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Só é necessário com mais de um servidor Frigate; caso contrário, é usada a seleção de perfil da integração Frigate."
@@ -362,13 +362,13 @@
                         "name": "Avançado - Frigate",
                         "description": "Ajustes para os perfis do Frigate, quando ativados acima. Cada estado de alarme é preenchido com o perfil com o mesmo nome, sem distinguir maiúsculas, ou então com um perfil chamado armed para todos os estados armados. Altere qualquer um deles, ou limpe um para manter o Frigate na sua configuração base nesse estado.",
                         "data": {
-                            "frigate_profile_entity": "Seleção de perfil do Frigate",
                             "frigate_profile_disarmed": "Desarmado",
                             "frigate_profile_armed_home": "Armado em casa",
                             "frigate_profile_armed_away": "Armado ausente",
                             "frigate_profile_armed_night": "Armado noite",
                             "frigate_profile_armed_vacation": "Armado férias",
-                            "frigate_profile_armed_custom_bypass": "Armado personalizado"
+                            "frigate_profile_armed_custom_bypass": "Armado personalizado",
+                            "frigate_profile_entity": "Seleção de perfil do Frigate"
                         },
                         "data_description": {
                             "frigate_profile_entity": "Só é necessário com mais de um servidor Frigate; caso contrário, é usada a seleção de perfil da integração Frigate."
@@ -451,7 +451,7 @@
         },
         "frigate_profile": {
             "options": {
-                "none": "Sem perfil"
+                "none": "Configuração base"
             }
         }
     },

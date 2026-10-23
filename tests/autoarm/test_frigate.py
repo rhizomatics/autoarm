@@ -20,6 +20,7 @@ from custom_components.autoarm.frigate import async_track_frigate_profile, match
 
 PANEL = "alarm_panel.testing"
 PROFILE_SELECT = "select.frigate_profile"
+CONTROL_PANEL = "alarm_control_panel.testing"
 PROFILE_OPTIONS = ["none", "quiet", "vigilant"]
 PROFILES = {"disarmed": "quiet", "armed_away": "vigilant"}
 
@@ -189,7 +190,9 @@ OTHER_SECTIONS = (
 
 def _frigate_select(hass: HomeAssistant, entity_registry: er.EntityRegistry, options: list[str], name: str = "profile") -> str:
     """The Frigate integration's profile select, as registered for a Frigate server"""
-    entry = entity_registry.async_get_or_create("select", "frigate", f"frigate_{name}:select:profile")
+    entry = entity_registry.async_get_or_create(
+        "select", "frigate", f"frigate_{name}:select:profile", suggested_object_id=f"frigate_{name}"
+    )
     hass.states.async_set(entry.entity_id, "none", {"options": options})
     return entry.entity_id
 
@@ -320,14 +323,16 @@ async def test_options_flow_fills_in_matched_profiles(
     assert data_schema is not None
     frigate_section = data_schema.schema["frigate_options"].schema.schema
     assert [str(k) for k in frigate_section] == [
-        CONF_FRIGATE_PROFILE_ENTITY,
         "frigate_profile_disarmed",
         "frigate_profile_armed_home",
         "frigate_profile_armed_away",
         "frigate_profile_armed_night",
         "frigate_profile_armed_vacation",
         "frigate_profile_armed_custom_bypass",
+        # last, and left blank, as only an override for more than one Frigate server
+        CONF_FRIGATE_PROFILE_ENTITY,
     ]
+    assert _field(data_schema, "frigate_options", CONF_FRIGATE_PROFILE_ENTITY).description["suggested_value"] is None
     suggested = {str(k): k.description["suggested_value"] for k in frigate_section if str(k) != CONF_FRIGATE_PROFILE_ENTITY}
     assert suggested == {
         "frigate_profile_disarmed": "Disarmed",
@@ -337,7 +342,7 @@ async def test_options_flow_fills_in_matched_profiles(
         "frigate_profile_armed_vacation": "armed",
         "frigate_profile_armed_custom_bypass": "armed",
     }
-    # no profile first, then those of any Frigate profile select before one is chosen
+    # no profile first, then those of the Frigate integration's profile select
     assert frigate_section[_field(data_schema, "frigate_options", "frigate_profile_disarmed")].config["options"] == [
         "none",
         "Disarmed",
@@ -346,61 +351,117 @@ async def test_options_flow_fills_in_matched_profiles(
     ]
 
 
+async def _save_options(
+    hass: HomeAssistant, entry: MockConfigEntry, enabled: bool = True, changes: dict[str, str | None] | None = None
+) -> None:
+    """Save the options as the form sends them, with fields left as filled in unless changed, and None for cleared"""
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    data_schema = result["data_schema"]
+    assert data_schema is not None
+    frigate: dict[str, Any] = {
+        str(k): k.description["suggested_value"]
+        for k in data_schema.schema["frigate_options"].schema.schema
+        if k.description and k.description.get("suggested_value") is not None
+    }
+    frigate.update(changes or {})
+    await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {
+            CONF_ALARM_PANEL: CONTROL_PANEL,
+            CONF_FRIGATE_ENABLED: enabled,
+            **{section: {} for section in OTHER_SECTIONS},
+            "frigate_options": {k: v for k, v in frigate.items() if v is not None},
+        },
+    )
+    await hass.async_block_till_done()
+
+
+async def _alarm_to(hass: HomeAssistant, state: str) -> None:
+    hass.states.async_set(CONTROL_PANEL, state)
+    await hass.async_block_till_done()
+
+
+async def test_switched_on_with_profiles_just_works(
+    hass: HomeAssistant, setup_autoarm: MockConfigEntry, entity_registry: er.EntityRegistry
+) -> None:
+    """Frigate already has profiles, and the only change is switching Frigate on"""
+    profiles = ["none", "Disarmed", "armed"]
+    _frigate_select(hass, entity_registry, profiles)
+    chosen = _register_select(hass, options=profiles)
+
+    await _save_options(hass, setup_autoarm)
+
+    assert not [k for k in setup_autoarm.options if k.startswith("frigate_profile_")]
+    armer = setup_autoarm.runtime_data
+    assert armer.frigate_profile_entity == PROFILE_SELECT
+    await _alarm_to(hass, "armed_night")
+    await _alarm_to(hass, "disarmed")
+    assert chosen[-2:] == ["armed", "Disarmed"]
+
+
+async def test_profile_added_later_just_works(
+    hass: HomeAssistant, setup_autoarm: MockConfigEntry, entity_registry: er.EntityRegistry
+) -> None:
+    """Frigate is switched on before it has any profiles, and one is added later"""
+    _frigate_select(hass, entity_registry, ["none"])
+    await _save_options(hass, setup_autoarm)
+    assert not [k for k in setup_autoarm.options if k.startswith("frigate_profile_")]
+
+    profiles = ["none", "Armed"]
+    hass.states.async_set(PROFILE_SELECT, "none", {"options": profiles})
+    chosen = _register_select(hass, options=profiles)
+    await _alarm_to(hass, "armed_home")
+
+    assert chosen == ["Armed"]
+
+
 async def test_cleared_profile_stays_cleared(
     hass: HomeAssistant, setup_autoarm: MockConfigEntry, entity_registry: er.EntityRegistry
 ) -> None:
     _frigate_select(hass, entity_registry, ["none", "Disarmed", "armed"])
-    result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
 
-    await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        {
-            CONF_ALARM_PANEL: "alarm_control_panel.testing",
-            CONF_FRIGATE_ENABLED: True,
-            **{section: {} for section in OTHER_SECTIONS},
-            # as the form sends it with armed_home cleared, and a profile not yet in Frigate typed in
-            "frigate_options": {
-                "frigate_profile_disarmed": "Disarmed",
-                "frigate_profile_armed_away": "armed",
-                "frigate_profile_armed_vacation": "holiday",
-            },
-        },
+    await _save_options(
+        hass, setup_autoarm, changes={"frigate_profile_armed_home": None, "frigate_profile_armed_vacation": "holiday"}
     )
-    await hass.async_block_till_done()
 
-    options = setup_autoarm.options
-    assert options[CONF_FRIGATE_ENABLED] is True
-    assert options["frigate_profile_disarmed"] == "Disarmed"
-    assert options["frigate_profile_armed_home"] == "none"
-    assert options["frigate_profile_armed_vacation"] == "holiday"
+    # only what differs from the profiles matched by name is kept
+    assert {k: v for k, v in setup_autoarm.options.items() if k.startswith("frigate_profile_")} == {
+        "frigate_profile_armed_home": "none",
+        "frigate_profile_armed_vacation": "holiday",
+    }
+    assert setup_autoarm.runtime_data.frigate_profiles == {"armed_home": "none", "armed_vacation": "holiday"}
 
-    # and isn't filled in by name again
+    # and isn't filled in by name again, nor changed by saving again
     result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
     data_schema = result["data_schema"]
     assert data_schema is not None
     assert _field(data_schema, "frigate_options", "frigate_profile_armed_home").description["suggested_value"] == "none"
+    hass.config_entries.options.async_abort(result["flow_id"])
+    await _save_options(hass, setup_autoarm)
+    assert setup_autoarm.options["frigate_profile_armed_home"] == "none"
 
 
-async def test_profiles_not_saved_while_off(
+async def test_cleared_without_match_left_to_match(
+    hass: HomeAssistant, setup_autoarm: MockConfigEntry, entity_registry: er.EntityRegistry
+) -> None:
+    _frigate_select(hass, entity_registry, ["none", "Disarmed"])
+
+    # armed_home has no match, so is blank, and stays to be matched when a profile is added
+    await _save_options(hass, setup_autoarm, changes={"frigate_profile_armed_home": None})
+
+    assert not [k for k in setup_autoarm.options if k.startswith("frigate_profile_")]
+
+
+async def test_overrides_kept_while_off(
     hass: HomeAssistant, setup_autoarm: MockConfigEntry, entity_registry: er.EntityRegistry
 ) -> None:
     _frigate_select(hass, entity_registry, ["none", "Disarmed", "armed"])
-    result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
 
-    await hass.config_entries.options.async_configure(
-        result["flow_id"],
-        {
-            CONF_ALARM_PANEL: "alarm_control_panel.testing",
-            CONF_FRIGATE_ENABLED: False,
-            **{section: {} for section in OTHER_SECTIONS},
-            "frigate_options": {"frigate_profile_disarmed": "Disarmed", "frigate_profile_armed_away": "armed"},
-        },
-    )
-    await hass.async_block_till_done()
+    await _save_options(hass, setup_autoarm, enabled=False, changes={"frigate_profile_armed_away": "vigilant"})
 
-    options = setup_autoarm.options
-    # so they're filled in afresh when turned on
-    assert not any(k.startswith("frigate_profile_") for k in options if k != CONF_FRIGATE_PROFILE_ENTITY)
+    assert setup_autoarm.options[CONF_FRIGATE_ENABLED] is False
+    assert setup_autoarm.options["frigate_profile_armed_away"] == "vigilant"
+    assert setup_autoarm.runtime_data.frigate_profile_entity is None
 
 
 async def test_quick_setup_offers_frigate(hass: HomeAssistant, mock_notify: Any, entity_registry: er.EntityRegistry) -> None:
