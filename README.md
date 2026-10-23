@@ -1,5 +1,5 @@
 
-![Auto Arm](assets/images/autoarm-dark-256x256.png){ align=left }
+![Auto Arm](https://autoarm.rhizomatics.org.uk/assets/images/autoarm-dark-256x256.png){ align=left }
 
 
 # Alarm Auto Arming
