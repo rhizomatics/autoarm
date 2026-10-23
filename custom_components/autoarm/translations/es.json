@@ -17,13 +17,15 @@
                     "alarm_panel": "Panel de control de alarma a gestionar",
                     "time_of_day_armed_night": "Hora de acostarse - Sensor de hora del día",
                     "calendar_entities": "Ocupación - Calendarios",
-                    "person_entities": "Presencia - Personas para el armado basado en ocupación"
+                    "person_entities": "Presencia - Personas para el armado basado en ocupación",
+                    "frigate_enabled": "Frigate - Cambiar perfiles con el estado de la alarma"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un sensor de hora del día que está encendido a la hora de acostarse cada día. Mientras está encendido, la alarma se mantiene en Armado noche. ¿Aún no tienes sensor de hora de acostarse? [Crea uno]({bedtime_help_url}), o ve a Configuración → Dispositivos y servicios → Auxiliares → **+ Crear auxiliar** → **Hora del día**. Dale un nombre y define una hora de inicio/fin para tu horario habitual de dormir.",
                     "alarm_panel": "¿Aún no tienes panel de alarma? [Crea uno virtual]({alarm_panel_help_url}), o en Home Assistant ve a Configuración → Dispositivos y servicios → Auxiliares → **+ Crear auxiliar** → Plantilla → **Panel de control de alarma**. Dale un nombre y envía; los demás campos son opcionales.",
                     "calendar_entities": "Los calendarios son necesarios para el estado Armado vacaciones, o si la presencia no está disponible o no es fiable para determinar la ocupación. Los calendarios también pueden establecer cualquier estado armado, por lo que pueden anular otros controles por sol, hora de acostarse u ocupación. ¿Aún no tienes calendario? [Crea un calendario local]({calendar_help_url}), o ve a Configuración → Dispositivos y servicios → **+ Añadir integración** → **Calendario local**. Dale un nombre y deja seleccionado 'Crear calendario vacío'.",
-                    "person_entities": "Que todas estas personas estén o no en casa determina los estados Armado ausente, Armado en casa y Desarmado. ¿Falta alguien? [Añade una nueva persona]({person_help_url}), o ve a Configuración → Personas → **+ Añadir persona**. Dale un nombre; vincular una cuenta de usuario es opcional."
+                    "person_entities": "Que todas estas personas estén o no en casa determina los estados Armado ausente, Armado en casa y Desarmado. ¿Falta alguien? [Añade una nueva persona]({person_help_url}), o ve a Configuración → Personas → **+ Añadir persona**. Dale un nombre; vincular una cuenta de usuario es opcional.",
+                    "frigate_enabled": "Cambiar el [perfil de Frigate]({frigate_profiles_url}) activo cuando cambia el estado de la alarma (requiere Frigate 0.18 o posterior). Cada estado de alarma usa el perfil del mismo nombre, sin distinguir mayúsculas, o si no, un perfil llamado armed para cualquiera de los estados armados. Se pueden elegir otros en Avanzado - Frigate."
                 }
             },
             "advanced_setup": {
@@ -33,14 +35,16 @@
                     "time_of_day_armed_night": "Hora de acostarse - Sensor de hora del día",
                     "calendar_entities": "Ocupación - Calendarios",
                     "person_entities": "Presencia - Personas para el armado basado en ocupación",
-                    "panel_code": "Código del panel de alarma"
+                    "panel_code": "Código del panel de alarma",
+                    "frigate_enabled": "Frigate - Cambiar perfiles con el estado de la alarma"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un sensor de hora del día que está encendido a la hora de acostarse cada día. Mientras está encendido, la alarma se mantiene en Armado noche. ¿Aún no tienes sensor de hora de acostarse? [Crea uno]({bedtime_help_url}), o ve a Configuración → Dispositivos y servicios → Auxiliares → **+ Crear auxiliar** → **Hora del día**. Dale un nombre y define una hora de inicio/fin para tu horario habitual de dormir.",
                     "alarm_panel": "¿Aún no tienes panel de alarma? [Crea uno virtual]({alarm_panel_help_url}), o en Home Assistant ve a Configuración → Dispositivos y servicios → Auxiliares → **+ Crear auxiliar** → Plantilla → **Panel de control de alarma**. Dale un nombre y envía; los demás campos son opcionales.",
                     "calendar_entities": "Los calendarios son necesarios para el estado Armado vacaciones, o si la presencia no está disponible o no es fiable para determinar la ocupación. Los calendarios también pueden establecer cualquier estado armado, por lo que pueden anular otros controles por sol, hora de acostarse u ocupación. ¿Aún no tienes calendario? [Crea un calendario local]({calendar_help_url}), o ve a Configuración → Dispositivos y servicios → **+ Añadir integración** → **Calendario local**. Dale un nombre y deja seleccionado 'Crear calendario vacío'.",
                     "person_entities": "Que todas estas personas estén o no en casa determina los estados Armado ausente, Armado en casa y Desarmado. ¿Falta alguien? [Añade una nueva persona]({person_help_url}), o ve a Configuración → Personas → **+ Añadir persona**. Dale un nombre; vincular una cuenta de usuario es opcional.",
-                    "panel_code": "Código que Auto Arm da a las acciones del panel de alarma al armar o desarmar, si el panel lo necesita. Se guarda cifrado y no se vuelve a mostrar. Déjalo en blanco para conservar el código ya guardado."
+                    "panel_code": "Código que Auto Arm da a las acciones del panel de alarma al armar o desarmar, si el panel lo necesita. Se guarda cifrado y no se vuelve a mostrar. Déjalo en blanco para conservar el código ya guardado.",
+                    "frigate_enabled": "Cambiar el [perfil de Frigate]({frigate_profiles_url}) activo cuando cambia el estado de la alarma (requiere Frigate 0.18 o posterior). Cada estado de alarma usa el perfil del mismo nombre, sin distinguir mayúsculas, o si no, un perfil llamado armed para cualquiera de los estados armados. Se pueden elegir otros en Avanzado - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -165,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Avanzado - Frigate",
-                        "description": "Cambiar el perfil activo de Frigate con el estado de la alarma, usando el selector de perfil de la integración de Frigate (requiere Frigate 0.18 o posterior). Elige o escribe el perfil para cada estado de alarma que deba tener uno. Cualquier otro estado de alarma devuelve Frigate a ningún perfil, su configuración base.",
+                        "description": "Ajustes para los [perfiles de Frigate]({frigate_profiles_url}), cuando están activados arriba. Cada estado de alarma se rellena con el perfil del mismo nombre, sin distinguir mayúsculas, o si no, con un perfil llamado armed para cualquiera de los estados armados. Cambia cualquiera de ellos, o vacía uno para mantener Frigate en su configuración base en ese estado.",
                         "data": {
                             "frigate_profile_entity": "Selector de perfil de Frigate",
                             "frigate_profile_disarmed": "Desarmado",
@@ -176,7 +180,7 @@
                             "frigate_profile_armed_custom_bypass": "Armado personalizado"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "La entidad de selección de perfil de la integración de Frigate."
+                            "frigate_profile_entity": "Solo es necesario con más de un servidor Frigate; si no, se usa el selector de perfil de la integración de Frigate."
                         }
                     },
                     "advanced_options": {
@@ -223,13 +227,15 @@
                     "calendar_entities": "Ocupación - Calendarios",
                     "person_entities": "Presencia - Personas para el armado basado en ocupación",
                     "panel_code": "Código del panel de alarma",
-                    "panel_code_clear": "Eliminar el código guardado del panel de alarma"
+                    "panel_code_clear": "Eliminar el código guardado del panel de alarma",
+                    "frigate_enabled": "Frigate - Cambiar perfiles con el estado de la alarma"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un sensor de hora del día que está encendido a la hora de acostarse cada día. Mientras está encendido, la alarma se mantiene en Armado noche.",
                     "calendar_entities": "Los calendarios son necesarios para el estado Armado vacaciones, o si la presencia no está disponible o no es fiable para determinar la ocupación. Los calendarios también pueden establecer cualquier estado armado, por lo que pueden anular otros controles por sol, hora de acostarse u ocupación.",
                     "person_entities": "Que todas estas personas estén o no en casa determina los estados Armado ausente, Armado en casa y Desarmado.",
-                    "panel_code": "Código que Auto Arm da a las acciones del panel de alarma al armar o desarmar, si el panel lo necesita. Se guarda cifrado y no se vuelve a mostrar. Déjalo en blanco para conservar el código ya guardado."
+                    "panel_code": "Código que Auto Arm da a las acciones del panel de alarma al armar o desarmar, si el panel lo necesita. Se guarda cifrado y no se vuelve a mostrar. Déjalo en blanco para conservar el código ya guardado.",
+                    "frigate_enabled": "Cambiar el [perfil de Frigate]({frigate_profiles_url}) activo cuando cambia el estado de la alarma (requiere Frigate 0.18 o posterior). Cada estado de alarma usa el perfil del mismo nombre, sin distinguir mayúsculas, o si no, un perfil llamado armed para cualquiera de los estados armados. Se pueden elegir otros en Avanzado - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -354,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Avanzado - Frigate",
-                        "description": "Cambiar el perfil activo de Frigate con el estado de la alarma, usando el selector de perfil de la integración de Frigate (requiere Frigate 0.18 o posterior). Elige o escribe el perfil para cada estado de alarma que deba tener uno. Cualquier otro estado de alarma devuelve Frigate a ningún perfil, su configuración base.",
+                        "description": "Ajustes para los [perfiles de Frigate]({frigate_profiles_url}), cuando están activados arriba. Cada estado de alarma se rellena con el perfil del mismo nombre, sin distinguir mayúsculas, o si no, con un perfil llamado armed para cualquiera de los estados armados. Cambia cualquiera de ellos, o vacía uno para mantener Frigate en su configuración base en ese estado.",
                         "data": {
                             "frigate_profile_entity": "Selector de perfil de Frigate",
                             "frigate_profile_disarmed": "Desarmado",
@@ -365,7 +371,7 @@
                             "frigate_profile_armed_custom_bypass": "Armado personalizado"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "La entidad de selección de perfil de la integración de Frigate."
+                            "frigate_profile_entity": "Solo es necesario con más de un servidor Frigate; si no, se usa el selector de perfil de la integración de Frigate."
                         }
                     },
                     "advanced_options": {
@@ -441,6 +447,11 @@
                 "calendar": "Calendario",
                 "state": "Estado de alarma",
                 "patterns": "Patrones"
+            }
+        },
+        "frigate_profile": {
+            "options": {
+                "none": "Sin perfil"
             }
         }
     },

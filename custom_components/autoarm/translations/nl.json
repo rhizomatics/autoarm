@@ -17,13 +17,15 @@
                     "alarm_panel": "Te beheren alarmcentrale",
                     "time_of_day_armed_night": "Bedtijd - Tijdstip-van-de-dag-sensor",
                     "calendar_entities": "Bezetting - Agenda's",
-                    "person_entities": "Aanwezigheid - Personen voor aanwezigheid-gebaseerd inschakelen"
+                    "person_entities": "Aanwezigheid - Personen voor aanwezigheid-gebaseerd inschakelen",
+                    "frigate_enabled": "Frigate - Profielen wisselen met de alarmstatus"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht. Nog geen bedtijdsensor? [Maak er een]({bedtime_help_url}), of ga naar Instellingen → Apparaten en diensten → Hulpmiddelen → **+ Hulpmiddel aanmaken** → **Tijdstip van de dag**. Geef hem een naam en stel een Na/Voor-tijd in voor uw gebruikelijke bedtijd.",
                     "alarm_panel": "Nog geen alarmpaneel? [Maak een virtueel paneel]({alarm_panel_help_url}), of ga in Home Assistant naar Instellingen → Apparaten en diensten → Hulpmiddelen → **+ Hulpmiddel aanmaken** → Sjabloon → **Alarmcentrale**. Geef het een naam en bevestig; alle andere velden zijn optioneel.",
                     "calendar_entities": "Agenda's zijn nodig voor de status Ingeschakeld vakantie, of als aanwezigheid niet beschikbaar of onbetrouwbaar is om de bezetting te bepalen. Agenda's kunnen ook elke ingeschakelde status instellen, en zo andere regelingen op basis van zon, bedtijd of bezetting overschrijven. Nog geen agenda? [Maak een lokale agenda]({calendar_help_url}), of ga naar Instellingen → Apparaten en diensten → **+ Integratie toevoegen** → **Lokale agenda**. Geef hem een naam en laat 'Lege agenda aanmaken' geselecteerd.",
-                    "person_entities": "Of al deze personen wel of niet thuis zijn bepaalt de statussen Ingeschakeld afwezig, Ingeschakeld thuis en Uitgeschakeld. Mist er iemand? [Voeg een nieuwe persoon toe]({person_help_url}), of ga naar Instellingen → Personen → **+ Persoon toevoegen**. Geef diegene een naam; koppelen aan een gebruikersaccount is optioneel."
+                    "person_entities": "Of al deze personen wel of niet thuis zijn bepaalt de statussen Ingeschakeld afwezig, Ingeschakeld thuis en Uitgeschakeld. Mist er iemand? [Voeg een nieuwe persoon toe]({person_help_url}), of ga naar Instellingen → Personen → **+ Persoon toevoegen**. Geef diegene een naam; koppelen aan een gebruikersaccount is optioneel.",
+                    "frigate_enabled": "Wissel het actieve [Frigate-profiel]({frigate_profiles_url}) als de alarmstatus verandert (vereist Frigate 0.18 of later). Elke alarmstatus gebruikt het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Andere kunnen worden gekozen onder Geavanceerd - Frigate."
                 }
             },
             "advanced_setup": {
@@ -33,14 +35,16 @@
                     "time_of_day_armed_night": "Bedtijd - Tijdstip-van-de-dag-sensor",
                     "calendar_entities": "Bezetting - Agenda's",
                     "person_entities": "Aanwezigheid - Personen voor aanwezigheid-gebaseerd inschakelen",
-                    "panel_code": "Code van het alarmpaneel"
+                    "panel_code": "Code van het alarmpaneel",
+                    "frigate_enabled": "Frigate - Profielen wisselen met de alarmstatus"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht. Nog geen bedtijdsensor? [Maak er een]({bedtime_help_url}), of ga naar Instellingen → Apparaten en diensten → Hulpmiddelen → **+ Hulpmiddel aanmaken** → **Tijdstip van de dag**. Geef hem een naam en stel een Na/Voor-tijd in voor uw gebruikelijke bedtijd.",
                     "alarm_panel": "Nog geen alarmpaneel? [Maak een virtueel paneel]({alarm_panel_help_url}), of ga in Home Assistant naar Instellingen → Apparaten en diensten → Hulpmiddelen → **+ Hulpmiddel aanmaken** → Sjabloon → **Alarmcentrale**. Geef het een naam en bevestig; alle andere velden zijn optioneel.",
                     "calendar_entities": "Agenda's zijn nodig voor de status Ingeschakeld vakantie, of als aanwezigheid niet beschikbaar of onbetrouwbaar is om de bezetting te bepalen. Agenda's kunnen ook elke ingeschakelde status instellen, en zo andere regelingen op basis van zon, bedtijd of bezetting overschrijven. Nog geen agenda? [Maak een lokale agenda]({calendar_help_url}), of ga naar Instellingen → Apparaten en diensten → **+ Integratie toevoegen** → **Lokale agenda**. Geef hem een naam en laat 'Lege agenda aanmaken' geselecteerd.",
                     "person_entities": "Of al deze personen wel of niet thuis zijn bepaalt de statussen Ingeschakeld afwezig, Ingeschakeld thuis en Uitgeschakeld. Mist er iemand? [Voeg een nieuwe persoon toe]({person_help_url}), of ga naar Instellingen → Personen → **+ Persoon toevoegen**. Geef diegene een naam; koppelen aan een gebruikersaccount is optioneel.",
-                    "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden."
+                    "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden.",
+                    "frigate_enabled": "Wissel het actieve [Frigate-profiel]({frigate_profiles_url}) als de alarmstatus verandert (vereist Frigate 0.18 of later). Elke alarmstatus gebruikt het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Andere kunnen worden gekozen onder Geavanceerd - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -165,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Geavanceerd - Frigate",
-                        "description": "Wissel het actieve Frigate-profiel mee met de alarmstatus, via de profielselectie van de Frigate-integratie (vereist Frigate 0.18 of later). Kies of typ het profiel voor elke alarmstatus die er een moet hebben. Elke andere alarmstatus schakelt Frigate terug naar geen profiel, de basisconfiguratie.",
+                        "description": "Aanpassingen voor [Frigate-profielen]({frigate_profiles_url}), als die hierboven zijn ingeschakeld. Elke alarmstatus wordt vooraf ingevuld met het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Wijzig deze, of maak er een leeg om Frigate in die status op de basisconfiguratie te houden.",
                         "data": {
                             "frigate_profile_entity": "Frigate-profielselectie",
                             "frigate_profile_disarmed": "Uitgeschakeld",
@@ -176,7 +180,7 @@
                             "frigate_profile_armed_custom_bypass": "Ingeschakeld aangepast"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "De profielselectie-entiteit van de Frigate-integratie."
+                            "frigate_profile_entity": "Alleen nodig met meer dan één Frigate-server, anders wordt de profielselectie van de Frigate-integratie gebruikt."
                         }
                     },
                     "advanced_options": {
@@ -223,13 +227,15 @@
                     "calendar_entities": "Bezetting - Agenda's",
                     "person_entities": "Aanwezigheid - Personen voor aanwezigheid-gebaseerd inschakelen",
                     "panel_code": "Code van het alarmpaneel",
-                    "panel_code_clear": "Opgeslagen code van het alarmpaneel verwijderen"
+                    "panel_code_clear": "Opgeslagen code van het alarmpaneel verwijderen",
+                    "frigate_enabled": "Frigate - Profielen wisselen met de alarmstatus"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Een tijdstip-van-de-dag-sensor die elke dag aan staat tijdens bedtijd. Zolang hij aan staat, blijft het alarm op Ingeschakeld nacht.",
                     "calendar_entities": "Agenda's zijn nodig voor de status Ingeschakeld vakantie, of als aanwezigheid niet beschikbaar of onbetrouwbaar is om de bezetting te bepalen. Agenda's kunnen ook elke ingeschakelde status instellen, en zo andere regelingen op basis van zon, bedtijd of bezetting overschrijven.",
                     "person_entities": "Of al deze personen wel of niet thuis zijn bepaalt de statussen Ingeschakeld afwezig, Ingeschakeld thuis en Uitgeschakeld.",
-                    "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden."
+                    "panel_code": "Code die Auto Arm aan de acties van het alarmpaneel geeft bij het in- of uitschakelen, als het paneel er een nodig heeft. De code wordt versleuteld opgeslagen en nooit meer getoond. Laat leeg om de al opgeslagen code te behouden.",
+                    "frigate_enabled": "Wissel het actieve [Frigate-profiel]({frigate_profiles_url}) als de alarmstatus verandert (vereist Frigate 0.18 of later). Elke alarmstatus gebruikt het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Andere kunnen worden gekozen onder Geavanceerd - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -354,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Geavanceerd - Frigate",
-                        "description": "Wissel het actieve Frigate-profiel mee met de alarmstatus, via de profielselectie van de Frigate-integratie (vereist Frigate 0.18 of later). Kies of typ het profiel voor elke alarmstatus die er een moet hebben. Elke andere alarmstatus schakelt Frigate terug naar geen profiel, de basisconfiguratie.",
+                        "description": "Aanpassingen voor [Frigate-profielen]({frigate_profiles_url}), als die hierboven zijn ingeschakeld. Elke alarmstatus wordt vooraf ingevuld met het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Wijzig deze, of maak er een leeg om Frigate in die status op de basisconfiguratie te houden.",
                         "data": {
                             "frigate_profile_entity": "Frigate-profielselectie",
                             "frigate_profile_disarmed": "Uitgeschakeld",
@@ -365,7 +371,7 @@
                             "frigate_profile_armed_custom_bypass": "Ingeschakeld aangepast"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "De profielselectie-entiteit van de Frigate-integratie."
+                            "frigate_profile_entity": "Alleen nodig met meer dan één Frigate-server, anders wordt de profielselectie van de Frigate-integratie gebruikt."
                         }
                     },
                     "advanced_options": {
@@ -441,6 +447,11 @@
                 "calendar": "Agenda",
                 "state": "Alarmstatus",
                 "patterns": "Patronen"
+            }
+        },
+        "frigate_profile": {
+            "options": {
+                "none": "Geen profiel"
             }
         }
     },

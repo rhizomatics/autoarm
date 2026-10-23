@@ -17,13 +17,15 @@
                     "alarm_panel": "Alarm Control Panel to manage",
                     "time_of_day_armed_night": "Bedtime - Times of the Day Sensor",
                     "calendar_entities": "Occupancy - Calendars",
-                    "person_entities": "Presence - People for Occupancy Based Arming"
+                    "person_entities": "Presence - People for Occupancy Based Arming",
+                    "frigate_enabled": "Frigate - Switch Profiles with the Alarm State"
                 },
                 "data_description": {
                     "alarm_panel": "No alarm panel yet? [Create a virtual one]({alarm_panel_help_url}), or in Home Assistant go to Settings → Devices & Services → Helpers → **+ Create Helper** → Template → **Alarm control panel**. Give it a name and submit; every other field is optional.",
                     "calendar_entities": "Calendars are needed to drive the Armed Vacation state, or if presence is unavailable or unreliable for working out occupancy. Calendars can also set any armed state, so can override other diurnal, bedtime or occupancy controls. No calendar yet? [Create a local calendar]({calendar_help_url}), or go to Settings → Devices & Services → **+ Add Integration** → **Local calendar**. Give it a name and leave 'Create empty calendar' selected.",
                     "time_of_day_armed_night": "A Times of the Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. No bedtime sensor yet? [Create one]({bedtime_help_url}), or go to Settings → Devices & Services → Helpers → **+ Create Helper** → **Time of the Day**. Give it a name and set an After/Before time for your usual bedtime window.",
-                    "person_entities": "Whether or not all of these people are home drives the Armed Away, Armed Home and Disarmed states. Somebody missing? [Add a new person]({person_help_url}), or go to Settings → People → **+ Add Person**. Give them a name; linking a user account is optional."
+                    "person_entities": "Whether or not all of these people are home drives the Armed Away, Armed Home and Disarmed states. Somebody missing? [Add a new person]({person_help_url}), or go to Settings → People → **+ Add Person**. Give them a name; linking a user account is optional.",
+                    "frigate_enabled": "Switch the active [Frigate profile]({frigate_profiles_url}) as the alarm state changes (needs Frigate 0.18 or later). Each alarm state uses the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Others can be chosen under Advanced - Frigate."
                 }
             },
             "advanced_setup": {
@@ -33,14 +35,16 @@
                     "time_of_day_armed_night": "Bedtime - Times of the Day Sensor",
                     "calendar_entities": "Occupancy - Calendars",
                     "person_entities": "Presence - People for Occupancy Based Arming",
-                    "panel_code": "Alarm panel code"
+                    "panel_code": "Alarm panel code",
+                    "frigate_enabled": "Frigate - Switch Profiles with the Alarm State"
                 },
                 "data_description": {
                     "alarm_panel": "No alarm panel yet? [Create a virtual one]({alarm_panel_help_url}), or in Home Assistant go to Settings → Devices & Services → Helpers → **+ Create Helper** → Template → **Alarm control panel**. Give it a name and submit; every other field is optional.",
                     "calendar_entities": "Calendars are needed to drive the Armed Vacation state, or if presence is unavailable or unreliable for working out occupancy. Calendars can also set any armed state, so can override other diurnal, bedtime or occupancy controls. No calendar yet? [Create a local calendar]({calendar_help_url}), or go to Settings → Devices & Services → **+ Add Integration** → **Local calendar**. Give it a name and leave 'Create empty calendar' selected.",
                     "time_of_day_armed_night": "A Times of the Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on. No bedtime sensor yet? [Create one]({bedtime_help_url}), or go to Settings → Devices & Services → Helpers → **+ Create Helper** → **Time of the Day**. Give it a name and set an After/Before time for your usual bedtime window.",
                     "person_entities": "Whether or not all of these people are home drives the Armed Away, Armed Home and Disarmed states. Somebody missing? [Add a new person]({person_help_url}), or go to Settings → People → **+ Add Person**. Give them a name; linking a user account is optional.",
-                    "panel_code": "Code for Auto Arm to give the alarm panel's actions when arming or disarming, if the panel needs one. It is stored encrypted and never shown again. Leave blank to keep the code already stored."
+                    "panel_code": "Code for Auto Arm to give the alarm panel's actions when arming or disarming, if the panel needs one. It is stored encrypted and never shown again. Leave blank to keep the code already stored.",
+                    "frigate_enabled": "Switch the active [Frigate profile]({frigate_profiles_url}) as the alarm state changes (needs Frigate 0.18 or later). Each alarm state uses the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Others can be chosen under Advanced - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -165,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Advanced - Frigate",
-                        "description": "Switch the active Frigate profile with the alarm state, using the Profile select from the Frigate integration (needs Frigate 0.18 or later). Choose or type the profile for each alarm state that should have one. Any other alarm state switches Frigate back to no profile, its base config.",
+                        "description": "Overrides for [Frigate profiles]({frigate_profiles_url}), when switched on above. Each alarm state is filled in with the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Change any of these, or clear one to keep Frigate on its base config for that state.",
                         "data": {
                             "frigate_profile_entity": "Frigate profile select",
                             "frigate_profile_disarmed": "Disarmed",
@@ -176,7 +180,7 @@
                             "frigate_profile_armed_custom_bypass": "Armed Custom Bypass"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "The Profile select entity from the Frigate integration."
+                            "frigate_profile_entity": "Only needed with more than one Frigate server, otherwise the Profile select of the Frigate integration is used."
                         }
                     },
                     "advanced_options": {
@@ -223,13 +227,15 @@
                     "calendar_entities": "Occupancy - Calendars",
                     "person_entities": "Presence - People for Occupancy Based Arming",
                     "panel_code": "Alarm panel code",
-                    "panel_code_clear": "Remove the stored alarm panel code"
+                    "panel_code_clear": "Remove the stored alarm panel code",
+                    "frigate_enabled": "Frigate - Switch Profiles with the Alarm State"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "A Times of the Day sensor that's on for bedtime every day. The alarm is held at Armed Night while it's on.",
                     "calendar_entities": "Calendars are needed to drive the Armed Vacation state, or if presence is unavailable or unreliable for working out occupancy. Calendars can also set any armed state, so can override other diurnal, bedtime or occupancy controls.",
                     "person_entities": "Whether or not all of these people are home drives the Armed Away, Armed Home and Disarmed states.",
-                    "panel_code": "Code for Auto Arm to give the alarm panel's actions when arming or disarming, if the panel needs one. It is stored encrypted and never shown again. Leave blank to keep the code already stored."
+                    "panel_code": "Code for Auto Arm to give the alarm panel's actions when arming or disarming, if the panel needs one. It is stored encrypted and never shown again. Leave blank to keep the code already stored.",
+                    "frigate_enabled": "Switch the active [Frigate profile]({frigate_profiles_url}) as the alarm state changes (needs Frigate 0.18 or later). Each alarm state uses the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Others can be chosen under Advanced - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -354,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Advanced - Frigate",
-                        "description": "Switch the active Frigate profile with the alarm state, using the Profile select from the Frigate integration (needs Frigate 0.18 or later). Choose or type the profile for each alarm state that should have one. Any other alarm state switches Frigate back to no profile, its base config.",
+                        "description": "Overrides for [Frigate profiles]({frigate_profiles_url}), when switched on above. Each alarm state is filled in with the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Change any of these, or clear one to keep Frigate on its base config for that state.",
                         "data": {
                             "frigate_profile_entity": "Frigate profile select",
                             "frigate_profile_disarmed": "Disarmed",
@@ -365,7 +371,7 @@
                             "frigate_profile_armed_custom_bypass": "Armed Custom Bypass"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "The Profile select entity from the Frigate integration."
+                            "frigate_profile_entity": "Only needed with more than one Frigate server, otherwise the Profile select of the Frigate integration is used."
                         }
                     },
                     "advanced_options": {
@@ -441,6 +447,11 @@
                 "calendar": "Calendar",
                 "state": "Alarm state",
                 "patterns": "Patterns"
+            }
+        },
+        "frigate_profile": {
+            "options": {
+                "none": "No profile"
             }
         }
     },

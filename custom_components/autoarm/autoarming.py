@@ -81,6 +81,7 @@ from .config_flow import (
     CONF_CALENDAR_OCCUPANCY_ENDS_AWAY,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_CALENDAR_POLL_MINUTES,
+    CONF_FRIGATE_ENABLED,
     CONF_FRIGATE_PROFILE_ENTITY,
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
@@ -156,6 +157,7 @@ from .const import (
     DEFAULT_TRANSITIONS,
     DIURNAL_CALENDAR_STATES,
     DOMAIN,
+    FRIGATE_NO_PROFILE,
     NO_CAL_EVENT_MODE_AUTO,
     NO_CAL_EVENT_MODE_AUTO_OCCUPANCY,
     NO_CAL_EVENT_MODE_AUTO_SUN,
@@ -172,7 +174,7 @@ from .const import (
     ConditionVariables,
 )
 from .crypto import async_decrypt
-from .frigate import async_track_frigate_profile
+from .frigate import async_track_frigate_profile, frigate_profile_selects
 from .helpers import (
     AppHealthTracker,
     ExtendedExtendedJSONEncoder,
@@ -528,11 +530,29 @@ def _build_armer_from_entry(
         # entries from before the option existed keep setting the state directly
         use_alarm_service=entry.options.get(CONF_USE_ALARM_SERVICE, False),
         panel_code=panel_code,
-        frigate_profile_entity=entry.options.get(CONF_FRIGATE_PROFILE_ENTITY),
+        frigate_profile_entity=_frigate_profile_entity(hass, entry.options),
+        # states never saved in the options are left out, to be matched by name
         frigate_profiles={
-            state: profile for option, state in FRIGATE_PROFILE_OPTIONS.items() if (profile := entry.options.get(option))
+            state: entry.options[option] or FRIGATE_NO_PROFILE
+            for option, state in FRIGATE_PROFILE_OPTIONS.items()
+            if option in entry.options
         },
     )
+
+
+def _frigate_profile_entity(hass: HomeAssistant, options: Mapping[str, Any]) -> str | None:
+    """The profile select chosen in the options, or else Frigate's own, when Frigate profiles are on"""
+    if not options.get(CONF_FRIGATE_ENABLED):
+        return None
+    if selected := options.get(CONF_FRIGATE_PROFILE_ENTITY):
+        return cast("str", selected)
+    selects = frigate_profile_selects(hass)
+    if not selects:
+        _LOGGER.warning("AUTOARM Frigate profiles on, but no Frigate profile select found")
+        return None
+    if len(selects) > 1:
+        _LOGGER.warning("AUTOARM Using Frigate profile select %s, choose another in the options from %s", selects[0], selects)
+    return selects[0]
 
 
 def _buttons_from_options(options: Mapping[str, Any]) -> dict[str, ConfigType]:

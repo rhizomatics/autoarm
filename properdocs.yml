@@ -42,6 +42,9 @@ plugins:
   - tags
   - htmlproofer:
       skip_downloads: True
+      # turns away link checkers, though fine in a browser
+      ignore_urls:
+        - https://www.amazon.*
   - llmstxt:
       base_url: https://autoarm.rhizomatics.org.uk/
       preprocess: docgen/llms_preprocess.py

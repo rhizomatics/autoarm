@@ -17,13 +17,15 @@
                     "alarm_panel": "Panel kontroli alarmu do zarządzania",
                     "time_of_day_armed_night": "Pora snu - Czujnik pory dnia",
                     "calendar_entities": "Zajętość - Kalendarze",
-                    "person_entities": "Obecność - Osoby do uzbrajania na podstawie obecności"
+                    "person_entities": "Obecność - Osoby do uzbrajania na podstawie obecności",
+                    "frigate_enabled": "Frigate - Przełączanie profili ze stanem alarmu"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc. Nie masz jeszcze czujnika pory snu? [Utwórz go]({bedtime_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → Pomocnicy → **+ Utwórz pomocnika** → **Pora dnia**. Podaj nazwę i ustaw godzinę początku/końca swojej zwykłej pory snu.",
                     "alarm_panel": "Nie masz jeszcze panelu alarmowego? [Utwórz wirtualny]({alarm_panel_help_url}), albo w Home Assistant przejdź do Ustawienia → Urządzenia i usługi → Pomocnicy → **+ Utwórz pomocnika** → Szablon → **Panel kontroli alarmu**. Podaj nazwę i zatwierdź; wszystkie inne pola są opcjonalne.",
                     "calendar_entities": "Kalendarze są potrzebne dla stanu Uzbrojony na urlop, albo gdy obecność jest niedostępna lub zawodna przy ustalaniu zajętości. Kalendarze mogą też ustawić dowolny stan uzbrojenia, więc mogą nadpisać inne sterowanie według słońca, pory snu lub zajętości. Nie masz jeszcze kalendarza? [Utwórz lokalny kalendarz]({calendar_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → **+ Dodaj integrację** → **Kalendarz lokalny**. Podaj nazwę i pozostaw zaznaczone 'Utwórz pusty kalendarz'.",
-                    "person_entities": "To, czy wszystkie te osoby są w domu, czy nie, decyduje o stanach Uzbrojony poza domem, Uzbrojony w domu i Rozbrojony. Kogoś brakuje? [Dodaj nową osobę]({person_help_url}), albo przejdź do Ustawienia → Osoby → **+ Dodaj osobę**. Podaj jej imię; powiązanie z kontem użytkownika jest opcjonalne."
+                    "person_entities": "To, czy wszystkie te osoby są w domu, czy nie, decyduje o stanach Uzbrojony poza domem, Uzbrojony w domu i Rozbrojony. Kogoś brakuje? [Dodaj nową osobę]({person_help_url}), albo przejdź do Ustawienia → Osoby → **+ Dodaj osobę**. Podaj jej imię; powiązanie z kontem użytkownika jest opcjonalne.",
+                    "frigate_enabled": "Przełączaj aktywny [profil Frigate]({frigate_profiles_url}), gdy zmienia się stan alarmu (wymaga Frigate 0.18 lub nowszego). Każdy stan alarmu używa profilu o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilu o nazwie armed dla wszystkich stanów uzbrojenia. Inne można wybrać w Zaawansowane - Frigate."
                 }
             },
             "advanced_setup": {
@@ -33,14 +35,16 @@
                     "time_of_day_armed_night": "Pora snu - Czujnik pory dnia",
                     "calendar_entities": "Zajętość - Kalendarze",
                     "person_entities": "Obecność - Osoby do uzbrajania na podstawie obecności",
-                    "panel_code": "Kod panelu alarmowego"
+                    "panel_code": "Kod panelu alarmowego",
+                    "frigate_enabled": "Frigate - Przełączanie profili ze stanem alarmu"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc. Nie masz jeszcze czujnika pory snu? [Utwórz go]({bedtime_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → Pomocnicy → **+ Utwórz pomocnika** → **Pora dnia**. Podaj nazwę i ustaw godzinę początku/końca swojej zwykłej pory snu.",
                     "alarm_panel": "Nie masz jeszcze panelu alarmowego? [Utwórz wirtualny]({alarm_panel_help_url}), albo w Home Assistant przejdź do Ustawienia → Urządzenia i usługi → Pomocnicy → **+ Utwórz pomocnika** → Szablon → **Panel kontroli alarmu**. Podaj nazwę i zatwierdź; wszystkie inne pola są opcjonalne.",
                     "calendar_entities": "Kalendarze są potrzebne dla stanu Uzbrojony na urlop, albo gdy obecność jest niedostępna lub zawodna przy ustalaniu zajętości. Kalendarze mogą też ustawić dowolny stan uzbrojenia, więc mogą nadpisać inne sterowanie według słońca, pory snu lub zajętości. Nie masz jeszcze kalendarza? [Utwórz lokalny kalendarz]({calendar_help_url}), albo przejdź do Ustawienia → Urządzenia i usługi → **+ Dodaj integrację** → **Kalendarz lokalny**. Podaj nazwę i pozostaw zaznaczone 'Utwórz pusty kalendarz'.",
                     "person_entities": "To, czy wszystkie te osoby są w domu, czy nie, decyduje o stanach Uzbrojony poza domem, Uzbrojony w domu i Rozbrojony. Kogoś brakuje? [Dodaj nową osobę]({person_help_url}), albo przejdź do Ustawienia → Osoby → **+ Dodaj osobę**. Podaj jej imię; powiązanie z kontem użytkownika jest opcjonalne.",
-                    "panel_code": "Kod, który Auto Arm przekazuje akcjom panelu alarmowego podczas uzbrajania lub rozbrajania, jeśli panel go wymaga. Jest przechowywany w postaci zaszyfrowanej i nigdy więcej nie jest wyświetlany. Pozostaw puste, aby zachować już zapisany kod."
+                    "panel_code": "Kod, który Auto Arm przekazuje akcjom panelu alarmowego podczas uzbrajania lub rozbrajania, jeśli panel go wymaga. Jest przechowywany w postaci zaszyfrowanej i nigdy więcej nie jest wyświetlany. Pozostaw puste, aby zachować już zapisany kod.",
+                    "frigate_enabled": "Przełączaj aktywny [profil Frigate]({frigate_profiles_url}), gdy zmienia się stan alarmu (wymaga Frigate 0.18 lub nowszego). Każdy stan alarmu używa profilu o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilu o nazwie armed dla wszystkich stanów uzbrojenia. Inne można wybrać w Zaawansowane - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -165,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Zaawansowane - Frigate",
-                        "description": "Przełączaj aktywny profil Frigate zgodnie ze stanem alarmu, za pomocą wyboru profilu z integracji Frigate (wymaga Frigate 0.18 lub nowszego). Wybierz lub wpisz profil dla każdego stanu alarmu, który ma go mieć. Każdy inny stan alarmu przywraca Frigate do braku profilu, czyli konfiguracji podstawowej.",
+                        "description": "Zmiany dla [profili Frigate]({frigate_profiles_url}), gdy są włączone powyżej. Każdy stan alarmu jest wstępnie wypełniany profilem o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilem o nazwie armed dla wszystkich stanów uzbrojenia. Zmień dowolny z nich lub wyczyść, aby w tym stanie Frigate pozostał przy konfiguracji podstawowej.",
                         "data": {
                             "frigate_profile_entity": "Wybór profilu Frigate",
                             "frigate_profile_disarmed": "Rozbrojony",
@@ -176,7 +180,7 @@
                             "frigate_profile_armed_custom_bypass": "Uzbrojony niestandardowo"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "Encja wyboru profilu z integracji Frigate."
+                            "frigate_profile_entity": "Potrzebne tylko przy więcej niż jednym serwerze Frigate, w przeciwnym razie używany jest wybór profilu z integracji Frigate."
                         }
                     },
                     "advanced_options": {
@@ -223,13 +227,15 @@
                     "calendar_entities": "Zajętość - Kalendarze",
                     "person_entities": "Obecność - Osoby do uzbrajania na podstawie obecności",
                     "panel_code": "Kod panelu alarmowego",
-                    "panel_code_clear": "Usuń zapisany kod panelu alarmowego"
+                    "panel_code_clear": "Usuń zapisany kod panelu alarmowego",
+                    "frigate_enabled": "Frigate - Przełączanie profili ze stanem alarmu"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Czujnik pory dnia, który jest włączony codziennie w porze snu. Gdy jest włączony, alarm pozostaje w stanie Uzbrojony na noc.",
                     "calendar_entities": "Kalendarze są potrzebne dla stanu Uzbrojony na urlop, albo gdy obecność jest niedostępna lub zawodna przy ustalaniu zajętości. Kalendarze mogą też ustawić dowolny stan uzbrojenia, więc mogą nadpisać inne sterowanie według słońca, pory snu lub zajętości.",
                     "person_entities": "To, czy wszystkie te osoby są w domu, czy nie, decyduje o stanach Uzbrojony poza domem, Uzbrojony w domu i Rozbrojony.",
-                    "panel_code": "Kod, który Auto Arm przekazuje akcjom panelu alarmowego podczas uzbrajania lub rozbrajania, jeśli panel go wymaga. Jest przechowywany w postaci zaszyfrowanej i nigdy więcej nie jest wyświetlany. Pozostaw puste, aby zachować już zapisany kod."
+                    "panel_code": "Kod, który Auto Arm przekazuje akcjom panelu alarmowego podczas uzbrajania lub rozbrajania, jeśli panel go wymaga. Jest przechowywany w postaci zaszyfrowanej i nigdy więcej nie jest wyświetlany. Pozostaw puste, aby zachować już zapisany kod.",
+                    "frigate_enabled": "Przełączaj aktywny [profil Frigate]({frigate_profiles_url}), gdy zmienia się stan alarmu (wymaga Frigate 0.18 lub nowszego). Każdy stan alarmu używa profilu o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilu o nazwie armed dla wszystkich stanów uzbrojenia. Inne można wybrać w Zaawansowane - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -354,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Zaawansowane - Frigate",
-                        "description": "Przełączaj aktywny profil Frigate zgodnie ze stanem alarmu, za pomocą wyboru profilu z integracji Frigate (wymaga Frigate 0.18 lub nowszego). Wybierz lub wpisz profil dla każdego stanu alarmu, który ma go mieć. Każdy inny stan alarmu przywraca Frigate do braku profilu, czyli konfiguracji podstawowej.",
+                        "description": "Zmiany dla [profili Frigate]({frigate_profiles_url}), gdy są włączone powyżej. Każdy stan alarmu jest wstępnie wypełniany profilem o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilem o nazwie armed dla wszystkich stanów uzbrojenia. Zmień dowolny z nich lub wyczyść, aby w tym stanie Frigate pozostał przy konfiguracji podstawowej.",
                         "data": {
                             "frigate_profile_entity": "Wybór profilu Frigate",
                             "frigate_profile_disarmed": "Rozbrojony",
@@ -365,7 +371,7 @@
                             "frigate_profile_armed_custom_bypass": "Uzbrojony niestandardowo"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "Encja wyboru profilu z integracji Frigate."
+                            "frigate_profile_entity": "Potrzebne tylko przy więcej niż jednym serwerze Frigate, w przeciwnym razie używany jest wybór profilu z integracji Frigate."
                         }
                     },
                     "advanced_options": {
@@ -441,6 +447,11 @@
                 "calendar": "Kalendarz",
                 "state": "Stan alarmu",
                 "patterns": "Wzorce"
+            }
+        },
+        "frigate_profile": {
+            "options": {
+                "none": "Brak profilu"
             }
         }
     },

@@ -17,13 +17,15 @@
                     "alarm_panel": "Panneau de contrôle d'alarme à gérer",
                     "time_of_day_armed_night": "Coucher - Capteur de moment de la journée",
                     "calendar_entities": "Occupation - Calendriers",
-                    "person_entities": "Présence - Personnes pour l'armement basé sur l'occupation"
+                    "person_entities": "Présence - Personnes pour l'armement basé sur l'occupation",
+                    "frigate_enabled": "Frigate - Changer de profil selon l'état de l'alarme"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un capteur de moment de la journée actif chaque jour à l'heure du coucher. Tant qu'il est actif, l'alarme reste sur Armé nuit. Pas encore de capteur d'heure de coucher ? [Créez-en un]({bedtime_help_url}), ou allez dans Paramètres → Appareils et services → Auxiliaires → **+ Créer un auxiliaire** → **Heure de la journée**. Donnez-lui un nom et définissez une heure de début/fin pour votre heure de coucher habituelle.",
                     "alarm_panel": "Pas encore de panneau d'alarme ? [Créez-en un virtuel]({alarm_panel_help_url}), ou dans Home Assistant allez dans Paramètres → Appareils et services → Auxiliaires → **+ Créer un auxiliaire** → Modèle → **Panneau de contrôle d'alarme**. Donnez-lui un nom et validez ; tous les autres champs sont facultatifs.",
                     "calendar_entities": "Les calendriers sont nécessaires pour l'état Armé vacances, ou si la présence est indisponible ou peu fiable pour déterminer l'occupation. Les calendriers peuvent aussi définir n'importe quel état armé, et donc remplacer les autres contrôles selon le soleil, le coucher ou l'occupation. Pas encore de calendrier ? [Créez un calendrier local]({calendar_help_url}), ou allez dans Paramètres → Appareils et services → **+ Ajouter une intégration** → **Calendrier local**. Donnez-lui un nom et laissez « Créer un calendrier vide » sélectionné.",
-                    "person_entities": "Le fait que toutes ces personnes soient ou non à la maison détermine les états Armé absence, Armé présence et Désarmé. Quelqu'un manque ? [Ajoutez une nouvelle personne]({person_help_url}), ou allez dans Paramètres → Personnes → **+ Ajouter une personne**. Donnez-lui un nom ; associer un compte utilisateur est facultatif."
+                    "person_entities": "Le fait que toutes ces personnes soient ou non à la maison détermine les états Armé absence, Armé présence et Désarmé. Quelqu'un manque ? [Ajoutez une nouvelle personne]({person_help_url}), ou allez dans Paramètres → Personnes → **+ Ajouter une personne**. Donnez-lui un nom ; associer un compte utilisateur est facultatif.",
+                    "frigate_enabled": "Changer le [profil Frigate]({frigate_profiles_url}) actif quand l'état de l'alarme change (nécessite Frigate 0.18 ou ultérieur). Chaque état d'alarme utilise le profil du même nom, sans tenir compte de la casse, ou à défaut un profil nommé armed pour tous les états armés. D'autres peuvent être choisis dans Avancé - Frigate."
                 }
             },
             "advanced_setup": {
@@ -33,14 +35,16 @@
                     "time_of_day_armed_night": "Coucher - Capteur de moment de la journée",
                     "calendar_entities": "Occupation - Calendriers",
                     "person_entities": "Présence - Personnes pour l'armement basé sur l'occupation",
-                    "panel_code": "Code de la centrale d'alarme"
+                    "panel_code": "Code de la centrale d'alarme",
+                    "frigate_enabled": "Frigate - Changer de profil selon l'état de l'alarme"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un capteur de moment de la journée actif chaque jour à l'heure du coucher. Tant qu'il est actif, l'alarme reste sur Armé nuit. Pas encore de capteur d'heure de coucher ? [Créez-en un]({bedtime_help_url}), ou allez dans Paramètres → Appareils et services → Auxiliaires → **+ Créer un auxiliaire** → **Heure de la journée**. Donnez-lui un nom et définissez une heure de début/fin pour votre heure de coucher habituelle.",
                     "alarm_panel": "Pas encore de panneau d'alarme ? [Créez-en un virtuel]({alarm_panel_help_url}), ou dans Home Assistant allez dans Paramètres → Appareils et services → Auxiliaires → **+ Créer un auxiliaire** → Modèle → **Panneau de contrôle d'alarme**. Donnez-lui un nom et validez ; tous les autres champs sont facultatifs.",
                     "calendar_entities": "Les calendriers sont nécessaires pour l'état Armé vacances, ou si la présence est indisponible ou peu fiable pour déterminer l'occupation. Les calendriers peuvent aussi définir n'importe quel état armé, et donc remplacer les autres contrôles selon le soleil, le coucher ou l'occupation. Pas encore de calendrier ? [Créez un calendrier local]({calendar_help_url}), ou allez dans Paramètres → Appareils et services → **+ Ajouter une intégration** → **Calendrier local**. Donnez-lui un nom et laissez « Créer un calendrier vide » sélectionné.",
                     "person_entities": "Le fait que toutes ces personnes soient ou non à la maison détermine les états Armé absence, Armé présence et Désarmé. Quelqu'un manque ? [Ajoutez une nouvelle personne]({person_help_url}), ou allez dans Paramètres → Personnes → **+ Ajouter une personne**. Donnez-lui un nom ; associer un compte utilisateur est facultatif.",
-                    "panel_code": "Code qu'Auto Arm fournit aux actions de la centrale d'alarme lors de l'armement ou du désarmement, si la centrale en exige un. Il est stocké chiffré et n'est plus jamais affiché. Laissez vide pour conserver le code déjà enregistré."
+                    "panel_code": "Code qu'Auto Arm fournit aux actions de la centrale d'alarme lors de l'armement ou du désarmement, si la centrale en exige un. Il est stocké chiffré et n'est plus jamais affiché. Laissez vide pour conserver le code déjà enregistré.",
+                    "frigate_enabled": "Changer le [profil Frigate]({frigate_profiles_url}) actif quand l'état de l'alarme change (nécessite Frigate 0.18 ou ultérieur). Chaque état d'alarme utilise le profil du même nom, sans tenir compte de la casse, ou à défaut un profil nommé armed pour tous les états armés. D'autres peuvent être choisis dans Avancé - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -165,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Avancé - Frigate",
-                        "description": "Changer le profil Frigate actif selon l'état de l'alarme, avec la sélection de profil de l'intégration Frigate (nécessite Frigate 0.18 ou ultérieur). Choisissez ou saisissez le profil pour chaque état d'alarme qui doit en avoir un. Tout autre état d'alarme ramène Frigate à aucun profil, sa configuration de base.",
+                        "description": "Ajustements des [profils Frigate]({frigate_profiles_url}), lorsqu'ils sont activés ci-dessus. Chaque état d'alarme est prérempli avec le profil du même nom, sans tenir compte de la casse, ou à défaut un profil nommé armed pour tous les états armés. Modifiez-les, ou videz-en un pour garder Frigate sur sa configuration de base dans cet état.",
                         "data": {
                             "frigate_profile_entity": "Sélection de profil Frigate",
                             "frigate_profile_disarmed": "Désarmé",
@@ -176,7 +180,7 @@
                             "frigate_profile_armed_custom_bypass": "Armé personnalisé"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "L'entité de sélection de profil de l'intégration Frigate."
+                            "frigate_profile_entity": "Nécessaire seulement avec plusieurs serveurs Frigate, sinon la sélection de profil de l'intégration Frigate est utilisée."
                         }
                     },
                     "advanced_options": {
@@ -223,13 +227,15 @@
                     "calendar_entities": "Occupation - Calendriers",
                     "person_entities": "Présence - Personnes pour l'armement basé sur l'occupation",
                     "panel_code": "Code de la centrale d'alarme",
-                    "panel_code_clear": "Supprimer le code enregistré de la centrale d'alarme"
+                    "panel_code_clear": "Supprimer le code enregistré de la centrale d'alarme",
+                    "frigate_enabled": "Frigate - Changer de profil selon l'état de l'alarme"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un capteur de moment de la journée actif chaque jour à l'heure du coucher. Tant qu'il est actif, l'alarme reste sur Armé nuit.",
                     "calendar_entities": "Les calendriers sont nécessaires pour l'état Armé vacances, ou si la présence est indisponible ou peu fiable pour déterminer l'occupation. Les calendriers peuvent aussi définir n'importe quel état armé, et donc remplacer les autres contrôles selon le soleil, le coucher ou l'occupation.",
                     "person_entities": "Le fait que toutes ces personnes soient ou non à la maison détermine les états Armé absence, Armé présence et Désarmé.",
-                    "panel_code": "Code qu'Auto Arm fournit aux actions de la centrale d'alarme lors de l'armement ou du désarmement, si la centrale en exige un. Il est stocké chiffré et n'est plus jamais affiché. Laissez vide pour conserver le code déjà enregistré."
+                    "panel_code": "Code qu'Auto Arm fournit aux actions de la centrale d'alarme lors de l'armement ou du désarmement, si la centrale en exige un. Il est stocké chiffré et n'est plus jamais affiché. Laissez vide pour conserver le code déjà enregistré.",
+                    "frigate_enabled": "Changer le [profil Frigate]({frigate_profiles_url}) actif quand l'état de l'alarme change (nécessite Frigate 0.18 ou ultérieur). Chaque état d'alarme utilise le profil du même nom, sans tenir compte de la casse, ou à défaut un profil nommé armed pour tous les états armés. D'autres peuvent être choisis dans Avancé - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -354,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Avancé - Frigate",
-                        "description": "Changer le profil Frigate actif selon l'état de l'alarme, avec la sélection de profil de l'intégration Frigate (nécessite Frigate 0.18 ou ultérieur). Choisissez ou saisissez le profil pour chaque état d'alarme qui doit en avoir un. Tout autre état d'alarme ramène Frigate à aucun profil, sa configuration de base.",
+                        "description": "Ajustements des [profils Frigate]({frigate_profiles_url}), lorsqu'ils sont activés ci-dessus. Chaque état d'alarme est prérempli avec le profil du même nom, sans tenir compte de la casse, ou à défaut un profil nommé armed pour tous les états armés. Modifiez-les, ou videz-en un pour garder Frigate sur sa configuration de base dans cet état.",
                         "data": {
                             "frigate_profile_entity": "Sélection de profil Frigate",
                             "frigate_profile_disarmed": "Désarmé",
@@ -365,7 +371,7 @@
                             "frigate_profile_armed_custom_bypass": "Armé personnalisé"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "L'entité de sélection de profil de l'intégration Frigate."
+                            "frigate_profile_entity": "Nécessaire seulement avec plusieurs serveurs Frigate, sinon la sélection de profil de l'intégration Frigate est utilisée."
                         }
                     },
                     "advanced_options": {
@@ -441,6 +447,11 @@
                 "calendar": "Calendrier",
                 "state": "État d'alarme",
                 "patterns": "Motifs"
+            }
+        },
+        "frigate_profile": {
+            "options": {
+                "none": "Aucun profil"
             }
         }
     },

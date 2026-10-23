@@ -17,13 +17,15 @@
                     "alarm_panel": "Pannello di controllo allarme da gestire",
                     "time_of_day_armed_night": "Ora di dormire - Sensore ora del giorno",
                     "calendar_entities": "Occupazione - Calendari",
-                    "person_entities": "Presenza - Persone per l'inserimento basato sulla presenza"
+                    "person_entities": "Presenza - Persone per l'inserimento basato sulla presenza",
+                    "frigate_enabled": "Frigate - Cambia profilo con lo stato dell'allarme"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte. Non hai ancora un sensore dell'ora di andare a dormire? [Creane uno]({bedtime_help_url}), oppure vai su Impostazioni → Dispositivi e servizi → Ausiliari → **+ Crea ausiliario** → **Ora del giorno**. Dagli un nome e imposta un orario di inizio/fine per la tua solita ora di andare a dormire.",
                     "alarm_panel": "Non hai ancora un pannello di allarme? [Creane uno virtuale]({alarm_panel_help_url}), oppure in Home Assistant vai su Impostazioni → Dispositivi e servizi → Ausiliari → **+ Crea ausiliario** → Template → **Pannello di controllo allarme**. Dagli un nome e invia; tutti gli altri campi sono opzionali.",
                     "calendar_entities": "I calendari servono per lo stato Inserito vacanza, o se la presenza non è disponibile o è inaffidabile per determinare l'occupazione. I calendari possono anche impostare qualsiasi stato inserito, quindi possono sovrascrivere gli altri controlli basati su sole, ora di dormire o occupazione. Non hai ancora un calendario? [Crea un calendario locale]({calendar_help_url}), oppure vai su Impostazioni → Dispositivi e servizi → **+ Aggiungi integrazione** → **Calendario locale**. Dagli un nome e lascia selezionato 'Crea calendario vuoto'.",
-                    "person_entities": "Il fatto che tutte queste persone siano o meno in casa determina gli stati Inserito fuori casa, Inserito in casa e Disinserito. Manca qualcuno? [Aggiungi una nuova persona]({person_help_url}), oppure vai su Impostazioni → Persone → **+ Aggiungi persona**. Dagli un nome; collegare un account utente è opzionale."
+                    "person_entities": "Il fatto che tutte queste persone siano o meno in casa determina gli stati Inserito fuori casa, Inserito in casa e Disinserito. Manca qualcuno? [Aggiungi una nuova persona]({person_help_url}), oppure vai su Impostazioni → Persone → **+ Aggiungi persona**. Dagli un nome; collegare un account utente è opzionale.",
+                    "frigate_enabled": "Cambia il [profilo Frigate]({frigate_profiles_url}) attivo quando cambia lo stato dell'allarme (richiede Frigate 0.18 o successivo). Ogni stato dell'allarme usa il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure un profilo chiamato armed per tutti gli stati inseriti. Altri si possono scegliere in Avanzate - Frigate."
                 }
             },
             "advanced_setup": {
@@ -33,14 +35,16 @@
                     "time_of_day_armed_night": "Ora di dormire - Sensore ora del giorno",
                     "calendar_entities": "Occupazione - Calendari",
                     "person_entities": "Presenza - Persone per l'inserimento basato sulla presenza",
-                    "panel_code": "Codice della centrale d'allarme"
+                    "panel_code": "Codice della centrale d'allarme",
+                    "frigate_enabled": "Frigate - Cambia profilo con lo stato dell'allarme"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte. Non hai ancora un sensore dell'ora di andare a dormire? [Creane uno]({bedtime_help_url}), oppure vai su Impostazioni → Dispositivi e servizi → Ausiliari → **+ Crea ausiliario** → **Ora del giorno**. Dagli un nome e imposta un orario di inizio/fine per la tua solita ora di andare a dormire.",
                     "alarm_panel": "Non hai ancora un pannello di allarme? [Creane uno virtuale]({alarm_panel_help_url}), oppure in Home Assistant vai su Impostazioni → Dispositivi e servizi → Ausiliari → **+ Crea ausiliario** → Template → **Pannello di controllo allarme**. Dagli un nome e invia; tutti gli altri campi sono opzionali.",
                     "calendar_entities": "I calendari servono per lo stato Inserito vacanza, o se la presenza non è disponibile o è inaffidabile per determinare l'occupazione. I calendari possono anche impostare qualsiasi stato inserito, quindi possono sovrascrivere gli altri controlli basati su sole, ora di dormire o occupazione. Non hai ancora un calendario? [Crea un calendario locale]({calendar_help_url}), oppure vai su Impostazioni → Dispositivi e servizi → **+ Aggiungi integrazione** → **Calendario locale**. Dagli un nome e lascia selezionato 'Crea calendario vuoto'.",
                     "person_entities": "Il fatto che tutte queste persone siano o meno in casa determina gli stati Inserito fuori casa, Inserito in casa e Disinserito. Manca qualcuno? [Aggiungi una nuova persona]({person_help_url}), oppure vai su Impostazioni → Persone → **+ Aggiungi persona**. Dagli un nome; collegare un account utente è opzionale.",
-                    "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato."
+                    "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato.",
+                    "frigate_enabled": "Cambia il [profilo Frigate]({frigate_profiles_url}) attivo quando cambia lo stato dell'allarme (richiede Frigate 0.18 o successivo). Ogni stato dell'allarme usa il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure un profilo chiamato armed per tutti gli stati inseriti. Altri si possono scegliere in Avanzate - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -165,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Avanzate - Frigate",
-                        "description": "Cambia il profilo Frigate attivo con lo stato dell'allarme, usando la selezione del profilo dell'integrazione Frigate (richiede Frigate 0.18 o successivo). Scegli o digita il profilo per ogni stato dell'allarme che deve averne uno. Qualsiasi altro stato dell'allarme riporta Frigate a nessun profilo, la sua configurazione di base.",
+                        "description": "Personalizzazioni dei [profili Frigate]({frigate_profiles_url}), quando attivati sopra. Ogni stato dell'allarme è precompilato con il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure con un profilo chiamato armed per tutti gli stati inseriti. Modificali, o svuotane uno per mantenere Frigate sulla configurazione di base in quello stato.",
                         "data": {
                             "frigate_profile_entity": "Selezione profilo Frigate",
                             "frigate_profile_disarmed": "Disinserito",
@@ -176,7 +180,7 @@
                             "frigate_profile_armed_custom_bypass": "Inserito personalizzato"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "L'entità di selezione del profilo dell'integrazione Frigate."
+                            "frigate_profile_entity": "Necessario solo con più di un server Frigate, altrimenti si usa la selezione del profilo dell'integrazione Frigate."
                         }
                     },
                     "advanced_options": {
@@ -223,13 +227,15 @@
                     "calendar_entities": "Occupazione - Calendari",
                     "person_entities": "Presenza - Persone per l'inserimento basato sulla presenza",
                     "panel_code": "Codice della centrale d'allarme",
-                    "panel_code_clear": "Rimuovi il codice salvato della centrale d'allarme"
+                    "panel_code_clear": "Rimuovi il codice salvato della centrale d'allarme",
+                    "frigate_enabled": "Frigate - Cambia profilo con lo stato dell'allarme"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Un sensore ora del giorno attivo ogni giorno all'ora di andare a dormire. Finché è attivo, l'allarme resta su Inserito notte.",
                     "calendar_entities": "I calendari servono per lo stato Inserito vacanza, o se la presenza non è disponibile o è inaffidabile per determinare l'occupazione. I calendari possono anche impostare qualsiasi stato inserito, quindi possono sovrascrivere gli altri controlli basati su sole, ora di dormire o occupazione.",
                     "person_entities": "Il fatto che tutte queste persone siano o meno in casa determina gli stati Inserito fuori casa, Inserito in casa e Disinserito.",
-                    "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato."
+                    "panel_code": "Codice che Auto Arm fornisce alle azioni della centrale d'allarme durante l'inserimento o il disinserimento, se la centrale lo richiede. Viene salvato cifrato e non viene più mostrato. Lascia vuoto per mantenere il codice già salvato.",
+                    "frigate_enabled": "Cambia il [profilo Frigate]({frigate_profiles_url}) attivo quando cambia lo stato dell'allarme (richiede Frigate 0.18 o successivo). Ogni stato dell'allarme usa il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure un profilo chiamato armed per tutti gli stati inseriti. Altri si possono scegliere in Avanzate - Frigate."
                 },
                 "sections": {
                     "assist_options": {
@@ -354,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Avanzate - Frigate",
-                        "description": "Cambia il profilo Frigate attivo con lo stato dell'allarme, usando la selezione del profilo dell'integrazione Frigate (richiede Frigate 0.18 o successivo). Scegli o digita il profilo per ogni stato dell'allarme che deve averne uno. Qualsiasi altro stato dell'allarme riporta Frigate a nessun profilo, la sua configurazione di base.",
+                        "description": "Personalizzazioni dei [profili Frigate]({frigate_profiles_url}), quando attivati sopra. Ogni stato dell'allarme è precompilato con il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure con un profilo chiamato armed per tutti gli stati inseriti. Modificali, o svuotane uno per mantenere Frigate sulla configurazione di base in quello stato.",
                         "data": {
                             "frigate_profile_entity": "Selezione profilo Frigate",
                             "frigate_profile_disarmed": "Disinserito",
@@ -365,7 +371,7 @@
                             "frigate_profile_armed_custom_bypass": "Inserito personalizzato"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "L'entità di selezione del profilo dell'integrazione Frigate."
+                            "frigate_profile_entity": "Necessario solo con più di un server Frigate, altrimenti si usa la selezione del profilo dell'integrazione Frigate."
                         }
                     },
                     "advanced_options": {
@@ -441,6 +447,11 @@
                 "calendar": "Calendario",
                 "state": "Stato di allarme",
                 "patterns": "Modelli"
+            }
+        },
+        "frigate_profile": {
+            "options": {
+                "none": "Nessun profilo"
             }
         }
     },

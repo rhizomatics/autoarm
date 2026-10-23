@@ -5,7 +5,6 @@ import re
 from collections.abc import Mapping
 from typing import Any
 
-from homeassistant.components.select.const import ATTR_OPTIONS
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_SERVICE
 from homeassistant.core import HomeAssistant
@@ -64,6 +63,7 @@ from .const import (
     TRIGGER_AUTO,
 )
 from .crypto import async_encrypt
+from .frigate import frigate_profile_selects, frigate_profiles, match_profile
 from .supernotify_api import deliveries, supernotify_available
 
 CONF_CALENDAR_ENTITIES = "calendar_entities"
@@ -128,7 +128,9 @@ CONF_PANEL_CODE = "panel_code"
 CONF_PANEL_CODE_CLEAR = "panel_code_clear"
 CONF_SENTENCE_ARM = "sentence_arm"
 CONF_SENTENCE_DISARM = "sentence_disarm"
-# the Frigate integration's profile select
+# switch Frigate profiles with the alarm state, using the Frigate integration's profile select
+CONF_FRIGATE_ENABLED = "frigate_enabled"
+# only needed to choose between more than one Frigate server
 CONF_FRIGATE_PROFILE_ENTITY = "frigate_profile_entity"
 
 DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES: list[str] = ["disarmed", "armed_home", "armed_night", "armed_away"]
@@ -139,18 +141,21 @@ ALARM_PANEL_HELP_URL = "https://my.home-assistant.io/redirect/config_flow_start/
 CALENDAR_HELP_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=local_calendar"
 TIME_OF_DAY_HELP_URL = "https://my.home-assistant.io/redirect/config_flow_start/?domain=tod"
 PERSON_HELP_URL = "https://my.home-assistant.io/redirect/people/"
+FRIGATE_PROFILES_URL = "https://docs.frigate.video/configuration/profiles/"
 SETUP_HELP_PLACEHOLDERS: dict[str, str] = {
     "recipe_url": RECIPE_URL,
     "alarm_panel_help_url": ALARM_PANEL_HELP_URL,
     "calendar_help_url": CALENDAR_HELP_URL,
     "bedtime_help_url": TIME_OF_DAY_HELP_URL,
     "person_help_url": PERSON_HELP_URL,
+    "frigate_profiles_url": FRIGATE_PROFILES_URL,
 }
+OPTIONS_HELP_PLACEHOLDERS: dict[str, str] = {"recipe_url": RECIPE_URL, "frigate_profiles_url": FRIGATE_PROFILES_URL}
 # option holding the Times of the Day sensors for each alarm state, a daily period doesn't suit vacations
 TIME_OF_DAY_OPTIONS: dict[str, str] = {
     f"time_of_day_{state}": state for state in PUBLIC_ALARM_STATES if state != "armed_vacation"
 }
-# option holding the Frigate profile for each alarm state, a state without one switching Frigate to no profile
+# option holding the Frigate profile for each alarm state, a state without one matched to a profile by name
 FRIGATE_PROFILE_OPTIONS: dict[str, str] = {f"frigate_profile_{state}": state for state in PUBLIC_ALARM_STATES}
 # a reset button, and buttons for each alarm state, each with a delay in seconds before it acts
 BUTTON_USES: list[str] = [ATTR_RESET, *PUBLIC_ALARM_STATES]
@@ -211,7 +216,9 @@ DEFAULT_OPTIONS: dict[str, Any] = {
 }
 
 
-def _top_level_fields(options: Mapping[str, Any], alarm_panel_default: str | None = None) -> dict[Any, Any]:
+def _top_level_fields(
+    options: Mapping[str, Any], alarm_panel_default: str | None = None, frigate_available: bool = False
+) -> dict[Any, Any]:
     """Alarm panel plus the recommended-recipe entities, shared by every setup path and the options flow."""
     alarm_panel_marker = (
         vol.Required(CONF_ALARM_PANEL, default=alarm_panel_default) if alarm_panel_default else vol.Required(CONF_ALARM_PANEL)
@@ -225,7 +232,17 @@ def _top_level_fields(options: Mapping[str, Any], alarm_panel_default: str | Non
         vol.Optional(CONF_PERSON_ENTITIES, default=options.get(CONF_PERSON_ENTITIES, [])): EntitySelector(
             EntitySelectorConfig(domain="person", multiple=True)
         ),
+        **(
+            {vol.Optional(CONF_FRIGATE_ENABLED, default=options.get(CONF_FRIGATE_ENABLED, False)): BooleanSelector()}
+            if frigate_available
+            else {}
+        ),
     }
+
+
+def _frigate_available(hass: HomeAssistant, options: Mapping[str, Any]) -> bool:
+    """There's a Frigate with profiles, or profiles are already on, so they can be turned off after Frigate has gone"""
+    return bool(frigate_profile_selects(hass)) or bool(options.get(CONF_FRIGATE_ENABLED))
 
 
 def _default_notify_action(hass: HomeAssistant) -> str:
@@ -236,11 +253,6 @@ def _default_notify_action(hass: HomeAssistant) -> str:
 async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
     """The alarm panel code and the full set of options flow sections, shared by advanced setup and the options flow."""
     notify_services = sorted(f"notify.{service}" for service in hass.services.async_services().get("notify", {}))
-    # profiles offered from the select already chosen, others can be typed in before it's chosen or while Frigate is down
-    frigate_select = hass.states.get(options.get(CONF_FRIGATE_PROFILE_ENTITY) or "")
-    frigate_profiles: list[str] = [
-        p for p in (frigate_select.attributes.get(ATTR_OPTIONS, []) if frigate_select else []) if p != FRIGATE_NO_PROFILE
-    ]
     notify_target_fields: dict[Any, Any]
     if supernotify_available(hass):
         notify_services.insert(0, SUPERNOTIFY_ACTION)
@@ -454,21 +466,7 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
             }),
             {"collapsed": True},
         ),
-        vol.Required("frigate_options"): section(
-            vol.Schema({
-                vol.Optional(
-                    CONF_FRIGATE_PROFILE_ENTITY,
-                    description={"suggested_value": options.get(CONF_FRIGATE_PROFILE_ENTITY)},
-                ): EntitySelector(EntitySelectorConfig(domain="select", integration="frigate")),
-                **{
-                    vol.Optional(option, description={"suggested_value": options.get(option)}): SelectSelector(
-                        SelectSelectorConfig(options=frigate_profiles, custom_value=True, mode=SelectSelectorMode.DROPDOWN)
-                    )
-                    for option in FRIGATE_PROFILE_OPTIONS
-                },
-            }),
-            {"collapsed": True},
-        ),
+        **_frigate_section(hass, options),
         vol.Required("advanced_options"): section(
             vol.Schema({
                 vol.Required(
@@ -495,6 +493,52 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
             {"collapsed": True},
         ),
     }
+
+
+def _frigate_section(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
+    """Overrides for Frigate profiles, the select where there's more than one Frigate, and profiles not matched by name"""
+    if not _frigate_available(hass, options):
+        return {}
+    profiles: list[str] = frigate_profiles(hass, options.get(CONF_FRIGATE_PROFILE_ENTITY))
+    # no profile, for a state cleared, then those in Frigate, others can be typed in while Frigate is down
+    profile_choices: list[str] = [FRIGATE_NO_PROFILE, *profiles]
+    return {
+        vol.Required("frigate_options"): section(
+            vol.Schema({
+                vol.Optional(
+                    CONF_FRIGATE_PROFILE_ENTITY,
+                    description={"suggested_value": options.get(CONF_FRIGATE_PROFILE_ENTITY)},
+                ): EntitySelector(EntitySelectorConfig(domain="select", integration="frigate")),
+                **{
+                    # filled in by name until saved, so a profile cleared stays cleared
+                    vol.Optional(
+                        option,
+                        description={
+                            "suggested_value": options[option] if option in options else match_profile(state, profiles)
+                        },
+                    ): SelectSelector(
+                        SelectSelectorConfig(
+                            options=profile_choices,
+                            custom_value=True,
+                            mode=SelectSelectorMode.DROPDOWN,
+                            translation_key="frigate_profile",
+                        )
+                    )
+                    for option, state in FRIGATE_PROFILE_OPTIONS.items()
+                },
+            }),
+            {"collapsed": True},
+        ),
+    }
+
+
+def _settle_frigate_profiles(data: dict[str, Any]) -> None:
+    """Keep a state cleared as no profile, so it isn't matched by name again, or drop the profiles while switched off"""
+    for option in FRIGATE_PROFILE_OPTIONS:
+        if not data.get(CONF_FRIGATE_ENABLED):
+            data.pop(option, None)
+        elif not data.get(option):
+            data[option] = FRIGATE_NO_PROFILE
 
 
 def _flatten_sections(user_input: dict[str, Any]) -> dict[str, Any]:
@@ -553,6 +597,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_BEDTIME_ENTITIES: user_input.get(CONF_BEDTIME_ENTITIES, []),
                 CONF_CALENDAR_ENTITIES: user_input.get(CONF_CALENDAR_ENTITIES, []),
                 CONF_PERSON_ENTITIES: user_input.get(CONF_PERSON_ENTITIES, []),
+                CONF_FRIGATE_ENABLED: user_input.get(CONF_FRIGATE_ENABLED, False),
             }
 
             return self.async_create_entry(
@@ -565,7 +610,9 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         default_options = {CONF_PERSON_ENTITIES: sorted(self.hass.states.async_entity_ids("person"))}
         return self.async_show_form(
             step_id="quick_setup",
-            data_schema=vol.Schema(_top_level_fields(default_options)),
+            data_schema=vol.Schema(
+                _top_level_fields(default_options, frigate_available=_frigate_available(self.hass, default_options))
+            ),
             description_placeholders=SETUP_HELP_PLACEHOLDERS,
         )
 
@@ -579,6 +626,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if user_input is not None:
             data = _flatten_sections(user_input)
+            _settle_frigate_profiles(data)
             errors = _pattern_errors(data)
             if not errors:
                 await _protect_panel_code(self.hass, data)
@@ -594,7 +642,11 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="advanced_setup",
             data_schema=vol.Schema({
-                **_top_level_fields(default_options, alarm_panel_default=default_options.get(CONF_ALARM_PANEL)),
+                **_top_level_fields(
+                    default_options,
+                    alarm_panel_default=default_options.get(CONF_ALARM_PANEL),
+                    frigate_available=_frigate_available(self.hass, default_options),
+                ),
                 **await _section_fields(self.hass, default_options),
             }),
             description_placeholders=SETUP_HELP_PLACEHOLDERS,
@@ -671,6 +723,7 @@ class AutoArmOptionsFlow(OptionsFlow):
         errors: dict[str, str] = {}
         if user_input is not None:
             data = _flatten_sections(user_input)
+            _settle_frigate_profiles(data)
             errors = _pattern_errors(data)
             if not errors:
                 await _protect_panel_code(self.hass, data, self.config_entry.options.get(CONF_PANEL_CODE))
@@ -693,10 +746,12 @@ class AutoArmOptionsFlow(OptionsFlow):
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
-                **_top_level_fields(options, alarm_panel_default=alarm_panel),
+                **_top_level_fields(
+                    options, alarm_panel_default=alarm_panel, frigate_available=_frigate_available(self.hass, options)
+                ),
                 **await _section_fields(self.hass, options),
             }),
-            description_placeholders={"recipe_url": RECIPE_URL},
+            description_placeholders=OPTIONS_HELP_PLACEHOLDERS,
             errors=errors,
         )
 

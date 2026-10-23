@@ -7,6 +7,11 @@
   - For example, when the alarm is `disarmed`, you could have
   Frigate switch to a `disarmed` profile and reduce unwanted alerts. Or have an extra vigilant `armed_vacation` profile
   - Profile names can be anything, although simpler if match the armed state
+  - Auto Arm will *auto match* alarm states to Frigate profiles for you, including matching an `armed` profile to any of the
+  armed states that don't have a better matching profile
+    - Use the `Advanced - Frigate Settings` box if you want
+    to override or cancel the auto-matching
+  - When alarm state changes, and there's no Frigate profile mapped, it will be set back to its base config
 
 # 2.0.0
 

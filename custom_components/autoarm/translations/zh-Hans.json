@@ -17,13 +17,15 @@
                     "alarm_panel": "要管理的警报控制面板",
                     "time_of_day_armed_night": "就寝时间 - 时段传感器",
                     "calendar_entities": "占用 - 日历",
-                    "person_entities": "在家状态 - 用于基于在家状态布防的人员"
+                    "person_entities": "在家状态 - 用于基于在家状态布防的人员",
+                    "frigate_enabled": "Frigate - 随警报状态切换配置文件"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间,警报保持在夜间布防。 还没有就寝时间传感器?[创建一个]({bedtime_help_url}),或前往 设置 → 设备与服务 → 辅助 → **+ 创建辅助** → **时段**。为其命名,并为平常的就寝时间设置起止时间。",
                     "alarm_panel": "还没有警报面板?[创建一个虚拟面板]({alarm_panel_help_url}),或在 Home Assistant 中前往 设置 → 设备与服务 → 辅助 → **+ 创建辅助** → 模板 → **警报控制面板**。为其命名并提交;其余字段均为可选。",
                     "calendar_entities": "度假布防状态需要日历;当在家状态不可用或不足以可靠判断是否有人时,也需要日历。日历还可以设置任何布防状态,因此可以覆盖其他基于日出日落、就寝时间或在家状态的控制。 还没有日历?[创建本地日历]({calendar_help_url}),或前往 设置 → 设备与服务 → **+ 添加集成** → **本地日历**。为其命名,并保持选中“创建空日历”。",
-                    "person_entities": "这些人员是否全部在家,决定离家布防、在家布防和撤防状态。 少了谁?[添加新成员]({person_help_url}),或前往 设置 → 人员 → **+ 添加人员**。为其命名;关联用户账户为可选项。"
+                    "person_entities": "这些人员是否全部在家,决定离家布防、在家布防和撤防状态。 少了谁?[添加新成员]({person_help_url}),或前往 设置 → 人员 → **+ 添加人员**。为其命名;关联用户账户为可选项。",
+                    "frigate_enabled": "警报状态变化时切换活动的 [Frigate 配置文件]({frigate_profiles_url})（需要 Frigate 0.18 或更高版本）。每个警报状态使用同名配置文件（不区分大小写），否则所有布防状态使用名为 armed 的配置文件。其他配置文件可在 高级 - Frigate 中选择。"
                 }
             },
             "advanced_setup": {
@@ -33,14 +35,16 @@
                     "time_of_day_armed_night": "就寝时间 - 时段传感器",
                     "calendar_entities": "占用 - 日历",
                     "person_entities": "在家状态 - 用于基于在家状态布防的人员",
-                    "panel_code": "报警面板密码"
+                    "panel_code": "报警面板密码",
+                    "frigate_enabled": "Frigate - 随警报状态切换配置文件"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间,警报保持在夜间布防。 还没有就寝时间传感器?[创建一个]({bedtime_help_url}),或前往 设置 → 设备与服务 → 辅助 → **+ 创建辅助** → **时段**。为其命名,并为平常的就寝时间设置起止时间。",
                     "alarm_panel": "还没有警报面板?[创建一个虚拟面板]({alarm_panel_help_url}),或在 Home Assistant 中前往 设置 → 设备与服务 → 辅助 → **+ 创建辅助** → 模板 → **警报控制面板**。为其命名并提交;其余字段均为可选。",
                     "calendar_entities": "度假布防状态需要日历;当在家状态不可用或不足以可靠判断是否有人时,也需要日历。日历还可以设置任何布防状态,因此可以覆盖其他基于日出日落、就寝时间或在家状态的控制。 还没有日历?[创建本地日历]({calendar_help_url}),或前往 设置 → 设备与服务 → **+ 添加集成** → **本地日历**。为其命名,并保持选中“创建空日历”。",
                     "person_entities": "这些人员是否全部在家,决定离家布防、在家布防和撤防状态。 少了谁?[添加新成员]({person_help_url}),或前往 设置 → 人员 → **+ 添加人员**。为其命名;关联用户账户为可选项。",
-                    "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。"
+                    "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。",
+                    "frigate_enabled": "警报状态变化时切换活动的 [Frigate 配置文件]({frigate_profiles_url})（需要 Frigate 0.18 或更高版本）。每个警报状态使用同名配置文件（不区分大小写），否则所有布防状态使用名为 armed 的配置文件。其他配置文件可在 高级 - Frigate 中选择。"
                 },
                 "sections": {
                     "assist_options": {
@@ -165,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "高级 - Frigate",
-                        "description": "通过 Frigate 集成的配置文件选择实体，随警报状态切换 Frigate 的活动配置文件（需要 Frigate 0.18 或更高版本）。为需要配置文件的每个警报状态选择或输入配置文件。其他任何警报状态都会让 Frigate 回到无配置文件，即其基础配置。",
+                        "description": "在上方开启时，对 [Frigate 配置文件]({frigate_profiles_url}) 的覆盖设置。每个警报状态会预先填入同名配置文件（不区分大小写），否则所有布防状态填入名为 armed 的配置文件。可修改其中任何一项，或清空某项让 Frigate 在该状态下保持基础配置。",
                         "data": {
                             "frigate_profile_entity": "Frigate 配置文件选择",
                             "frigate_profile_disarmed": "撤防",
@@ -176,7 +180,7 @@
                             "frigate_profile_armed_custom_bypass": "自定义布防"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "Frigate 集成的配置文件选择实体。"
+                            "frigate_profile_entity": "仅在有多个 Frigate 服务器时需要，否则使用 Frigate 集成的配置文件选择实体。"
                         }
                     },
                     "advanced_options": {
@@ -223,13 +227,15 @@
                     "calendar_entities": "占用 - 日历",
                     "person_entities": "在家状态 - 用于基于在家状态布防的人员",
                     "panel_code": "报警面板密码",
-                    "panel_code_clear": "删除已存储的报警面板密码"
+                    "panel_code_clear": "删除已存储的报警面板密码",
+                    "frigate_enabled": "Frigate - 随警报状态切换配置文件"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "每天就寝时间开启的时段传感器。开启期间,警报保持在夜间布防。",
                     "calendar_entities": "度假布防状态需要日历;当在家状态不可用或不足以可靠判断是否有人时,也需要日历。日历还可以设置任何布防状态,因此可以覆盖其他基于日出日落、就寝时间或在家状态的控制。",
                     "person_entities": "这些人员是否全部在家,决定离家布防、在家布防和撤防状态。",
-                    "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。"
+                    "panel_code": "如果面板需要密码，Auto Arm 在布防或撤防时提供给报警面板操作的密码。密码加密存储，且不会再次显示。留空则保留已存储的密码。",
+                    "frigate_enabled": "警报状态变化时切换活动的 [Frigate 配置文件]({frigate_profiles_url})（需要 Frigate 0.18 或更高版本）。每个警报状态使用同名配置文件（不区分大小写），否则所有布防状态使用名为 armed 的配置文件。其他配置文件可在 高级 - Frigate 中选择。"
                 },
                 "sections": {
                     "assist_options": {
@@ -354,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "高级 - Frigate",
-                        "description": "通过 Frigate 集成的配置文件选择实体，随警报状态切换 Frigate 的活动配置文件（需要 Frigate 0.18 或更高版本）。为需要配置文件的每个警报状态选择或输入配置文件。其他任何警报状态都会让 Frigate 回到无配置文件，即其基础配置。",
+                        "description": "在上方开启时，对 [Frigate 配置文件]({frigate_profiles_url}) 的覆盖设置。每个警报状态会预先填入同名配置文件（不区分大小写），否则所有布防状态填入名为 armed 的配置文件。可修改其中任何一项，或清空某项让 Frigate 在该状态下保持基础配置。",
                         "data": {
                             "frigate_profile_entity": "Frigate 配置文件选择",
                             "frigate_profile_disarmed": "撤防",
@@ -365,7 +371,7 @@
                             "frigate_profile_armed_custom_bypass": "自定义布防"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "Frigate 集成的配置文件选择实体。"
+                            "frigate_profile_entity": "仅在有多个 Frigate 服务器时需要，否则使用 Frigate 集成的配置文件选择实体。"
                         }
                     },
                     "advanced_options": {
@@ -441,6 +447,11 @@
                 "calendar": "日历",
                 "state": "警报状态",
                 "patterns": "模式"
+            }
+        },
+        "frigate_profile": {
+            "options": {
+                "none": "无配置文件"
             }
         }
     },

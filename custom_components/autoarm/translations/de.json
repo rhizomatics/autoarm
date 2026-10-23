@@ -17,13 +17,15 @@
                     "alarm_panel": "Zu verwaltende Alarmzentrale",
                     "time_of_day_armed_night": "Schlafenszeit - Tageszeit-Sensor",
                     "calendar_entities": "Belegung - Kalender",
-                    "person_entities": "Anwesenheit - Personen für die belegungsbasierte Scharfschaltung"
+                    "person_entities": "Anwesenheit - Personen für die belegungsbasierte Scharfschaltung",
+                    "frigate_enabled": "Frigate - Profile mit dem Alarmzustand wechseln"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Ein Tageszeit-Sensor, der jeden Tag zur Schlafenszeit eingeschaltet ist. Solange er an ist, bleibt der Alarm auf 'Scharf Nacht'. Noch keinen Schlafenszeit-Sensor? [Erstellen Sie einen]({bedtime_help_url}), oder gehen Sie zu Einstellungen → Geräte & Dienste → Helfer → **+ Helfer erstellen** → **Tageszeit**. Geben Sie ihm einen Namen und legen Sie eine Nach-/Vor-Uhrzeit für Ihre übliche Schlafenszeit fest.",
                     "alarm_panel": "Noch keine Alarmzentrale? [Erstellen Sie eine virtuelle]({alarm_panel_help_url}), oder gehen Sie in Home Assistant zu Einstellungen → Geräte & Dienste → Helfer → **+ Helfer erstellen** → Template → **Alarmzentrale**. Geben Sie ihr einen Namen und bestätigen Sie; alle anderen Felder sind optional.",
                     "calendar_entities": "Kalender werden für den Zustand 'Scharf Urlaub' benötigt, oder wenn die Anwesenheit nicht verfügbar oder unzuverlässig ist, um die Belegung zu ermitteln. Kalender können auch jeden scharfen Zustand setzen und so andere Steuerungen nach Tageslicht, Schlafenszeit oder Belegung überschreiben. Noch keinen Kalender? [Erstellen Sie einen lokalen Kalender]({calendar_help_url}), oder gehen Sie zu Einstellungen → Geräte & Dienste → **+ Integration hinzufügen** → **Lokaler Kalender**. Geben Sie ihm einen Namen und lassen Sie „Leeren Kalender erstellen“ ausgewählt.",
-                    "person_entities": "Ob alle diese Personen zu Hause sind oder nicht, bestimmt die Zustände 'Scharf abwesend', 'Scharf zu Hause' und 'Unscharf'. Fehlt jemand? [Fügen Sie eine neue Person hinzu]({person_help_url}), oder gehen Sie zu Einstellungen → Personen → **+ Person hinzufügen**. Geben Sie ihr einen Namen; die Verknüpfung mit einem Benutzerkonto ist optional."
+                    "person_entities": "Ob alle diese Personen zu Hause sind oder nicht, bestimmt die Zustände 'Scharf abwesend', 'Scharf zu Hause' und 'Unscharf'. Fehlt jemand? [Fügen Sie eine neue Person hinzu]({person_help_url}), oder gehen Sie zu Einstellungen → Personen → **+ Person hinzufügen**. Geben Sie ihr einen Namen; die Verknüpfung mit einem Benutzerkonto ist optional.",
+                    "frigate_enabled": "Das aktive [Frigate-Profil]({frigate_profiles_url}) wechseln, wenn sich der Alarmzustand ändert (erfordert Frigate 0.18 oder neuer). Jeder Alarmzustand nutzt das gleichnamige Profil, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände ein Profil namens armed. Andere können unter Erweitert - Frigate gewählt werden."
                 }
             },
             "advanced_setup": {
@@ -33,14 +35,16 @@
                     "time_of_day_armed_night": "Schlafenszeit - Tageszeit-Sensor",
                     "calendar_entities": "Belegung - Kalender",
                     "person_entities": "Anwesenheit - Personen für die belegungsbasierte Scharfschaltung",
-                    "panel_code": "Code der Alarmzentrale"
+                    "panel_code": "Code der Alarmzentrale",
+                    "frigate_enabled": "Frigate - Profile mit dem Alarmzustand wechseln"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Ein Tageszeit-Sensor, der jeden Tag zur Schlafenszeit eingeschaltet ist. Solange er an ist, bleibt der Alarm auf 'Scharf Nacht'. Noch keinen Schlafenszeit-Sensor? [Erstellen Sie einen]({bedtime_help_url}), oder gehen Sie zu Einstellungen → Geräte & Dienste → Helfer → **+ Helfer erstellen** → **Tageszeit**. Geben Sie ihm einen Namen und legen Sie eine Nach-/Vor-Uhrzeit für Ihre übliche Schlafenszeit fest.",
                     "alarm_panel": "Noch keine Alarmzentrale? [Erstellen Sie eine virtuelle]({alarm_panel_help_url}), oder gehen Sie in Home Assistant zu Einstellungen → Geräte & Dienste → Helfer → **+ Helfer erstellen** → Template → **Alarmzentrale**. Geben Sie ihr einen Namen und bestätigen Sie; alle anderen Felder sind optional.",
                     "calendar_entities": "Kalender werden für den Zustand 'Scharf Urlaub' benötigt, oder wenn die Anwesenheit nicht verfügbar oder unzuverlässig ist, um die Belegung zu ermitteln. Kalender können auch jeden scharfen Zustand setzen und so andere Steuerungen nach Tageslicht, Schlafenszeit oder Belegung überschreiben. Noch keinen Kalender? [Erstellen Sie einen lokalen Kalender]({calendar_help_url}), oder gehen Sie zu Einstellungen → Geräte & Dienste → **+ Integration hinzufügen** → **Lokaler Kalender**. Geben Sie ihm einen Namen und lassen Sie „Leeren Kalender erstellen“ ausgewählt.",
                     "person_entities": "Ob alle diese Personen zu Hause sind oder nicht, bestimmt die Zustände 'Scharf abwesend', 'Scharf zu Hause' und 'Unscharf'. Fehlt jemand? [Fügen Sie eine neue Person hinzu]({person_help_url}), oder gehen Sie zu Einstellungen → Personen → **+ Person hinzufügen**. Geben Sie ihr einen Namen; die Verknüpfung mit einem Benutzerkonto ist optional.",
-                    "panel_code": "Code, den Auto Arm den Aktionen der Alarmzentrale beim Scharf- oder Unscharfschalten übergibt, falls die Zentrale einen verlangt. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um den bereits gespeicherten Code zu behalten."
+                    "panel_code": "Code, den Auto Arm den Aktionen der Alarmzentrale beim Scharf- oder Unscharfschalten übergibt, falls die Zentrale einen verlangt. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um den bereits gespeicherten Code zu behalten.",
+                    "frigate_enabled": "Das aktive [Frigate-Profil]({frigate_profiles_url}) wechseln, wenn sich der Alarmzustand ändert (erfordert Frigate 0.18 oder neuer). Jeder Alarmzustand nutzt das gleichnamige Profil, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände ein Profil namens armed. Andere können unter Erweitert - Frigate gewählt werden."
                 },
                 "sections": {
                     "assist_options": {
@@ -165,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Erweitert - Frigate",
-                        "description": "Das aktive Frigate-Profil mit dem Alarmzustand wechseln, über die Profilauswahl der Frigate-Integration (erfordert Frigate 0.18 oder neuer). Wähle oder tippe das Profil für jeden Alarmzustand, der eines haben soll. Jeder andere Alarmzustand schaltet Frigate zurück auf kein Profil, also seine Basiskonfiguration.",
+                        "description": "Abweichungen für [Frigate-Profile]({frigate_profiles_url}), wenn oben eingeschaltet. Jeder Alarmzustand wird mit dem gleichnamigen Profil vorbelegt, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände mit einem Profil namens armed. Ändere diese, oder leere eines, um Frigate in diesem Zustand bei seiner Basiskonfiguration zu lassen.",
                         "data": {
                             "frigate_profile_entity": "Frigate-Profilauswahl",
                             "frigate_profile_disarmed": "Unscharf",
@@ -176,7 +180,7 @@
                             "frigate_profile_armed_custom_bypass": "Scharf benutzerdefiniert"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "Die Profil-Auswahlentität der Frigate-Integration."
+                            "frigate_profile_entity": "Nur bei mehr als einem Frigate-Server nötig, sonst wird die Profilauswahl der Frigate-Integration verwendet."
                         }
                     },
                     "advanced_options": {
@@ -223,13 +227,15 @@
                     "calendar_entities": "Belegung - Kalender",
                     "person_entities": "Anwesenheit - Personen für die belegungsbasierte Scharfschaltung",
                     "panel_code": "Code der Alarmzentrale",
-                    "panel_code_clear": "Gespeicherten Code der Alarmzentrale entfernen"
+                    "panel_code_clear": "Gespeicherten Code der Alarmzentrale entfernen",
+                    "frigate_enabled": "Frigate - Profile mit dem Alarmzustand wechseln"
                 },
                 "data_description": {
                     "time_of_day_armed_night": "Ein Tageszeit-Sensor, der jeden Tag zur Schlafenszeit eingeschaltet ist. Solange er an ist, bleibt der Alarm auf 'Scharf Nacht'.",
                     "calendar_entities": "Kalender werden für den Zustand 'Scharf Urlaub' benötigt, oder wenn die Anwesenheit nicht verfügbar oder unzuverlässig ist, um die Belegung zu ermitteln. Kalender können auch jeden scharfen Zustand setzen und so andere Steuerungen nach Tageslicht, Schlafenszeit oder Belegung überschreiben.",
                     "person_entities": "Ob alle diese Personen zu Hause sind oder nicht, bestimmt die Zustände 'Scharf abwesend', 'Scharf zu Hause' und 'Unscharf'.",
-                    "panel_code": "Code, den Auto Arm den Aktionen der Alarmzentrale beim Scharf- oder Unscharfschalten übergibt, falls die Zentrale einen verlangt. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um den bereits gespeicherten Code zu behalten."
+                    "panel_code": "Code, den Auto Arm den Aktionen der Alarmzentrale beim Scharf- oder Unscharfschalten übergibt, falls die Zentrale einen verlangt. Er wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um den bereits gespeicherten Code zu behalten.",
+                    "frigate_enabled": "Das aktive [Frigate-Profil]({frigate_profiles_url}) wechseln, wenn sich der Alarmzustand ändert (erfordert Frigate 0.18 oder neuer). Jeder Alarmzustand nutzt das gleichnamige Profil, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände ein Profil namens armed. Andere können unter Erweitert - Frigate gewählt werden."
                 },
                 "sections": {
                     "assist_options": {
@@ -354,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Erweitert - Frigate",
-                        "description": "Das aktive Frigate-Profil mit dem Alarmzustand wechseln, über die Profilauswahl der Frigate-Integration (erfordert Frigate 0.18 oder neuer). Wähle oder tippe das Profil für jeden Alarmzustand, der eines haben soll. Jeder andere Alarmzustand schaltet Frigate zurück auf kein Profil, also seine Basiskonfiguration.",
+                        "description": "Abweichungen für [Frigate-Profile]({frigate_profiles_url}), wenn oben eingeschaltet. Jeder Alarmzustand wird mit dem gleichnamigen Profil vorbelegt, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände mit einem Profil namens armed. Ändere diese, oder leere eines, um Frigate in diesem Zustand bei seiner Basiskonfiguration zu lassen.",
                         "data": {
                             "frigate_profile_entity": "Frigate-Profilauswahl",
                             "frigate_profile_disarmed": "Unscharf",
@@ -365,7 +371,7 @@
                             "frigate_profile_armed_custom_bypass": "Scharf benutzerdefiniert"
                         },
                         "data_description": {
-                            "frigate_profile_entity": "Die Profil-Auswahlentität der Frigate-Integration."
+                            "frigate_profile_entity": "Nur bei mehr als einem Frigate-Server nötig, sonst wird die Profilauswahl der Frigate-Integration verwendet."
                         }
                     },
                     "advanced_options": {
@@ -441,6 +447,11 @@
                 "calendar": "Kalender",
                 "state": "Alarmzustand",
                 "patterns": "Muster"
+            }
+        },
+        "frigate_profile": {
+            "options": {
+                "none": "Kein Profil"
             }
         }
     },

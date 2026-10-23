@@ -30,6 +30,7 @@ from custom_components.autoarm.config_flow import (
     CONF_SUNSET_TRIGGER,
     CONF_UNOCCUPIED_TRIGGER,
     CONF_USE_ALARM_SERVICE,
+    OPTIONS_HELP_PLACEHOLDERS,
     RECIPE_URL,
     SETUP_HELP_PLACEHOLDERS,
 )
@@ -191,7 +192,6 @@ async def test_user_flow_advanced_setup(hass: HomeAssistant, mock_notify: Any) -
             CONF_PERSON_ENTITIES: [],
             "presence_options": {},
             "time_of_day_options": {},
-            "frigate_options": {},
             "sun_options": {
                 CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
                 CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_night",
@@ -282,7 +282,7 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
     result = await hass.config_entries.options.async_init(entry.entry_id)
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "init"
-    assert result["description_placeholders"] == {"recipe_url": RECIPE_URL}
+    assert result["description_placeholders"] == OPTIONS_HELP_PLACEHOLDERS
     data_schema = result["data_schema"]
     assert data_schema is not None
     # the bedtime sensor is asked for up front, the other states have their own section
@@ -305,7 +305,6 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
             },
             "button_options": {"button_armed_away": ["binary_sensor.door_button"], "button_armed_away_delay": 60},
             "time_of_day_options": {"time_of_day_armed_home": ["binary_sensor.evening"]},
-            "frigate_options": {},
             "notify_options": {
                 CONF_NOTIFY_ACTION: "notify.supernotify",
                 CONF_NOTIFY_TARGETS: ["mobile_app_phone"],
@@ -386,7 +385,6 @@ async def test_options_flow_field_and_section_order(hass: HomeAssistant, setup_a
         "calendar_options",
         "sun_options",
         "presence_options",
-        "frigate_options",
         "advanced_options",
         "time_of_day_options",
     ]

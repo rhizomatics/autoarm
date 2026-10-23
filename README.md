@@ -21,7 +21,7 @@
 
 
 Automate the arming and disarming of the built-in Home Assistant [Alarm
-Control Panel Integrations][], with additional support for calendar integration, occupancy-driven arming and disarming, manual override via remote control buttons, and mobile push actionable notifications.
+Control Panel Integrations][], with additional support for calendar integration, occupancy-driven arming and disarming, manual override via remote control buttons, mobile push actionable notifications and [Frigate Profile Switching](./configuration/frigate.md).
 
 Calendar, occupancy, physical buttons, diurnal and bedtime scheduling available with **zero YAML**, support for 11 languages, and everything configured from the Home Assistant settings. Advanced configuration for transition logic, and fine-tuning for notifications and other scheduling, available from optional YAML configuration.
 
