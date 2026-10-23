@@ -96,6 +96,9 @@ You can also change the profile selection via the Home Assistant `select.frigate
 
 ![Frigate Profile Select](../assets/images/frigate_select_entity.png){width=500}
 
+!!! tip
+    When Auto Arm changes the profile, it does so using full Home Assistant Context and Logbook integration, so you will able to track that on the state history for `select.frigate_profile` and all the way back to whatever triggered Auto Arm.
+
 ### From Frigate
 
 Frigate shows the current profile at the bottom of the screen, and clicking on it leads to the switching page, which also has controls to add/edit/delete profiles.
