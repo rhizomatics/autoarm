@@ -163,6 +163,22 @@
                             "unoccupied_delay": "Aantal seconden wachten nadat iemand van huis gaat voordat de alarmstatus wordt bepaald, zodat een korte afwezigheid of een wegvallende tracker het alarm niet inschakelt. Een handmatige wijziging in die tijd annuleert dit."
                         }
                     },
+                    "frigate_options": {
+                        "name": "Geavanceerd - Frigate",
+                        "description": "Wissel het actieve Frigate-profiel mee met de alarmstatus, via de profielselectie van de Frigate-integratie (vereist Frigate 0.18 of later). Kies of typ het profiel voor elke alarmstatus die er een moet hebben. Elke andere alarmstatus schakelt Frigate terug naar geen profiel, de basisconfiguratie.",
+                        "data": {
+                            "frigate_profile_entity": "Frigate-profielselectie",
+                            "frigate_profile_disarmed": "Uitgeschakeld",
+                            "frigate_profile_armed_home": "Ingeschakeld thuis",
+                            "frigate_profile_armed_away": "Ingeschakeld afwezig",
+                            "frigate_profile_armed_night": "Ingeschakeld nacht",
+                            "frigate_profile_armed_vacation": "Ingeschakeld vakantie",
+                            "frigate_profile_armed_custom_bypass": "Ingeschakeld aangepast"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "De profielselectie-entiteit van de Frigate-integratie."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Geavanceerd - Overig",
                         "data": {
@@ -334,6 +350,22 @@
                             "calendar_occupancy_ends_away": "Wanneer iemand thuiskomt op de dag dat een agenda-item voor Ingeschakeld afwezig of Ingeschakeld vakantie afloopt, eindigt het item op dat moment in plaats van op de eindtijd, en gaat het alarm naar de status die is ingesteld voor het einde van een agenda-item. Geldt voor eenmalige en voor terugkerende items.",
                             "occupied_delay": "Aantal seconden wachten nadat iemand thuiskomt voordat de alarmstatus wordt bepaald. Een handmatige wijziging in die tijd annuleert dit.",
                             "unoccupied_delay": "Aantal seconden wachten nadat iemand van huis gaat voordat de alarmstatus wordt bepaald, zodat een korte afwezigheid of een wegvallende tracker het alarm niet inschakelt. Een handmatige wijziging in die tijd annuleert dit."
+                        }
+                    },
+                    "frigate_options": {
+                        "name": "Geavanceerd - Frigate",
+                        "description": "Wissel het actieve Frigate-profiel mee met de alarmstatus, via de profielselectie van de Frigate-integratie (vereist Frigate 0.18 of later). Kies of typ het profiel voor elke alarmstatus die er een moet hebben. Elke andere alarmstatus schakelt Frigate terug naar geen profiel, de basisconfiguratie.",
+                        "data": {
+                            "frigate_profile_entity": "Frigate-profielselectie",
+                            "frigate_profile_disarmed": "Uitgeschakeld",
+                            "frigate_profile_armed_home": "Ingeschakeld thuis",
+                            "frigate_profile_armed_away": "Ingeschakeld afwezig",
+                            "frigate_profile_armed_night": "Ingeschakeld nacht",
+                            "frigate_profile_armed_vacation": "Ingeschakeld vakantie",
+                            "frigate_profile_armed_custom_bypass": "Ingeschakeld aangepast"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "De profielselectie-entiteit van de Frigate-integratie."
                         }
                     },
                     "advanced_options": {

@@ -191,6 +191,7 @@ async def test_user_flow_advanced_setup(hass: HomeAssistant, mock_notify: Any) -
             CONF_PERSON_ENTITIES: [],
             "presence_options": {},
             "time_of_day_options": {},
+            "frigate_options": {},
             "sun_options": {
                 CONF_OCCUPANCY_DEFAULT_DAY: "disarmed",
                 CONF_OCCUPANCY_DEFAULT_NIGHT: "armed_night",
@@ -304,6 +305,7 @@ async def test_options_flow(hass: HomeAssistant, setup_autoarm: MockConfigEntry)
             },
             "button_options": {"button_armed_away": ["binary_sensor.door_button"], "button_armed_away_delay": 60},
             "time_of_day_options": {"time_of_day_armed_home": ["binary_sensor.evening"]},
+            "frigate_options": {},
             "notify_options": {
                 CONF_NOTIFY_ACTION: "notify.supernotify",
                 CONF_NOTIFY_TARGETS: ["mobile_app_phone"],
@@ -384,6 +386,7 @@ async def test_options_flow_field_and_section_order(hass: HomeAssistant, setup_a
         "calendar_options",
         "sun_options",
         "presence_options",
+        "frigate_options",
         "advanced_options",
         "time_of_day_options",
     ]

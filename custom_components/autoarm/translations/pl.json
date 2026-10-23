@@ -163,6 +163,22 @@
                             "unoccupied_delay": "Liczba sekund oczekiwania po czyimś wyjściu z domu przed ustaleniem stanu alarmu, aby krótka nieobecność lub utrata połączenia przez tracker nie uzbroiła alarmu. Ręczna zmiana w tym czasie to anuluje."
                         }
                     },
+                    "frigate_options": {
+                        "name": "Zaawansowane - Frigate",
+                        "description": "Przełączaj aktywny profil Frigate zgodnie ze stanem alarmu, za pomocą wyboru profilu z integracji Frigate (wymaga Frigate 0.18 lub nowszego). Wybierz lub wpisz profil dla każdego stanu alarmu, który ma go mieć. Każdy inny stan alarmu przywraca Frigate do braku profilu, czyli konfiguracji podstawowej.",
+                        "data": {
+                            "frigate_profile_entity": "Wybór profilu Frigate",
+                            "frigate_profile_disarmed": "Rozbrojony",
+                            "frigate_profile_armed_home": "Uzbrojony w domu",
+                            "frigate_profile_armed_away": "Uzbrojony poza domem",
+                            "frigate_profile_armed_night": "Uzbrojony na noc",
+                            "frigate_profile_armed_vacation": "Uzbrojony na urlop",
+                            "frigate_profile_armed_custom_bypass": "Uzbrojony niestandardowo"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "Encja wyboru profilu z integracji Frigate."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Zaawansowane - Inne",
                         "data": {
@@ -334,6 +350,22 @@
                             "calendar_occupancy_ends_away": "Gdy ktoś wraca do domu w dniu, w którym ma się zakończyć wydarzenie kalendarza Uzbrojony poza domem lub Uzbrojony na urlop, wydarzenie kończy się od razu zamiast o swojej godzinie zakończenia, a alarm przechodzi w stan ustawiony na koniec wydarzenia kalendarza. Dotyczy wydarzeń jednorazowych i cyklicznych.",
                             "occupied_delay": "Liczba sekund oczekiwania po czyimś powrocie do domu przed ustaleniem stanu alarmu. Ręczna zmiana w tym czasie to anuluje.",
                             "unoccupied_delay": "Liczba sekund oczekiwania po czyimś wyjściu z domu przed ustaleniem stanu alarmu, aby krótka nieobecność lub utrata połączenia przez tracker nie uzbroiła alarmu. Ręczna zmiana w tym czasie to anuluje."
+                        }
+                    },
+                    "frigate_options": {
+                        "name": "Zaawansowane - Frigate",
+                        "description": "Przełączaj aktywny profil Frigate zgodnie ze stanem alarmu, za pomocą wyboru profilu z integracji Frigate (wymaga Frigate 0.18 lub nowszego). Wybierz lub wpisz profil dla każdego stanu alarmu, który ma go mieć. Każdy inny stan alarmu przywraca Frigate do braku profilu, czyli konfiguracji podstawowej.",
+                        "data": {
+                            "frigate_profile_entity": "Wybór profilu Frigate",
+                            "frigate_profile_disarmed": "Rozbrojony",
+                            "frigate_profile_armed_home": "Uzbrojony w domu",
+                            "frigate_profile_armed_away": "Uzbrojony poza domem",
+                            "frigate_profile_armed_night": "Uzbrojony na noc",
+                            "frigate_profile_armed_vacation": "Uzbrojony na urlop",
+                            "frigate_profile_armed_custom_bypass": "Uzbrojony niestandardowo"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "Encja wyboru profilu z integracji Frigate."
                         }
                     },
                     "advanced_options": {

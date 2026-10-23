@@ -81,6 +81,7 @@ from .config_flow import (
     CONF_CALENDAR_OCCUPANCY_ENDS_AWAY,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
     CONF_CALENDAR_POLL_MINUTES,
+    CONF_FRIGATE_PROFILE_ENTITY,
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
     CONF_NOTIFY_CUSTOM_TARGET,
@@ -118,6 +119,7 @@ from .config_flow import (
     DEFAULT_OCCUPANCY_DELAYS,
     DEFAULT_RATE_LIMIT_MAX_CALLS,
     DEFAULT_RATE_LIMIT_SECONDS,
+    FRIGATE_PROFILE_OPTIONS,
     TIME_OF_DAY_OPTIONS,
     button_delay_option,
     button_option,
@@ -170,6 +172,7 @@ from .const import (
     ConditionVariables,
 )
 from .crypto import async_decrypt
+from .frigate import async_track_frigate_profile
 from .helpers import (
     AppHealthTracker,
     ExtendedExtendedJSONEncoder,
@@ -525,6 +528,10 @@ def _build_armer_from_entry(
         # entries from before the option existed keep setting the state directly
         use_alarm_service=entry.options.get(CONF_USE_ALARM_SERVICE, False),
         panel_code=panel_code,
+        frigate_profile_entity=entry.options.get(CONF_FRIGATE_PROFILE_ENTITY),
+        frigate_profiles={
+            state: profile for option, state in FRIGATE_PROFILE_OPTIONS.items() if (profile := entry.options.get(option))
+        },
     )
 
 
@@ -747,6 +754,8 @@ class AlarmArmer:
         calendar_occupancy_ends_away: bool = True,
         use_alarm_service: bool = True,
         panel_code: str | None = None,
+        frigate_profile_entity: str | None = None,
+        frigate_profiles: dict[str, str] | None = None,
     ) -> None:
         occupancy = occupancy or {}
         rate_limit = rate_limit or {}
@@ -820,6 +829,9 @@ class AlarmArmer:
         self.use_alarm_service: bool = use_alarm_service
         # given to the alarm panel's actions, and kept out of logs, events and diagnostics
         self._panel_code: str | None = panel_code
+        # select entity for the Frigate profile, and the profile for each alarm state
+        self.frigate_profile_entity: str | None = frigate_profile_entity
+        self.frigate_profiles: dict[str, str] = frigate_profiles or {}
         # state the panel is being moved to by its actions, so the change isn't mistaken for a manual one
         self._service_target: AlarmControlPanelState | None = None
         self.last_change: StateChange | None = None
@@ -848,6 +860,7 @@ class AlarmArmer:
         _LOGGER.info("AUTOARM occupied=%s, state=%s, calendars=%s", self.is_occupied(), self.armed_state(), len(self.calendars))
 
         self.initialize_alarm_panel()
+        await self.initialize_frigate()
         await self.initialize_calendar()
         await self.initialize_time_of_day()
         await self.initialize_logic()
@@ -910,6 +923,15 @@ class AlarmArmer:
         self.unsubscribes.append(async_track_state_change_event(self.hass, [self.alarm_panel], self.on_panel_change))
         self.check_panel_code()
         _LOGGER.debug("AUTOARM Auto-arming %s", self.alarm_panel)
+
+    async def initialize_frigate(self) -> None:
+        if self.frigate_profile_entity:
+            self.unsubscribes.append(
+                await async_track_frigate_profile(
+                    self.hass, self.alarm_panel, self.frigate_profile_entity, self.frigate_profiles
+                )
+            )
+            _LOGGER.debug("AUTOARM Frigate profiles via %s: %s", self.frigate_profile_entity, self.frigate_profiles)
 
     def check_panel_code(self) -> None:
         """Raise a repair when the alarm panel's actions want a code, and there isn't one to give them

@@ -163,6 +163,22 @@
                             "unoccupied_delay": "Segundos de espera después de que alguien sale de casa antes de calcular el estado de la alarma, para que una ausencia breve o un rastreador que se desconecta no arme la alarma. Un cambio manual en ese tiempo lo cancela."
                         }
                     },
+                    "frigate_options": {
+                        "name": "Avanzado - Frigate",
+                        "description": "Cambiar el perfil activo de Frigate con el estado de la alarma, usando el selector de perfil de la integración de Frigate (requiere Frigate 0.18 o posterior). Elige o escribe el perfil para cada estado de alarma que deba tener uno. Cualquier otro estado de alarma devuelve Frigate a ningún perfil, su configuración base.",
+                        "data": {
+                            "frigate_profile_entity": "Selector de perfil de Frigate",
+                            "frigate_profile_disarmed": "Desarmado",
+                            "frigate_profile_armed_home": "Armado en casa",
+                            "frigate_profile_armed_away": "Armado ausente",
+                            "frigate_profile_armed_night": "Armado noche",
+                            "frigate_profile_armed_vacation": "Armado vacaciones",
+                            "frigate_profile_armed_custom_bypass": "Armado personalizado"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "La entidad de selección de perfil de la integración de Frigate."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Avanzado - Otros",
                         "data": {
@@ -334,6 +350,22 @@
                             "calendar_occupancy_ends_away": "Cuando alguien llega a casa el día en que debe terminar un evento de calendario de Armado ausente o Armado vacaciones, el evento termina en ese momento en lugar de a su hora de fin, y la alarma pasa al estado definido para cuando termina un evento de calendario. Se aplica tanto a eventos únicos como a los recurrentes.",
                             "occupied_delay": "Segundos de espera después de que alguien llega a casa antes de calcular el estado de la alarma. Un cambio manual en ese tiempo lo cancela.",
                             "unoccupied_delay": "Segundos de espera después de que alguien sale de casa antes de calcular el estado de la alarma, para que una ausencia breve o un rastreador que se desconecta no arme la alarma. Un cambio manual en ese tiempo lo cancela."
+                        }
+                    },
+                    "frigate_options": {
+                        "name": "Avanzado - Frigate",
+                        "description": "Cambiar el perfil activo de Frigate con el estado de la alarma, usando el selector de perfil de la integración de Frigate (requiere Frigate 0.18 o posterior). Elige o escribe el perfil para cada estado de alarma que deba tener uno. Cualquier otro estado de alarma devuelve Frigate a ningún perfil, su configuración base.",
+                        "data": {
+                            "frigate_profile_entity": "Selector de perfil de Frigate",
+                            "frigate_profile_disarmed": "Desarmado",
+                            "frigate_profile_armed_home": "Armado en casa",
+                            "frigate_profile_armed_away": "Armado ausente",
+                            "frigate_profile_armed_night": "Armado noche",
+                            "frigate_profile_armed_vacation": "Armado vacaciones",
+                            "frigate_profile_armed_custom_bypass": "Armado personalizado"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "La entidad de selección de perfil de la integración de Frigate."
                         }
                     },
                     "advanced_options": {

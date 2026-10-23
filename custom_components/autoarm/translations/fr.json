@@ -163,6 +163,22 @@
                             "unoccupied_delay": "Secondes d'attente après le départ de quelqu'un avant de déterminer l'état de l'alarme, afin qu'une brève absence ou un traceur qui décroche n'arme pas l'alarme. Un changement manuel pendant ce temps l'annule."
                         }
                     },
+                    "frigate_options": {
+                        "name": "Avancé - Frigate",
+                        "description": "Changer le profil Frigate actif selon l'état de l'alarme, avec la sélection de profil de l'intégration Frigate (nécessite Frigate 0.18 ou ultérieur). Choisissez ou saisissez le profil pour chaque état d'alarme qui doit en avoir un. Tout autre état d'alarme ramène Frigate à aucun profil, sa configuration de base.",
+                        "data": {
+                            "frigate_profile_entity": "Sélection de profil Frigate",
+                            "frigate_profile_disarmed": "Désarmé",
+                            "frigate_profile_armed_home": "Armé présence",
+                            "frigate_profile_armed_away": "Armé absence",
+                            "frigate_profile_armed_night": "Armé nuit",
+                            "frigate_profile_armed_vacation": "Armé vacances",
+                            "frigate_profile_armed_custom_bypass": "Armé personnalisé"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "L'entité de sélection de profil de l'intégration Frigate."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Avancé - Autres",
                         "data": {
@@ -334,6 +350,22 @@
                             "calendar_occupancy_ends_away": "Lorsque quelqu'un rentre le jour où un événement de calendrier Armé absence ou Armé vacances doit se terminer, l'événement prend fin à ce moment-là plutôt qu'à son heure de fin, et l'alarme passe à l'état défini pour la fin d'un événement de calendrier. S'applique aux événements ponctuels comme aux événements récurrents.",
                             "occupied_delay": "Secondes d'attente après l'arrivée de quelqu'un à la maison avant de déterminer l'état de l'alarme. Un changement manuel pendant ce temps l'annule.",
                             "unoccupied_delay": "Secondes d'attente après le départ de quelqu'un avant de déterminer l'état de l'alarme, afin qu'une brève absence ou un traceur qui décroche n'arme pas l'alarme. Un changement manuel pendant ce temps l'annule."
+                        }
+                    },
+                    "frigate_options": {
+                        "name": "Avancé - Frigate",
+                        "description": "Changer le profil Frigate actif selon l'état de l'alarme, avec la sélection de profil de l'intégration Frigate (nécessite Frigate 0.18 ou ultérieur). Choisissez ou saisissez le profil pour chaque état d'alarme qui doit en avoir un. Tout autre état d'alarme ramène Frigate à aucun profil, sa configuration de base.",
+                        "data": {
+                            "frigate_profile_entity": "Sélection de profil Frigate",
+                            "frigate_profile_disarmed": "Désarmé",
+                            "frigate_profile_armed_home": "Armé présence",
+                            "frigate_profile_armed_away": "Armé absence",
+                            "frigate_profile_armed_night": "Armé nuit",
+                            "frigate_profile_armed_vacation": "Armé vacances",
+                            "frigate_profile_armed_custom_bypass": "Armé personnalisé"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "L'entité de sélection de profil de l'intégration Frigate."
                         }
                     },
                     "advanced_options": {

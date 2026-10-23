@@ -163,6 +163,22 @@
                             "unoccupied_delay": "誰かが外出してからアラーム状態を判定するまでの待ち時間（秒）です。短時間の不在やトラッカーの切断で警戒状態にならないようにします。その間に手動で変更すると取り消されます。"
                         }
                     },
+                    "frigate_options": {
+                        "name": "詳細設定 - Frigate",
+                        "description": "Frigate 統合のプロファイル選択を使い、アラーム状態に合わせて Frigate のアクティブなプロファイルを切り替えます（Frigate 0.18 以降が必要）。プロファイルを使うアラーム状態ごとに、プロファイルを選択または入力します。その他のアラーム状態では、Frigate をプロファイルなし（基本設定）に戻します。",
+                        "data": {
+                            "frigate_profile_entity": "Frigate プロファイル選択",
+                            "frigate_profile_disarmed": "解除",
+                            "frigate_profile_armed_home": "在宅警戒",
+                            "frigate_profile_armed_away": "外出警戒",
+                            "frigate_profile_armed_night": "夜間警戒",
+                            "frigate_profile_armed_vacation": "休暇警戒",
+                            "frigate_profile_armed_custom_bypass": "カスタム警戒"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "Frigate 統合のプロファイル選択エンティティ。"
+                        }
+                    },
                     "advanced_options": {
                         "name": "詳細設定 - その他",
                         "data": {
@@ -334,6 +350,22 @@
                             "calendar_occupancy_ends_away": "外出警戒または休暇警戒のカレンダーイベントが終了する予定の日に誰かが帰宅すると、イベントは終了時刻を待たずにその時点で終了し、アラームはカレンダーイベント終了時に設定された状態になります。単発のイベントにも繰り返しイベントにも適用されます。",
                             "occupied_delay": "誰かが帰宅してからアラーム状態を判定するまでの待ち時間（秒）です。その間に手動で変更すると取り消されます。",
                             "unoccupied_delay": "誰かが外出してからアラーム状態を判定するまでの待ち時間（秒）です。短時間の不在やトラッカーの切断で警戒状態にならないようにします。その間に手動で変更すると取り消されます。"
+                        }
+                    },
+                    "frigate_options": {
+                        "name": "詳細設定 - Frigate",
+                        "description": "Frigate 統合のプロファイル選択を使い、アラーム状態に合わせて Frigate のアクティブなプロファイルを切り替えます（Frigate 0.18 以降が必要）。プロファイルを使うアラーム状態ごとに、プロファイルを選択または入力します。その他のアラーム状態では、Frigate をプロファイルなし（基本設定）に戻します。",
+                        "data": {
+                            "frigate_profile_entity": "Frigate プロファイル選択",
+                            "frigate_profile_disarmed": "解除",
+                            "frigate_profile_armed_home": "在宅警戒",
+                            "frigate_profile_armed_away": "外出警戒",
+                            "frigate_profile_armed_night": "夜間警戒",
+                            "frigate_profile_armed_vacation": "休暇警戒",
+                            "frigate_profile_armed_custom_bypass": "カスタム警戒"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "Frigate 統合のプロファイル選択エンティティ。"
                         }
                     },
                     "advanced_options": {

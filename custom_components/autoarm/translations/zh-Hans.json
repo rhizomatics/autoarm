@@ -163,6 +163,22 @@
                             "unoccupied_delay": "有人离家后，在计算报警状态之前等待的秒数，这样短暂离开或追踪器掉线就不会布防。在此期间的手动更改会将其取消。"
                         }
                     },
+                    "frigate_options": {
+                        "name": "高级 - Frigate",
+                        "description": "通过 Frigate 集成的配置文件选择实体，随警报状态切换 Frigate 的活动配置文件（需要 Frigate 0.18 或更高版本）。为需要配置文件的每个警报状态选择或输入配置文件。其他任何警报状态都会让 Frigate 回到无配置文件，即其基础配置。",
+                        "data": {
+                            "frigate_profile_entity": "Frigate 配置文件选择",
+                            "frigate_profile_disarmed": "撤防",
+                            "frigate_profile_armed_home": "在家布防",
+                            "frigate_profile_armed_away": "离家布防",
+                            "frigate_profile_armed_night": "夜间布防",
+                            "frigate_profile_armed_vacation": "度假布防",
+                            "frigate_profile_armed_custom_bypass": "自定义布防"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "Frigate 集成的配置文件选择实体。"
+                        }
+                    },
                     "advanced_options": {
                         "name": "高级 - 其他",
                         "data": {
@@ -334,6 +350,22 @@
                             "calendar_occupancy_ends_away": "当有人在离家布防或度假布防日历事件预定结束的当天回家时，事件会立即结束，而不是等到结束时间，警报将切换到为日历事件结束所设置的状态。适用于一次性事件和重复事件。",
                             "occupied_delay": "有人到家后，在计算报警状态之前等待的秒数。在此期间的手动更改会将其取消。",
                             "unoccupied_delay": "有人离家后，在计算报警状态之前等待的秒数，这样短暂离开或追踪器掉线就不会布防。在此期间的手动更改会将其取消。"
+                        }
+                    },
+                    "frigate_options": {
+                        "name": "高级 - Frigate",
+                        "description": "通过 Frigate 集成的配置文件选择实体，随警报状态切换 Frigate 的活动配置文件（需要 Frigate 0.18 或更高版本）。为需要配置文件的每个警报状态选择或输入配置文件。其他任何警报状态都会让 Frigate 回到无配置文件，即其基础配置。",
+                        "data": {
+                            "frigate_profile_entity": "Frigate 配置文件选择",
+                            "frigate_profile_disarmed": "撤防",
+                            "frigate_profile_armed_home": "在家布防",
+                            "frigate_profile_armed_away": "离家布防",
+                            "frigate_profile_armed_night": "夜间布防",
+                            "frigate_profile_armed_vacation": "度假布防",
+                            "frigate_profile_armed_custom_bypass": "自定义布防"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "Frigate 集成的配置文件选择实体。"
                         }
                     },
                     "advanced_options": {

@@ -43,6 +43,8 @@ CONF_ALARM_STATES = "alarm_states"
 
 ALARM_STATES = [k.lower() for k in AlarmControlPanelState.__members__]
 PUBLIC_ALARM_STATES = [s for s in ALARM_STATES if s not in ("pending", "triggered", "arming", "disarming")]
+# the Frigate integration's profile select option for no profile, where cameras run on their base config
+FRIGATE_NO_PROFILE = "none"
 
 # auto is auto_sun if a sunrise or sunset trigger is active today, otherwise auto_occupancy
 NO_CAL_EVENT_MODE_AUTO = "auto"

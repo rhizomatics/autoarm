@@ -163,6 +163,22 @@
                             "unoccupied_delay": "Sekunden, die nach dem Weggehen einer Person gewartet wird, bevor der Alarmstatus ermittelt wird, damit eine kurze Abwesenheit oder ein ausfallender Tracker den Alarm nicht scharfschaltet. Eine manuelle Änderung in dieser Zeit bricht dies ab."
                         }
                     },
+                    "frigate_options": {
+                        "name": "Erweitert - Frigate",
+                        "description": "Das aktive Frigate-Profil mit dem Alarmzustand wechseln, über die Profilauswahl der Frigate-Integration (erfordert Frigate 0.18 oder neuer). Wähle oder tippe das Profil für jeden Alarmzustand, der eines haben soll. Jeder andere Alarmzustand schaltet Frigate zurück auf kein Profil, also seine Basiskonfiguration.",
+                        "data": {
+                            "frigate_profile_entity": "Frigate-Profilauswahl",
+                            "frigate_profile_disarmed": "Unscharf",
+                            "frigate_profile_armed_home": "Scharf zu Hause",
+                            "frigate_profile_armed_away": "Scharf abwesend",
+                            "frigate_profile_armed_night": "Scharf Nacht",
+                            "frigate_profile_armed_vacation": "Scharf Urlaub",
+                            "frigate_profile_armed_custom_bypass": "Scharf benutzerdefiniert"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "Die Profil-Auswahlentität der Frigate-Integration."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Erweitert - Sonstiges",
                         "data": {
@@ -334,6 +350,22 @@
                             "calendar_occupancy_ends_away": "Wenn jemand an dem Tag nach Hause kommt, an dem ein Kalenderereignis für Scharf abwesend oder Scharf Urlaub enden soll, endet das Ereignis sofort statt zu seiner Endzeit, und die Alarmanlage wechselt in den Zustand, der für das Ende eines Kalenderereignisses festgelegt ist. Gilt für einmalige ebenso wie für wiederkehrende Ereignisse.",
                             "occupied_delay": "Sekunden, die nach der Ankunft einer Person gewartet wird, bevor der Alarmstatus ermittelt wird. Eine manuelle Änderung in dieser Zeit bricht dies ab.",
                             "unoccupied_delay": "Sekunden, die nach dem Weggehen einer Person gewartet wird, bevor der Alarmstatus ermittelt wird, damit eine kurze Abwesenheit oder ein ausfallender Tracker den Alarm nicht scharfschaltet. Eine manuelle Änderung in dieser Zeit bricht dies ab."
+                        }
+                    },
+                    "frigate_options": {
+                        "name": "Erweitert - Frigate",
+                        "description": "Das aktive Frigate-Profil mit dem Alarmzustand wechseln, über die Profilauswahl der Frigate-Integration (erfordert Frigate 0.18 oder neuer). Wähle oder tippe das Profil für jeden Alarmzustand, der eines haben soll. Jeder andere Alarmzustand schaltet Frigate zurück auf kein Profil, also seine Basiskonfiguration.",
+                        "data": {
+                            "frigate_profile_entity": "Frigate-Profilauswahl",
+                            "frigate_profile_disarmed": "Unscharf",
+                            "frigate_profile_armed_home": "Scharf zu Hause",
+                            "frigate_profile_armed_away": "Scharf abwesend",
+                            "frigate_profile_armed_night": "Scharf Nacht",
+                            "frigate_profile_armed_vacation": "Scharf Urlaub",
+                            "frigate_profile_armed_custom_bypass": "Scharf benutzerdefiniert"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "Die Profil-Auswahlentität der Frigate-Integration."
                         }
                     },
                     "advanced_options": {

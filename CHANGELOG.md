@@ -1,3 +1,13 @@
+# 2.1.0
+
+## ✨ Enhancements
+- **Frigate Profiles**
+  - Use [Frigate Profiles](https://docs.frigate.video/configuration/profiles/) to change camera detection, GenAI integration etc for different alarm states
+  - AutoArm can then automatically switch profiles when a configured alarm state is reached
+  - For example, when the alarm is `disarmed`, you could have
+  Frigate switch to a `disarmed` profile and reduce unwanted alerts. Or have an extra vigilant `armed_vacation` profile
+  - Profile names can be anything, although simpler if match the armed state
+
 # 2.0.0
 
 The major change reflects extending the UI configuration so **zero YAML** required (existing YAML is auto migrated, and its still possible to override the rules engine in YAML), a stronger focus on **simplicity and convenience** with a new standard recipe, and the dropping of support for older versions of Home Assistant and Python 3.13.

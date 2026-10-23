@@ -163,6 +163,22 @@
                             "unoccupied_delay": "Secondi di attesa dopo che qualcuno esce di casa prima di determinare lo stato dell'allarme, così una breve assenza o un tracker che si disconnette non inserisce l'allarme. Una modifica manuale in quel tempo lo annulla."
                         }
                     },
+                    "frigate_options": {
+                        "name": "Avanzate - Frigate",
+                        "description": "Cambia il profilo Frigate attivo con lo stato dell'allarme, usando la selezione del profilo dell'integrazione Frigate (richiede Frigate 0.18 o successivo). Scegli o digita il profilo per ogni stato dell'allarme che deve averne uno. Qualsiasi altro stato dell'allarme riporta Frigate a nessun profilo, la sua configurazione di base.",
+                        "data": {
+                            "frigate_profile_entity": "Selezione profilo Frigate",
+                            "frigate_profile_disarmed": "Disinserito",
+                            "frigate_profile_armed_home": "Inserito in casa",
+                            "frigate_profile_armed_away": "Inserito fuori casa",
+                            "frigate_profile_armed_night": "Inserito notte",
+                            "frigate_profile_armed_vacation": "Inserito vacanza",
+                            "frigate_profile_armed_custom_bypass": "Inserito personalizzato"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "L'entità di selezione del profilo dell'integrazione Frigate."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Avanzate - Altro",
                         "data": {
@@ -334,6 +350,22 @@
                             "calendar_occupancy_ends_away": "Quando qualcuno rientra a casa nel giorno in cui deve terminare un evento di calendario Inserito fuori casa o Inserito vacanza, l'evento termina in quel momento anziché all'orario di fine, e l'allarme passa allo stato impostato per la fine di un evento di calendario. Vale sia per gli eventi singoli sia per quelli ricorrenti.",
                             "occupied_delay": "Secondi di attesa dopo l'arrivo di qualcuno a casa prima di determinare lo stato dell'allarme. Una modifica manuale in quel tempo lo annulla.",
                             "unoccupied_delay": "Secondi di attesa dopo che qualcuno esce di casa prima di determinare lo stato dell'allarme, così una breve assenza o un tracker che si disconnette non inserisce l'allarme. Una modifica manuale in quel tempo lo annulla."
+                        }
+                    },
+                    "frigate_options": {
+                        "name": "Avanzate - Frigate",
+                        "description": "Cambia il profilo Frigate attivo con lo stato dell'allarme, usando la selezione del profilo dell'integrazione Frigate (richiede Frigate 0.18 o successivo). Scegli o digita il profilo per ogni stato dell'allarme che deve averne uno. Qualsiasi altro stato dell'allarme riporta Frigate a nessun profilo, la sua configurazione di base.",
+                        "data": {
+                            "frigate_profile_entity": "Selezione profilo Frigate",
+                            "frigate_profile_disarmed": "Disinserito",
+                            "frigate_profile_armed_home": "Inserito in casa",
+                            "frigate_profile_armed_away": "Inserito fuori casa",
+                            "frigate_profile_armed_night": "Inserito notte",
+                            "frigate_profile_armed_vacation": "Inserito vacanza",
+                            "frigate_profile_armed_custom_bypass": "Inserito personalizzato"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "L'entità di selezione del profilo dell'integrazione Frigate."
                         }
                     },
                     "advanced_options": {

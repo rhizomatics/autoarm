@@ -5,6 +5,7 @@ import re
 from collections.abc import Mapping
 from typing import Any
 
+from homeassistant.components.select.const import ATTR_OPTIONS
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_SERVICE
 from homeassistant.core import HomeAssistant
@@ -51,6 +52,7 @@ from .const import (
     CONF_SUNSET,
     DEFAULT_CALENDAR_NOTIFY_GRACE,
     DOMAIN,
+    FRIGATE_NO_PROFILE,
     NO_CAL_EVENT_MODE_AUTO,
     NOTIFY_COMMON,
     NOTIFY_PRIORITY_DEFAULTS,
@@ -126,6 +128,8 @@ CONF_PANEL_CODE = "panel_code"
 CONF_PANEL_CODE_CLEAR = "panel_code_clear"
 CONF_SENTENCE_ARM = "sentence_arm"
 CONF_SENTENCE_DISARM = "sentence_disarm"
+# the Frigate integration's profile select
+CONF_FRIGATE_PROFILE_ENTITY = "frigate_profile_entity"
 
 DEFAULT_CALENDAR_OCCUPANCY_OVERRIDE_STATES: list[str] = ["disarmed", "armed_home", "armed_night", "armed_away"]
 RECIPE_URL = "https://autoarm.rhizomatics.org.uk/configuration/examples/recommended_recipe/"
@@ -146,6 +150,8 @@ SETUP_HELP_PLACEHOLDERS: dict[str, str] = {
 TIME_OF_DAY_OPTIONS: dict[str, str] = {
     f"time_of_day_{state}": state for state in PUBLIC_ALARM_STATES if state != "armed_vacation"
 }
+# option holding the Frigate profile for each alarm state, a state without one switching Frigate to no profile
+FRIGATE_PROFILE_OPTIONS: dict[str, str] = {f"frigate_profile_{state}": state for state in PUBLIC_ALARM_STATES}
 # a reset button, and buttons for each alarm state, each with a delay in seconds before it acts
 BUTTON_USES: list[str] = [ATTR_RESET, *PUBLIC_ALARM_STATES]
 BUTTON_DOMAINS: list[str] = ["binary_sensor", "button", "input_button"]
@@ -230,6 +236,11 @@ def _default_notify_action(hass: HomeAssistant) -> str:
 async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
     """The alarm panel code and the full set of options flow sections, shared by advanced setup and the options flow."""
     notify_services = sorted(f"notify.{service}" for service in hass.services.async_services().get("notify", {}))
+    # profiles offered from the select already chosen, others can be typed in before it's chosen or while Frigate is down
+    frigate_select = hass.states.get(options.get(CONF_FRIGATE_PROFILE_ENTITY) or "")
+    frigate_profiles: list[str] = [
+        p for p in (frigate_select.attributes.get(ATTR_OPTIONS, []) if frigate_select else []) if p != FRIGATE_NO_PROFILE
+    ]
     notify_target_fields: dict[Any, Any]
     if supernotify_available(hass):
         notify_services.insert(0, SUPERNOTIFY_ACTION)
@@ -439,6 +450,21 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
                 **{
                     vol.Optional(option, default=options.get(option, default)): _seconds_selector()
                     for option, default in DEFAULT_OCCUPANCY_DELAYS.items()
+                },
+            }),
+            {"collapsed": True},
+        ),
+        vol.Required("frigate_options"): section(
+            vol.Schema({
+                vol.Optional(
+                    CONF_FRIGATE_PROFILE_ENTITY,
+                    description={"suggested_value": options.get(CONF_FRIGATE_PROFILE_ENTITY)},
+                ): EntitySelector(EntitySelectorConfig(domain="select", integration="frigate")),
+                **{
+                    vol.Optional(option, description={"suggested_value": options.get(option)}): SelectSelector(
+                        SelectSelectorConfig(options=frigate_profiles, custom_value=True, mode=SelectSelectorMode.DROPDOWN)
+                    )
+                    for option in FRIGATE_PROFILE_OPTIONS
                 },
             }),
             {"collapsed": True},

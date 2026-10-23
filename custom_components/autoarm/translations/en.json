@@ -163,6 +163,22 @@
                             "unoccupied_delay": "Seconds to wait after someone leaves home before working out the alarm state, so a brief absence, or a tracker dropping out, doesn't arm the alarm. A manual change in that time cancels it."
                         }
                     },
+                    "frigate_options": {
+                        "name": "Advanced - Frigate",
+                        "description": "Switch the active Frigate profile with the alarm state, using the Profile select from the Frigate integration (needs Frigate 0.18 or later). Choose or type the profile for each alarm state that should have one. Any other alarm state switches Frigate back to no profile, its base config.",
+                        "data": {
+                            "frigate_profile_entity": "Frigate profile select",
+                            "frigate_profile_disarmed": "Disarmed",
+                            "frigate_profile_armed_home": "Armed Home",
+                            "frigate_profile_armed_away": "Armed Away",
+                            "frigate_profile_armed_night": "Armed Night",
+                            "frigate_profile_armed_vacation": "Armed Vacation",
+                            "frigate_profile_armed_custom_bypass": "Armed Custom Bypass"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "The Profile select entity from the Frigate integration."
+                        }
+                    },
                     "advanced_options": {
                         "name": "Advanced - Other",
                         "data": {
@@ -334,6 +350,22 @@
                             "calendar_occupancy_ends_away": "When someone comes home on the day an Armed Away or Armed Vacation calendar event is due to end, the event ends then rather than at its end time, and the alarm goes to the state set for when a calendar event ends. Applies to one-off events as well as recurring ones.",
                             "occupied_delay": "Seconds to wait after someone arrives home before working out the alarm state. A manual change in that time cancels it.",
                             "unoccupied_delay": "Seconds to wait after someone leaves home before working out the alarm state, so a brief absence, or a tracker dropping out, doesn't arm the alarm. A manual change in that time cancels it."
+                        }
+                    },
+                    "frigate_options": {
+                        "name": "Advanced - Frigate",
+                        "description": "Switch the active Frigate profile with the alarm state, using the Profile select from the Frigate integration (needs Frigate 0.18 or later). Choose or type the profile for each alarm state that should have one. Any other alarm state switches Frigate back to no profile, its base config.",
+                        "data": {
+                            "frigate_profile_entity": "Frigate profile select",
+                            "frigate_profile_disarmed": "Disarmed",
+                            "frigate_profile_armed_home": "Armed Home",
+                            "frigate_profile_armed_away": "Armed Away",
+                            "frigate_profile_armed_night": "Armed Night",
+                            "frigate_profile_armed_vacation": "Armed Vacation",
+                            "frigate_profile_armed_custom_bypass": "Armed Custom Bypass"
+                        },
+                        "data_description": {
+                            "frigate_profile_entity": "The Profile select entity from the Frigate integration."
                         }
                     },
                     "advanced_options": {

@@ -139,6 +139,7 @@ async def test_options_flow_rejects_invalid_pattern(
         "assist_options": {},
         "notify_options": {"notify_action": "notify.supernotify"},
         "time_of_day_options": {},
+        "frigate_options": {},
         "advanced_options": {},
         "calendar_options": {
             "calendar_poll_interval": 30,
@@ -181,6 +182,7 @@ async def test_advanced_setup_rejects_invalid_pattern(hass: HomeAssistant, mock_
             "assist_options": {},
             "notify_options": {"notify_action": "notify.supernotify"},
             "time_of_day_options": {},
+            "frigate_options": {},
             "advanced_options": {},
             "calendar_options": {
                 "calendar_match_rules": [{"calendar": "calendar.family", "state": "armed_away", "patterns": ["[a-"]}]
