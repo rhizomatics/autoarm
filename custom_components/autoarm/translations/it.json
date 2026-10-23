@@ -169,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Avanzate - Frigate",
-                        "description": "Personalizzazioni dei [profili Frigate]({frigate_profiles_url}), quando attivati sopra. Ogni stato dell'allarme è precompilato con il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure con un profilo chiamato armed per tutti gli stati inseriti. Modificali, o svuotane uno per mantenere Frigate sulla configurazione di base in quello stato.",
+                        "description": "Personalizzazioni dei profili Frigate, quando attivati sopra. Ogni stato dell'allarme è precompilato con il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure con un profilo chiamato armed per tutti gli stati inseriti. Modificali, o svuotane uno per mantenere Frigate sulla configurazione di base in quello stato.",
                         "data": {
                             "frigate_profile_entity": "Selezione profilo Frigate",
                             "frigate_profile_disarmed": "Disinserito",
@@ -360,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Avanzate - Frigate",
-                        "description": "Personalizzazioni dei [profili Frigate]({frigate_profiles_url}), quando attivati sopra. Ogni stato dell'allarme è precompilato con il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure con un profilo chiamato armed per tutti gli stati inseriti. Modificali, o svuotane uno per mantenere Frigate sulla configurazione di base in quello stato.",
+                        "description": "Personalizzazioni dei profili Frigate, quando attivati sopra. Ogni stato dell'allarme è precompilato con il profilo con lo stesso nome, senza distinguere maiuscole e minuscole, oppure con un profilo chiamato armed per tutti gli stati inseriti. Modificali, o svuotane uno per mantenere Frigate sulla configurazione di base in quello stato.",
                         "data": {
                             "frigate_profile_entity": "Selezione profilo Frigate",
                             "frigate_profile_disarmed": "Disinserito",

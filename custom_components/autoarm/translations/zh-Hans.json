@@ -169,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "高级 - Frigate",
-                        "description": "在上方开启时，对 [Frigate 配置文件]({frigate_profiles_url}) 的覆盖设置。每个警报状态会预先填入同名配置文件（不区分大小写），否则所有布防状态填入名为 armed 的配置文件。可修改其中任何一项，或清空某项让 Frigate 在该状态下保持基础配置。",
+                        "description": "在上方开启时，对 Frigate 配置文件 的覆盖设置。每个警报状态会预先填入同名配置文件（不区分大小写），否则所有布防状态填入名为 armed 的配置文件。可修改其中任何一项，或清空某项让 Frigate 在该状态下保持基础配置。",
                         "data": {
                             "frigate_profile_entity": "Frigate 配置文件选择",
                             "frigate_profile_disarmed": "撤防",
@@ -360,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "高级 - Frigate",
-                        "description": "在上方开启时，对 [Frigate 配置文件]({frigate_profiles_url}) 的覆盖设置。每个警报状态会预先填入同名配置文件（不区分大小写），否则所有布防状态填入名为 armed 的配置文件。可修改其中任何一项，或清空某项让 Frigate 在该状态下保持基础配置。",
+                        "description": "在上方开启时，对 Frigate 配置文件 的覆盖设置。每个警报状态会预先填入同名配置文件（不区分大小写），否则所有布防状态填入名为 armed 的配置文件。可修改其中任何一项，或清空某项让 Frigate 在该状态下保持基础配置。",
                         "data": {
                             "frigate_profile_entity": "Frigate 配置文件选择",
                             "frigate_profile_disarmed": "撤防",

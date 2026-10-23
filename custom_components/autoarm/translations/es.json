@@ -169,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Avanzado - Frigate",
-                        "description": "Ajustes para los [perfiles de Frigate]({frigate_profiles_url}), cuando están activados arriba. Cada estado de alarma se rellena con el perfil del mismo nombre, sin distinguir mayúsculas, o si no, con un perfil llamado armed para cualquiera de los estados armados. Cambia cualquiera de ellos, o vacía uno para mantener Frigate en su configuración base en ese estado.",
+                        "description": "Ajustes para los perfiles de Frigate, cuando están activados arriba. Cada estado de alarma se rellena con el perfil del mismo nombre, sin distinguir mayúsculas, o si no, con un perfil llamado armed para cualquiera de los estados armados. Cambia cualquiera de ellos, o vacía uno para mantener Frigate en su configuración base en ese estado.",
                         "data": {
                             "frigate_profile_entity": "Selector de perfil de Frigate",
                             "frigate_profile_disarmed": "Desarmado",
@@ -360,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Avanzado - Frigate",
-                        "description": "Ajustes para los [perfiles de Frigate]({frigate_profiles_url}), cuando están activados arriba. Cada estado de alarma se rellena con el perfil del mismo nombre, sin distinguir mayúsculas, o si no, con un perfil llamado armed para cualquiera de los estados armados. Cambia cualquiera de ellos, o vacía uno para mantener Frigate en su configuración base en ese estado.",
+                        "description": "Ajustes para los perfiles de Frigate, cuando están activados arriba. Cada estado de alarma se rellena con el perfil del mismo nombre, sin distinguir mayúsculas, o si no, con un perfil llamado armed para cualquiera de los estados armados. Cambia cualquiera de ellos, o vacía uno para mantener Frigate en su configuración base en ese estado.",
                         "data": {
                             "frigate_profile_entity": "Selector de perfil de Frigate",
                             "frigate_profile_disarmed": "Desarmado",

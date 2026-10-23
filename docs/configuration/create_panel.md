@@ -17,6 +17,7 @@ alarm_control_panel:
     trigger_time: 0
 ```
 
+
 ## Selecting the Alarm Panel in Auto Arm
 
 The alarm panel entity is selected during the Auto Arm UI config flow. Go to **Settings** > **Devices & Services** > **Add Integration**, search for **Auto Arm**, and select your alarm panel entity.
@@ -43,6 +44,8 @@ when the panel is set up that way and there is no code for it to use. There are 
 - Set a default code for the alarm panel entity in Home Assistant, from the entity's own settings. Home Assistant then
   supplies it to every action called without a code, not only those from Auto Arm.
 - Switch the code requirement off in the panel's own integration.
+
+![Alarm Panel Code](../assets/images/alarm_panel_code.png){width=500}
 
 The code set in Auto Arm is handled with some care, though it is not a vault:
 

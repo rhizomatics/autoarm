@@ -169,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Avancé - Frigate",
-                        "description": "Ajustements des [profils Frigate]({frigate_profiles_url}), lorsqu'ils sont activés ci-dessus. Chaque état d'alarme est prérempli avec le profil du même nom, sans tenir compte de la casse, ou à défaut un profil nommé armed pour tous les états armés. Modifiez-les, ou videz-en un pour garder Frigate sur sa configuration de base dans cet état.",
+                        "description": "Ajustements des profils Frigate, lorsqu'ils sont activés ci-dessus. Chaque état d'alarme est prérempli avec le profil du même nom, sans tenir compte de la casse, ou à défaut un profil nommé armed pour tous les états armés. Modifiez-les, ou videz-en un pour garder Frigate sur sa configuration de base dans cet état.",
                         "data": {
                             "frigate_profile_entity": "Sélection de profil Frigate",
                             "frigate_profile_disarmed": "Désarmé",
@@ -360,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Avancé - Frigate",
-                        "description": "Ajustements des [profils Frigate]({frigate_profiles_url}), lorsqu'ils sont activés ci-dessus. Chaque état d'alarme est prérempli avec le profil du même nom, sans tenir compte de la casse, ou à défaut un profil nommé armed pour tous les états armés. Modifiez-les, ou videz-en un pour garder Frigate sur sa configuration de base dans cet état.",
+                        "description": "Ajustements des profils Frigate, lorsqu'ils sont activés ci-dessus. Chaque état d'alarme est prérempli avec le profil du même nom, sans tenir compte de la casse, ou à défaut un profil nommé armed pour tous les états armés. Modifiez-les, ou videz-en un pour garder Frigate sur sa configuration de base dans cet état.",
                         "data": {
                             "frigate_profile_entity": "Sélection de profil Frigate",
                             "frigate_profile_disarmed": "Désarmé",

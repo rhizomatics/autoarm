@@ -169,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Advanced - Frigate",
-                        "description": "Overrides for [Frigate profiles]({frigate_profiles_url}), when switched on above. Each alarm state is filled in with the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Change any of these, or clear one to keep Frigate on its base config for that state.",
+                        "description": "Overrides for Frigate profiles, when switched on above. Each alarm state is filled in with the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Change any of these, or clear one to keep Frigate on its base config for that state.",
                         "data": {
                             "frigate_profile_entity": "Frigate profile select",
                             "frigate_profile_disarmed": "Disarmed",
@@ -360,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Advanced - Frigate",
-                        "description": "Overrides for [Frigate profiles]({frigate_profiles_url}), when switched on above. Each alarm state is filled in with the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Change any of these, or clear one to keep Frigate on its base config for that state.",
+                        "description": "Overrides for Frigate profiles, when switched on above. Each alarm state is filled in with the profile of the same name, ignoring case, or else a profile named armed for any of the armed states. Change any of these, or clear one to keep Frigate on its base config for that state.",
                         "data": {
                             "frigate_profile_entity": "Frigate profile select",
                             "frigate_profile_disarmed": "Disarmed",

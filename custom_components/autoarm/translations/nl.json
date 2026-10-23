@@ -169,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Geavanceerd - Frigate",
-                        "description": "Aanpassingen voor [Frigate-profielen]({frigate_profiles_url}), als die hierboven zijn ingeschakeld. Elke alarmstatus wordt vooraf ingevuld met het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Wijzig deze, of maak er een leeg om Frigate in die status op de basisconfiguratie te houden.",
+                        "description": "Aanpassingen voor Frigate-profielen, als die hierboven zijn ingeschakeld. Elke alarmstatus wordt vooraf ingevuld met het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Wijzig deze, of maak er een leeg om Frigate in die status op de basisconfiguratie te houden.",
                         "data": {
                             "frigate_profile_entity": "Frigate-profielselectie",
                             "frigate_profile_disarmed": "Uitgeschakeld",
@@ -360,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Geavanceerd - Frigate",
-                        "description": "Aanpassingen voor [Frigate-profielen]({frigate_profiles_url}), als die hierboven zijn ingeschakeld. Elke alarmstatus wordt vooraf ingevuld met het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Wijzig deze, of maak er een leeg om Frigate in die status op de basisconfiguratie te houden.",
+                        "description": "Aanpassingen voor Frigate-profielen, als die hierboven zijn ingeschakeld. Elke alarmstatus wordt vooraf ingevuld met het profiel met dezelfde naam, ongeacht hoofdletters, of anders een profiel met de naam armed voor alle ingeschakelde statussen. Wijzig deze, of maak er een leeg om Frigate in die status op de basisconfiguratie te houden.",
                         "data": {
                             "frigate_profile_entity": "Frigate-profielselectie",
                             "frigate_profile_disarmed": "Uitgeschakeld",

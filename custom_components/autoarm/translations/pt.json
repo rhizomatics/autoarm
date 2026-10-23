@@ -169,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Avançado - Frigate",
-                        "description": "Ajustes para os [perfis do Frigate]({frigate_profiles_url}), quando ativados acima. Cada estado de alarme é preenchido com o perfil com o mesmo nome, sem distinguir maiúsculas, ou então com um perfil chamado armed para todos os estados armados. Altere qualquer um deles, ou limpe um para manter o Frigate na sua configuração base nesse estado.",
+                        "description": "Ajustes para os perfis do Frigate, quando ativados acima. Cada estado de alarme é preenchido com o perfil com o mesmo nome, sem distinguir maiúsculas, ou então com um perfil chamado armed para todos os estados armados. Altere qualquer um deles, ou limpe um para manter o Frigate na sua configuração base nesse estado.",
                         "data": {
                             "frigate_profile_entity": "Seleção de perfil do Frigate",
                             "frigate_profile_disarmed": "Desarmado",
@@ -360,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Avançado - Frigate",
-                        "description": "Ajustes para os [perfis do Frigate]({frigate_profiles_url}), quando ativados acima. Cada estado de alarme é preenchido com o perfil com o mesmo nome, sem distinguir maiúsculas, ou então com um perfil chamado armed para todos os estados armados. Altere qualquer um deles, ou limpe um para manter o Frigate na sua configuração base nesse estado.",
+                        "description": "Ajustes para os perfis do Frigate, quando ativados acima. Cada estado de alarme é preenchido com o perfil com o mesmo nome, sem distinguir maiúsculas, ou então com um perfil chamado armed para todos os estados armados. Altere qualquer um deles, ou limpe um para manter o Frigate na sua configuração base nesse estado.",
                         "data": {
                             "frigate_profile_entity": "Seleção de perfil do Frigate",
                             "frigate_profile_disarmed": "Desarmado",

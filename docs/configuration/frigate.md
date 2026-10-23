@@ -4,7 +4,7 @@ Auto Arm can switch the active [Frigate Profile](https://docs.frigate.video/conf
 alarm state changes. For example, your cameras could record and send notifications only while the alarm is
 `armed_away`, or skip detection on indoor cameras while `disarmed`.
 
-![Frigate Configure](../assets/images/frigate_configure.png){width=500}
+![Frigate Enable](../assets/images/frigate_enable.png){width=500}
 
 This needs Frigate 0.18 or later, and the [Frigate integration](https://docs.frigate.video/integrations/home-assistant/),
 which provides a **Profile** select entity once at least one profile is defined in Frigate.
@@ -14,8 +14,11 @@ which provides a **Profile** select entity once at least one profile is defined 
 !!! tip
     Profiles can be configured in Frigate's web based [Settings UI](https://docs.frigate.video/configuration/config/#using-the-settings-ui) as well as directly in YAML.
 
-Profiles named after alarm states are matched up automatically, so naming them that way needs no
-further setup in Auto Arm:
+If your standard Frigate config is hyper-vigilant, then
+you probably only need a single `disarmed` profile with relaxed settings, since Auto Arm will set Frigate back to its default
+if the alarm state changes and the new state isn't mapped to a profile. A single `armed` profile will by default map to all armed states, or if you want create multiple armed profiles.
+
+Profiles named after alarm states are matched up automatically, so naming them that way needs no further setup in Auto Arm:
 
 ```yaml
 profiles:
@@ -59,6 +62,8 @@ The **Advanced - Frigate** section of the Options is only needed to change the m
   Profile select is found automatically
 - a profile for each alarm state, filled in with the profile matched by name, to change to another of
   Frigate's profiles, or one typed in
+
+![Frigate Configure](../assets/images/frigate_configure.png){width=500}
 
 Clear a state, or choose **No profile**, to keep Frigate on its base config for that state. Once the Options are
 saved, the profiles are kept as they are, so a state cleared isn't matched again, and a profile added to Frigate

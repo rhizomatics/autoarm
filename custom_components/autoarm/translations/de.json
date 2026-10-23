@@ -169,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Erweitert - Frigate",
-                        "description": "Abweichungen für [Frigate-Profile]({frigate_profiles_url}), wenn oben eingeschaltet. Jeder Alarmzustand wird mit dem gleichnamigen Profil vorbelegt, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände mit einem Profil namens armed. Ändere diese, oder leere eines, um Frigate in diesem Zustand bei seiner Basiskonfiguration zu lassen.",
+                        "description": "Abweichungen für Frigate-Profile, wenn oben eingeschaltet. Jeder Alarmzustand wird mit dem gleichnamigen Profil vorbelegt, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände mit einem Profil namens armed. Ändere diese, oder leere eines, um Frigate in diesem Zustand bei seiner Basiskonfiguration zu lassen.",
                         "data": {
                             "frigate_profile_entity": "Frigate-Profilauswahl",
                             "frigate_profile_disarmed": "Unscharf",
@@ -360,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Erweitert - Frigate",
-                        "description": "Abweichungen für [Frigate-Profile]({frigate_profiles_url}), wenn oben eingeschaltet. Jeder Alarmzustand wird mit dem gleichnamigen Profil vorbelegt, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände mit einem Profil namens armed. Ändere diese, oder leere eines, um Frigate in diesem Zustand bei seiner Basiskonfiguration zu lassen.",
+                        "description": "Abweichungen für Frigate-Profile, wenn oben eingeschaltet. Jeder Alarmzustand wird mit dem gleichnamigen Profil vorbelegt, ohne Beachtung der Groß-/Kleinschreibung, oder sonst für alle Scharf-Zustände mit einem Profil namens armed. Ändere diese, oder leere eines, um Frigate in diesem Zustand bei seiner Basiskonfiguration zu lassen.",
                         "data": {
                             "frigate_profile_entity": "Frigate-Profilauswahl",
                             "frigate_profile_disarmed": "Unscharf",

@@ -169,7 +169,7 @@
                     },
                     "frigate_options": {
                         "name": "Zaawansowane - Frigate",
-                        "description": "Zmiany dla [profili Frigate]({frigate_profiles_url}), gdy są włączone powyżej. Każdy stan alarmu jest wstępnie wypełniany profilem o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilem o nazwie armed dla wszystkich stanów uzbrojenia. Zmień dowolny z nich lub wyczyść, aby w tym stanie Frigate pozostał przy konfiguracji podstawowej.",
+                        "description": "Zmiany dla profili Frigate, gdy są włączone powyżej. Każdy stan alarmu jest wstępnie wypełniany profilem o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilem o nazwie armed dla wszystkich stanów uzbrojenia. Zmień dowolny z nich lub wyczyść, aby w tym stanie Frigate pozostał przy konfiguracji podstawowej.",
                         "data": {
                             "frigate_profile_entity": "Wybór profilu Frigate",
                             "frigate_profile_disarmed": "Rozbrojony",
@@ -360,7 +360,7 @@
                     },
                     "frigate_options": {
                         "name": "Zaawansowane - Frigate",
-                        "description": "Zmiany dla [profili Frigate]({frigate_profiles_url}), gdy są włączone powyżej. Każdy stan alarmu jest wstępnie wypełniany profilem o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilem o nazwie armed dla wszystkich stanów uzbrojenia. Zmień dowolny z nich lub wyczyść, aby w tym stanie Frigate pozostał przy konfiguracji podstawowej.",
+                        "description": "Zmiany dla profili Frigate, gdy są włączone powyżej. Każdy stan alarmu jest wstępnie wypełniany profilem o tej samej nazwie, bez względu na wielkość liter, a w przeciwnym razie profilem o nazwie armed dla wszystkich stanów uzbrojenia. Zmień dowolny z nich lub wyczyść, aby w tym stanie Frigate pozostał przy konfiguracji podstawowej.",
                         "data": {
                             "frigate_profile_entity": "Wybór profilu Frigate",
                             "frigate_profile_disarmed": "Rozbrojony",
