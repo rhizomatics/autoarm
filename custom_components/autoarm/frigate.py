@@ -14,7 +14,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 
-from .const import FRIGATE_NO_PROFILE, PUBLIC_ALARM_STATES
+from .const import EVENT_TRIGGERED, FRIGATE_NO_PROFILE, PUBLIC_ALARM_STATES
 from .helpers import child_context
 
 _LOGGER = logging.getLogger(__name__)
@@ -82,6 +82,10 @@ async def async_track_frigate_profile(
         if profile == select.state:
             return
         _LOGGER.info("AUTOARM Frigate profile %s-->%s for alarm state %s", select.state, profile, panel.state)
+        context = context or Context()
+        if context.origin_event is None:
+            # the logbook takes the first event of a context as its cause, otherwise that's the select action
+            hass.bus.async_fire(EVENT_TRIGGERED, {ATTR_ENTITY_ID: profile_select, "alarm_state": panel.state}, context=context)
         try:
             await hass.services.async_call(
                 SELECT_DOMAIN,

@@ -4,7 +4,7 @@ from collections.abc import AsyncGenerator
 from typing import Any
 
 import pytest
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import Context, Event, HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -15,7 +15,7 @@ from custom_components.autoarm.config_flow import (
     CONF_USE_ALARM_SERVICE,
     OPTIONS_HELP_PLACEHOLDERS,
 )
-from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY
+from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, EVENT_TRIGGERED, YAML_DATA_KEY
 from custom_components.autoarm.frigate import async_track_frigate_profile, match_profile
 
 PANEL = "alarm_panel.testing"
@@ -480,3 +480,26 @@ async def test_quick_setup_offers_frigate(hass: HomeAssistant, mock_notify: Any,
     assert result["options"][CONF_FRIGATE_ENABLED] is True
     # left to be matched by name, with nothing yet saved for each state
     assert not any(k.startswith("frigate_profile_") for k in result["options"])
+
+
+async def test_profile_change_has_cause(hass: HomeAssistant, tracking: None) -> None:
+    """The logbook shows the alarm state as the cause, linked back to the alarm panel's change"""
+    calls: list[ServiceCall] = []
+    triggered: list[Event] = []
+
+    async def handler(call: ServiceCall) -> None:
+        calls.append(call)
+
+    hass.services.async_register("select", "select_option", handler)
+    hass.bus.async_listen(EVENT_TRIGGERED, triggered.append)
+
+    panel_context = Context()
+    hass.states.async_set(PANEL, "armed_away", context=panel_context)
+    await hass.async_block_till_done()
+
+    [event] = triggered
+    assert event.data == {"entity_id": PROFILE_SELECT, "alarm_state": "armed_away"}
+    [call] = calls
+    assert call.context is event.context
+    assert call.context.origin_event is event
+    assert call.context.parent_id == panel_context.id

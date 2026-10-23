@@ -51,6 +51,17 @@ async def test_describes_time_of_day_sensor(hass: HomeAssistant) -> None:
     assert described["source"] == "times of the day sensor Bedtime"
 
 
+async def test_describes_alarm_state(hass: HomeAssistant) -> None:
+    described = _describer(hass)(Mock(data={"entity_id": "select.frigate_profile", "alarm_state": "armed_away"}))
+
+    assert described == {
+        "name": "Auto Arm (alarm armed_away)",
+        "message": "triggered by alarm armed_away",
+        "source": "alarm armed_away",
+        "entity_id": "select.frigate_profile",
+    }
+
+
 async def test_describes_deferred_source(hass: HomeAssistant) -> None:
     described = _describer(hass)(
         Mock(data={"entity_id": "alarm_control_panel.home", "source": "sunrise", "summary": None, "deferred": True})

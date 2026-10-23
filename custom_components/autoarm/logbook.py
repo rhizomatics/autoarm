@@ -27,6 +27,9 @@ def async_describe_events(
     def async_describe_triggered(event: LazyEventPartialState) -> dict[str, Any]:
         data = event.data
         cause: str = data.get("source", "unknown")
+        if data.get("alarm_state"):
+            # following the alarm state, as for the Frigate profile
+            cause = f"alarm {data['alarm_state']}"
         if data.get("summary"):
             kind = "times of the day sensor" if cause == ChangeSource.TOD else "calendar event"
             cause = f"{kind} {data['summary']}"
