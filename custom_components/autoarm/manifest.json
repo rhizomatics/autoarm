@@ -12,6 +12,9 @@
         "sun",
         "tod"
     ],
+    "categories": [
+        "security_safety.alarm_systems"
+    ],
     "codeowners": [
         "@jeyrb"
     ],
