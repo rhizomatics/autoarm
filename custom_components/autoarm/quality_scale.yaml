@@ -1,3 +1,10 @@
+---
+# Quality Scale tracking for the AutoArm integration
+# Updated: 2026-11-02 (2026-Q4 architecture review)
+# Rule set verified against https://contributors.home-assistant.io/core/quality-scale/rules/#checklist
+# (HA 2026.10.4; 54 rules). 2026-11-02: added the Bronze docs-triggers and docs-conditions
+# rules, which were missing; strict-typing set to todo ("in progress" is not a valid status).
+
 rules:
   # ============================================================================
   # Bronze Tier
@@ -56,6 +63,12 @@ rules:
       Services are documented in services.yaml and README.md describes the reload,
       enquire_configuration, and reset_state actions.
 
+  docs-conditions:
+    status: exempt
+    comment: |
+      AutoArm provides no automation condition platform. Transition conditions are its own
+      configuration, not exposed through Home Assistant's condition system.
+
   docs-high-level-description:
     status: done
     comment: |
@@ -74,6 +87,11 @@ rules:
     comment: |
       Removal instructions documented in docs/configuration/removal.md covering
       deleting the integration entry, HACS removal, manual removal, and cleanup steps.
+
+  docs-triggers:
+    status: exempt
+    comment: |
+      AutoArm provides no automation trigger or device trigger platform.
 
   entity-event-setup:
     status: done
@@ -182,8 +200,8 @@ rules:
   test-coverage:
     status: done
     comment: |
-      Test suite maintains >90% coverage with --cov-fail-under=90 enforced
-      in pyproject.toml.
+      Silver needs above 95%. 421 tests pass on HA 2026.10.4 with 96% line coverage
+      (2026-11-02), and pyproject.toml enforces --cov-fail-under=95.
 
   # ============================================================================
   # Gold Tier
@@ -334,7 +352,8 @@ rules:
       No external HTTP calls requiring websession injection.
 
   strict-typing:
-    status: in progress
+    status: todo
     comment: |
-      Type hints are used throughout. py.typed marker is present. Some `Any`
+      Type hints are used throughout and py.typed is present. mypy passes (2026-11-02) but
+      not in strict mode: pyproject.toml only sets disallow_any_generics. Some `Any`
       types remain due to HA ConfigType and service data patterns.
