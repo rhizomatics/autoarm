@@ -1,4 +1,5 @@
 [tools]
+actionlint = "latest"
 pre-commit = "latest"
 ruff = "latest"
 ty = "latest"
