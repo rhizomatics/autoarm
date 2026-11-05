@@ -1,7 +1,7 @@
 [project]
 name = "autoarm"
 readme = "README.md"
-description = "Automated setting of Home Assistant Alarm Control Panel based on occupancy rules, calendars, buttons or sun."
+description = "Automated setting of Home Assistant Alarm Control Panel based on occupancy rules, calendars, buttons or sun. Also coordinate Frigate profiles with alarm state."
 dynamic = ["version"]
 requires-python = ">=3.14.4"
 
