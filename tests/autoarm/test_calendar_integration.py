@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import CONF_ENTITY_ID
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ARMED_END_MODE,

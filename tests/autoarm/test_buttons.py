@@ -6,7 +6,7 @@ from typing import Any
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import CONF_DELAY_TIME, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.autoarm.config_flow import CONF_PERSON_ENTITIES, CONF_USE_ALARM_SERVICE
 from custom_components.autoarm.const import CONF_ALARM_PANEL, CONF_BUTTONS, DOMAIN, YAML_DATA_KEY, ChangeSource

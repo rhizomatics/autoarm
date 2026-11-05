@@ -6,7 +6,7 @@ from homeassistant.components.alarm_control_panel.const import AlarmControlPanel
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.autoarm.autoarming import YAML_NOTIFY_ISSUE, AlarmArmer
 from custom_components.autoarm.config_flow import CONF_NOTIFY_ACTION, CONF_NOTIFY_ENABLED, CONF_USE_ALARM_SERVICE

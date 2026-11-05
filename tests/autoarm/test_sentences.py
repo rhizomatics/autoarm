@@ -14,7 +14,7 @@ import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEvent
 from homeassistant.core import Context, Event, HomeAssistant, ServiceCall, callback
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant.common import MockConfigEntry
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer

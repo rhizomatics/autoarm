@@ -10,8 +10,8 @@ from homeassistant.components.alarm_control_panel.const import AlarmControlPanel
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant_custom_component.components.recorder.common import async_wait_recording_done
-from pytest_homeassistant_custom_component.typing import WebSocketGenerator
+from pytest_homeassistant.components.recorder.common import async_wait_recording_done
+from pytest_homeassistant.typing import WebSocketGenerator
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer

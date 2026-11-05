@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant.common import MockConfigEntry
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import PANEL_CODE_ISSUE, AlarmArmer

@@ -5,7 +5,7 @@ from typing import Any
 
 from homeassistant.const import CONF_DELAY_TIME
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
+from pytest_homeassistant.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.autoarm.config_flow import (
     CONF_OCCUPIED_DELAY,

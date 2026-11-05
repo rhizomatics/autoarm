@@ -9,7 +9,7 @@ import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEntity
 from homeassistant.core import HomeAssistant, State
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ARMED_END_MODE,

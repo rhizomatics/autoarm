@@ -8,7 +8,7 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import Context, Event, HomeAssistant, ServiceCall, callback
-from pytest_homeassistant_custom_component.common import async_fire_time_changed
+from pytest_homeassistant.common import async_fire_time_changed
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer

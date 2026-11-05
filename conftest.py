@@ -16,7 +16,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
 from homeassistant.setup import EventComponentLoaded, async_setup_component
 from homeassistant.util import slugify
-from pytest_homeassistant_custom_component.common import AsyncMock, MockConfigEntry
+from pytest_homeassistant.common import AsyncMock, MockConfigEntry
 
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.config_flow import (

@@ -3,19 +3,19 @@ name = "autoarm"
 readme = "README.md"
 description = "Automated setting of Home Assistant Alarm Control Panel based on occupancy rules, calendars, buttons or sun."
 dynamic = ["version"]
-requires-python = ">=3.14.2"
+requires-python = ">=3.14.9"
 
 dependencies = [
-    "homeassistant>=2026.4.0",
+    "homeassistant>=2026.10.0",
     "ical",
     "properdocs",
 ]
 
 [dependency-groups]
 dev=[
-    "pytest==9.0.3",
+    "pytest>=9.0.0",
     "pytest-cov",
-    "pytest-homeassistant-custom-component",
+    "pytest-homeassistant",
     "pytest-unordered",
     "pytest-mock",
     "pytest-xdist",
@@ -25,7 +25,8 @@ dev=[
     "mypy",
     "codespell",
     "genbadge[all]", # hass compatibility
-    "uv"
+    "uv",
+    "pytest-timeout>=2.4.0,<3.0.0",
 ]
 docs=[
     "mkdocs-minify-plugin",
@@ -44,7 +45,7 @@ docs=[
     "mkdocs-htmlproofer-plugin",
     "mkdocs-minify-plugin",
     "mkdocs-material-extensions",
-    "mkdocs-llmstxt>=0.5.1,<0.6.0",
+    "mkdocs-llmstxt>=0.5.1",
     "bs4" # llmsgen doc hook
 ]
 
@@ -123,7 +124,7 @@ preview = true
 
 [tool.uv]
 exclude-newer = "5 days"
-exclude-newer-package = { certifi=false, ruff="2 days", homeassistant=false, homeassistant-stubs=false, pytest-homeassistant-custom-component=false, aiohttp=false, uv=false }
+exclude-newer-package = { certifi=false, ruff="2 days", homeassistant=false, homeassistant-stubs=false, pytest-homeassistant=false, aiohttp=false, uv=false }
 add-bounds = "major"
 # Skip the 3.14.0-3.14.1 gap: HA 2026.3+ requires >=3.14.2, so those patch
 # versions are unusable regardless.
@@ -144,7 +145,7 @@ files = ["custom_components/autoarm", "tests", "conftest.py"]
 disallow_any_generics = true
 
 [[tool.mypy.overrides]]
-module = "pytest_homeassistant_custom_component.*"
+module = "pytest_homeassistant.*"
 ignore_missing_imports = true
 
 # TODO: remove when v2026.9 support is dropped, probatio only arrives with HA 2026.10
@@ -163,6 +164,7 @@ norecursedirs = [
 ]
 
 addopts = [
+    "-p", "no:respx",  # let Home Assistant alias httpx to httpx2 before respx imports it
     "--timeout=30",
     "--cov-report=xml:cov.xml",
     "--cov-report=html",
