@@ -3,7 +3,7 @@ name = "autoarm"
 readme = "README.md"
 description = "Automated setting of Home Assistant Alarm Control Panel based on occupancy rules, calendars, buttons or sun."
 dynamic = ["version"]
-requires-python = ">=3.14.9"
+requires-python = ">=3.14.4"
 
 dependencies = [
     "homeassistant>=2026.10.0",
