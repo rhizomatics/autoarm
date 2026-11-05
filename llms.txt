@@ -1,0 +1,32 @@
+# Home Assistant Auto Arm
+
+> Automated alarm control panel arming and disarming for Home Assistant
+
+Auto Arm is a Home Assistant custom integration that arms and disarms an Alarm Control Panel automatically, from who's home, sunrise and sunset, and calendar events, with physical buttons, mobile actionable notifications and Assist voice commands for manual changes. Everything is set in the UI, including buttons, other than advanced options such as transition conditions and notification profiles, which are in YAML.
+
+## Start here
+
+- [Auto Arm for HomeAssistant](https://autoarm.rhizomatics.org.uk/index.md): Overview of what AutoArm does
+- [Automated Arming](https://autoarm.rhizomatics.org.uk/automated_arming/index.md): How the armed state is worked out, and the actions and voice commands
+
+## Configuration
+
+- [Configuring Auto Arm](https://autoarm.rhizomatics.org.uk/configuration/index.md)
+- [Advanced Configuration](https://autoarm.rhizomatics.org.uk/configuration/advanced_config/index.md)
+- [Create a Calendar](https://autoarm.rhizomatics.org.uk/configuration/create_calendar/index.md)
+- [Create an Alarm Panel](https://autoarm.rhizomatics.org.uk/configuration/create_panel/index.md)
+- [Frigate Profile Switching](https://autoarm.rhizomatics.org.uk/configuration/frigate/index.md)
+- [Migration Guide](https://autoarm.rhizomatics.org.uk/configuration/migration/index.md)
+- [Mobile Actions](https://autoarm.rhizomatics.org.uk/configuration/mobile_actions/index.md)
+- [Notifications](https://autoarm.rhizomatics.org.uk/configuration/notifications/index.md)
+- [Removing Auto Arm](https://autoarm.rhizomatics.org.uk/configuration/removal/index.md)
+- [Example Configurations](https://autoarm.rhizomatics.org.uk/configuration/examples/index.md)
+- [Minimal Configuration](https://autoarm.rhizomatics.org.uk/configuration/examples/minimal/index.md)
+- [Recommended Recipe](https://autoarm.rhizomatics.org.uk/configuration/examples/recommended_recipe/index.md)
+- [Typical Configuration](https://autoarm.rhizomatics.org.uk/configuration/examples/typical/index.md)
+
+## Help
+
+- [Troubleshooting](https://autoarm.rhizomatics.org.uk/help/troubleshooting/index.md): Diagnosing arming, calendar and notification problems
+- [Known Limitations](https://autoarm.rhizomatics.org.uk/help/known_limitations/index.md): What Auto Arm doesn't do, or does with caveats
+
