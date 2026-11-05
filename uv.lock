@@ -2321,6 +2321,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mkdocs" },
 ]
+sdist = { url = "https://files.pythonhosted.org/packages/83/12/8ae6d9f7caed326bed8e6932fe03e40cd5dc5f1952625795079f07ce9f39/mkdocs_minify_html_plugin-0.3.18.tar.gz", hash = "sha256:0111c88c90c452ee5b884f8741f57c40c63ddddca255d0a1f4db0d7b6c91e780", size = 47763, upload-time = "2026-10-31T19:58:07.892Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d3/68/7fa70275ccbc7418ad8939cd908f61e585dcdab6d15921c9e463e689f829/mkdocs_minify_html_plugin-0.3.18-cp314-cp314-macosx_10_12_x86_64.whl", hash = "sha256:c41c76f5ef789d894a452a8d26a38ed0005f32ae63b08ef1604e7b0f1c07e0f4", size = 3150245, upload-time = "2026-10-31T19:47:28.512Z" },
     { url = "https://files.pythonhosted.org/packages/c0/69/96954aef64486f3ef5ed8e0b7a71e63b6c0f7bbf41c6f27c7ccd1ad38c7c/mkdocs_minify_html_plugin-0.3.18-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:ecba179f9d55da31baee1f274201375a3a3db386f2083498c175d0ec26f86659", size = 3034053, upload-time = "2026-10-31T19:47:30.478Z" },
