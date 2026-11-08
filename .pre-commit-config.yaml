@@ -56,7 +56,7 @@ repos:
           - pytest_mock
           - pytest-homeassistant-custom-component
   - repo: https://github.com/astral-sh/ty-pre-commit
-    rev: v0.0.96
+    rev: v0.0.95
     hooks:
       - id: ty
         # docs group for docgen's bs4

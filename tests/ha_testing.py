@@ -17,15 +17,15 @@ try:
         WebSocketGenerator,
     )
 except ImportError:
-    from pytest_homeassistant_custom_component.common import (  # type: ignore[import-untyped,unused-ignore]
+    from pytest_homeassistant_custom_component.common import (  # type: ignore[import-untyped,unused-ignore]  # ty: ignore
         AsyncMock,
         MockConfigEntry,
         async_fire_time_changed,
     )
-    from pytest_homeassistant_custom_component.components.recorder.common import (  # type: ignore[import-untyped,unused-ignore]
+    from pytest_homeassistant_custom_component.components.recorder.common import (  # type: ignore[import-untyped,unused-ignore]  # ty: ignore
         async_wait_recording_done,
     )
-    from pytest_homeassistant_custom_component.typing import (  # type: ignore[import-untyped,unused-ignore]
+    from pytest_homeassistant_custom_component.typing import (  # type: ignore[import-untyped,unused-ignore]  # ty: ignore
         WebSocketGenerator,
     )
 
