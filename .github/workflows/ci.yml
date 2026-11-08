@@ -60,8 +60,6 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    # a failure here doesn't fail ci-ok for a row marked experimental
-    continue-on-error: ${{ matrix.experimental == true }}
     strategy:
       fail-fast: false
       matrix:
@@ -70,9 +68,6 @@ jobs:
           - ha-version: "2026.5"
             python-version: "3.14"
             ha-override: "2026.5.*"
-            # calendar options need HA 2026.6 (3 tests fail on 2026.5): see hq-private#85. Drop this
-            # row's flag when fixed, or when the support window moves past 2026.5 in December
-            experimental: true
           - ha-version: "2026.11"
             python-version: "3.14"
 

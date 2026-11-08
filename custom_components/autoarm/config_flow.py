@@ -368,14 +368,16 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
                         label_field=CONF_RULE_STATE,
                         description_field=CONF_RULE_CALENDAR,
                         translation_key="calendar_match_rule",
+                        # field selectors as plain config dicts: HA before 2026.6 can't validate
+                        # Selector objects here, which stopped options with calendar rules saving
                         fields={
                             CONF_RULE_CALENDAR: {
-                                "selector": EntitySelector(EntitySelectorConfig(domain="calendar")),
+                                "selector": _selector_config(EntitySelector(EntitySelectorConfig(domain="calendar"))),
                                 "required": True,
                             },
-                            CONF_RULE_STATE: {"selector": _alarm_state_selector(), "required": True},
+                            CONF_RULE_STATE: {"selector": _selector_config(_alarm_state_selector()), "required": True},
                             CONF_RULE_PATTERNS: {
-                                "selector": TextSelector(TextSelectorConfig(multiple=True)),
+                                "selector": _selector_config(TextSelector(TextSelectorConfig(multiple=True))),
                                 "required": True,
                             },
                         },
@@ -493,6 +495,11 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
             {"collapsed": True},
         ),
     }
+
+
+def _selector_config(sel: Any) -> dict[str, Any]:
+    """A selector as the plain `{type: config}` dict an ObjectSelector field takes on every supported HA."""
+    return sel.serialize()["selector"]  # type: ignore[no-any-return]
 
 
 def _frigate_section(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
