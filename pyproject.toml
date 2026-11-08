@@ -20,12 +20,10 @@ dev=[
     "pytest-mock",
     "pytest-xdist",
     "pytest-icdiff",
-    "pre-commit",
     "ruff",
     "mypy",
     "codespell",
     "genbadge[all]", # hass compatibility
-    "uv",
     "pytest-timeout>=2.4.0,<3.0.0",
 ]
 docs=[

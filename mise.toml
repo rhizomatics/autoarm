@@ -1,6 +1,6 @@
 [tools]
 actionlint = "latest"
-pre-commit = "latest"
+prek = "latest"
 ruff = "latest"
 ty = "latest"
 uv = "latest"

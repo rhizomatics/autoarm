@@ -84,5 +84,5 @@ Common commands:
 - `uv run ruff format` - format code
 - `uv run mypy custom_components/autoarm` - type check
 - `uv run codespell` - spell check
-- `pre-commit run` - check all staged files
+- `prek run` - check all staged files
 - `uv run properdocs build` - build the documentation without starting a server
