@@ -7,7 +7,6 @@ import pytest
 from homeassistant.core import Context, Event, HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
-from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.autoarm.config_flow import (
     CONF_FRIGATE_ENABLED,
@@ -17,6 +16,7 @@ from custom_components.autoarm.config_flow import (
 )
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, EVENT_TRIGGERED, YAML_DATA_KEY
 from custom_components.autoarm.frigate import async_track_frigate_profile, match_profile
+from tests.ha_testing import MockConfigEntry
 
 PANEL = "alarm_panel.testing"
 PROFILE_SELECT = "select.frigate_profile"

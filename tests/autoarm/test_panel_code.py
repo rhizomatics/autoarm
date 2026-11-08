@@ -7,7 +7,6 @@ from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
-from pytest_homeassistant.common import MockConfigEntry
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import PANEL_CODE_ISSUE, AlarmArmer
@@ -15,6 +14,7 @@ from custom_components.autoarm.config_flow import CONF_PANEL_CODE, CONF_PANEL_CO
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, ChangeSource
 from custom_components.autoarm.crypto import async_decrypt, async_encrypt
 from custom_components.autoarm.diagnostics import async_get_config_entry_diagnostics
+from tests.ha_testing import MockConfigEntry
 
 CODE_WANTED: dict[str, Any] = {"code_arm_required": True, "code_format": "number"}
 

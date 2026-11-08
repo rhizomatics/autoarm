@@ -8,12 +8,12 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import Context, Event, HomeAssistant, ServiceCall, callback
-from pytest_homeassistant.common import async_fire_time_changed
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.calendar_events import TrackedCalendarEvent
 from custom_components.autoarm.const import DOMAIN, EVENT_TRIGGERED, NO_CAL_EVENT_MODE_AUTO_SUN, ChangeSource
+from tests.ha_testing import async_fire_time_changed
 
 USER_ID = "user-1234"
 

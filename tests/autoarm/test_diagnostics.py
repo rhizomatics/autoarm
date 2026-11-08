@@ -1,7 +1,6 @@
 from typing import Any
 
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ENTITIES,
@@ -13,6 +12,7 @@ from custom_components.autoarm.config_flow import (
 )
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY
 from custom_components.autoarm.diagnostics import async_get_config_entry_diagnostics
+from tests.ha_testing import MockConfigEntry
 
 
 async def _setup_entry(hass: HomeAssistant) -> MockConfigEntry:

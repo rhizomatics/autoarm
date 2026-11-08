@@ -6,7 +6,6 @@ from homeassistant.config_entries import SOURCE_IMPORT, SOURCE_USER
 from homeassistant.const import CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
-from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.autoarm.config_flow import (
     CONF_BEDTIME_ENTITIES,
@@ -45,6 +44,7 @@ from custom_components.autoarm.const import (
     DOMAIN,
     YAML_DATA_KEY,
 )
+from tests.ha_testing import MockConfigEntry
 
 
 async def test_user_flow_complete(hass: HomeAssistant, mock_notify: Any) -> None:

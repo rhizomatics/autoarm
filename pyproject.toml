@@ -143,7 +143,7 @@ files = ["custom_components/autoarm", "tests", "conftest.py"]
 disallow_any_generics = true
 
 [[tool.mypy.overrides]]
-module = "pytest_homeassistant.*"
+module = ["pytest_homeassistant.*", "pytest_homeassistant_custom_component.*"]
 ignore_missing_imports = true
 
 # TODO: remove when v2026.9 support is dropped, probatio only arrives with HA 2026.10
