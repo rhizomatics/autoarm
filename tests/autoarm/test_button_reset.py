@@ -5,12 +5,12 @@ import homeassistant.util.dt as dt_util
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.const import CONF_DELAY_TIME, CONF_ENTITY_ID
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant.common import async_fire_time_changed
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.const import ATTR_RESET
 from custom_components.autoarm.notifier import Notifier
+from tests.ha_testing import async_fire_time_changed
 
 AWAY_BUTTON = "binary_sensor.away_button"
 RESET_BUTTON = "binary_sensor.reset_button"

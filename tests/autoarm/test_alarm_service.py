@@ -7,12 +7,12 @@ import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
-from pytest_homeassistant.common import MockConfigEntry
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.config_flow import CONF_USE_ALARM_SERVICE
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY, ChangeSource
+from tests.ha_testing import MockConfigEntry
 
 
 def _register_panel_actions(hass: HomeAssistant, to_state: str | None = None, fail: bool = False) -> list[ServiceCall]:

@@ -10,11 +10,11 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import SERVICE_RELOAD
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
-from pytest_homeassistant.common import MockConfigEntry
 
 from conftest import MockAction
 from custom_components.autoarm.config_flow import CONF_PERSON_ENTITIES, CONF_USE_ALARM_SERVICE
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN
+from tests.ha_testing import MockConfigEntry
 
 EXAMPLES_ROOT = pathlib.Path("examples")
 RELOAD_FIXTURE = pathlib.Path(__file__).parent.joinpath("fixtures", "empty_config.yaml").absolute()

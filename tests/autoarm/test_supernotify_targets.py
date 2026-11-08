@@ -4,7 +4,6 @@ from typing import Any
 from unittest.mock import Mock
 
 from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse, callback
-from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.autoarm.config_flow import (
     CONF_NOTIFY_CUSTOM_TARGET,
@@ -16,6 +15,7 @@ from custom_components.autoarm.const import ChangeSource
 from custom_components.autoarm.helpers import AppHealthTracker
 from custom_components.autoarm.notifier import Notifier
 from custom_components.autoarm.supernotify_api import deliveries
+from tests.ha_testing import MockConfigEntry
 
 
 def _capture(hass: HomeAssistant, domain: str, action: str) -> list[ServiceCall]:

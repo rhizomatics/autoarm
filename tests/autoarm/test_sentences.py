@@ -14,13 +14,13 @@ import pytest
 from homeassistant.components.alarm_control_panel.const import AlarmControlPanelState
 from homeassistant.components.calendar import CalendarEvent
 from homeassistant.core import Context, Event, HomeAssistant, ServiceCall, callback
-from pytest_homeassistant.common import MockConfigEntry
 
 from conftest import TEST_PANEL
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.config_flow import CONF_SENTENCE_ARM, CONF_SENTENCE_DISARM, CONF_USE_ALARM_SERVICE
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY, ChangeSource
 from custom_components.autoarm.sentences import SENTENCES, async_respond, explain
+from tests.ha_testing import MockConfigEntry
 
 if TYPE_CHECKING:
     from freezegun.api import FrozenDateTimeFactory

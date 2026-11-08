@@ -6,7 +6,6 @@ from typing import Any
 import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
-from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ENTITIES,
@@ -15,6 +14,7 @@ from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_POLL_MINUTES,
 )
 from custom_components.autoarm.const import CONF_ALARM_PANEL, CONFIG_SCHEMA, DOMAIN, YAML_DATA_KEY
+from tests.ha_testing import MockConfigEntry
 
 PANEL = "alarm_control_panel.testing"
 YAML_CALENDAR_CONTROL: dict[str, Any] = {
