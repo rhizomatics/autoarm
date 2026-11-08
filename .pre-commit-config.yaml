@@ -61,18 +61,3 @@ repos:
       - id: ty
         # docs group for docgen's bs4
         args: [--isolated, --no-python-downloads, --group, docs]
-
-ci:
-    autofix_commit_msg: |
-        [pre-commit.ci] auto fixes from pre-commit.com hooks
-
-        for more information, see https://pre-commit.ci
-    autofix_prs: true
-    autoupdate_branch: ''
-    autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
-    autoupdate_schedule: weekly
-    skip:
-      - bandit
-      - mypy
-      - ty
-    submodules: false
