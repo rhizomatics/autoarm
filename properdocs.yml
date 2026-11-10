@@ -86,6 +86,9 @@ plugins:
             overloads_only: true
             show_if_no_docstring: false
 
+extra_css:
+  - assets/stylesheets/extra.css
+
 extra_javascript:
   - javascripts/markdown_actions.js
 
