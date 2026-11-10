@@ -7,13 +7,11 @@
 
 This also removes the Auto Arm device and its entities.
 
-## Via HACS
+## Uninstall from the Marketplace
 
-1. Open **HACS** in your Home Assistant instance
-2. Navigate to **Integrations**
-3. Find **Auto Arm** and click on it
-4. Click the three-dot menu and select **Remove**
-5. Restart Home Assistant
+Go to **Settings → Marketplace**, open **Auto Arm**, and choose **Uninstall** from the three dots menu. It can't be uninstalled while it's still set up, so either remove the integration entry first (above), or choose **Delete and uninstall**, which also deletes its device and entities.
+
+Before Home Assistant 2026.11, open **HACS**, find **Auto Arm**, choose **Remove** from the three dots menu, then restart Home Assistant.
 
 ## Manual Removal
 
