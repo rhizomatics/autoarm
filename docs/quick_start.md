@@ -5,7 +5,7 @@ description: Get up and running quickly with Auto Arm
 # Quick Start
 
 
-Auto Arm is one of the default repositories on [HACS][], so there's no need to register a custom repo.
+Install Auto Arm from the [Home Assistant Marketplace](https://www.home-assistant.io/integrations/marketplace): go to **Settings → Marketplace** and search for **Auto Arm**. It's a default repository, so there's no need to add a custom repository. Before Home Assistant 2026.11, install it from [HACS](https://hacs.xyz) instead.
 
 Notifications will work with any HomeAssistant notification implementation, with additional support for [Supernotify](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
 

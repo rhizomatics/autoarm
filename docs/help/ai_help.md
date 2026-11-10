@@ -17,7 +17,7 @@ AI agents, like Claude or ChatGPT, are becoming increasingly better at giving go
 
 They can diagnose issues, suggest how make alarms work how you want, and even write or rewrite the advanced YAML configs.
 
-Even if you don't have an AI agent, Google search will come up with AI agent advice itself. Ask the question, and if necessary mention you want to use the **HACS Auto Arm** integration.
+Even if you don't have an AI agent, Google search will come up with AI agent advice itself. Ask the question, and if necessary mention you want to use the **Auto Arm** integration from the Home Assistant Marketplace.
 
 Not all searches in Google result in AI advice, and you might have this switched off, however you should still get pointed directly at the right page in the on-line Auto Arm help.
 
