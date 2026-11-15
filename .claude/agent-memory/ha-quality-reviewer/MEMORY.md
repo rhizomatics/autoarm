@@ -1,7 +1,7 @@
 # AutoArm Integration Quality Review Memory
 
 ## Integration Overview
-- **Type**: Home Assistant custom component (HACS)
+- **Type**: Home Assistant custom component (Marketplace)
 - **Domain**: autoarm
 - **Purpose**: Automated alarm panel control based on occupancy, calendars, buttons, and diurnal patterns
 - **Architecture**: Uses AlarmArmer coordinator, config flow with YAML import, notifier system

@@ -38,7 +38,7 @@ The Bronze tier represents the baseline standard for all integrations.
 | `dependency-transparency` | Done | No external packages; only standard HA components, declared in `manifest.json` |
 | `docs-actions` | Done | Actions documented in `services.yaml` and the docs |
 | `docs-high-level-description` | Done | Clear overview in README.md |
-| `docs-installation-instructions` | Done | HACS installation documented |
+| `docs-installation-instructions` | Done | Marketplace installation documented |
 | `docs-removal-instructions` | Done | Removal instructions in `docs/configuration/removal.md` |
 | `entity-event-setup` | Done | Entities subscribe to status updates in `async_added_to_hass`, and unsubscribe with `async_on_remove` |
 | `entity-unique-id` | Done | Unique ID from the config entry id and the entity key |
