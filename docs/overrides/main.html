@@ -11,3 +11,10 @@
   </a>
   {{ super() }}
 {% endblock %}
+
+{% block extrahead %}
+  {{ super() }}
+  {# Page views: GoatCounter, cookieless, so no consent banner (hq policies/project_standards.md) #}
+  <script data-goatcounter="https://autoarm.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+{% endblock %}
