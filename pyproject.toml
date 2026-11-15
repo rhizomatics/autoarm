@@ -7,8 +7,7 @@ requires-python = ">=3.14.4"
 
 dependencies = [
     "homeassistant>=2026.10.0",
-    "ical",
-    "properdocs",
+    "ical"
 ]
 
 [dependency-groups]
@@ -27,6 +26,7 @@ dev=[
     "pytest-timeout>=2.4.0,<3.0.0",
 ]
 docs=[
+    "properdocs",
     "mkdocs-minify-plugin",
     "pymdown-extensions",
     "mkdocs-materialx[imaging]",
