@@ -79,14 +79,14 @@ rules:
   docs-installation-instructions:
     status: done
     comment: |
-      README.md includes HACS installation instructions and links to detailed
+      README.md includes Marketplace installation instructions and links to detailed
       configuration guides.
 
   docs-removal-instructions:
     status: done
     comment: |
       Removal instructions documented in docs/configuration/removal.md covering
-      deleting the integration entry, HACS removal, manual removal, and cleanup steps.
+      deleting the integration entry, Marketplace removal, manual removal, and cleanup steps.
 
   docs-triggers:
     status: exempt

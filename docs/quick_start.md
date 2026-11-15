@@ -5,7 +5,7 @@ description: Get up and running quickly with Auto Arm
 # Quick Start
 
 
-Auto Arm is one of the default repositories on [HACS][], so there's no need to register a custom repo.
+Auto Arm is one of the default repositories on [Marketplace][], so there's no need to register a custom repo.
 
 Notifications will work with any HomeAssistant notification implementation, with additional support for [Supernotify](https://supernotify.rhizomatics.org.uk) for multi-channel notifications with mobile actions.
 
@@ -43,3 +43,5 @@ Set up [Frigate Profiles](https://docs.frigate.video/configuration/profiles/) fo
 Easiest thing is to create a `disarmed` profile to reduce noisy alerts. Switch on Frigate integration in the Auto Arm integration settings.
 
 More on how to configure and use it at [Frigate Profile Switching](configuration/frigate.md).
+
+[marketplace]: https://www.home-assistant.io/integrations/marketplace

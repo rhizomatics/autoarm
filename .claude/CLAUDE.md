@@ -74,7 +74,7 @@ mypy for type checking (with experimental use of [ty](https://github.com/astral-
 Documentation uses properdocs with the MaterialX theme, and is published using Github Pages with a
 custom domain of autoarm.rhizomatics.org.
 
-While this is a HACS component, it should be built wherever possible to adhere to the [Home Assistant Integration Quality Scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/) at the highest level. This also means all dependencies must be consistent with the set of Home Assistant production dependencies, and test coverage maintained above 90%, with regression tests for bug fixes and new tests for all new features.
+While this is a Marketplace component, it should be built wherever possible to adhere to the [Home Assistant Integration Quality Scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/) at the highest level. This also means all dependencies must be consistent with the set of Home Assistant production dependencies, and test coverage maintained above 90%, with regression tests for bug fixes and new tests for all new features.
 
 ### Project Commands
 
