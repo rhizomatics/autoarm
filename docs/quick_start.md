@@ -43,3 +43,5 @@ Set up [Frigate Profiles](https://docs.frigate.video/configuration/profiles/) fo
 Easiest thing is to create a `disarmed` profile to reduce noisy alerts. Switch on Frigate integration in the Auto Arm integration settings.
 
 More on how to configure and use it at [Frigate Profile Switching](configuration/frigate.md).
+
+[marketplace]: https://www.home-assistant.io/integrations/marketplace

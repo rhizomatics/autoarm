@@ -106,11 +106,10 @@ See [Automated Arming](https://autoarm.rhizomatics.org.uk/automated_arming/) for
 [![Built with MaterialX for ProperDocs](https://img.shields.io/badge/MaterialX_for_ProperDocs-526CFE?style=for-the-badge&logo=MaterialForMkDocs&logoColor=white)](https://github.com/jaywhj/mkdocs-materialx)
 
 
-[marketplace]: https://www.home-assistant.io/integrations/marketplace
-[marketplacebadge]: https://img.shields.io/badge/Home%20Assistant-Marketplace-blue.svg
 [CalendarEvent]: https://github.com/home-assistant/core/blob/56a71e6798ada65e9c99f92f64bd4168e98b935b/homeassistant/components/calendar/__init__.py#L364
 [Alarm Control Panel Integrations]: https://www.home-assistant.io/integrations/?search=alarm+control+panel
 [Conditions]: https://www.home-assistant.io/docs/scripts/conditions/
-[HACS]: https://hacs.xyz
 [Button Integration]: https://www.home-assistant.io/integrations/button/
 [Person Integration]: https://www.home-assistant.io/integrations/person/
+[marketplace]: https://www.home-assistant.io/integrations/marketplace
+[marketplacebadge]: https://img.shields.io/badge/Home%20Assistant-Marketplace-blue.svg
