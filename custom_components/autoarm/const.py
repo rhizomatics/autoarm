@@ -104,6 +104,7 @@ SUPERNOTIFY_MOBILE_ACTIONS: list[dict[str, str]] = [
     {CONF_ACTION: "ALARM_PANEL_RESET", "icon": "sfsymbols:bell"},
     {CONF_ACTION: "ALARM_PANEL_AWAY", "icon": "sfsymbols:airplane"},
 ]
+MOBILE_ACTIONS: list[str] = [mobile_action[CONF_ACTION] for mobile_action in SUPERNOTIFY_MOBILE_ACTIONS]
 # actions that would do nothing with the alarm already in that state
 MOBILE_ACTION_STATES: dict[str, AlarmControlPanelState] = {
     "ALARM_PANEL_DISARM": AlarmControlPanelState.DISARMED,

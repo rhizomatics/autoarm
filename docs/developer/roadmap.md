@@ -111,10 +111,34 @@ Start with A, adding a picker of Companion App devices to a collapsed **Occupanc
 
 ## Alarm Panel Codes
 
-Auto Arm never passes a code when it changes the panel's state, so panels that need a code to arm or disarm, shown by the `code_format` and `code_arm_required` attributes, can't be driven by it. Support
-would mean:
+Auto Arm can already drive a panel that needs a code. The **Alarm panel code** option is stored encrypted and
+passed to the `alarm_control_panel` actions, or the panel's own default code is used. A repair is raised when the
+panel wants a code and has none, judged from its `code_format` and `code_arm_required` attributes. See
+[Panels That Need a Code](../configuration/create_panel.md#panels-that-need-a-code).
 
-- Somewhere to keep the code, such as a password field in the options, or a secret in YAML.
-- Passing `code` in the `alarm_control_panel` action calls when the panel needs one.
-- Letting Assist disarm only when a code is said, such as "disarm the alarm 1234", checked against the
-  panel, rather than disarming for anyone who can talk to Assist.
+Still to do:
+
+- Letting Assist disarm only when a code is said, such as "disarm the alarm 1234", checked against the code,
+  rather than disarming for anyone who can talk to Assist when **Disarm by voice** is on.
+- Asking for a code on mobile actions too, see [PIN Protection for Mobile Actions](#pin-protection-for-mobile-actions).
+- Keeping the stored code better than obfuscation. The encryption key is derived from the Home Assistant
+  instance id, kept next to the encrypted code, so anyone with the configuration directory, or a backup of it,
+  can recover the code.
+
+## PIN Protection for Mobile Actions
+
+A mobile action can disarm the alarm without a code. **Mobile action users** limits who can do it, but anyone on
+that list can disarm from their phone, including whoever has the phone in hand. Options:
+
+- Ask for a PIN in the notification itself, with a reply text field on the action (`behavior: textInput`), and
+  only disarm when the reply matches the alarm panel code.
+- Use the Companion App's own lock check, `authenticationRequired: true` on the action, so the phone must be
+  unlocked first. iOS only, and it proves the phone was unlocked, not who unlocked it.
+- Make the PIN a per-user setting, so a code can be withdrawn from one person without changing the panel.
+
+To decide:
+
+- Whether the PIN is the panel code, or Auto Arm's own.
+- What happens after a wrong PIN: a warning in the log, a notification back to the sender, and whether
+  repeated wrong PINs lock mobile actions out for a while.
+- Whether PIN protection is needed for arming away and reset too, or only disarming.

@@ -90,7 +90,8 @@
                             "notify_priority_scheduled": "Prioriteit - geplande wijzigingen",
                             "notify_priority_occupancy": "Prioriteit - aanwezigheidswijzigingen",
                             "notify_priority_manual": "Prioriteit - handmatige wijzigingen",
-                            "notify_data": "Extra meldingsgegevens"
+                            "notify_data": "Extra meldingsgegevens",
+                            "mobile_action_users": "Gebruikers voor mobiele acties"
                         },
                         "data_description": {
                             "notify_enabled": "Meldingen inschakelen bij wijzigingen van de alarmstatus",
@@ -102,7 +103,8 @@
                             "notify_priority_scheduled": "Supernotify-prioriteit voor wijzigingen door een Tijden van de dag-sensor, agenda, zonsopkomst of zonsondergang.",
                             "notify_priority_occupancy": "Supernotify-prioriteit voor wijzigingen doordat mensen aankomen of vertrekken.",
                             "notify_priority_manual": "Supernotify-prioriteit voor wijzigingen op de alarmcentrale, of met een knop, mobiele actie of spraak.",
-                            "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
+                            "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel.",
+                            "mobile_action_users": "Alleen deze Home Assistant-gebruikers kunnen het alarm wijzigen met een mobiele actie, zoals een knop Uitschakelen in een melding. Laat leeg om elke gebruiker toe te staan. Waarschuwing: er wordt geen code gevraagd, dus als dit leeg is, kan iedereen die kan inloggen op Home Assistant het alarm uitschakelen."
                         }
                     },
                     "calendar_options": {
@@ -288,7 +290,8 @@
                             "notify_priority_scheduled": "Prioriteit - geplande wijzigingen",
                             "notify_priority_occupancy": "Prioriteit - aanwezigheidswijzigingen",
                             "notify_priority_manual": "Prioriteit - handmatige wijzigingen",
-                            "notify_data": "Extra meldingsgegevens"
+                            "notify_data": "Extra meldingsgegevens",
+                            "mobile_action_users": "Gebruikers voor mobiele acties"
                         },
                         "data_description": {
                             "notify_enabled": "Meldingen inschakelen bij wijzigingen van de alarmstatus",
@@ -300,7 +303,8 @@
                             "notify_priority_scheduled": "Supernotify-prioriteit voor wijzigingen door een Tijden van de dag-sensor, agenda, zonsopkomst of zonsondergang.",
                             "notify_priority_occupancy": "Supernotify-prioriteit voor wijzigingen doordat mensen aankomen of vertrekken.",
                             "notify_priority_manual": "Supernotify-prioriteit voor wijzigingen op de alarmcentrale, of met een knop, mobiele actie of spraak.",
-                            "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel."
+                            "notify_data": "Extra gegevens die worden doorgegeven aan de meldingsactie, zoals acties of een kanaal voor een mobiele app-melding. Een waarde die hier is ingesteld, wordt overschreven door een overeenkomende sleutel in een YAML-meldingsprofiel.",
+                            "mobile_action_users": "Alleen deze Home Assistant-gebruikers kunnen het alarm wijzigen met een mobiele actie, zoals een knop Uitschakelen in een melding. Laat leeg om elke gebruiker toe te staan. Waarschuwing: er wordt geen code gevraagd, dus als dit leeg is, kan iedereen die kan inloggen op Home Assistant het alarm uitschakelen."
                         }
                     },
                     "calendar_options": {

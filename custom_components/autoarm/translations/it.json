@@ -90,7 +90,8 @@
                             "notify_priority_scheduled": "Priorità - cambi programmati",
                             "notify_priority_occupancy": "Priorità - cambi per presenza",
                             "notify_priority_manual": "Priorità - cambi manuali",
-                            "notify_data": "Dati di notifica aggiuntivi"
+                            "notify_data": "Dati di notifica aggiuntivi",
+                            "mobile_action_users": "Utenti delle azioni mobili"
                         },
                         "data_description": {
                             "notify_enabled": "Abilita le notifiche per i cambiamenti di stato dell'allarme",
@@ -102,7 +103,8 @@
                             "notify_priority_scheduled": "Priorità Supernotify per i cambi fatti da un sensore Orari del giorno, dal calendario, dall'alba o dal tramonto.",
                             "notify_priority_occupancy": "Priorità Supernotify per i cambi dovuti a persone che arrivano o escono.",
                             "notify_priority_manual": "Priorità Supernotify per i cambi fatti dal pannello di allarme, o con un pulsante, un'azione mobile o la voce.",
-                            "notify_data": "Dati aggiuntivi passati all'azione di notifica, come azioni o un canale per una notifica dell'app mobile. Qualsiasi valore impostato qui viene sovrascritto da una chiave corrispondente in un profilo di notifica YAML."
+                            "notify_data": "Dati aggiuntivi passati all'azione di notifica, come azioni o un canale per una notifica dell'app mobile. Qualsiasi valore impostato qui viene sovrascritto da una chiave corrispondente in un profilo di notifica YAML.",
+                            "mobile_action_users": "Solo questi utenti di Home Assistant possono cambiare l'allarme con un'azione mobile, come un pulsante Disinserisci in una notifica. Lasciare vuoto per consentirlo a qualsiasi utente. Attenzione: non viene chiesto alcun codice, quindi se vuoto chiunque possa accedere a Home Assistant potrà disinserire l'allarme."
                         }
                     },
                     "calendar_options": {
@@ -288,7 +290,8 @@
                             "notify_priority_scheduled": "Priorità - cambi programmati",
                             "notify_priority_occupancy": "Priorità - cambi per presenza",
                             "notify_priority_manual": "Priorità - cambi manuali",
-                            "notify_data": "Dati di notifica aggiuntivi"
+                            "notify_data": "Dati di notifica aggiuntivi",
+                            "mobile_action_users": "Utenti delle azioni mobili"
                         },
                         "data_description": {
                             "notify_enabled": "Abilita le notifiche per i cambiamenti di stato dell'allarme",
@@ -300,7 +303,8 @@
                             "notify_priority_scheduled": "Priorità Supernotify per i cambi fatti da un sensore Orari del giorno, dal calendario, dall'alba o dal tramonto.",
                             "notify_priority_occupancy": "Priorità Supernotify per i cambi dovuti a persone che arrivano o escono.",
                             "notify_priority_manual": "Priorità Supernotify per i cambi fatti dal pannello di allarme, o con un pulsante, un'azione mobile o la voce.",
-                            "notify_data": "Dati aggiuntivi passati all'azione di notifica, come azioni o un canale per una notifica dell'app mobile. Qualsiasi valore impostato qui viene sovrascritto da una chiave corrispondente in un profilo di notifica YAML."
+                            "notify_data": "Dati aggiuntivi passati all'azione di notifica, come azioni o un canale per una notifica dell'app mobile. Qualsiasi valore impostato qui viene sovrascritto da una chiave corrispondente in un profilo di notifica YAML.",
+                            "mobile_action_users": "Solo questi utenti di Home Assistant possono cambiare l'allarme con un'azione mobile, come un pulsante Disinserisci in una notifica. Lasciare vuoto per consentirlo a qualsiasi utente. Attenzione: non viene chiesto alcun codice, quindi se vuoto chiunque possa accedere a Home Assistant potrà disinserire l'allarme."
                         }
                     },
                     "calendar_options": {

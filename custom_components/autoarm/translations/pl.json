@@ -90,7 +90,8 @@
                             "notify_priority_scheduled": "Priorytet - zmiany zaplanowane",
                             "notify_priority_occupancy": "Priorytet - zmiany obecności",
                             "notify_priority_manual": "Priorytet - zmiany ręczne",
-                            "notify_data": "Dodatkowe dane powiadomienia"
+                            "notify_data": "Dodatkowe dane powiadomienia",
+                            "mobile_action_users": "Użytkownicy akcji mobilnych"
                         },
                         "data_description": {
                             "notify_enabled": "Włącz powiadomienia o zmianach stanu alarmu",
@@ -102,7 +103,8 @@
                             "notify_priority_scheduled": "Priorytet Supernotify dla zmian wywołanych przez czujnik pór dnia, kalendarz, wschód lub zachód słońca.",
                             "notify_priority_occupancy": "Priorytet Supernotify dla zmian wywołanych przyjściem lub wyjściem osób.",
                             "notify_priority_manual": "Priorytet Supernotify dla zmian dokonanych na panelu alarmu albo przyciskiem, akcją mobilną lub głosem.",
-                            "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML."
+                            "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML.",
+                            "mobile_action_users": "Tylko ci użytkownicy Home Assistant mogą zmieniać alarm akcją mobilną, na przykład przyciskiem Rozbrój w powiadomieniu. Pozostaw puste, aby zezwolić każdemu użytkownikowi. Uwaga: kod nie jest wymagany, więc gdy lista jest pusta, każdy, kto może zalogować się do Home Assistant, będzie mógł rozbroić alarm."
                         }
                     },
                     "calendar_options": {
@@ -288,7 +290,8 @@
                             "notify_priority_scheduled": "Priorytet - zmiany zaplanowane",
                             "notify_priority_occupancy": "Priorytet - zmiany obecności",
                             "notify_priority_manual": "Priorytet - zmiany ręczne",
-                            "notify_data": "Dodatkowe dane powiadomienia"
+                            "notify_data": "Dodatkowe dane powiadomienia",
+                            "mobile_action_users": "Użytkownicy akcji mobilnych"
                         },
                         "data_description": {
                             "notify_enabled": "Włącz powiadomienia o zmianach stanu alarmu",
@@ -300,7 +303,8 @@
                             "notify_priority_scheduled": "Priorytet Supernotify dla zmian wywołanych przez czujnik pór dnia, kalendarz, wschód lub zachód słońca.",
                             "notify_priority_occupancy": "Priorytet Supernotify dla zmian wywołanych przyjściem lub wyjściem osób.",
                             "notify_priority_manual": "Priorytet Supernotify dla zmian dokonanych na panelu alarmu albo przyciskiem, akcją mobilną lub głosem.",
-                            "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML."
+                            "notify_data": "Dodatkowe dane przekazywane do akcji powiadomienia, takie jak akcje lub kanał dla powiadomienia aplikacji mobilnej. Wszystko ustawione tutaj jest nadpisywane przez pasujący klucz w profilu powiadomień YAML.",
+                            "mobile_action_users": "Tylko ci użytkownicy Home Assistant mogą zmieniać alarm akcją mobilną, na przykład przyciskiem Rozbrój w powiadomieniu. Pozostaw puste, aby zezwolić każdemu użytkownikowi. Uwaga: kod nie jest wymagany, więc gdy lista jest pusta, każdy, kto może zalogować się do Home Assistant, będzie mógł rozbroić alarm."
                         }
                     },
                     "calendar_options": {

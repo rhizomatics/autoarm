@@ -90,7 +90,8 @@
                             "notify_priority_scheduled": "优先级 - 计划的变更",
                             "notify_priority_occupancy": "优先级 - 在家状态变更",
                             "notify_priority_manual": "优先级 - 手动变更",
-                            "notify_data": "额外通知数据"
+                            "notify_data": "额外通知数据",
+                            "mobile_action_users": "移动操作用户"
                         },
                         "data_description": {
                             "notify_enabled": "在警报状态发生变化时启用通知",
@@ -102,7 +103,8 @@
                             "notify_priority_scheduled": "由时段传感器、日历、日出或日落引起的变更所用的 Supernotify 优先级。",
                             "notify_priority_occupancy": "由人员到家或离家引起的变更所用的 Supernotify 优先级。",
                             "notify_priority_manual": "在警报面板上，或通过按钮、移动端操作或语音进行的变更所用的 Supernotify 优先级。",
-                            "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
+                            "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。",
+                            "mobile_action_users": "只有这些 Home Assistant 用户可以通过移动操作更改警报，例如通知中的撤防按钮。留空则允许任何用户。警告：不会要求输入代码，因此留空时，任何能登录 Home Assistant 的人都可以撤防警报。"
                         }
                     },
                     "calendar_options": {
@@ -288,7 +290,8 @@
                             "notify_priority_scheduled": "优先级 - 计划的变更",
                             "notify_priority_occupancy": "优先级 - 在家状态变更",
                             "notify_priority_manual": "优先级 - 手动变更",
-                            "notify_data": "额外通知数据"
+                            "notify_data": "额外通知数据",
+                            "mobile_action_users": "移动操作用户"
                         },
                         "data_description": {
                             "notify_enabled": "在警报状态发生变化时启用通知",
@@ -300,7 +303,8 @@
                             "notify_priority_scheduled": "由时段传感器、日历、日出或日落引起的变更所用的 Supernotify 优先级。",
                             "notify_priority_occupancy": "由人员到家或离家引起的变更所用的 Supernotify 优先级。",
                             "notify_priority_manual": "在警报面板上，或通过按钮、移动端操作或语音进行的变更所用的 Supernotify 优先级。",
-                            "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。"
+                            "notify_data": "传递给通知操作的额外数据，例如移动应用通知的操作或频道。此处设置的任何值都会被 YAML 通知配置文件中匹配的键覆盖。",
+                            "mobile_action_users": "只有这些 Home Assistant 用户可以通过移动操作更改警报，例如通知中的撤防按钮。留空则允许任何用户。警告：不会要求输入代码，因此留空时，任何能登录 Home Assistant 的人都可以撤防警报。"
                         }
                     },
                     "calendar_options": {

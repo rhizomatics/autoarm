@@ -14,6 +14,7 @@ from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ENTITIES,
     CONF_CALENDAR_OCCUPANCY_ENDS_AWAY,
     CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES,
+    CONF_MOBILE_ACTION_USERS,
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
     CONF_NOTIFY_TARGETS,
@@ -44,7 +45,7 @@ from custom_components.autoarm.const import (
     DOMAIN,
     YAML_DATA_KEY,
 )
-from tests.ha_testing import MockConfigEntry
+from tests.ha_testing import MockConfigEntry, MockUser
 
 
 async def test_user_flow_complete(hass: HomeAssistant, mock_notify: Any) -> None:
@@ -412,6 +413,36 @@ async def test_options_flow_without_supernotify_action(hass: HomeAssistant, setu
     notify_section = data_schema.schema["notify_options"].schema.schema
     action_selector = next(v for k, v in notify_section.items() if k == CONF_NOTIFY_ACTION)
     assert "supernotify.notify" not in action_selector.config["options"]
+
+
+async def test_options_flow_limits_mobile_actions_to_users(
+    hass: HomeAssistant, setup_autoarm: MockConfigEntry, hass_admin_user: MockUser
+) -> None:
+    """Users who can log in are offered, and one since removed is still shown, to be taken off"""
+    hass.config_entries.async_update_entry(setup_autoarm, options={**setup_autoarm.options, CONF_MOBILE_ACTION_USERS: ["gone"]})
+    result = await hass.config_entries.options.async_init(setup_autoarm.entry_id)
+
+    data_schema = result["data_schema"]
+    assert data_schema is not None
+    notify_section = data_schema.schema["notify_options"].schema.schema
+    users_selector = next(v for k, v in notify_section.items() if k == CONF_MOBILE_ACTION_USERS)
+    choices = {choice["value"]: choice["label"] for choice in users_selector.config["options"]}
+    assert choices[hass_admin_user.id] == hass_admin_user.name
+    assert choices["gone"] == "gone"
+    assert not any(user.system_generated and user.id in choices for user in await hass.auth.async_get_users())
+
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {
+            CONF_ALARM_PANEL: "alarm_control_panel.new_panel",
+            **{
+                f"{name}_options": {} for name in ("assist", "button", "calendar", "sun", "presence", "advanced", "time_of_day")
+            },
+            "notify_options": {CONF_MOBILE_ACTION_USERS: [hass_admin_user.id]},
+        },
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert setup_autoarm.options[CONF_MOBILE_ACTION_USERS] == [hass_admin_user.id]
 
 
 async def test_migrate_no_event_mode_to_end_modes(hass: HomeAssistant, mock_notify: Any) -> None:

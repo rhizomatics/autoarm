@@ -90,7 +90,8 @@
                             "notify_priority_scheduled": "Priority - scheduled changes",
                             "notify_priority_occupancy": "Priority - occupancy changes",
                             "notify_priority_manual": "Priority - manual changes",
-                            "notify_data": "Extra Notification Data"
+                            "notify_data": "Extra Notification Data",
+                            "mobile_action_users": "Mobile action users"
                         },
                         "data_description": {
                             "notify_enabled": "Enable notifications for alarm state changes",
@@ -102,7 +103,8 @@
                             "notify_priority_scheduled": "Supernotify priority for changes made by a Times of the Day sensor, calendar, sunrise or sunset.",
                             "notify_priority_occupancy": "Supernotify priority for changes made by people arriving or leaving.",
                             "notify_priority_manual": "Supernotify priority for changes made at the alarm panel, or by a button, mobile action or voice.",
-                            "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
+                            "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile.",
+                            "mobile_action_users": "Only these Home Assistant users can change the alarm with a mobile action, such as a Disarm button on a notification. Leave empty to allow any user. Warning: no code is asked for, so with this empty, anyone who can log in to Home Assistant can disarm the alarm."
                         }
                     },
                     "calendar_options": {
@@ -288,7 +290,8 @@
                             "notify_priority_scheduled": "Priority - scheduled changes",
                             "notify_priority_occupancy": "Priority - occupancy changes",
                             "notify_priority_manual": "Priority - manual changes",
-                            "notify_data": "Extra Notification Data"
+                            "notify_data": "Extra Notification Data",
+                            "mobile_action_users": "Mobile action users"
                         },
                         "data_description": {
                             "notify_enabled": "Enable notifications for alarm state changes",
@@ -300,7 +303,8 @@
                             "notify_priority_scheduled": "Supernotify priority for changes made by a Times of the Day sensor, calendar, sunrise or sunset.",
                             "notify_priority_occupancy": "Supernotify priority for changes made by people arriving or leaving.",
                             "notify_priority_manual": "Supernotify priority for changes made at the alarm panel, or by a button, mobile action or voice.",
-                            "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile."
+                            "notify_data": "Extra data passed to the notification action, such as actions or a channel for a mobile app notification. Anything set here is overridden by a matching key in a YAML notify profile.",
+                            "mobile_action_users": "Only these Home Assistant users can change the alarm with a mobile action, such as a Disarm button on a notification. Leave empty to allow any user. Warning: no code is asked for, so with this empty, anyone who can log in to Home Assistant can disarm the alarm."
                         }
                     },
                     "calendar_options": {

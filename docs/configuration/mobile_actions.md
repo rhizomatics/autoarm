@@ -10,6 +10,18 @@ Auto Arm listens out for the result of [Actionable Notifications](https://compan
 | ALARM_PANEL_RESET  |
 | ALARM_PANEL_AWAY   |
 
+## Who Can Use Mobile Actions
+
+By default any Home Assistant user can use these actions. To limit them, choose the users in
+**Mobile action users**, in the **Notifications** section of the options. An action from anyone else is ignored,
+with a warning in the log.
+
+!!! danger "Disarming by mobile action"
+    No code is asked for when a mobile action disarms the alarm, even if Auto Arm has the alarm panel code to use
+    itself. Actions don't have to come from a notification Auto Arm sent: anyone who can log in to Home Assistant,
+    and so register a mobile app, can send one. Choose **Mobile action users** to keep this to the people who
+    should be able to disarm the alarm.
+
 ## Add Action to a Mobile Push Notification
 
 Here's how to send a notification to a mobile app, with a Disarm action:

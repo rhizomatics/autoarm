@@ -90,7 +90,8 @@
                             "notify_priority_scheduled": "Priorität - geplante Änderungen",
                             "notify_priority_occupancy": "Priorität - Anwesenheitsänderungen",
                             "notify_priority_manual": "Priorität - manuelle Änderungen",
-                            "notify_data": "Zusätzliche Benachrichtigungsdaten"
+                            "notify_data": "Zusätzliche Benachrichtigungsdaten",
+                            "mobile_action_users": "Benutzer für mobile Aktionen"
                         },
                         "data_description": {
                             "notify_enabled": "Benachrichtigungen für Alarmzustandsänderungen aktivieren",
@@ -102,7 +103,8 @@
                             "notify_priority_scheduled": "Supernotify-Priorität für Änderungen durch einen Tageszeiten-Sensor, Kalender, Sonnenaufgang oder Sonnenuntergang.",
                             "notify_priority_occupancy": "Supernotify-Priorität für Änderungen durch ankommende oder gehende Personen.",
                             "notify_priority_manual": "Supernotify-Priorität für Änderungen an der Alarmzentrale oder per Taste, mobiler Aktion oder Sprache.",
-                            "notify_data": "Zusätzliche Daten, die an die Benachrichtigungsaktion übergeben werden, z. B. Aktionen oder ein Kanal für eine mobile App-Benachrichtigung. Werte hier werden durch einen passenden Schlüssel in einem YAML-Benachrichtigungsprofil überschrieben."
+                            "notify_data": "Zusätzliche Daten, die an die Benachrichtigungsaktion übergeben werden, z. B. Aktionen oder ein Kanal für eine mobile App-Benachrichtigung. Werte hier werden durch einen passenden Schlüssel in einem YAML-Benachrichtigungsprofil überschrieben.",
+                            "mobile_action_users": "Nur diese Home-Assistant-Benutzer können die Alarmanlage über eine mobile Aktion ändern, etwa über eine Schaltfläche 'Unscharf' in einer Benachrichtigung. Leer lassen, um jeden Benutzer zuzulassen. Warnung: Es wird kein Code abgefragt, daher kann bei leerer Liste jeder, der sich bei Home Assistant anmelden kann, die Alarmanlage unscharf schalten."
                         }
                     },
                     "calendar_options": {
@@ -288,7 +290,8 @@
                             "notify_priority_scheduled": "Priorität - geplante Änderungen",
                             "notify_priority_occupancy": "Priorität - Anwesenheitsänderungen",
                             "notify_priority_manual": "Priorität - manuelle Änderungen",
-                            "notify_data": "Zusätzliche Benachrichtigungsdaten"
+                            "notify_data": "Zusätzliche Benachrichtigungsdaten",
+                            "mobile_action_users": "Benutzer für mobile Aktionen"
                         },
                         "data_description": {
                             "notify_enabled": "Benachrichtigungen für Alarmzustandsänderungen aktivieren",
@@ -300,7 +303,8 @@
                             "notify_priority_scheduled": "Supernotify-Priorität für Änderungen durch einen Tageszeiten-Sensor, Kalender, Sonnenaufgang oder Sonnenuntergang.",
                             "notify_priority_occupancy": "Supernotify-Priorität für Änderungen durch ankommende oder gehende Personen.",
                             "notify_priority_manual": "Supernotify-Priorität für Änderungen an der Alarmzentrale oder per Taste, mobiler Aktion oder Sprache.",
-                            "notify_data": "Zusätzliche Daten, die an die Benachrichtigungsaktion übergeben werden, z. B. Aktionen oder ein Kanal für eine mobile App-Benachrichtigung. Werte hier werden durch einen passenden Schlüssel in einem YAML-Benachrichtigungsprofil überschrieben."
+                            "notify_data": "Zusätzliche Daten, die an die Benachrichtigungsaktion übergeben werden, z. B. Aktionen oder ein Kanal für eine mobile App-Benachrichtigung. Werte hier werden durch einen passenden Schlüssel in einem YAML-Benachrichtigungsprofil überschrieben.",
+                            "mobile_action_users": "Nur diese Home-Assistant-Benutzer können die Alarmanlage über eine mobile Aktion ändern, etwa über eine Schaltfläche 'Unscharf' in einer Benachrichtigung. Leer lassen, um jeden Benutzer zuzulassen. Warnung: Es wird kein Code abgefragt, daher kann bei leerer Liste jeder, der sich bei Home Assistant anmelden kann, die Alarmanlage unscharf schalten."
                         }
                     },
                     "calendar_options": {

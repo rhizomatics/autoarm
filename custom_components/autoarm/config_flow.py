@@ -20,6 +20,7 @@ from homeassistant.helpers.selector import (
     NumberSelectorMode,
     ObjectSelector,
     ObjectSelectorConfig,
+    SelectOptionDict,
     Selector,
     SelectSelector,
     SelectSelectorConfig,
@@ -134,6 +135,8 @@ CONF_PANEL_CODE = "panel_code"
 CONF_PANEL_CODE_CLEAR = "panel_code_clear"
 CONF_SENTENCE_ARM = "sentence_arm"
 CONF_SENTENCE_DISARM = "sentence_disarm"
+# Home Assistant user ids allowed to change the alarm by mobile action, any user if empty
+CONF_MOBILE_ACTION_USERS = "mobile_action_users"
 # switch Frigate profiles with the alarm state, using the Frigate integration's profile select
 CONF_FRIGATE_ENABLED = "frigate_enabled"
 # only needed to choose between more than one Frigate server
@@ -256,6 +259,15 @@ def _default_notify_action(hass: HomeAssistant) -> str:
     return SUPERNOTIFY_ACTION if supernotify_available(hass) else DEFAULT_NOTIFY_ACTION
 
 
+async def _user_choices(hass: HomeAssistant, chosen: list[str]) -> list[SelectOptionDict]:
+    """People who can log in to Home Assistant, and any user already chosen since removed, to be taken off"""
+    users: dict[str, str] = {
+        user.id: user.name or user.id for user in await hass.auth.async_get_users() if not user.system_generated
+    }
+    users.update({user_id: user_id for user_id in chosen if user_id not in users})
+    return [SelectOptionDict(value=user_id, label=name) for user_id, name in users.items()]
+
+
 async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> dict[Any, Any]:
     """The alarm panel code and the full set of options flow sections, shared by advanced setup and the options flow."""
     notify_services = sorted(f"notify.{service}" for service in hass.services.async_services().get("notify", {}))
@@ -352,6 +364,16 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
                     CONF_NOTIFY_DATA,
                     default=options.get(CONF_NOTIFY_DATA, {}),
                 ): ObjectSelector(),
+                vol.Optional(
+                    CONF_MOBILE_ACTION_USERS,
+                    default=options.get(CONF_MOBILE_ACTION_USERS, []),
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=await _user_choices(hass, options.get(CONF_MOBILE_ACTION_USERS, [])),
+                        multiple=True,
+                        mode=SelectSelectorMode.DROPDOWN,
+                    )
+                ),
             }),
             {"collapsed": True},
         ),

@@ -18,6 +18,7 @@ from homeassistant.setup import async_setup_component
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ENTITIES,
+    CONF_MOBILE_ACTION_USERS,
     CONF_NO_EVENT_MODE,
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
@@ -38,7 +39,7 @@ from custom_components.autoarm.const import (
     DOMAIN,
     YAML_DATA_KEY,
 )
-from tests.ha_testing import MockConfigEntry
+from tests.ha_testing import MockConfigEntry, MockUser
 
 YAML_CONFIG: dict[str, Any] = {
     CONF_DIURNAL: {CONF_SUNRISE: {CONF_EARLIEST: "06:30:00"}},
@@ -274,6 +275,32 @@ async def test_disarm_on_mobile_action(hass: HomeAssistant, mock_notify: Any) ->
     await _setup_entry(hass)
 
     hass.bus.async_fire("mobile_app_notification_action", {"action": "ALARM_PANEL_DISARM"})
+    await hass.async_block_till_done()
+    assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
+
+
+async def test_mobile_action_from_user_not_allowed_is_ignored(
+    hass: HomeAssistant, mock_notify: Any, hass_admin_user: MockUser, hass_read_only_user: MockUser
+) -> None:
+    """A mobile action fired through any mobile app registration mustn't disarm without the code when users are limited"""
+    hass.states.async_set("alarm_panel.testing", "armed_away")
+    await _setup_entry(hass, options={**ENTRY_OPTIONS, CONF_MOBILE_ACTION_USERS: [hass_admin_user.id]})
+
+    hass.bus.async_fire(
+        "mobile_app_notification_action",
+        {"action": "ALARM_PANEL_DISARM"},
+        context=Context(user_id=hass_read_only_user.id),
+    )
+    # fired without any user, as from an automation
+    hass.bus.async_fire("mobile_app_notification_action", {"action": "ALARM_PANEL_DISARM"})
+    await hass.async_block_till_done()
+    assert hass.states.get("alarm_panel.testing").state == "armed_away"  # type: ignore
+
+    hass.bus.async_fire(
+        "mobile_app_notification_action",
+        {"action": "ALARM_PANEL_DISARM"},
+        context=Context(user_id=hass_admin_user.id),
+    )
     await hass.async_block_till_done()
     assert hass.states.get("alarm_panel.testing").state == "disarmed"  # type: ignore
 

@@ -90,7 +90,8 @@
                             "notify_priority_scheduled": "Prioridade - alterações agendadas",
                             "notify_priority_occupancy": "Prioridade - alterações de ocupação",
                             "notify_priority_manual": "Prioridade - alterações manuais",
-                            "notify_data": "Dados extra de notificação"
+                            "notify_data": "Dados extra de notificação",
+                            "mobile_action_users": "Utilizadores das ações móveis"
                         },
                         "data_description": {
                             "notify_enabled": "Ativar notificações para alterações do estado do alarme",
@@ -102,7 +103,8 @@
                             "notify_priority_scheduled": "Prioridade do Supernotify para alterações feitas por um sensor Horas do dia, calendário, nascer ou pôr do sol.",
                             "notify_priority_occupancy": "Prioridade do Supernotify para alterações por pessoas a chegar ou a sair.",
                             "notify_priority_manual": "Prioridade do Supernotify para alterações feitas no painel de alarme, ou por um botão, ação móvel ou voz.",
-                            "notify_data": "Dados extra passados para a ação de notificação, como ações ou um canal para uma notificação da app móvel. Qualquer valor definido aqui é substituído por uma chave correspondente num perfil de notificação YAML."
+                            "notify_data": "Dados extra passados para a ação de notificação, como ações ou um canal para uma notificação da app móvel. Qualquer valor definido aqui é substituído por uma chave correspondente num perfil de notificação YAML.",
+                            "mobile_action_users": "Apenas estes utilizadores do Home Assistant podem mudar o alarme com uma ação móvel, como um botão Desarmar numa notificação. Deixe vazio para permitir qualquer utilizador. Aviso: nenhum código é pedido, por isso, se estiver vazio, qualquer pessoa que consiga iniciar sessão no Home Assistant poderá desarmar o alarme."
                         }
                     },
                     "calendar_options": {
@@ -288,7 +290,8 @@
                             "notify_priority_scheduled": "Prioridade - alterações agendadas",
                             "notify_priority_occupancy": "Prioridade - alterações de ocupação",
                             "notify_priority_manual": "Prioridade - alterações manuais",
-                            "notify_data": "Dados extra de notificação"
+                            "notify_data": "Dados extra de notificação",
+                            "mobile_action_users": "Utilizadores das ações móveis"
                         },
                         "data_description": {
                             "notify_enabled": "Ativar notificações para alterações do estado do alarme",
@@ -300,7 +303,8 @@
                             "notify_priority_scheduled": "Prioridade do Supernotify para alterações feitas por um sensor Horas do dia, calendário, nascer ou pôr do sol.",
                             "notify_priority_occupancy": "Prioridade do Supernotify para alterações por pessoas a chegar ou a sair.",
                             "notify_priority_manual": "Prioridade do Supernotify para alterações feitas no painel de alarme, ou por um botão, ação móvel ou voz.",
-                            "notify_data": "Dados extra passados para a ação de notificação, como ações ou um canal para uma notificação da app móvel. Qualquer valor definido aqui é substituído por uma chave correspondente num perfil de notificação YAML."
+                            "notify_data": "Dados extra passados para a ação de notificação, como ações ou um canal para uma notificação da app móvel. Qualquer valor definido aqui é substituído por uma chave correspondente num perfil de notificação YAML.",
+                            "mobile_action_users": "Apenas estes utilizadores do Home Assistant podem mudar o alarme com uma ação móvel, como um botão Desarmar numa notificação. Deixe vazio para permitir qualquer utilizador. Aviso: nenhum código é pedido, por isso, se estiver vazio, qualquer pessoa que consiga iniciar sessão no Home Assistant poderá desarmar o alarme."
                         }
                     },
                     "calendar_options": {

@@ -85,6 +85,7 @@ from .config_flow import (
     CONF_CALENDAR_POLL_MINUTES,
     CONF_FRIGATE_ENABLED,
     CONF_FRIGATE_PROFILE_ENTITY,
+    CONF_MOBILE_ACTION_USERS,
     CONF_NO_EVENT_MODE,
     CONF_NOTIFY_ACTION,
     CONF_NOTIFY_CUSTOM_TARGET,
@@ -163,6 +164,7 @@ from .const import (
     DIURNAL_CALENDAR_STATES,
     DOMAIN,
     FRIGATE_NO_PROFILE,
+    MOBILE_ACTIONS,
     NO_CAL_EVENT_MODE_AUTO,
     NO_CAL_EVENT_MODE_AUTO_OCCUPANCY,
     NO_CAL_EVENT_MODE_AUTO_SUN,
@@ -548,6 +550,7 @@ def _build_armer_from_entry(
             if option in entry.options
         },
         state_action=entry.options.get(CONF_STATE_ACTION),
+        mobile_action_users=entry.options.get(CONF_MOBILE_ACTION_USERS),
     )
 
 
@@ -788,6 +791,7 @@ class AlarmArmer:
         frigate_profile_entity: str | None = None,
         frigate_profiles: dict[str, str] | None = None,
         state_action: list[dict[str, Any]] | None = None,
+        mobile_action_users: list[str] | None = None,
     ) -> None:
         occupancy = occupancy or {}
         rate_limit = rate_limit or {}
@@ -865,6 +869,8 @@ class AlarmArmer:
         self.frigate_profile_entity: str | None = frigate_profile_entity
         self.frigate_profiles: dict[str, str] = frigate_profiles or {}
         self.state_action: list[dict[str, Any]] = state_action or []
+        # anyone able to fire a mobile app event could otherwise change the alarm, as the code isn't asked for
+        self.mobile_action_users: set[str] = set(mobile_action_users or [])
         # state the panel is being moved to by its actions, so the change isn't mistaken for a manual one
         self._service_target: AlarmControlPanelState | None = None
         self.last_change: StateChange | None = None
@@ -1962,8 +1968,14 @@ class AlarmArmer:
         _LOGGER.debug("AUTOARM Mobile Action: %s", event)
         source: ChangeSource = ChangeSource.MOBILE
         context: Context = child_context(event.context)
+        action: str | None = event.data.get("action")
+        if action in MOBILE_ACTIONS and self.mobile_action_users and event.context.user_id not in self.mobile_action_users:
+            _LOGGER.warning(
+                "AUTOARM Ignoring mobile action %s from user %s, not an allowed user", action, event.context.user_id
+            )
+            return
 
-        match event.data.get("action"):
+        match action:
             case "ALARM_PANEL_DISARM":
                 self.record_intervention(source=source, state=AlarmControlPanelState.DISARMED, context=context)
                 await self.arm(

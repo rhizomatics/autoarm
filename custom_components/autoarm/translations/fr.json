@@ -90,7 +90,8 @@
                             "notify_priority_scheduled": "Priorité - changements planifiés",
                             "notify_priority_occupancy": "Priorité - changements d'occupation",
                             "notify_priority_manual": "Priorité - changements manuels",
-                            "notify_data": "Données de notification supplémentaires"
+                            "notify_data": "Données de notification supplémentaires",
+                            "mobile_action_users": "Utilisateurs des actions mobiles"
                         },
                         "data_description": {
                             "notify_enabled": "Activer les notifications pour les changements d'état de l'alarme",
@@ -102,7 +103,8 @@
                             "notify_priority_scheduled": "Priorité Supernotify pour les changements faits par un capteur Moments de la journée, un calendrier, le lever ou le coucher du soleil.",
                             "notify_priority_occupancy": "Priorité Supernotify pour les changements dus aux arrivées ou aux départs.",
                             "notify_priority_manual": "Priorité Supernotify pour les changements faits sur le panneau d'alarme, ou par un bouton, une action mobile ou la voix.",
-                            "notify_data": "Données supplémentaires transmises à l'action de notification, telles que des actions ou un canal pour une notification d'application mobile. Toute valeur définie ici est remplacée par une clé correspondante dans un profil de notification YAML."
+                            "notify_data": "Données supplémentaires transmises à l'action de notification, telles que des actions ou un canal pour une notification d'application mobile. Toute valeur définie ici est remplacée par une clé correspondante dans un profil de notification YAML.",
+                            "mobile_action_users": "Seuls ces utilisateurs de Home Assistant peuvent changer l'alarme par une action mobile, comme un bouton Désarmer dans une notification. Laisser vide pour autoriser tout utilisateur. Attention : aucun code n'est demandé, donc si la liste est vide, toute personne pouvant se connecter à Home Assistant peut désarmer l'alarme."
                         }
                     },
                     "calendar_options": {
@@ -288,7 +290,8 @@
                             "notify_priority_scheduled": "Priorité - changements planifiés",
                             "notify_priority_occupancy": "Priorité - changements d'occupation",
                             "notify_priority_manual": "Priorité - changements manuels",
-                            "notify_data": "Données de notification supplémentaires"
+                            "notify_data": "Données de notification supplémentaires",
+                            "mobile_action_users": "Utilisateurs des actions mobiles"
                         },
                         "data_description": {
                             "notify_enabled": "Activer les notifications pour les changements d'état de l'alarme",
@@ -300,7 +303,8 @@
                             "notify_priority_scheduled": "Priorité Supernotify pour les changements faits par un capteur Moments de la journée, un calendrier, le lever ou le coucher du soleil.",
                             "notify_priority_occupancy": "Priorité Supernotify pour les changements dus aux arrivées ou aux départs.",
                             "notify_priority_manual": "Priorité Supernotify pour les changements faits sur le panneau d'alarme, ou par un bouton, une action mobile ou la voix.",
-                            "notify_data": "Données supplémentaires transmises à l'action de notification, telles que des actions ou un canal pour une notification d'application mobile. Toute valeur définie ici est remplacée par une clé correspondante dans un profil de notification YAML."
+                            "notify_data": "Données supplémentaires transmises à l'action de notification, telles que des actions ou un canal pour une notification d'application mobile. Toute valeur définie ici est remplacée par une clé correspondante dans un profil de notification YAML.",
+                            "mobile_action_users": "Seuls ces utilisateurs de Home Assistant peuvent changer l'alarme par une action mobile, comme un bouton Désarmer dans une notification. Laisser vide pour autoriser tout utilisateur. Attention : aucun code n'est demandé, donc si la liste est vide, toute personne pouvant se connecter à Home Assistant peut désarmer l'alarme."
                         }
                     },
                     "calendar_options": {
