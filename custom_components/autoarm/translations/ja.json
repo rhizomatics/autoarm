@@ -193,13 +193,13 @@
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
                             "rate_limit_max_calls": "レート制限 - 最大変更回数",
                             "rate_limit_period": "レート制限 - 期間",
-                            "state_change_action": "状態変化時のアクション"
+                            "state_change_action": "アラーム状態の変化時にアクションを呼び出す"
                         },
                         "data_description": {
                             "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、上で設定してください。",
                             "rate_limit_max_calls": "ループを防ぐため、レート制限の期間内に Auto Arm が行うアラーム状態の変更の最大回数です。期間内のそれ以上の変更はスキップされます。",
                             "rate_limit_period": "最大変更回数を数える期間の長さ（秒）です。",
-                            "state_change_action": "アラームの状態が変わるたびに実行するアクションです。電子ペーパーのラベルやスマートディスプレイの更新などに使えます。テンプレートでは to_state、from_state、friendly_state、alarm_panel を使用できます。"
+                            "state_change_action": "状態が変わったときに任意の Home Assistant アクションを呼び出します。たとえば画面に現在のアラーム状態を表示できます。Auto Arm のテンプレート変数も使えます（任意）: to_state, from_state, friendly_state, alarm_panel。"
                         }
                     },
                     "time_of_day_options": {
@@ -217,7 +217,7 @@
         },
         "error": {
             "invalid_pattern": "カレンダーの一致ルールに、正しい正規表現ではないパターンがあります。",
-            "invalid_action": "状態変化時のアクションが無効です。"
+            "invalid_action": "アラーム状態の変化時に呼び出すアクションが無効です。"
         },
         "abort": {
             "already_configured": "Auto Arm はすでに設定済みです"
@@ -391,13 +391,13 @@
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
                             "rate_limit_max_calls": "レート制限 - 最大変更回数",
                             "rate_limit_period": "レート制限 - 期間",
-                            "state_change_action": "状態変化時のアクション"
+                            "state_change_action": "アラーム状態の変化時にアクションを呼び出す"
                         },
                         "data_description": {
                             "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、上で設定してください。",
                             "rate_limit_max_calls": "ループを防ぐため、レート制限の期間内に Auto Arm が行うアラーム状態の変更の最大回数です。期間内のそれ以上の変更はスキップされます。",
                             "rate_limit_period": "最大変更回数を数える期間の長さ（秒）です。",
-                            "state_change_action": "アラームの状態が変わるたびに実行するアクションです。電子ペーパーのラベルやスマートディスプレイの更新などに使えます。テンプレートでは to_state、from_state、friendly_state、alarm_panel を使用できます。"
+                            "state_change_action": "状態が変わったときに任意の Home Assistant アクションを呼び出します。たとえば画面に現在のアラーム状態を表示できます。Auto Arm のテンプレート変数も使えます（任意）: to_state, from_state, friendly_state, alarm_panel。"
                         }
                     },
                     "time_of_day_options": {
@@ -415,7 +415,7 @@
         },
         "error": {
             "invalid_pattern": "カレンダーの一致ルールに、正しい正規表現ではないパターンがあります。",
-            "invalid_action": "状態変化時のアクションが無効です。"
+            "invalid_action": "アラーム状態の変化時に呼び出すアクションが無効です。"
         }
     },
     "selector": {

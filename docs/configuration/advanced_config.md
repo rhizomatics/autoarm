@@ -53,9 +53,11 @@ out to no change at all, nothing is sent.
 
 This only debounces the *notification*; the alarm panel's actual state still updates immediately as each calendar-driven change happens.
 
-### State Change Action
+### Call Action When Alarm State Changes
 
-**State change action**, in the **Advanced - Other** section of the options, runs any Home Assistant
+Call any Home Assistant action when the state changes, for example to display current alarm state on a screen, with optional Auto Arm template variables.
+
+**Call Action When Alarm State Changes**, in the **Advanced - Other** section of the options, runs any Home Assistant
 actions whenever the alarm panel changes state, whatever changed it. It uses the same action editor as
 automations, so each action's fields are there to fill in. Use it to show the alarm state somewhere, such as an
 e-ink shelf label or a smart display.

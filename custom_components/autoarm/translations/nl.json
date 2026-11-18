@@ -193,13 +193,13 @@
                             "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
                             "rate_limit_max_calls": "Snelheidslimiet - maximale wijzigingen",
                             "rate_limit_period": "Snelheidslimiet - periode",
-                            "state_change_action": "Actie bij statuswijziging"
+                            "state_change_action": "Actie aanroepen wanneer de alarmstatus verandert"
                         },
                         "data_description": {
                             "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hierboven in.",
                             "rate_limit_max_calls": "Het maximale aantal wijzigingen van de alarmstatus dat Auto Arm binnen de periode van de snelheidslimiet uitvoert, als bescherming tegen lussen. Verdere wijzigingen in die periode worden overgeslagen.",
                             "rate_limit_period": "Lengte van de periode, in seconden, waarover de maximale wijzigingen worden geteld.",
-                            "state_change_action": "Acties die worden uitgevoerd telkens wanneer de alarmstatus verandert, bijvoorbeeld om een e-ink-label of een slim scherm bij te werken. Sjablonen kunnen to_state, from_state, friendly_state en alarm_panel gebruiken."
+                            "state_change_action": "Roep een willekeurige Home Assistant-actie aan wanneer de status verandert, bijvoorbeeld om de huidige alarmstatus op een scherm te tonen, met optionele Auto Arm-sjabloonvariabelen: to_state, from_state, friendly_state, alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -217,7 +217,7 @@
         },
         "error": {
             "invalid_pattern": "Een overeenkomstregel voor een agenda heeft een patroon dat geen geldige reguliere expressie is.",
-            "invalid_action": "De actie bij statuswijziging is ongeldig."
+            "invalid_action": "De actie die wordt aangeroepen wanneer de alarmstatus verandert, is ongeldig."
         },
         "abort": {
             "already_configured": "Auto Arm is al geconfigureerd"
@@ -391,13 +391,13 @@
                             "use_alarm_service": "Status wijzigen via de acties van het alarmpaneel",
                             "rate_limit_max_calls": "Snelheidslimiet - maximale wijzigingen",
                             "rate_limit_period": "Snelheidslimiet - periode",
-                            "state_change_action": "Actie bij statuswijziging"
+                            "state_change_action": "Actie aanroepen wanneer de alarmstatus verandert"
                         },
                         "data_description": {
                             "use_alarm_service": "Roept de alarm_control_panel acties voor inschakelen en uitschakelen aan in plaats van de status direct in te stellen. Nodig voor panelen zoals Alarmo met eigen verwerking, zoals het inschakelen van onderliggende gebieden. Als het paneel een code vereist, stel die dan hierboven in.",
                             "rate_limit_max_calls": "Het maximale aantal wijzigingen van de alarmstatus dat Auto Arm binnen de periode van de snelheidslimiet uitvoert, als bescherming tegen lussen. Verdere wijzigingen in die periode worden overgeslagen.",
                             "rate_limit_period": "Lengte van de periode, in seconden, waarover de maximale wijzigingen worden geteld.",
-                            "state_change_action": "Acties die worden uitgevoerd telkens wanneer de alarmstatus verandert, bijvoorbeeld om een e-ink-label of een slim scherm bij te werken. Sjablonen kunnen to_state, from_state, friendly_state en alarm_panel gebruiken."
+                            "state_change_action": "Roep een willekeurige Home Assistant-actie aan wanneer de status verandert, bijvoorbeeld om de huidige alarmstatus op een scherm te tonen, met optionele Auto Arm-sjabloonvariabelen: to_state, from_state, friendly_state, alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -415,7 +415,7 @@
         },
         "error": {
             "invalid_pattern": "Een overeenkomstregel voor een agenda heeft een patroon dat geen geldige reguliere expressie is.",
-            "invalid_action": "De actie bij statuswijziging is ongeldig."
+            "invalid_action": "De actie die wordt aangeroepen wanneer de alarmstatus verandert, is ongeldig."
         }
     },
     "selector": {

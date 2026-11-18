@@ -193,13 +193,13 @@
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                             "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
                             "rate_limit_period": "Limite di frequenza - periodo",
-                            "state_change_action": "Azione al cambio di stato"
+                            "state_change_action": "Chiama un'azione quando cambia lo stato dell'allarme"
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sopra.",
                             "rate_limit_max_calls": "Il numero massimo di cambi di stato dell'allarme che Auto Arm effettua nel periodo del limite di frequenza, come protezione dai cicli. Le ulteriori modifiche in quel periodo vengono saltate.",
                             "rate_limit_period": "Durata del periodo, in secondi, in cui vengono contate le modifiche massime.",
-                            "state_change_action": "Azioni da eseguire a ogni cambio di stato dell'allarme, ad esempio per aggiornare un'etichetta e-ink o uno smart display. I modelli possono usare to_state, from_state, friendly_state e alarm_panel."
+                            "state_change_action": "Chiama qualsiasi azione di Home Assistant quando cambia lo stato, ad esempio per mostrare lo stato attuale dell'allarme su uno schermo, con variabili di modello Auto Arm facoltative: to_state, from_state, friendly_state, alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -217,7 +217,7 @@
         },
         "error": {
             "invalid_pattern": "Una regola di corrispondenza del calendario ha un modello che non è un'espressione regolare valida.",
-            "invalid_action": "L'azione al cambio di stato non è valida."
+            "invalid_action": "L'azione da chiamare quando cambia lo stato dell'allarme non è valida."
         },
         "abort": {
             "already_configured": "Auto Arm è già configurato"
@@ -391,13 +391,13 @@
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                             "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
                             "rate_limit_period": "Limite di frequenza - periodo",
-                            "state_change_action": "Azione al cambio di stato"
+                            "state_change_action": "Chiama un'azione quando cambia lo stato dell'allarme"
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sopra.",
                             "rate_limit_max_calls": "Il numero massimo di cambi di stato dell'allarme che Auto Arm effettua nel periodo del limite di frequenza, come protezione dai cicli. Le ulteriori modifiche in quel periodo vengono saltate.",
                             "rate_limit_period": "Durata del periodo, in secondi, in cui vengono contate le modifiche massime.",
-                            "state_change_action": "Azioni da eseguire a ogni cambio di stato dell'allarme, ad esempio per aggiornare un'etichetta e-ink o uno smart display. I modelli possono usare to_state, from_state, friendly_state e alarm_panel."
+                            "state_change_action": "Chiama qualsiasi azione di Home Assistant quando cambia lo stato, ad esempio per mostrare lo stato attuale dell'allarme su uno schermo, con variabili di modello Auto Arm facoltative: to_state, from_state, friendly_state, alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -415,7 +415,7 @@
         },
         "error": {
             "invalid_pattern": "Una regola di corrispondenza del calendario ha un modello che non è un'espressione regolare valida.",
-            "invalid_action": "L'azione al cambio di stato non è valida."
+            "invalid_action": "L'azione da chiamare quando cambia lo stato dell'allarme non è valida."
         }
     },
     "selector": {

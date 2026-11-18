@@ -193,13 +193,13 @@
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                             "rate_limit_max_calls": "Ratenbegrenzung - maximale Änderungen",
                             "rate_limit_period": "Ratenbegrenzung - Zeitraum",
-                            "state_change_action": "Aktion bei Zustandsänderung"
+                            "state_change_action": "Aktion bei Änderung des Alarmzustands aufrufen"
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn oben fest.",
                             "rate_limit_max_calls": "Die Höchstzahl an Änderungen des Alarmstatus, die Auto Arm innerhalb des Zeitraums der Ratenbegrenzung vornimmt, als Schutz vor Schleifen. Weitere Änderungen in diesem Zeitraum werden übersprungen.",
                             "rate_limit_period": "Länge des Zeitraums in Sekunden, über den die maximalen Änderungen gezählt werden.",
-                            "state_change_action": "Aktionen, die bei jeder Änderung des Alarmzustands ausgeführt werden, etwa um ein E-Ink-Etikett oder ein Smart Display zu aktualisieren. Vorlagen können to_state, from_state, friendly_state und alarm_panel verwenden."
+                            "state_change_action": "Ruft eine beliebige Home-Assistant-Aktion auf, wenn sich der Zustand ändert, etwa um den aktuellen Alarmzustand auf einem Bildschirm anzuzeigen, optional mit Auto-Arm-Vorlagenvariablen: to_state, from_state, friendly_state, alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -217,7 +217,7 @@
         },
         "error": {
             "invalid_pattern": "Eine Kalender-Zuordnungsregel enthält ein Muster, das kein gültiger regulärer Ausdruck ist.",
-            "invalid_action": "Die Aktion bei Zustandsänderung ist ungültig."
+            "invalid_action": "Die Aktion bei Änderung des Alarmzustands ist ungültig."
         },
         "abort": {
             "already_configured": "Auto Arm ist bereits konfiguriert"
@@ -391,13 +391,13 @@
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                             "rate_limit_max_calls": "Ratenbegrenzung - maximale Änderungen",
                             "rate_limit_period": "Ratenbegrenzung - Zeitraum",
-                            "state_change_action": "Aktion bei Zustandsänderung"
+                            "state_change_action": "Aktion bei Änderung des Alarmzustands aufrufen"
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn oben fest.",
                             "rate_limit_max_calls": "Die Höchstzahl an Änderungen des Alarmstatus, die Auto Arm innerhalb des Zeitraums der Ratenbegrenzung vornimmt, als Schutz vor Schleifen. Weitere Änderungen in diesem Zeitraum werden übersprungen.",
                             "rate_limit_period": "Länge des Zeitraums in Sekunden, über den die maximalen Änderungen gezählt werden.",
-                            "state_change_action": "Aktionen, die bei jeder Änderung des Alarmzustands ausgeführt werden, etwa um ein E-Ink-Etikett oder ein Smart Display zu aktualisieren. Vorlagen können to_state, from_state, friendly_state und alarm_panel verwenden."
+                            "state_change_action": "Ruft eine beliebige Home-Assistant-Aktion auf, wenn sich der Zustand ändert, etwa um den aktuellen Alarmzustand auf einem Bildschirm anzuzeigen, optional mit Auto-Arm-Vorlagenvariablen: to_state, from_state, friendly_state, alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -415,7 +415,7 @@
         },
         "error": {
             "invalid_pattern": "Eine Kalender-Zuordnungsregel enthält ein Muster, das kein gültiger regulärer Ausdruck ist.",
-            "invalid_action": "Die Aktion bei Zustandsänderung ist ungültig."
+            "invalid_action": "Die Aktion bei Änderung des Alarmzustands ist ungültig."
         }
     },
     "selector": {

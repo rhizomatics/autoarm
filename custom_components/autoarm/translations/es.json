@@ -193,13 +193,13 @@
                             "use_alarm_service": "Cambiar el estado con las acciones del panel de alarma",
                             "rate_limit_max_calls": "Límite de frecuencia - cambios máximos",
                             "rate_limit_period": "Límite de frecuencia - periodo",
-                            "state_change_action": "Acción al cambiar de estado"
+                            "state_change_action": "Llamar a una acción cuando cambie el estado de la alarma"
                         },
                         "data_description": {
                             "use_alarm_service": "Llama a las acciones alarm_control_panel de armado y desarmado en lugar de establecer el estado directamente. Necesario para paneles como Alarmo que hacen su propio procesamiento, como armar áreas hijas. Si el panel requiere un código, configúralo más arriba.",
                             "rate_limit_max_calls": "El máximo de cambios de estado de la alarma que Auto Arm hará dentro del periodo del límite de frecuencia, como protección contra bucles. Los demás cambios en ese periodo se omiten.",
                             "rate_limit_period": "Duración del periodo, en segundos, durante el cual se cuentan los cambios máximos.",
-                            "state_change_action": "Acciones que se ejecutan cada vez que cambia el estado de la alarma, como actualizar una etiqueta de tinta electrónica o una pantalla inteligente. Las plantillas pueden usar to_state, from_state, friendly_state y alarm_panel."
+                            "state_change_action": "Llama a cualquier acción de Home Assistant cuando cambia el estado, por ejemplo para mostrar el estado actual de la alarma en una pantalla, con variables de plantilla opcionales de Auto Arm: to_state, from_state, friendly_state, alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -217,7 +217,7 @@
         },
         "error": {
             "invalid_pattern": "Una regla de coincidencia de calendario tiene un patrón que no es una expresión regular válida.",
-            "invalid_action": "La acción al cambiar de estado no es válida."
+            "invalid_action": "La acción a llamar cuando cambia el estado de la alarma no es válida."
         },
         "abort": {
             "already_configured": "Auto Arm ya está configurado"
@@ -391,13 +391,13 @@
                             "use_alarm_service": "Cambiar el estado con las acciones del panel de alarma",
                             "rate_limit_max_calls": "Límite de frecuencia - cambios máximos",
                             "rate_limit_period": "Límite de frecuencia - periodo",
-                            "state_change_action": "Acción al cambiar de estado"
+                            "state_change_action": "Llamar a una acción cuando cambie el estado de la alarma"
                         },
                         "data_description": {
                             "use_alarm_service": "Llama a las acciones alarm_control_panel de armado y desarmado en lugar de establecer el estado directamente. Necesario para paneles como Alarmo que hacen su propio procesamiento, como armar áreas hijas. Si el panel requiere un código, configúralo más arriba.",
                             "rate_limit_max_calls": "El máximo de cambios de estado de la alarma que Auto Arm hará dentro del periodo del límite de frecuencia, como protección contra bucles. Los demás cambios en ese periodo se omiten.",
                             "rate_limit_period": "Duración del periodo, en segundos, durante el cual se cuentan los cambios máximos.",
-                            "state_change_action": "Acciones que se ejecutan cada vez que cambia el estado de la alarma, como actualizar una etiqueta de tinta electrónica o una pantalla inteligente. Las plantillas pueden usar to_state, from_state, friendly_state y alarm_panel."
+                            "state_change_action": "Llama a cualquier acción de Home Assistant cuando cambia el estado, por ejemplo para mostrar el estado actual de la alarma en una pantalla, con variables de plantilla opcionales de Auto Arm: to_state, from_state, friendly_state, alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -415,7 +415,7 @@
         },
         "error": {
             "invalid_pattern": "Una regla de coincidencia de calendario tiene un patrón que no es una expresión regular válida.",
-            "invalid_action": "La acción al cambiar de estado no es válida."
+            "invalid_action": "La acción a llamar cuando cambia el estado de la alarma no es válida."
         }
     },
     "selector": {
