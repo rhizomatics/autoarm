@@ -8,34 +8,17 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  release:
-    # edited too, so the zip is rebuilt when a release is moved to a new tag
-    types: [published, edited]
+  # releases are published, with their zip, by release.yml, as they're immutable once published
+
+# Nothing by default; each job grants only what it needs (OpenSSF Scorecard Token-Permissions).
+permissions: {}
 
 jobs:
-  release-zip:
-    # separate from build so Marketplace can download the zip as soon as possible
-    if: github.event_name == 'release'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/checkout@v7.0.1
-    - name: Package release zip
-      run: |
-        cd custom_components/autoarm
-        zip -r "${{ github.workspace }}/autoarm.zip" . -x "__pycache__/*" "*/__pycache__/*"
-    - name: Upload release zip asset
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: gh release upload "${{ github.event.release.tag_name }}" autoarm.zip --clobber
-
   build:
-    # an edited release only needs its zip rebuilt
-    if: github.event.action != 'edited'
     runs-on: ubuntu-latest
+    # read-only: this job runs PR code, so nothing here can write - see the publish job
     permissions:
-      contents: write
+      contents: read
       pull-requests: read
 
     strategy:
@@ -69,6 +52,55 @@ jobs:
     - name: Test with pytest
       run: |
         uv run pytest . --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=custom_components.autoarm --cov-report=xml --cov-report=html
+    - name: Upload pytest test results
+      uses: actions/upload-artifact@v7
+      with:
+        name: pytest-results-${{ matrix.python-version }}
+        path: |
+          junit/test-results-${{ matrix.python-version }}.xml
+          coverage.xml
+        # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
+    - name: Verify docs build
+      # PRs only verify the docs build, the publish job deploys them for everything else
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
+        uv sync --group docs
+        uv run properdocs build
+
+  publish:
+    # badges and docs, never for a PR, so the only job with a writable token runs no PR code
+    needs: build
+    if: ${{ always() && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages-publish
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.14"]
+
+    steps:
+    - uses: actions/checkout@v7.0.1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v7
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Install uv
+      uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2
+    - name: Install dependencies
+      run: |
+        sudo apt-get install pngquant
+        # the docs build needs the integration's own dependencies too, as schemagen imports homeassistant
+        uv sync --group docs
+    - name: Download pytest test results
+      uses: actions/download-artifact@v8
+      with:
+        name: pytest-results-${{ matrix.python-version }}
     - name: Generate badges
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -90,17 +122,9 @@ jobs:
           echo "No changes to badges"
         fi
 
-    - name: Upload pytest test results
-      uses: actions/upload-artifact@v7
-      with:
-        name: pytest-results-${{ matrix.python-version }}
-        path: junit/test-results-${{ matrix.python-version }}.xml
-        # Use always() to always run this step to publish test results when there are test failures
-      if: ${{ always() }}
     - name: Deploy docs
-      # run in the build workflow since schemagen has homeassistant dependency
-      run: |
-        uv sync --group docs
-        uv run properdocs gh-deploy --force --config-file properdocs.yml
+      # only once the tests have passed, unlike the badges, which also show a failure
+      if: ${{ needs.build.result == 'success' }}
+      run: uv run properdocs gh-deploy --force --config-file properdocs.yml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
