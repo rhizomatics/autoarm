@@ -8,6 +8,7 @@ try:
     from pytest_homeassistant.common import (  # type: ignore[import-not-found,unused-ignore]
         AsyncMock,
         MockConfigEntry,
+        MockUser,
         async_fire_time_changed,
     )
     from pytest_homeassistant.components.recorder.common import (  # type: ignore[import-not-found,unused-ignore]
@@ -20,6 +21,7 @@ except ImportError:
     from pytest_homeassistant_custom_component.common import (  # type: ignore[import-untyped,unused-ignore]  # ty: ignore
         AsyncMock,
         MockConfigEntry,
+        MockUser,
         async_fire_time_changed,
     )
     from pytest_homeassistant_custom_component.components.recorder.common import (  # type: ignore[import-untyped,unused-ignore]  # ty: ignore
@@ -32,6 +34,7 @@ except ImportError:
 __all__ = [
     "AsyncMock",
     "MockConfigEntry",
+    "MockUser",
     "WebSocketGenerator",
     "async_fire_time_changed",
     "async_wait_recording_done",

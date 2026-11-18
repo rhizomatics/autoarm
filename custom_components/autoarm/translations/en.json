@@ -113,14 +113,18 @@
                             "calendar_disarmed_end_mode": "When a calendar disarming override ends",
                             "calendar_match_rules": "Match rules",
                             "calendar_poll_interval": "Poll interval",
-                            "calendar_notify_grace": "Notification grace period"
+                            "calendar_notify_grace": "Notification grace period",
+                            "calendar_confirm_changes": "Confirm calendar changes",
+                            "calendar_arm_only": "Arm-only calendars"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
                             "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out.",
                             "calendar_match_rules": "Each rule sets an alarm state for the events of one calendar whose summary or description matches any of its patterns, which are regular expressions. Rules for a calendar replace the defaults for that calendar.",
                             "calendar_poll_interval": "Minutes between checks of each calendar for events.",
-                            "calendar_notify_grace": "Seconds to wait before notifying of a calendar change, so that changes landing close together, such as one event ending as another starts, are sent as one notification."
+                            "calendar_notify_grace": "Seconds to wait before notifying of a calendar change, so that changes landing close together, such as one event ending as another starts, are sent as one notification.",
+                            "calendar_confirm_changes": "Notify when an event is added, edited or deleted so that it starts or stops setting the alarm.",
+                            "calendar_arm_only": "Calendars whose events can only set Armed Away or Armed Vacation, never disarm or lower the protection. Use for calendars that others can add events to, such as by sending an invitation."
                         }
                     },
                     "sun_options": {
@@ -188,12 +192,14 @@
                         "data": {
                             "use_alarm_service": "Change state using the alarm panel's actions",
                             "rate_limit_max_calls": "Rate limit - maximum changes",
-                            "rate_limit_period": "Rate limit - period"
+                            "rate_limit_period": "Rate limit - period",
+                            "state_change_action": "State change action"
                         },
                         "data_description": {
                             "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. If the panel requires a code, set it above.",
                             "rate_limit_max_calls": "The most changes of alarm state Auto Arm will make within the rate limit period, as a guard against loops. Any more in that period are skipped.",
-                            "rate_limit_period": "Length of the period, in seconds, over which the maximum changes are counted."
+                            "rate_limit_period": "Length of the period, in seconds, over which the maximum changes are counted.",
+                            "state_change_action": "Actions to run whenever the alarm state changes, such as updating an e-ink label or a smart display. Templates can use to_state, from_state, friendly_state and alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -210,7 +216,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "A calendar match rule has a pattern that isn't a valid regular expression."
+            "invalid_pattern": "A calendar match rule has a pattern that isn't a valid regular expression.",
+            "invalid_action": "The state change action isn't valid."
         },
         "abort": {
             "already_configured": "Service is already configured"
@@ -304,14 +311,18 @@
                             "calendar_disarmed_end_mode": "When a calendar disarming override ends",
                             "calendar_match_rules": "Match rules",
                             "calendar_poll_interval": "Poll interval",
-                            "calendar_notify_grace": "Notification grace period"
+                            "calendar_notify_grace": "Notification grace period",
+                            "calendar_confirm_changes": "Confirm calendar changes",
+                            "calendar_arm_only": "Arm-only calendars"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy disarms, or arms away if everyone is out.",
                             "calendar_disarmed_end_mode": "Auto goes by occupancy and sun, or by occupancy alone on days the sunrise and sunset triggers are off. By occupancy and sun works the state out from who's home and whether it's day or night. By occupancy arms home, or away if everyone is out.",
                             "calendar_match_rules": "Each rule sets an alarm state for the events of one calendar whose summary or description matches any of its patterns, which are regular expressions. Rules for a calendar replace the defaults for that calendar.",
                             "calendar_poll_interval": "Minutes between checks of each calendar for events.",
-                            "calendar_notify_grace": "Seconds to wait before notifying of a calendar change, so that changes landing close together, such as one event ending as another starts, are sent as one notification."
+                            "calendar_notify_grace": "Seconds to wait before notifying of a calendar change, so that changes landing close together, such as one event ending as another starts, are sent as one notification.",
+                            "calendar_confirm_changes": "Notify when an event is added, edited or deleted so that it starts or stops setting the alarm.",
+                            "calendar_arm_only": "Calendars whose events can only set Armed Away or Armed Vacation, never disarm or lower the protection. Use for calendars that others can add events to, such as by sending an invitation."
                         }
                     },
                     "sun_options": {
@@ -379,12 +390,14 @@
                         "data": {
                             "use_alarm_service": "Change state using the alarm panel's actions",
                             "rate_limit_max_calls": "Rate limit - maximum changes",
-                            "rate_limit_period": "Rate limit - period"
+                            "rate_limit_period": "Rate limit - period",
+                            "state_change_action": "State change action"
                         },
                         "data_description": {
                             "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. If the panel requires a code, set it above.",
                             "rate_limit_max_calls": "The most changes of alarm state Auto Arm will make within the rate limit period, as a guard against loops. Any more in that period are skipped.",
-                            "rate_limit_period": "Length of the period, in seconds, over which the maximum changes are counted."
+                            "rate_limit_period": "Length of the period, in seconds, over which the maximum changes are counted.",
+                            "state_change_action": "Actions to run whenever the alarm state changes, such as updating an e-ink label or a smart display. Templates can use to_state, from_state, friendly_state and alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -401,7 +414,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "A calendar match rule has a pattern that isn't a valid regular expression."
+            "invalid_pattern": "A calendar match rule has a pattern that isn't a valid regular expression.",
+            "invalid_action": "The state change action isn't valid."
         }
     },
     "selector": {

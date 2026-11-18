@@ -53,6 +53,54 @@ out to no change at all, nothing is sent.
 
 This only debounces the *notification*; the alarm panel's actual state still updates immediately as each calendar-driven change happens.
 
+### State Change Action
+
+**State change action**, in the **Advanced - Other** section of the options, runs any Home Assistant
+actions whenever the alarm panel changes state, whatever changed it. It uses the same action editor as
+automations, so each action's fields are there to fill in. Use it to show the alarm state somewhere, such as an
+e-ink shelf label or a smart display.
+
+These variables can be used in templates:
+
+| Variable         | Example                              |
+|------------------|--------------------------------------|
+| `to_state`       | `armed_vacation`                     |
+| `from_state`     | `disarmed`                           |
+| `friendly_state` | `Armed Vacation`                     |
+| `alarm_panel`    | `alarm_control_panel.home_alarm`     |
+
+For example, to show the state on a [Gicisky](https://github.com/eigger/hass-gicisky) e-ink shelf label
+by the front door, choose **Gicisky: Write** in the action editor, or switch it to YAML and paste:
+
+```yaml
+- action: gicisky.write
+  target:
+    device_id: <your device>
+  data:
+    payload:
+      - type: text
+        value: Alarm
+        x: 10
+        y: 10
+        size: 24
+      - type: text
+        value: "{{ friendly_state }}"
+        x: 10
+        y: 44
+        size: 40
+```
+
+E-ink labels are slow to refresh, so to skip the transitional states, put a condition before it:
+
+```yaml
+- condition: template
+  value_template: "{{ to_state not in ['arming', 'pending'] }}"
+```
+
+It runs on every change, including transitional states like `arming`, `pending` and `triggered`, so add a
+condition if only some states should be shown. It doesn't run when the panel goes unavailable, or only an
+attribute changes. Changes are handled one at a time, in order, so a slow display can't show them out of turn.
+
 ## Automated Transitions
 
 !!! note "YAML-only"

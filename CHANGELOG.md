@@ -1,3 +1,26 @@
+# 2.2.0
+
+## ✨ Enhancements
+- **Calendar change confirmations**
+  - A notification is sent when a calendar event is added, edited or deleted so that it starts or stops setting the alarm, however far ahead it is
+  - On by default, switched off with **Confirm calendar changes** in the **Advanced - Calendar** section of the options
+  - See [Confirming Calendar Changes](https://autoarm.rhizomatics.org.uk/configuration/create_calendar/#confirming-calendar-changes)
+- **State change action**
+  - Run any Home Assistant actions when the alarm state changes, for example to show it on a Gicisky e-ink label or a smart display
+  - Set in the **Advanced - Other** section of the options, with the same action editor as automations
+  - See [State Change Action](https://autoarm.rhizomatics.org.uk/configuration/advanced_config/#state-change-action)
+- **Calendar state names in any case**
+  - An alarm state's own name in an event now matches in any case, so `armed_vacation` works as well as `ARMED_VACATION`
+  - Only whole state names that can be set match, so `Pending` or `Farming` no longer set a transient state
+
+## 🔒 Security
+- **Arm-only calendars**, in the **Advanced - Calendar** options, can only set `armed_away` or `armed_vacation`, so an event someone else adds, such as by sending an invitation to a Google Calendar, can't disarm the alarm
+- The `enquire_configuration` action can now only be called by an administrator, since the configuration it returns includes notification targets such as phone numbers and email addresses
+- Notification targets and data are now redacted from the diagnostics bundle, along with the new state change action
+
+## 🐛 Fixes
+- A calendar event edited to a different alarm state now sets the new state, straight away if the event is underway, where before it kept the state it started with
+
 # 2.1.0
 
 ## ✨ Enhancements

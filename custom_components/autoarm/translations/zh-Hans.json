@@ -113,14 +113,18 @@
                             "calendar_disarmed_end_mode": "日历撤防覆盖结束时",
                             "calendar_match_rules": "匹配规则",
                             "calendar_poll_interval": "轮询间隔",
-                            "calendar_notify_grace": "通知宽限期"
+                            "calendar_notify_grace": "通知宽限期",
+                            "calendar_confirm_changes": "确认日历变更",
+                            "calendar_arm_only": "仅布防日历"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
                             "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。",
                             "calendar_match_rules": "每条规则为某个日历中标题或描述与其任一模式（正则表达式）匹配的事件设置一种警报状态。某个日历的规则会替换该日历的默认规则。",
                             "calendar_poll_interval": "每次检查各日历事件之间的分钟数。",
-                            "calendar_notify_grace": "通知日历变更前等待的秒数，以便将相隔很近的变更（例如一个事件结束时另一个事件开始）合并为一条通知发送。"
+                            "calendar_notify_grace": "通知日历变更前等待的秒数，以便将相隔很近的变更（例如一个事件结束时另一个事件开始）合并为一条通知发送。",
+                            "calendar_confirm_changes": "当事件被添加、编辑或删除，从而开始或不再设置警报时发送通知。",
+                            "calendar_arm_only": "这些日历中的事件只能设置为离家布防或度假布防，永远不会撤防或降低防护。用于他人可以添加事件的日历，例如通过发送邀请。"
                         }
                     },
                     "sun_options": {
@@ -188,12 +192,14 @@
                         "data": {
                             "use_alarm_service": "使用报警面板的操作更改状态",
                             "rate_limit_max_calls": "速率限制 - 最大更改次数",
-                            "rate_limit_period": "速率限制 - 周期"
+                            "rate_limit_period": "速率限制 - 周期",
+                            "state_change_action": "状态变化时的动作"
                         },
                         "data_description": {
                             "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在上方设置。",
                             "rate_limit_max_calls": "为防止循环，Auto Arm 在速率限制周期内最多更改报警状态的次数。该周期内超出的更改将被跳过。",
-                            "rate_limit_period": "统计最大更改次数的周期长度（秒）。"
+                            "rate_limit_period": "统计最大更改次数的周期长度（秒）。",
+                            "state_change_action": "每当警报状态变化时运行的动作，例如更新电子墨水标签或智能显示屏。模板可以使用 to_state、from_state、friendly_state 和 alarm_panel。"
                         }
                     },
                     "time_of_day_options": {
@@ -210,7 +216,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "某条日历匹配规则中的模式不是有效的正则表达式。"
+            "invalid_pattern": "某条日历匹配规则中的模式不是有效的正则表达式。",
+            "invalid_action": "状态变化时的动作无效。"
         },
         "abort": {
             "already_configured": "Auto Arm 已配置"
@@ -304,14 +311,18 @@
                             "calendar_disarmed_end_mode": "日历撤防覆盖结束时",
                             "calendar_match_rules": "匹配规则",
                             "calendar_poll_interval": "轮询间隔",
-                            "calendar_notify_grace": "通知宽限期"
+                            "calendar_notify_grace": "通知宽限期",
+                            "calendar_confirm_changes": "确认日历变更",
+                            "calendar_arm_only": "仅布防日历"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况撤防，如果无人在家则离家布防。",
                             "calendar_disarmed_end_mode": "自动按在家情况和日出日落决定，在日出和日落触发器关闭的日子只按在家情况。按在家情况和日出日落根据谁在家以及白天还是夜晚计算状态。按在家情况在家布防，如果无人在家则离家布防。",
                             "calendar_match_rules": "每条规则为某个日历中标题或描述与其任一模式（正则表达式）匹配的事件设置一种警报状态。某个日历的规则会替换该日历的默认规则。",
                             "calendar_poll_interval": "每次检查各日历事件之间的分钟数。",
-                            "calendar_notify_grace": "通知日历变更前等待的秒数，以便将相隔很近的变更（例如一个事件结束时另一个事件开始）合并为一条通知发送。"
+                            "calendar_notify_grace": "通知日历变更前等待的秒数，以便将相隔很近的变更（例如一个事件结束时另一个事件开始）合并为一条通知发送。",
+                            "calendar_confirm_changes": "当事件被添加、编辑或删除，从而开始或不再设置警报时发送通知。",
+                            "calendar_arm_only": "这些日历中的事件只能设置为离家布防或度假布防，永远不会撤防或降低防护。用于他人可以添加事件的日历，例如通过发送邀请。"
                         }
                     },
                     "sun_options": {
@@ -379,12 +390,14 @@
                         "data": {
                             "use_alarm_service": "使用报警面板的操作更改状态",
                             "rate_limit_max_calls": "速率限制 - 最大更改次数",
-                            "rate_limit_period": "速率限制 - 周期"
+                            "rate_limit_period": "速率限制 - 周期",
+                            "state_change_action": "状态变化时的动作"
                         },
                         "data_description": {
                             "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在上方设置。",
                             "rate_limit_max_calls": "为防止循环，Auto Arm 在速率限制周期内最多更改报警状态的次数。该周期内超出的更改将被跳过。",
-                            "rate_limit_period": "统计最大更改次数的周期长度（秒）。"
+                            "rate_limit_period": "统计最大更改次数的周期长度（秒）。",
+                            "state_change_action": "每当警报状态变化时运行的动作，例如更新电子墨水标签或智能显示屏。模板可以使用 to_state、from_state、friendly_state 和 alarm_panel。"
                         }
                     },
                     "time_of_day_options": {
@@ -401,7 +414,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "某条日历匹配规则中的模式不是有效的正则表达式。"
+            "invalid_pattern": "某条日历匹配规则中的模式不是有效的正则表达式。",
+            "invalid_action": "状态变化时的动作无效。"
         }
     },
     "selector": {

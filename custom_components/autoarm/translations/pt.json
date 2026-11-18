@@ -113,14 +113,18 @@
                             "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário",
                             "calendar_match_rules": "Regras de correspondência",
                             "calendar_poll_interval": "Intervalo de consulta",
-                            "calendar_notify_grace": "Período de tolerância das notificações"
+                            "calendar_notify_grace": "Período de tolerância das notificações",
+                            "calendar_confirm_changes": "Confirmar alterações do calendário",
+                            "calendar_arm_only": "Calendários só para armar"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
                             "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém.",
                             "calendar_match_rules": "Cada regra define um estado de alarme para os eventos de um calendário cujo título ou descrição corresponda a algum dos seus padrões, que são expressões regulares. As regras de um calendário substituem as predefinidas para esse calendário.",
                             "calendar_poll_interval": "Minutos entre verificações de eventos em cada calendário.",
-                            "calendar_notify_grace": "Segundos de espera antes de notificar uma alteração de calendário, para que alterações muito próximas, como um evento que termina quando outro começa, sejam enviadas como uma só notificação."
+                            "calendar_notify_grace": "Segundos de espera antes de notificar uma alteração de calendário, para que alterações muito próximas, como um evento que termina quando outro começa, sejam enviadas como uma só notificação.",
+                            "calendar_confirm_changes": "Notificar quando um evento é adicionado, editado ou eliminado de forma a começar ou deixar de definir o alarme.",
+                            "calendar_arm_only": "Calendários cujos eventos só podem definir Armado ausente ou Armado férias, nunca desarmar nem reduzir a proteção. Para calendários onde outros podem adicionar eventos, por exemplo enviando um convite."
                         }
                     },
                     "sun_options": {
@@ -188,12 +192,14 @@
                         "data": {
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
                             "rate_limit_max_calls": "Limite de frequência - alterações máximas",
-                            "rate_limit_period": "Limite de frequência - período"
+                            "rate_limit_period": "Limite de frequência - período",
+                            "state_change_action": "Ação ao mudar de estado"
                         },
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o acima.",
                             "rate_limit_max_calls": "O máximo de alterações do estado do alarme que o Auto Arm fará dentro do período do limite de frequência, como proteção contra ciclos. As restantes alterações nesse período são ignoradas.",
-                            "rate_limit_period": "Duração do período, em segundos, durante o qual são contadas as alterações máximas."
+                            "rate_limit_period": "Duração do período, em segundos, durante o qual são contadas as alterações máximas.",
+                            "state_change_action": "Ações executadas sempre que o estado do alarme muda, como atualizar uma etiqueta de tinta eletrónica ou um ecrã inteligente. Os modelos podem usar to_state, from_state, friendly_state e alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -210,7 +216,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "Uma regra de correspondência de calendário tem um padrão que não é uma expressão regular válida."
+            "invalid_pattern": "Uma regra de correspondência de calendário tem um padrão que não é uma expressão regular válida.",
+            "invalid_action": "A ação ao mudar de estado não é válida."
         },
         "abort": {
             "already_configured": "Auto Arm já está configurado"
@@ -304,14 +311,18 @@
                             "calendar_disarmed_end_mode": "Quando termina um desarmar por calendário",
                             "calendar_match_rules": "Regras de correspondência",
                             "calendar_poll_interval": "Intervalo de consulta",
-                            "calendar_notify_grace": "Período de tolerância das notificações"
+                            "calendar_notify_grace": "Período de tolerância das notificações",
+                            "calendar_confirm_changes": "Confirmar alterações do calendário",
+                            "calendar_arm_only": "Calendários só para armar"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação desarma, ou arma ausente se não estiver ninguém.",
                             "calendar_disarmed_end_mode": "Automático segue a ocupação e o sol, ou só a ocupação nos dias em que os acionadores de nascer e pôr do sol estão desligados. Por ocupação e sol calcula o estado a partir de quem está em casa e se é dia ou noite. Por ocupação arma em casa, ou ausente se não estiver ninguém.",
                             "calendar_match_rules": "Cada regra define um estado de alarme para os eventos de um calendário cujo título ou descrição corresponda a algum dos seus padrões, que são expressões regulares. As regras de um calendário substituem as predefinidas para esse calendário.",
                             "calendar_poll_interval": "Minutos entre verificações de eventos em cada calendário.",
-                            "calendar_notify_grace": "Segundos de espera antes de notificar uma alteração de calendário, para que alterações muito próximas, como um evento que termina quando outro começa, sejam enviadas como uma só notificação."
+                            "calendar_notify_grace": "Segundos de espera antes de notificar uma alteração de calendário, para que alterações muito próximas, como um evento que termina quando outro começa, sejam enviadas como uma só notificação.",
+                            "calendar_confirm_changes": "Notificar quando um evento é adicionado, editado ou eliminado de forma a começar ou deixar de definir o alarme.",
+                            "calendar_arm_only": "Calendários cujos eventos só podem definir Armado ausente ou Armado férias, nunca desarmar nem reduzir a proteção. Para calendários onde outros podem adicionar eventos, por exemplo enviando um convite."
                         }
                     },
                     "sun_options": {
@@ -379,12 +390,14 @@
                         "data": {
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
                             "rate_limit_max_calls": "Limite de frequência - alterações máximas",
-                            "rate_limit_period": "Limite de frequência - período"
+                            "rate_limit_period": "Limite de frequência - período",
+                            "state_change_action": "Ação ao mudar de estado"
                         },
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o acima.",
                             "rate_limit_max_calls": "O máximo de alterações do estado do alarme que o Auto Arm fará dentro do período do limite de frequência, como proteção contra ciclos. As restantes alterações nesse período são ignoradas.",
-                            "rate_limit_period": "Duração do período, em segundos, durante o qual são contadas as alterações máximas."
+                            "rate_limit_period": "Duração do período, em segundos, durante o qual são contadas as alterações máximas.",
+                            "state_change_action": "Ações executadas sempre que o estado do alarme muda, como atualizar uma etiqueta de tinta eletrónica ou um ecrã inteligente. Os modelos podem usar to_state, from_state, friendly_state e alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -401,7 +414,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "Uma regra de correspondência de calendário tem um padrão que não é uma expressão regular válida."
+            "invalid_pattern": "Uma regra de correspondência de calendário tem um padrão que não é uma expressão regular válida.",
+            "invalid_action": "A ação ao mudar de estado não é válida."
         }
     },
     "selector": {

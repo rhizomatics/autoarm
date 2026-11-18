@@ -9,7 +9,9 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResu
 from homeassistant.const import CONF_ENABLED, CONF_ENTITY_ID, CONF_SERVICE
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import section
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.selector import (
+    ActionSelector,
     BooleanSelector,
     EntitySelector,
     EntitySelectorConfig,
@@ -64,6 +66,7 @@ from .const import (
 )
 from .crypto import async_encrypt
 from .frigate import frigate_profile_selects, frigate_profiles, match_profile
+from .state_action import async_validate_state_actions
 from .supernotify_api import deliveries, supernotify_available
 
 CONF_CALENDAR_ENTITIES = "calendar_entities"
@@ -84,6 +87,9 @@ CONF_CALENDAR_POLL_MINUTES = "calendar_poll_interval"
 DEFAULT_CALENDAR_POLL_MINUTES = 15
 # seconds to hold a notification of a calendar change, so that changes close together are told as one
 CONF_CALENDAR_NOTIFY_GRACE_SECONDS = "calendar_notify_grace"
+CONF_CALENDAR_CONFIRM_CHANGES = "calendar_confirm_changes"
+CONF_CALENDAR_ARM_ONLY_ENTITIES = "calendar_arm_only"
+CONF_STATE_ACTION = "state_change_action"
 CONF_CALENDAR_OCCUPANCY_OVERRIDE_STATES = "calendar_occupancy_override_states"
 CONF_CALENDAR_OCCUPANCY_ENDS_AWAY = "calendar_occupancy_ends_away"
 CONF_NOTIFY_ACTION = "notify_action"
@@ -391,6 +397,14 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
                     CONF_CALENDAR_NOTIFY_GRACE_SECONDS,
                     default=options.get(CONF_CALENDAR_NOTIFY_GRACE_SECONDS, int(DEFAULT_CALENDAR_NOTIFY_GRACE.total_seconds())),
                 ): _seconds_selector(),
+                vol.Optional(
+                    CONF_CALENDAR_CONFIRM_CHANGES,
+                    default=options.get(CONF_CALENDAR_CONFIRM_CHANGES, True),
+                ): BooleanSelector(),
+                vol.Optional(
+                    CONF_CALENDAR_ARM_ONLY_ENTITIES,
+                    default=options.get(CONF_CALENDAR_ARM_ONLY_ENTITIES, []),
+                ): EntitySelector(EntitySelectorConfig(domain="calendar", multiple=True)),
             }),
             {"collapsed": True},
         ),
@@ -481,6 +495,7 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
                     CONF_RATE_LIMIT_SECONDS,
                     default=options.get(CONF_RATE_LIMIT_SECONDS, DEFAULT_RATE_LIMIT_SECONDS),
                 ): _seconds_selector(minimum=1),
+                vol.Optional(CONF_STATE_ACTION, default=options.get(CONF_STATE_ACTION, [])): ActionSelector(),
             }),
             {"collapsed": True},
         ),
@@ -572,6 +587,16 @@ def _pattern_errors(data: Mapping[str, Any]) -> dict[str, str]:
     return {}
 
 
+async def _action_errors(hass: HomeAssistant, data: Mapping[str, Any]) -> dict[str, str]:
+    """Errors for the form if the state change action can't be run"""
+    if data.get(CONF_STATE_ACTION):
+        try:
+            await async_validate_state_actions(hass, data[CONF_STATE_ACTION])
+        except vol.Invalid, HomeAssistantError:
+            return {"base": "invalid_action"}
+    return {}
+
+
 async def _protect_panel_code(hass: HomeAssistant, data: dict[str, Any], stored: str | None = None) -> None:
     """Swap a code typed in for its encrypted form, keeping the one already stored if none was typed"""
     code: str | None = data.pop(CONF_PANEL_CODE, None)
@@ -638,7 +663,7 @@ class AutoArmConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             data = _flatten_sections(user_input)
             _settle_frigate_profiles(self.hass, data)
-            errors = _pattern_errors(data)
+            errors = _pattern_errors(data) or await _action_errors(self.hass, data)
             if not errors:
                 await _protect_panel_code(self.hass, data)
                 alarm_panel = data.pop(CONF_ALARM_PANEL)
@@ -735,7 +760,7 @@ class AutoArmOptionsFlow(OptionsFlow):
         if user_input is not None:
             data = _flatten_sections(user_input)
             _settle_frigate_profiles(self.hass, data)
-            errors = _pattern_errors(data)
+            errors = _pattern_errors(data) or await _action_errors(self.hass, data)
             if not errors:
                 await _protect_panel_code(self.hass, data, self.config_entry.options.get(CONF_PANEL_CODE))
 

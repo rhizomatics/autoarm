@@ -37,6 +37,28 @@ In this example `Alarm Control` is the name of the calendar:
 
 Once a calendar has a rule of its own, the default names no longer apply to that calendar.
 
+Whatever the rules, an event with an alarm state's own name in its summary or description, in any case, sets that state, for example `armed_vacation`, `ARMED_VACATION` or `Boat trip armed_away`.
+
+### Arm-only Calendars
+
+Anyone who can add an event to a calendar can change the alarm with it. For a shared calendar, or one such as
+Google Calendar that adds the invitations people send you, choose it under **Arm-only calendars** in the
+**Advanced - Calendar** section of the options. Its events can then only set `armed_away` or `armed_vacation`, and
+an event for any other state, such as `disarmed`, is ignored, so an invitation can never disarm the alarm or lower its protection.
+
+A calendar only you can change, like the [Local Calendar](#add-a-local-calendar) made here, doesn't need it.
+
+### Confirming Calendar Changes
+
+When an event is added, edited or deleted so that it starts or stops setting the alarm, Auto Arm sends a
+notification, such as *Birthday on Boat armed_vacation (Tue 17 Nov 14:00) will set the alarm to Armed Vacation*.
+This covers any current or future event, however far ahead, and comes with the next calendar poll, or
+straight away when the change is to the calendar's current or next event. No notification means the event
+isn't going to change the alarm. Events already in the calendar when Home Assistant starts aren't announced.
+Switch off **Confirm calendar changes** in the **Advanced - Calendar** section of the options to stop them.
+
+An event that's underway when it's edited to a different state switches the alarm to that state straight away.
+
 !!! note "Migrating from YAML"
     `state_patterns` in a YAML `calendar_control` section are copied into match rules the first time, along with `notify_grace_period`, and can then be removed from YAML. There is now one **Poll interval** for all calendars, taken from the shortest `poll_interval` in YAML.
 

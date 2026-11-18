@@ -113,14 +113,18 @@
                             "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時",
                             "calendar_match_rules": "一致ルール",
                             "calendar_poll_interval": "ポーリング間隔",
-                            "calendar_notify_grace": "通知の猶予時間"
+                            "calendar_notify_grace": "通知の猶予時間",
+                            "calendar_confirm_changes": "カレンダーの変更を確認",
+                            "calendar_arm_only": "警戒専用カレンダー"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは解除し、全員外出中なら外出警戒にします。",
                             "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。",
                             "calendar_match_rules": "各ルールは、1 つのカレンダーのイベントのうち、タイトルまたは説明がいずれかのパターン（正規表現）に一致するものにアラーム状態を設定します。カレンダーにルールがあると、そのカレンダーの既定のルールは置き換えられます。",
                             "calendar_poll_interval": "各カレンダーのイベントを確認する間隔（分）です。",
-                            "calendar_notify_grace": "カレンダーによる変更を通知するまで待つ秒数です。あるイベントの終了と同時に別のイベントが始まる場合など、近接した変更を 1 つの通知にまとめます。"
+                            "calendar_notify_grace": "カレンダーによる変更を通知するまで待つ秒数です。あるイベントの終了と同時に別のイベントが始まる場合など、近接した変更を 1 つの通知にまとめます。",
+                            "calendar_confirm_changes": "イベントの追加・編集・削除によって、アラームを設定するようになった、または設定しなくなったときに通知します。",
+                            "calendar_arm_only": "イベントで設定できるのを外出警戒または休暇警戒のみに限り、解除や保護の引き下げを行わないカレンダーです。招待の送信などで他の人がイベントを追加できるカレンダーに使います。"
                         }
                     },
                     "sun_options": {
@@ -188,12 +192,14 @@
                         "data": {
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
                             "rate_limit_max_calls": "レート制限 - 最大変更回数",
-                            "rate_limit_period": "レート制限 - 期間"
+                            "rate_limit_period": "レート制限 - 期間",
+                            "state_change_action": "状態変化時のアクション"
                         },
                         "data_description": {
                             "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、上で設定してください。",
                             "rate_limit_max_calls": "ループを防ぐため、レート制限の期間内に Auto Arm が行うアラーム状態の変更の最大回数です。期間内のそれ以上の変更はスキップされます。",
-                            "rate_limit_period": "最大変更回数を数える期間の長さ（秒）です。"
+                            "rate_limit_period": "最大変更回数を数える期間の長さ（秒）です。",
+                            "state_change_action": "アラームの状態が変わるたびに実行するアクションです。電子ペーパーのラベルやスマートディスプレイの更新などに使えます。テンプレートでは to_state、from_state、friendly_state、alarm_panel を使用できます。"
                         }
                     },
                     "time_of_day_options": {
@@ -210,7 +216,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "カレンダーの一致ルールに、正しい正規表現ではないパターンがあります。"
+            "invalid_pattern": "カレンダーの一致ルールに、正しい正規表現ではないパターンがあります。",
+            "invalid_action": "状態変化時のアクションが無効です。"
         },
         "abort": {
             "already_configured": "Auto Arm はすでに設定済みです"
@@ -304,14 +311,18 @@
                             "calendar_disarmed_end_mode": "カレンダーによる解除オーバーライドの終了時",
                             "calendar_match_rules": "一致ルール",
                             "calendar_poll_interval": "ポーリング間隔",
-                            "calendar_notify_grace": "通知の猶予時間"
+                            "calendar_notify_grace": "通知の猶予時間",
+                            "calendar_confirm_changes": "カレンダーの変更を確認",
+                            "calendar_arm_only": "警戒専用カレンダー"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは解除し、全員外出中なら外出警戒にします。",
                             "calendar_disarmed_end_mode": "自動は在宅と太陽で決め、日の出・日の入りトリガーがオフの日は在宅だけで決めます。在宅と太陽によるは在宅者と昼か夜かから状態を決めます。在宅によるは在宅警戒にし、全員外出中なら外出警戒にします。",
                             "calendar_match_rules": "各ルールは、1 つのカレンダーのイベントのうち、タイトルまたは説明がいずれかのパターン（正規表現）に一致するものにアラーム状態を設定します。カレンダーにルールがあると、そのカレンダーの既定のルールは置き換えられます。",
                             "calendar_poll_interval": "各カレンダーのイベントを確認する間隔（分）です。",
-                            "calendar_notify_grace": "カレンダーによる変更を通知するまで待つ秒数です。あるイベントの終了と同時に別のイベントが始まる場合など、近接した変更を 1 つの通知にまとめます。"
+                            "calendar_notify_grace": "カレンダーによる変更を通知するまで待つ秒数です。あるイベントの終了と同時に別のイベントが始まる場合など、近接した変更を 1 つの通知にまとめます。",
+                            "calendar_confirm_changes": "イベントの追加・編集・削除によって、アラームを設定するようになった、または設定しなくなったときに通知します。",
+                            "calendar_arm_only": "イベントで設定できるのを外出警戒または休暇警戒のみに限り、解除や保護の引き下げを行わないカレンダーです。招待の送信などで他の人がイベントを追加できるカレンダーに使います。"
                         }
                     },
                     "sun_options": {
@@ -379,12 +390,14 @@
                         "data": {
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
                             "rate_limit_max_calls": "レート制限 - 最大変更回数",
-                            "rate_limit_period": "レート制限 - 期間"
+                            "rate_limit_period": "レート制限 - 期間",
+                            "state_change_action": "状態変化時のアクション"
                         },
                         "data_description": {
                             "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、上で設定してください。",
                             "rate_limit_max_calls": "ループを防ぐため、レート制限の期間内に Auto Arm が行うアラーム状態の変更の最大回数です。期間内のそれ以上の変更はスキップされます。",
-                            "rate_limit_period": "最大変更回数を数える期間の長さ（秒）です。"
+                            "rate_limit_period": "最大変更回数を数える期間の長さ（秒）です。",
+                            "state_change_action": "アラームの状態が変わるたびに実行するアクションです。電子ペーパーのラベルやスマートディスプレイの更新などに使えます。テンプレートでは to_state、from_state、friendly_state、alarm_panel を使用できます。"
                         }
                     },
                     "time_of_day_options": {
@@ -401,7 +414,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "カレンダーの一致ルールに、正しい正規表現ではないパターンがあります。"
+            "invalid_pattern": "カレンダーの一致ルールに、正しい正規表現ではないパターンがあります。",
+            "invalid_action": "状態変化時のアクションが無効です。"
         }
     },
     "selector": {

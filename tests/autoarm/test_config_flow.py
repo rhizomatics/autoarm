@@ -365,6 +365,7 @@ async def test_options_flow_advanced_delays_and_rate_limit(hass: HomeAssistant, 
         "use_alarm_service": True,
         "rate_limit_max_calls": 5,
         "rate_limit_period": 60,
+        "state_change_action": [],
     }
     presence_defaults = data_schema.schema["presence_options"].schema({})
     assert presence_defaults["occupied_delay"] == 0

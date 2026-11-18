@@ -3,8 +3,10 @@
 import datetime as dt
 from typing import Any
 
+import pytest
 from homeassistant.const import CONF_DELAY_TIME
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Context, HomeAssistant
+from homeassistant.exceptions import Unauthorized
 
 from custom_components.autoarm.config_flow import (
     CONF_OCCUPIED_DELAY,
@@ -24,7 +26,7 @@ from custom_components.autoarm.const import (
     DOMAIN,
     YAML_DATA_KEY,
 )
-from tests.ha_testing import MockConfigEntry, async_fire_time_changed
+from tests.ha_testing import MockConfigEntry, MockUser, async_fire_time_changed
 
 PANEL = "alarm_panel.testing"
 
@@ -142,3 +144,19 @@ async def test_yaml_partial_rate_limit_migrated_alone(hass: HomeAssistant, mock_
 
     assert entry.options[CONF_RATE_LIMIT_MAX_CALLS] == 3
     assert CONF_RATE_LIMIT_SECONDS not in entry.options
+
+
+async def test_enquire_configuration_is_admin_only(
+    hass: HomeAssistant, mock_notify: Any, hass_read_only_user: MockUser
+) -> None:
+    await _setup_entry(hass, {})
+
+    with pytest.raises(Unauthorized):
+        await hass.services.async_call(
+            DOMAIN,
+            "enquire_configuration",
+            None,
+            blocking=True,
+            return_response=True,
+            context=Context(user_id=hass_read_only_user.id),
+        )

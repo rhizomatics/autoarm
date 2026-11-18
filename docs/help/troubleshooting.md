@@ -28,11 +28,12 @@ All Auto Arm log messages use the `AUTOARM` prefix for easy filtering.
 
 - [AI Agents](./ai_help.md) can give very good help these days, even the free one built into [Google Search](./ai_help.md#google-and-ai-assisted-help).
 - [Troubleshooting your configuration](https://www.home-assistant.io/docs/configuration/troubleshooting/) has the generic Home Assistant advice
-- Auto Arm has a [Diagnostics](https://www.home-assistant.io/integrations/diagnostics/) bundle available from the integration page
+- Auto Arm has a [Diagnostics](https://www.home-assistant.io/integrations/diagnostics/) bundle available from the integration page, with notification targets, notification data and the state change action redacted so it can be shared
 - Have a look at the [What's New](https://autoarm.rhizomatics.org.uk/changelog/), including any breaking changes, and any of the known [Issues](https://github.com/rhizomatics/autoarm/issues) or [Support Discussions](https://github.com/rhizomatics/autoarm/discussions).
 - Use the [Tools](https://www.home-assistant.io/docs/tools/dev-tools/) to call the action directly, listen to events, or view states
   - Since Auto Arm manages Home Assistant contexts, you can see the entire history of a why an alarm state changed, what the original trigger was, and also downstream things notifications, all laid out in the state history
   - Supernotify also has some of additional actions to `enquire_configuration`,`reload` configuration and `reset_state`, and offers lots of diagnostic entities
+  - `enquire_configuration` and `reload` can only be called by an administrator, as the configuration includes notification targets such as phone numbers
 
 
 ## Advanced Agent Usage

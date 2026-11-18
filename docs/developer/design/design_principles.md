@@ -7,22 +7,19 @@ product follows. Sections specific to autoarm are added here as its design settl
 
 autoarm: Automated alarm control panel arming for Home Assistant, with automatic profile switching for Frigate.
 
-It does one job and leaves the rest to Home Assistant and other integrations. Where a feature could live in
-Home Assistant core, another integration or here, the RFC for it says why it belongs here.
+It does one job and leaves the rest to Home Assistant and other integrations. Where a feature could live in Home Assistant core, another integration or here, the RFC for it says why it belongs here.
 
 ## Home Assistant alignment
 
 autoarm aims to be an exemplary Home Assistant citizen ([Home Assistant alignment](https://hq.rhizomatics.org.uk/policies/hass-alignment/)):
 
-- Configured through the UI (config flow), with YAML kept only for power-user content that is naturally text and
-  round-trips with the UI.
+- Configured through the UI (config flow), with YAML kept only for power-user content that is naturally text and round-trips with the UI.
   Exception: the rules engine can also be written in YAML, since it's power-user content that is naturally text.
 - Assessed against the [Integration Quality Scale](https://www.home-assistant.io/docs/quality_scale/), aiming for
   the highest level and keeping the way open to move from Marketplace to core.
 - Supports a rolling 6 months of Home Assistant releases ([project standards](https://hq.rhizomatics.org.uk/policies/project_standards/)), and the
   Python versions they need ([Python versions](https://hq.rhizomatics.org.uk/policies/python_versions/)).
-- Takes up new Home Assistant features within the month they're released, without dropping older supported
-  versions.
+- Takes up new Home Assistant features within the month they're released, without dropping older supported versions.
 
 ## How the design changes
 

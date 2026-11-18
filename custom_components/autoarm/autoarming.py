@@ -73,7 +73,9 @@ from .calendar_events import TrackedCalendar, TrackedCalendarEvent
 from .compat import vol
 from .config_flow import (
     BUTTON_USES,
+    CONF_CALENDAR_ARM_ONLY_ENTITIES,
     CONF_CALENDAR_ARMED_END_MODE,
+    CONF_CALENDAR_CONFIRM_CHANGES,
     CONF_CALENDAR_DISARMED_END_MODE,
     CONF_CALENDAR_ENTITIES,
     CONF_CALENDAR_MATCH_RULES,
@@ -105,6 +107,7 @@ from .config_flow import (
     CONF_RULE_STATE,
     CONF_SENTENCE_ARM,
     CONF_SENTENCE_DISARM,
+    CONF_STATE_ACTION,
     CONF_SUNRISE_EARLIEST,
     CONF_SUNRISE_LATEST,
     CONF_SUNRISE_TRIGGER,
@@ -130,7 +133,9 @@ from .const import (
     ATTR_RESET,
     CONF_ALARM_PANEL,
     CONF_BUTTONS,
+    CONF_CALENDAR_ARM_ONLY,
     CONF_CALENDAR_ARMED_END,
+    CONF_CALENDAR_CONFIRM,
     CONF_CALENDAR_CONTROL,
     CONF_CALENDAR_DISARMED_END,
     CONF_CALENDAR_EVENT_STATES,
@@ -187,6 +192,7 @@ from .helpers import (
     safe_state,
 )
 from .sentences import async_register_sentences
+from .state_action import async_track_state_action
 from .time_of_day import TrackedTimeOfDay
 
 if TYPE_CHECKING:
@@ -342,7 +348,9 @@ async def async_setup(
         except Exception as err:
             raise HomeAssistantError(f"Failed to serialize configuration: {err}") from err
 
-    hass.services.async_register(
+    # admin only, as the configuration has notification targets, such as phone numbers and email addresses
+    async_register_admin_service(
+        hass,
         DOMAIN,
         "enquire_configuration",
         supplemental_action_enquire_configuration,
@@ -462,6 +470,8 @@ def _build_armer_from_entry(
             CONF_ENTITY_ID: cal_entity_id,
             CONF_CALENDAR_POLL_INTERVAL: int(entry.options.get(CONF_CALENDAR_POLL_MINUTES, DEFAULT_CALENDAR_POLL_MINUTES)),
             CONF_CALENDAR_EVENT_STATES: _calendar_state_patterns(entry.options, cal_entity_id),
+            CONF_CALENDAR_CONFIRM: entry.options.get(CONF_CALENDAR_CONFIRM_CHANGES, True),
+            CONF_CALENDAR_ARM_ONLY: cal_entity_id in entry.options.get(CONF_CALENDAR_ARM_ONLY_ENTITIES, []),
         }
         for cal_entity_id in calendar_entities
     ]
@@ -537,6 +547,7 @@ def _build_armer_from_entry(
             for option, state in FRIGATE_PROFILE_OPTIONS.items()
             if option in entry.options
         },
+        state_action=entry.options.get(CONF_STATE_ACTION),
     )
 
 
@@ -776,6 +787,7 @@ class AlarmArmer:
         panel_code: str | None = None,
         frigate_profile_entity: str | None = None,
         frigate_profiles: dict[str, str] | None = None,
+        state_action: list[dict[str, Any]] | None = None,
     ) -> None:
         occupancy = occupancy or {}
         rate_limit = rate_limit or {}
@@ -852,6 +864,7 @@ class AlarmArmer:
         # select entity for the Frigate profile, and the profile for each alarm state
         self.frigate_profile_entity: str | None = frigate_profile_entity
         self.frigate_profiles: dict[str, str] = frigate_profiles or {}
+        self.state_action: list[dict[str, Any]] = state_action or []
         # state the panel is being moved to by its actions, so the change isn't mistaken for a manual one
         self._service_target: AlarmControlPanelState | None = None
         self.last_change: StateChange | None = None
@@ -881,6 +894,7 @@ class AlarmArmer:
 
         self.initialize_alarm_panel()
         await self.initialize_frigate()
+        await self.initialize_state_action()
         await self.initialize_calendar()
         await self.initialize_time_of_day()
         await self.initialize_logic()
@@ -952,6 +966,14 @@ class AlarmArmer:
                 )
             )
             _LOGGER.debug("AUTOARM Frigate profiles via %s: %s", self.frigate_profile_entity, self.frigate_profiles)
+
+    async def initialize_state_action(self) -> None:
+        if self.state_action and (
+            unsubscribe := await async_track_state_action(
+                self.hass, self.alarm_panel, self.state_action, self.app_health_tracker
+            )
+        ):
+            self.unsubscribes.append(unsubscribe)
 
     def check_panel_code(self) -> None:
         """Raise a repair when the alarm panel's actions want a code, and there isn't one to give them

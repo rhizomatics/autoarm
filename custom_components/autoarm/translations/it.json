@@ -113,14 +113,18 @@
                             "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario",
                             "calendar_match_rules": "Regole di corrispondenza",
                             "calendar_poll_interval": "Intervallo di interrogazione",
-                            "calendar_notify_grace": "Periodo di tolleranza delle notifiche"
+                            "calendar_notify_grace": "Periodo di tolleranza delle notifiche",
+                            "calendar_confirm_changes": "Conferma le modifiche al calendario",
+                            "calendar_arm_only": "Calendari solo inserimento"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
                             "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno.",
                             "calendar_match_rules": "Ogni regola imposta uno stato di allarme per gli eventi di un calendario il cui titolo o descrizione corrisponde a uno dei suoi modelli, che sono espressioni regolari. Le regole di un calendario sostituiscono quelle predefinite per quel calendario.",
                             "calendar_poll_interval": "Minuti tra un controllo e l'altro degli eventi di ogni calendario.",
-                            "calendar_notify_grace": "Secondi di attesa prima di notificare un cambio del calendario, così che i cambi ravvicinati, come un evento che termina mentre ne inizia un altro, siano inviati come un'unica notifica."
+                            "calendar_notify_grace": "Secondi di attesa prima di notificare un cambio del calendario, così che i cambi ravvicinati, come un evento che termina mentre ne inizia un altro, siano inviati come un'unica notifica.",
+                            "calendar_confirm_changes": "Notifica quando un evento viene aggiunto, modificato o eliminato in modo da iniziare o smettere di impostare l'allarme.",
+                            "calendar_arm_only": "Calendari i cui eventi possono impostare solo Inserito fuori casa o Inserito vacanza, senza mai disinserire o ridurre la protezione. Per i calendari a cui altri possono aggiungere eventi, ad esempio inviando un invito."
                         }
                     },
                     "sun_options": {
@@ -188,12 +192,14 @@
                         "data": {
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                             "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
-                            "rate_limit_period": "Limite di frequenza - periodo"
+                            "rate_limit_period": "Limite di frequenza - periodo",
+                            "state_change_action": "Azione al cambio di stato"
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sopra.",
                             "rate_limit_max_calls": "Il numero massimo di cambi di stato dell'allarme che Auto Arm effettua nel periodo del limite di frequenza, come protezione dai cicli. Le ulteriori modifiche in quel periodo vengono saltate.",
-                            "rate_limit_period": "Durata del periodo, in secondi, in cui vengono contate le modifiche massime."
+                            "rate_limit_period": "Durata del periodo, in secondi, in cui vengono contate le modifiche massime.",
+                            "state_change_action": "Azioni da eseguire a ogni cambio di stato dell'allarme, ad esempio per aggiornare un'etichetta e-ink o uno smart display. I modelli possono usare to_state, from_state, friendly_state e alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -210,7 +216,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "Una regola di corrispondenza del calendario ha un modello che non è un'espressione regolare valida."
+            "invalid_pattern": "Una regola di corrispondenza del calendario ha un modello che non è un'espressione regolare valida.",
+            "invalid_action": "L'azione al cambio di stato non è valida."
         },
         "abort": {
             "already_configured": "Auto Arm è già configurato"
@@ -304,14 +311,18 @@
                             "calendar_disarmed_end_mode": "Al termine di un disinserimento da calendario",
                             "calendar_match_rules": "Regole di corrispondenza",
                             "calendar_poll_interval": "Intervallo di interrogazione",
-                            "calendar_notify_grace": "Periodo di tolleranza delle notifiche"
+                            "calendar_notify_grace": "Periodo di tolleranza delle notifiche",
+                            "calendar_confirm_changes": "Conferma le modifiche al calendario",
+                            "calendar_arm_only": "Calendari solo inserimento"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza disinserisce, o inserisce fuori casa se non c'è nessuno.",
                             "calendar_disarmed_end_mode": "Automatico segue presenza e sole, o solo la presenza nei giorni in cui gli attivatori di alba e tramonto sono disattivati. In base a presenza e sole calcola lo stato da chi è in casa e se è giorno o notte. In base a presenza inserisce in casa, o fuori casa se non c'è nessuno.",
                             "calendar_match_rules": "Ogni regola imposta uno stato di allarme per gli eventi di un calendario il cui titolo o descrizione corrisponde a uno dei suoi modelli, che sono espressioni regolari. Le regole di un calendario sostituiscono quelle predefinite per quel calendario.",
                             "calendar_poll_interval": "Minuti tra un controllo e l'altro degli eventi di ogni calendario.",
-                            "calendar_notify_grace": "Secondi di attesa prima di notificare un cambio del calendario, così che i cambi ravvicinati, come un evento che termina mentre ne inizia un altro, siano inviati come un'unica notifica."
+                            "calendar_notify_grace": "Secondi di attesa prima di notificare un cambio del calendario, così che i cambi ravvicinati, come un evento che termina mentre ne inizia un altro, siano inviati come un'unica notifica.",
+                            "calendar_confirm_changes": "Notifica quando un evento viene aggiunto, modificato o eliminato in modo da iniziare o smettere di impostare l'allarme.",
+                            "calendar_arm_only": "Calendari i cui eventi possono impostare solo Inserito fuori casa o Inserito vacanza, senza mai disinserire o ridurre la protezione. Per i calendari a cui altri possono aggiungere eventi, ad esempio inviando un invito."
                         }
                     },
                     "sun_options": {
@@ -379,12 +390,14 @@
                         "data": {
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                             "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
-                            "rate_limit_period": "Limite di frequenza - periodo"
+                            "rate_limit_period": "Limite di frequenza - periodo",
+                            "state_change_action": "Azione al cambio di stato"
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sopra.",
                             "rate_limit_max_calls": "Il numero massimo di cambi di stato dell'allarme che Auto Arm effettua nel periodo del limite di frequenza, come protezione dai cicli. Le ulteriori modifiche in quel periodo vengono saltate.",
-                            "rate_limit_period": "Durata del periodo, in secondi, in cui vengono contate le modifiche massime."
+                            "rate_limit_period": "Durata del periodo, in secondi, in cui vengono contate le modifiche massime.",
+                            "state_change_action": "Azioni da eseguire a ogni cambio di stato dell'allarme, ad esempio per aggiornare un'etichetta e-ink o uno smart display. I modelli possono usare to_state, from_state, friendly_state e alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -401,7 +414,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "Una regola di corrispondenza del calendario ha un modello che non è un'espressione regolare valida."
+            "invalid_pattern": "Una regola di corrispondenza del calendario ha un modello che non è un'espressione regolare valida.",
+            "invalid_action": "L'azione al cambio di stato non è valida."
         }
     },
     "selector": {

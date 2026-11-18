@@ -113,14 +113,18 @@
                             "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet",
                             "calendar_match_rules": "Zuordnungsregeln",
                             "calendar_poll_interval": "Abfrageintervall",
-                            "calendar_notify_grace": "Wartezeit für Benachrichtigungen"
+                            "calendar_notify_grace": "Wartezeit für Benachrichtigungen",
+                            "calendar_confirm_changes": "Kalenderänderungen bestätigen",
+                            "calendar_arm_only": "Nur-Scharfschalten-Kalender"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
                             "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist.",
                             "calendar_match_rules": "Jede Regel setzt einen Alarmzustand für die Ereignisse eines Kalenders, deren Titel oder Beschreibung auf eines ihrer Muster passt; die Muster sind reguläre Ausdrücke. Regeln für einen Kalender ersetzen die Standards für diesen Kalender.",
                             "calendar_poll_interval": "Minuten zwischen den Abfragen jedes Kalenders nach Ereignissen.",
-                            "calendar_notify_grace": "Sekunden, die vor der Benachrichtigung über eine Kalenderänderung gewartet wird, damit dicht aufeinanderfolgende Änderungen, etwa wenn ein Ereignis endet und ein anderes beginnt, als eine Benachrichtigung gesendet werden."
+                            "calendar_notify_grace": "Sekunden, die vor der Benachrichtigung über eine Kalenderänderung gewartet wird, damit dicht aufeinanderfolgende Änderungen, etwa wenn ein Ereignis endet und ein anderes beginnt, als eine Benachrichtigung gesendet werden.",
+                            "calendar_confirm_changes": "Benachrichtigen, wenn ein Ereignis hinzugefügt, bearbeitet oder gelöscht wird, sodass es den Alarm setzt oder nicht mehr setzt.",
+                            "calendar_arm_only": "Kalender, deren Ereignisse nur Abwesend scharf oder Urlaub scharf setzen können und den Alarm nie entschärfen oder den Schutz verringern. Für Kalender, in die andere Ereignisse eintragen können, etwa durch eine Einladung."
                         }
                     },
                     "sun_options": {
@@ -188,12 +192,14 @@
                         "data": {
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                             "rate_limit_max_calls": "Ratenbegrenzung - maximale Änderungen",
-                            "rate_limit_period": "Ratenbegrenzung - Zeitraum"
+                            "rate_limit_period": "Ratenbegrenzung - Zeitraum",
+                            "state_change_action": "Aktion bei Zustandsänderung"
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn oben fest.",
                             "rate_limit_max_calls": "Die Höchstzahl an Änderungen des Alarmstatus, die Auto Arm innerhalb des Zeitraums der Ratenbegrenzung vornimmt, als Schutz vor Schleifen. Weitere Änderungen in diesem Zeitraum werden übersprungen.",
-                            "rate_limit_period": "Länge des Zeitraums in Sekunden, über den die maximalen Änderungen gezählt werden."
+                            "rate_limit_period": "Länge des Zeitraums in Sekunden, über den die maximalen Änderungen gezählt werden.",
+                            "state_change_action": "Aktionen, die bei jeder Änderung des Alarmzustands ausgeführt werden, etwa um ein E-Ink-Etikett oder ein Smart Display zu aktualisieren. Vorlagen können to_state, from_state, friendly_state und alarm_panel verwenden."
                         }
                     },
                     "time_of_day_options": {
@@ -210,7 +216,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "Eine Kalender-Zuordnungsregel enthält ein Muster, das kein gültiger regulärer Ausdruck ist."
+            "invalid_pattern": "Eine Kalender-Zuordnungsregel enthält ein Muster, das kein gültiger regulärer Ausdruck ist.",
+            "invalid_action": "Die Aktion bei Zustandsänderung ist ungültig."
         },
         "abort": {
             "already_configured": "Auto Arm ist bereits konfiguriert"
@@ -304,14 +311,18 @@
                             "calendar_disarmed_end_mode": "Wenn eine Kalender-Unscharfschaltung endet",
                             "calendar_match_rules": "Zuordnungsregeln",
                             "calendar_poll_interval": "Abfrageintervall",
-                            "calendar_notify_grace": "Wartezeit für Benachrichtigungen"
+                            "calendar_notify_grace": "Wartezeit für Benachrichtigungen",
+                            "calendar_confirm_changes": "Kalenderänderungen bestätigen",
+                            "calendar_arm_only": "Nur-Scharfschalten-Kalender"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet unscharf, oder abwesend scharf, wenn niemand zu Hause ist.",
                             "calendar_disarmed_end_mode": "Automatisch richtet sich nach Anwesenheit und Sonne, oder nur nach Anwesenheit an Tagen, an denen die Sonnenaufgangs- und Sonnenuntergangsauslöser aus sind. Nach Anwesenheit und Sonne ermittelt den Zustand aus Anwesenheit und Tag oder Nacht. Nach Anwesenheit schaltet zu Hause scharf, oder abwesend, wenn niemand zu Hause ist.",
                             "calendar_match_rules": "Jede Regel setzt einen Alarmzustand für die Ereignisse eines Kalenders, deren Titel oder Beschreibung auf eines ihrer Muster passt; die Muster sind reguläre Ausdrücke. Regeln für einen Kalender ersetzen die Standards für diesen Kalender.",
                             "calendar_poll_interval": "Minuten zwischen den Abfragen jedes Kalenders nach Ereignissen.",
-                            "calendar_notify_grace": "Sekunden, die vor der Benachrichtigung über eine Kalenderänderung gewartet wird, damit dicht aufeinanderfolgende Änderungen, etwa wenn ein Ereignis endet und ein anderes beginnt, als eine Benachrichtigung gesendet werden."
+                            "calendar_notify_grace": "Sekunden, die vor der Benachrichtigung über eine Kalenderänderung gewartet wird, damit dicht aufeinanderfolgende Änderungen, etwa wenn ein Ereignis endet und ein anderes beginnt, als eine Benachrichtigung gesendet werden.",
+                            "calendar_confirm_changes": "Benachrichtigen, wenn ein Ereignis hinzugefügt, bearbeitet oder gelöscht wird, sodass es den Alarm setzt oder nicht mehr setzt.",
+                            "calendar_arm_only": "Kalender, deren Ereignisse nur Abwesend scharf oder Urlaub scharf setzen können und den Alarm nie entschärfen oder den Schutz verringern. Für Kalender, in die andere Ereignisse eintragen können, etwa durch eine Einladung."
                         }
                     },
                     "sun_options": {
@@ -379,12 +390,14 @@
                         "data": {
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                             "rate_limit_max_calls": "Ratenbegrenzung - maximale Änderungen",
-                            "rate_limit_period": "Ratenbegrenzung - Zeitraum"
+                            "rate_limit_period": "Ratenbegrenzung - Zeitraum",
+                            "state_change_action": "Aktion bei Zustandsänderung"
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn oben fest.",
                             "rate_limit_max_calls": "Die Höchstzahl an Änderungen des Alarmstatus, die Auto Arm innerhalb des Zeitraums der Ratenbegrenzung vornimmt, als Schutz vor Schleifen. Weitere Änderungen in diesem Zeitraum werden übersprungen.",
-                            "rate_limit_period": "Länge des Zeitraums in Sekunden, über den die maximalen Änderungen gezählt werden."
+                            "rate_limit_period": "Länge des Zeitraums in Sekunden, über den die maximalen Änderungen gezählt werden.",
+                            "state_change_action": "Aktionen, die bei jeder Änderung des Alarmzustands ausgeführt werden, etwa um ein E-Ink-Etikett oder ein Smart Display zu aktualisieren. Vorlagen können to_state, from_state, friendly_state und alarm_panel verwenden."
                         }
                     },
                     "time_of_day_options": {
@@ -401,7 +414,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "Eine Kalender-Zuordnungsregel enthält ein Muster, das kein gültiger regulärer Ausdruck ist."
+            "invalid_pattern": "Eine Kalender-Zuordnungsregel enthält ein Muster, das kein gültiger regulärer Ausdruck ist.",
+            "invalid_action": "Die Aktion bei Zustandsänderung ist ungültig."
         }
     },
     "selector": {

@@ -5,9 +5,13 @@ from homeassistant.core import HomeAssistant
 from custom_components.autoarm.config_flow import (
     CONF_CALENDAR_ENTITIES,
     CONF_NO_EVENT_MODE,
+    CONF_NOTIFY_CUSTOM_TARGET,
+    CONF_NOTIFY_TARGETS,
     CONF_OCCUPANCY_DEFAULT_DAY,
     CONF_OCCUPANCY_DEFAULT_NIGHT,
+    CONF_PANEL_CODE,
     CONF_PERSON_ENTITIES,
+    CONF_STATE_ACTION,
     CONF_USE_ALARM_SERVICE,
 )
 from custom_components.autoarm.const import CONF_ALARM_PANEL, DOMAIN, YAML_DATA_KEY
@@ -28,6 +32,10 @@ async def _setup_entry(hass: HomeAssistant) -> MockConfigEntry:
             CONF_OCCUPANCY_DEFAULT_NIGHT: None,
             CONF_NO_EVENT_MODE: "auto",
             CONF_USE_ALARM_SERVICE: True,
+            CONF_NOTIFY_TARGETS: ["someone@example.com"],
+            CONF_NOTIFY_CUSTOM_TARGET: ["+441234567890"],
+            CONF_STATE_ACTION: [{"variables": {"token": "secret"}}],
+            CONF_PANEL_CODE: "encrypted",
         },
     )
     entry.add_to_hass(hass)
@@ -43,6 +51,8 @@ async def test_diagnostics(hass: HomeAssistant, mock_notify: Any) -> None:
 
     assert result["entry_data"] == {CONF_ALARM_PANEL: "alarm_panel.testing"}
     assert result["entry_options"][CONF_PERSON_ENTITIES] == ["person.house_owner"]
+    for redacted in (CONF_NOTIFY_TARGETS, CONF_NOTIFY_CUSTOM_TARGET, CONF_STATE_ACTION, CONF_PANEL_CODE):
+        assert result["entry_options"][redacted] == "**REDACTED**"
     assert result["yaml_keys"] == []
     assert "armer" in result
     assert result["armer"]["alarm_panel"] == "alarm_panel.testing"

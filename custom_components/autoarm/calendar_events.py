@@ -18,14 +18,17 @@ from homeassistant.helpers.event import (
 )
 from homeassistant.helpers.typing import ConfigType
 
-from custom_components.autoarm.helpers import AppHealthTracker, alarm_state_as_enum
+from custom_components.autoarm.helpers import AppHealthTracker, alarm_state_as_enum, friendly_state
 
 from .const import (
-    ALARM_STATES,
+    ARM_ONLY_STATES,
+    CONF_CALENDAR_ARM_ONLY,
+    CONF_CALENDAR_CONFIRM,
     CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_POLL_INTERVAL,
     NO_CAL_EVENT_MODE_AUTO_OCCUPANCY,
     NO_CAL_EVENT_MODE_AUTO_SUN,
+    PUBLIC_ALARM_STATES,
     ChangeSource,
 )
 
@@ -33,6 +36,9 @@ if TYPE_CHECKING:
     from homeassistant.core import CALLBACK_TYPE
 
 _LOGGER = logging.getLogger(__name__)
+
+# how far ahead to look for events added, edited or removed, to confirm whether they set the alarm
+CHANGE_HORIZON = dt.timedelta(days=5 * 365)
 
 
 def unlisten(listener: Callable[[], None] | None) -> None:
@@ -103,12 +109,18 @@ class TrackedCalendarEvent:
         self.ended_early = True
         await self.end(dt_util.now())
 
-    async def update(self, new_event: CalendarEvent) -> None:
+    async def update(self, new_event: CalendarEvent, arming_state: AlarmControlPanelState | None = None) -> None:
         _LOGGER.debug("AUTOARM Calendar event updated for %s: %s", self.id, self.event.summary)
         was_current = self.is_current()
         self.event = new_event
         if not self.is_current() and was_current:
             await self.end(dt_util.now())
+        elif arming_state is not None and arming_state != self.arming_state:
+            _LOGGER.info("AUTOARM Calendar event %s changed from %s to %s", self.id, self.arming_state, arming_state)
+            self.arming_state = arming_state
+            if self.track_status == "started":
+                # already underway, so switch now, otherwise the new state is set when it starts
+                await self.on_calendar_event_start(dt_util.now())
 
     async def remove(self) -> None:
         _LOGGER.debug("AUTOARM Calendar event deletion for %s: %s", self.id, self.event.summary)
@@ -278,6 +290,9 @@ class TrackedCalendar:
         self.alias: str = cast("str", calendar_config.get(CONF_ALIAS, ""))
         self.entity_id: str = cast("str", calendar_config.get(CONF_ENTITY_ID))
         self.poll_interval: int = calendar_config.get(CONF_CALENDAR_POLL_INTERVAL, 15)
+        self.confirm_changes_enabled: bool = calendar_config.get(CONF_CALENDAR_CONFIRM, True)
+        # for a calendar others can add events to, such as by an invitation, so they can't disarm the alarm
+        self.arm_only: bool = calendar_config.get(CONF_CALENDAR_ARM_ONLY, False)
         self.state_mappings: dict[str, list[str]] = cast(
             "dict[str, list[str]]", calendar_config.get(CONF_CALENDAR_EVENT_STATES)
         )
@@ -286,6 +301,9 @@ class TrackedCalendar:
         self.poller_listener: CALLBACK_TYPE | None = None
         self.state_listener: CALLBACK_TYPE | None = None
         self.poll_lock: asyncio.Lock = asyncio.Lock()
+        # state, summary, start and end of each current or future event, keyed once per recurring series,
+        # None until the first look so that startup doesn't announce every event already there
+        self.known_events: dict[str, tuple[str | None, str, dt.datetime, dt.datetime]] | None = None
 
     async def initialize(self, calendar_platform: entity_platform.EntityPlatform) -> None:
         try:
@@ -314,6 +332,7 @@ class TrackedCalendar:
                 self.enabled = True
                 # force an initial poll
                 await self.match_events()
+                await self.confirm_changes()
                 # calendar state changes on edits affecting current or next event, so poll then too
                 self.state_listener = async_track_state_change_event(self.hass, [self.entity_id], self.on_calendar_state_change)
 
@@ -338,11 +357,55 @@ class TrackedCalendar:
         async with self.poll_lock:
             await self.match_events()
             await self.prune_events()
+            await self.confirm_changes()
 
     async def on_calendar_state_change(self, _event: Event[EventStateChangedData]) -> None:
         """Poll immediately when calendar entity changes, e.g. on an edit, rather than wait for timed poll"""
         _LOGGER.debug("AUTOARM Calendar %s state changed, polling", self.entity_id)
         await self.on_timed_poll(dt_util.now())
+
+    async def confirm_changes(self) -> None:
+        """Notify when an event is added, edited or removed so that it starts or stops setting the alarm"""
+        if not self.confirm_changes_enabled:
+            return
+        now: dt.datetime = dt_util.now()
+        events: list[CalendarEvent] = await self.calendar_entity.async_get_events(self.hass, now, now + CHANGE_HORIZON)
+        current: dict[str, tuple[str | None, str, dt.datetime, dt.datetime]] = {}
+        for event in events:
+            current.setdefault(
+                TrackedCalendarEvent.event_id(self.entity_id, event),
+                (
+                    self.match_event(event.summary, event.description),
+                    event.summary or "",
+                    event.start_datetime_local,
+                    event.end_datetime_local,
+                ),
+            )
+        known = self.known_events
+        self.known_events = current
+        if known is None:
+            return
+        for event_id, (state, summary, start, _end) in current.items():
+            was_state: str | None = known[event_id][0] if event_id in known else None
+            if state and state != was_state:
+                await self.notify_change(f"{summary} ({start:%a %d %b %H:%M}) will set the alarm to {friendly_state(state)}")
+            elif was_state and not state:
+                await self.notify_change(
+                    f"{summary} ({start:%a %d %b %H:%M}) will no longer set the alarm to {friendly_state(was_state)}"
+                )
+        for event_id, (was_state, summary, start, end) in known.items():
+            if was_state and event_id not in current and end > now:
+                await self.notify_change(
+                    f"{summary} ({start:%a %d %b %H:%M}) was removed, and will no longer set the alarm to "
+                    f"{friendly_state(was_state)}"
+                )
+
+    async def notify_change(self, message: str) -> None:
+        _LOGGER.info("AUTOARM Calendar %s: %s", self.entity_id, message)
+        if self.armer.notifier:
+            await self.armer.notifier.notify(
+                ChangeSource.CALENDAR, from_state=self.armer.armed_state(), message=message, title="Alarm calendar change"
+            )
 
     def has_active_event(self) -> bool:
         """Is there any event matching a state pattern that is currently open"""
@@ -377,10 +440,19 @@ class TrackedCalendar:
         return max(ended, key=lambda ended_event: ended_event[0]) if ended else None
 
     def match_event(self, summary: str | None, description: str | None) -> str | None:
-        for state_str in ALARM_STATES:
-            if summary and (state_str.upper() in summary):
+        state_str: str | None = self._match_state(summary, description)
+        if self.arm_only and state_str is not None and state_str not in ARM_ONLY_STATES:
+            _LOGGER.debug("AUTOARM Calendar %s is arm only, ignoring %s for %s", self.entity_id, summary, state_str)
+            return None
+        return state_str
+
+    def _match_state(self, summary: str | None, description: str | None) -> str | None:
+        for state_str in PUBLIC_ALARM_STATES:
+            # the exact state name, in any case, such as armed_vacation or ARMED_VACATION
+            state_name = re.compile(rf"\b{state_str}\b", re.IGNORECASE)
+            if summary and state_name.search(summary):
                 return state_str
-            if description and (state_str.upper() in description):
+            if description and state_name.search(description):
                 return state_str
         for state_str, patterns in self.state_mappings.items():
             if (
@@ -465,7 +537,7 @@ class TrackedCalendar:
                             event.summary,
                             state_str,
                         )
-                        await existing_event.update(event)
+                        await existing_event.update(event, alarm_state_as_enum(state_str))
                     else:
                         _LOGGER.debug("AUTOARM No change to previously tracked event")
 

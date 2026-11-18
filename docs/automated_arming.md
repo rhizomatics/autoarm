@@ -148,7 +148,7 @@ the same way as other resets, such as at sunrise or sunset.
 ## Calendar Control
 
 !!! note "Configuration split"
-    Calendar entities are configured via the Auto Arm **Options** UI. Its **Advanced - Calendar** section has what happens when an event ends, the match rules for which events set which state, the poll interval and the notification grace period. Any of these still in YAML are copied into the options the first time.
+    Calendar entities are configured via the Auto Arm **Options** UI. Its **Advanced - Calendar** section has what happens when an event ends, the match rules for which events set which state, the poll interval, the notification grace period, and whether to confirm calendar changes. Any of these still in YAML are copied into the options the first time.
 
 ### Integrating a Calendar
 

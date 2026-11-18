@@ -113,14 +113,18 @@
                             "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier",
                             "calendar_match_rules": "Règles de correspondance",
                             "calendar_poll_interval": "Intervalle d'interrogation",
-                            "calendar_notify_grace": "Délai de grâce des notifications"
+                            "calendar_notify_grace": "Délai de grâce des notifications",
+                            "calendar_confirm_changes": "Confirmer les changements du calendrier",
+                            "calendar_arm_only": "Calendriers d'armement uniquement"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
                             "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là.",
                             "calendar_match_rules": "Chaque règle définit un état d'alarme pour les événements d'un calendrier dont le titre ou la description correspond à l'un de ses motifs, qui sont des expressions régulières. Les règles d'un calendrier remplacent celles par défaut pour ce calendrier.",
                             "calendar_poll_interval": "Minutes entre deux vérifications des événements de chaque calendrier.",
-                            "calendar_notify_grace": "Secondes d'attente avant de notifier un changement de calendrier, afin que des changements rapprochés, comme un événement qui se termine quand un autre commence, soient envoyés en une seule notification."
+                            "calendar_notify_grace": "Secondes d'attente avant de notifier un changement de calendrier, afin que des changements rapprochés, comme un événement qui se termine quand un autre commence, soient envoyés en une seule notification.",
+                            "calendar_confirm_changes": "Notifier quand un événement est ajouté, modifié ou supprimé de sorte qu'il commence ou cesse de régler l'alarme.",
+                            "calendar_arm_only": "Calendriers dont les événements peuvent seulement régler Armée absence ou Armée vacances, sans jamais désarmer ni réduire la protection. Pour les calendriers où d'autres peuvent ajouter des événements, par exemple en envoyant une invitation."
                         }
                     },
                     "sun_options": {
@@ -188,12 +192,14 @@
                         "data": {
                             "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
                             "rate_limit_max_calls": "Limite de fréquence - changements maximum",
-                            "rate_limit_period": "Limite de fréquence - période"
+                            "rate_limit_period": "Limite de fréquence - période",
+                            "state_change_action": "Action au changement d'état"
                         },
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. Si la centrale exige un code, définissez-le ci-dessus.",
                             "rate_limit_max_calls": "Le nombre maximal de changements d'état de l'alarme qu'Auto Arm effectuera pendant la période de limite de fréquence, pour se protéger des boucles. Les changements supplémentaires pendant cette période sont ignorés.",
-                            "rate_limit_period": "Durée de la période, en secondes, sur laquelle les changements maximum sont comptés."
+                            "rate_limit_period": "Durée de la période, en secondes, sur laquelle les changements maximum sont comptés.",
+                            "state_change_action": "Actions exécutées à chaque changement d'état de l'alarme, par exemple pour mettre à jour une étiquette à encre électronique ou un écran connecté. Les modèles peuvent utiliser to_state, from_state, friendly_state et alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -210,7 +216,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "Une règle de correspondance de calendrier contient un motif qui n'est pas une expression régulière valide."
+            "invalid_pattern": "Une règle de correspondance de calendrier contient un motif qui n'est pas une expression régulière valide.",
+            "invalid_action": "L'action au changement d'état n'est pas valide."
         },
         "abort": {
             "already_configured": "Auto Arm est déjà configuré"
@@ -304,14 +311,18 @@
                             "calendar_disarmed_end_mode": "À la fin d'un désarmement par calendrier",
                             "calendar_match_rules": "Règles de correspondance",
                             "calendar_poll_interval": "Intervalle d'interrogation",
-                            "calendar_notify_grace": "Délai de grâce des notifications"
+                            "calendar_notify_grace": "Délai de grâce des notifications",
+                            "calendar_confirm_changes": "Confirmer les changements du calendrier",
+                            "calendar_arm_only": "Calendriers d'armement uniquement"
                         },
                         "data_description": {
                             "calendar_armed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation désarme, ou arme en absence si personne n'est là.",
                             "calendar_disarmed_end_mode": "Automatique suit l'occupation et le soleil, ou l'occupation seule les jours où les déclencheurs de lever et de coucher du soleil sont désactivés. Selon l'occupation et le soleil détermine l'état selon qui est présent et s'il fait jour ou nuit. Selon l'occupation arme en présence, ou en absence si personne n'est là.",
                             "calendar_match_rules": "Chaque règle définit un état d'alarme pour les événements d'un calendrier dont le titre ou la description correspond à l'un de ses motifs, qui sont des expressions régulières. Les règles d'un calendrier remplacent celles par défaut pour ce calendrier.",
                             "calendar_poll_interval": "Minutes entre deux vérifications des événements de chaque calendrier.",
-                            "calendar_notify_grace": "Secondes d'attente avant de notifier un changement de calendrier, afin que des changements rapprochés, comme un événement qui se termine quand un autre commence, soient envoyés en une seule notification."
+                            "calendar_notify_grace": "Secondes d'attente avant de notifier un changement de calendrier, afin que des changements rapprochés, comme un événement qui se termine quand un autre commence, soient envoyés en une seule notification.",
+                            "calendar_confirm_changes": "Notifier quand un événement est ajouté, modifié ou supprimé de sorte qu'il commence ou cesse de régler l'alarme.",
+                            "calendar_arm_only": "Calendriers dont les événements peuvent seulement régler Armée absence ou Armée vacances, sans jamais désarmer ni réduire la protection. Pour les calendriers où d'autres peuvent ajouter des événements, par exemple en envoyant une invitation."
                         }
                     },
                     "sun_options": {
@@ -379,12 +390,14 @@
                         "data": {
                             "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
                             "rate_limit_max_calls": "Limite de fréquence - changements maximum",
-                            "rate_limit_period": "Limite de fréquence - période"
+                            "rate_limit_period": "Limite de fréquence - période",
+                            "state_change_action": "Action au changement d'état"
                         },
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. Si la centrale exige un code, définissez-le ci-dessus.",
                             "rate_limit_max_calls": "Le nombre maximal de changements d'état de l'alarme qu'Auto Arm effectuera pendant la période de limite de fréquence, pour se protéger des boucles. Les changements supplémentaires pendant cette période sont ignorés.",
-                            "rate_limit_period": "Durée de la période, en secondes, sur laquelle les changements maximum sont comptés."
+                            "rate_limit_period": "Durée de la période, en secondes, sur laquelle les changements maximum sont comptés.",
+                            "state_change_action": "Actions exécutées à chaque changement d'état de l'alarme, par exemple pour mettre à jour une étiquette à encre électronique ou un écran connecté. Les modèles peuvent utiliser to_state, from_state, friendly_state et alarm_panel."
                         }
                     },
                     "time_of_day_options": {
@@ -401,7 +414,8 @@
             }
         },
         "error": {
-            "invalid_pattern": "Une règle de correspondance de calendrier contient un motif qui n'est pas une expression régulière valide."
+            "invalid_pattern": "Une règle de correspondance de calendrier contient un motif qui n'est pas une expression régulière valide.",
+            "invalid_action": "L'action au changement d'état n'est pas valide."
         }
     },
     "selector": {

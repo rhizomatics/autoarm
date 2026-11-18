@@ -2,8 +2,8 @@ import asyncio
 import datetime as dt
 import sys
 from collections.abc import AsyncGenerator
-from typing import Any
-from unittest.mock import ANY, patch
+from typing import Any, cast
+from unittest.mock import ANY, AsyncMock, patch
 
 import homeassistant.util.dt as dt_util
 import pytest
@@ -16,6 +16,8 @@ from homeassistant.helpers.entity_platform import EntityPlatform
 from custom_components.autoarm.autoarming import AlarmArmer
 from custom_components.autoarm.calendar_events import TrackedCalendar, TrackedCalendarEvent
 from custom_components.autoarm.const import (
+    CONF_CALENDAR_ARM_ONLY,
+    CONF_CALENDAR_CONFIRM,
     CONF_CALENDAR_EVENT_STATES,
     CONF_CALENDAR_POLL_INTERVAL,
     ChangeSource,
@@ -332,3 +334,193 @@ async def test_calendar_overlapping_polls_prune_event_once(
         simple_tracked_calendar.on_timed_poll(dt_util.now()), simple_tracked_calendar.on_timed_poll(dt_util.now())
     )
     assert not simple_tracked_calendar.tracked_events
+
+
+@pytest.mark.parametrize("summary", ["armed_vacation", "Boat trip ARMED_VACATION", "Armed_Vacation on boat"])
+def test_calendar_matches_state_name_in_any_case(simple_tracked_calendar: TrackedCalendar, summary: str) -> None:
+    assert simple_tracked_calendar.match_event(summary, None) == "armed_vacation"
+    assert simple_tracked_calendar.match_event(None, summary) == "armed_vacation"
+
+
+@pytest.mark.parametrize("summary", ["Farming day", "Pending ARMING", "triggered", "rearmed_vacationer"])
+def test_calendar_ignores_transient_states_and_partial_names(simple_tracked_calendar: TrackedCalendar, summary: str) -> None:
+    assert simple_tracked_calendar.match_event(summary, None) is None
+
+
+async def test_calendar_confirms_event_added_far_ahead(
+    simple_tracked_calendar: TrackedCalendar, local_calendar: CalendarEntity, mock_armer_real_hass: AlarmArmer
+) -> None:
+    start = dt_util.now() + dt.timedelta(days=400)
+    await local_calendar.async_create_event(dtstart=start, dtend=start + dt.timedelta(days=7), summary="armed_vacation")
+    await local_calendar.async_create_event(dtstart=start, dtend=start + dt.timedelta(hours=2), summary="Birthday")
+    await simple_tracked_calendar.on_timed_poll(dt_util.now())
+    mock_armer_real_hass.notifier.notify.assert_called_once_with(  # type: ignore
+        ChangeSource.CALENDAR,
+        from_state=ANY,
+        message=f"armed_vacation ({start:%a %d %b %H:%M}) will set the alarm to Armed Vacation",
+        title="Alarm calendar change",
+    )
+
+
+async def test_calendar_no_confirmation_for_events_already_there_at_startup(
+    local_calendar: CalendarEntity, calendar_platform: EntityPlatform, mock_armer_real_hass: AlarmArmer
+) -> None:
+    start = dt_util.now() + dt.timedelta(days=3)
+    await local_calendar.async_create_event(dtstart=start, dtend=start + dt.timedelta(days=7), summary="Holiday at sea")
+    uut = TrackedCalendar(
+        mock_armer_real_hass.hass,
+        {CONF_ENTITY_ID: local_calendar.entity_id, CONF_CALENDAR_EVENT_STATES: {"armed_vacation": ["Holiday.*"]}},
+        armer=mock_armer_real_hass,
+        app_health_tracker=mock_armer_real_hass.app_health_tracker,
+    )
+    await uut.initialize(calendar_platform)
+    await uut.on_timed_poll(dt_util.now())
+    mock_armer_real_hass.notifier.notify.assert_not_called()  # type: ignore
+    uut.shutdown()
+
+
+async def test_calendar_confirms_edits_in_and_out_and_deletion(
+    simple_tracked_calendar: TrackedCalendar, local_calendar: CalendarEntity, mock_armer_real_hass: AlarmArmer
+) -> None:
+    start = dt_util.now() + dt.timedelta(days=10)
+    end = start + dt.timedelta(days=2)
+    await local_calendar.async_create_event(dtstart=start, dtend=end, summary="Birthday on Boat")
+    await simple_tracked_calendar.on_timed_poll(dt_util.now())
+    notify = cast("AsyncMock", mock_armer_real_hass.notifier).notify
+    notify.assert_not_called()
+    uid: str = (await local_calendar.async_get_events(mock_armer_real_hass.hass, start, end))[0].uid  # type: ignore
+
+    when = f"{start:%a %d %b %H:%M}"
+    for summary, message in (
+        ("Birthday on Boat armed_vacation", f"Birthday on Boat armed_vacation ({when}) will set the alarm to Armed Vacation"),
+        ("Birthday on Boat armed_away", f"Birthday on Boat armed_away ({when}) will set the alarm to Armed Away"),
+        ("Birthday on Boat", f"Birthday on Boat ({when}) will no longer set the alarm to Armed Away"),
+        ("Birthday on Boat ARMED_AWAY", f"Birthday on Boat ARMED_AWAY ({when}) will set the alarm to Armed Away"),
+    ):
+        notify.reset_mock()
+        await local_calendar.async_update_event(uid, {EVENT_START: start, EVENT_END: end, "summary": summary})
+        await simple_tracked_calendar.on_timed_poll(dt_util.now())
+        assert notify.call_args.kwargs["message"] == message
+        notify.assert_called_once()
+
+    notify.reset_mock()
+    await local_calendar.async_delete_event(uid)
+    await simple_tracked_calendar.on_timed_poll(dt_util.now())
+    assert notify.call_args.kwargs["message"] == (
+        f"Birthday on Boat ARMED_AWAY ({when}) was removed, and will no longer set the alarm to Armed Away"
+    )
+
+
+async def test_calendar_no_removal_confirmation_when_event_ends(
+    calendar_with_holiday_event: TrackedCalendar, mock_armer_real_hass: AlarmArmer
+) -> None:
+    mock_armer_real_hass.notifier.notify.reset_mock()  # type: ignore
+    with patch("homeassistant.util.dt.now", return_value=dt_util.now() + dt.timedelta(minutes=5)):
+        await calendar_with_holiday_event.confirm_changes()
+    mock_armer_real_hass.notifier.notify.assert_not_called()  # type: ignore
+
+
+async def test_calendar_no_confirmation_when_switched_off(
+    local_calendar: CalendarEntity, calendar_platform: EntityPlatform, mock_armer_real_hass: AlarmArmer
+) -> None:
+    uut = TrackedCalendar(
+        mock_armer_real_hass.hass,
+        {CONF_ENTITY_ID: local_calendar.entity_id, CONF_CALENDAR_EVENT_STATES: {}, CONF_CALENDAR_CONFIRM: False},
+        armer=mock_armer_real_hass,
+        app_health_tracker=mock_armer_real_hass.app_health_tracker,
+    )
+    await uut.initialize(calendar_platform)
+    start = dt_util.now() + dt.timedelta(days=3)
+    await local_calendar.async_create_event(dtstart=start, dtend=start + dt.timedelta(days=7), summary="armed_vacation")
+    await uut.on_timed_poll(dt_util.now())
+    mock_armer_real_hass.notifier.notify.assert_not_called()  # type: ignore
+    assert uut.known_events is None
+    uut.shutdown()
+
+
+async def test_calendar_follows_state_change_of_live_event(
+    calendar_with_holiday_event: TrackedCalendar, local_calendar: CalendarEntity, mock_armer_real_hass: AlarmArmer
+) -> None:
+    tracked: TrackedCalendarEvent = calendar_with_holiday_event.active_events()[0]
+    mock_armer_real_hass.arm.reset_mock()  # type: ignore
+    await local_calendar.async_update_event(
+        tracked.event.uid,  # type: ignore
+        {EVENT_START: tracked.event.start_datetime_local, EVENT_END: tracked.event.end_datetime_local, "summary": "Away"},
+    )
+    await calendar_with_holiday_event.on_timed_poll(dt_util.now())
+
+    assert calendar_with_holiday_event.active_events()[0].arming_state == AlarmControlPanelState.ARMED_AWAY
+    mock_armer_real_hass.arm.assert_called_once()  # type: ignore
+    assert mock_armer_real_hass.arm.call_args.kwargs["arming_state"] == AlarmControlPanelState.ARMED_AWAY  # type: ignore
+
+
+async def test_calendar_follows_state_change_of_pending_event(
+    simple_tracked_calendar: TrackedCalendar, local_calendar: CalendarEntity, mock_armer_real_hass: AlarmArmer
+) -> None:
+    start = dt_util.now() + dt.timedelta(minutes=5)
+    await local_calendar.async_create_event(dtstart=start, dtend=start + dt.timedelta(hours=1), summary="Holiday")
+    await simple_tracked_calendar.on_timed_poll(dt_util.now())
+    tracked: TrackedCalendarEvent = next(iter(simple_tracked_calendar.tracked_events.values()))
+    assert tracked.arming_state == AlarmControlPanelState.ARMED_VACATION
+
+    await local_calendar.async_update_event(
+        tracked.event.uid,  # type: ignore
+        {EVENT_START: start, EVENT_END: start + dt.timedelta(hours=1), "summary": "Away"},
+    )
+    await simple_tracked_calendar.on_timed_poll(dt_util.now())
+
+    assert tracked.arming_state == AlarmControlPanelState.ARMED_AWAY
+    assert tracked.track_status == "pending"
+    cast("AsyncMock", mock_armer_real_hass.arm).assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ("summary", "state"),
+    [
+        ("ARMED_AWAY", "armed_away"),
+        ("Holiday in Spain", "armed_vacation"),
+        ("Disarmed for the cleaner", None),
+        ("armed_home", None),
+        ("ARMED_NIGHT", None),
+        ("armed_custom_bypass", None),
+        ("Birthday", None),
+    ],
+)
+async def test_arm_only_calendar_cannot_lower_protection(
+    local_calendar: CalendarEntity, mock_armer_real_hass: AlarmArmer, summary: str, state: str | None
+) -> None:
+    uut = TrackedCalendar(
+        mock_armer_real_hass.hass,
+        {
+            CONF_ENTITY_ID: local_calendar.entity_id,
+            CONF_CALENDAR_EVENT_STATES: {"armed_vacation": ["Holiday.*"], "disarmed": ["Disarmed"]},
+            CONF_CALENDAR_ARM_ONLY: True,
+        },
+        armer=mock_armer_real_hass,
+        app_health_tracker=mock_armer_real_hass.app_health_tracker,
+    )
+    assert uut.match_event(summary, None) == state
+    assert uut.match_event(None, summary) == state
+
+
+async def test_arm_only_calendar_ignores_disarm_event(
+    local_calendar: CalendarEntity, calendar_platform: EntityPlatform, mock_armer_real_hass: AlarmArmer
+) -> None:
+    uut = TrackedCalendar(
+        mock_armer_real_hass.hass,
+        {CONF_ENTITY_ID: local_calendar.entity_id, CONF_CALENDAR_EVENT_STATES: {}, CONF_CALENDAR_ARM_ONLY: True},
+        armer=mock_armer_real_hass,
+        app_health_tracker=mock_armer_real_hass.app_health_tracker,
+    )
+    await uut.initialize(calendar_platform)
+    await local_calendar.async_create_event(
+        dtstart=dt_util.now() - dt.timedelta(minutes=2),
+        dtend=dt_util.now() + dt.timedelta(minutes=2),
+        summary="Party, alarm DISARMED",
+    )
+    await uut.on_timed_poll(dt_util.now())
+
+    assert not uut.has_active_event()
+    cast("AsyncMock", mock_armer_real_hass.arm).assert_not_called()
+    cast("AsyncMock", mock_armer_real_hass.notifier).notify.assert_not_called()
+    uut.shutdown()

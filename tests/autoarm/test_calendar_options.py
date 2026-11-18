@@ -8,6 +8,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.autoarm.config_flow import (
+    CONF_CALENDAR_ARM_ONLY_ENTITIES,
+    CONF_CALENDAR_CONFIRM_CHANGES,
     CONF_CALENDAR_ENTITIES,
     CONF_CALENDAR_MATCH_RULES,
     CONF_CALENDAR_NOTIFY_GRACE_SECONDS,
@@ -105,6 +107,7 @@ async def test_rules_for_a_calendar_are_grouped_by_state(hass: HomeAssistant, mo
     configured = _calendar_config(entry)
     assert configured["calendar.family"]["state_patterns"] == {"armed_away": ["Office", "Gym", "Pub"], "disarmed": ["Cleaner"]}
     assert configured["calendar.family"]["poll_interval"] == 15
+    assert configured["calendar.family"]["confirm_changes"] is True
     # without rules of its own it has the defaults
     assert configured["calendar.other"]["state_patterns"]["disarmed"] == ["Disarmed"]
     assert entry.runtime_data.calendar_notify_grace_period == dt.timedelta(seconds=60)
@@ -121,6 +124,8 @@ async def test_options_flow_calendar_section(hass: HomeAssistant, setup_autoarm:
         "calendar_match_rules": [],
         "calendar_poll_interval": 15,
         "calendar_notify_grace": 60,
+        "calendar_confirm_changes": True,
+        "calendar_arm_only": [],
     }
     rule_selector = data_schema.schema["calendar_options"].schema.schema["calendar_match_rules"]
     with pytest.raises(Exception, match="Field patterns is required"):
@@ -190,3 +195,20 @@ async def test_advanced_setup_rejects_invalid_pattern(hass: HomeAssistant, mock_
 
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "invalid_pattern"}
+
+
+async def test_calendar_confirmations_switched_off(hass: HomeAssistant, mock_notify: Any) -> None:
+    entry = await _setup_entry(hass, {CONF_CALENDAR_ENTITIES: ["calendar.family"], CONF_CALENDAR_CONFIRM_CHANGES: False})
+
+    assert _calendar_config(entry)["calendar.family"]["confirm_changes"] is False
+
+
+async def test_arm_only_calendars(hass: HomeAssistant, mock_notify: Any) -> None:
+    entry = await _setup_entry(
+        hass,
+        {CONF_CALENDAR_ENTITIES: ["calendar.family", "calendar.alarm"], CONF_CALENDAR_ARM_ONLY_ENTITIES: ["calendar.family"]},
+    )
+
+    configured = _calendar_config(entry)
+    assert configured["calendar.family"]["arm_only"] is True
+    assert configured["calendar.alarm"]["arm_only"] is False

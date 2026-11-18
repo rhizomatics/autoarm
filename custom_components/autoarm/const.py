@@ -167,6 +167,10 @@ DEFAULT_CALENDAR_MAPPINGS = {
 CONF_CALENDAR_CONTROL = "calendar_control"
 CONF_CALENDARS = "calendars"
 CONF_CALENDAR_POLL_INTERVAL = "poll_interval"
+CONF_CALENDAR_CONFIRM = "confirm_changes"
+CONF_CALENDAR_ARM_ONLY = "arm_only"
+# all an arm-only calendar can set, as none of these lower protection, whatever the state before
+ARM_ONLY_STATES: list[str] = ["armed_away", "armed_vacation"]
 CONF_CALENDAR_EVENT_STATES = "state_patterns"
 CONF_CALENDAR_NO_EVENT = "no_event_mode"
 CONF_CALENDAR_ARMED_END = "armed_end_mode"
