@@ -193,7 +193,7 @@
                             "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
                             "rate_limit_max_calls": "Limite de fréquence - changements maximum",
                             "rate_limit_period": "Limite de fréquence - période",
-                            "state_change_action": "Appeler une action quand l'état de l'alarme change"
+                            "state_change_action": "Action à appeler quand l'état de l'alarme change"
                         },
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. Si la centrale exige un code, définissez-le ci-dessus.",
@@ -391,7 +391,7 @@
                             "use_alarm_service": "Changer l'état via les actions de la centrale d'alarme",
                             "rate_limit_max_calls": "Limite de fréquence - changements maximum",
                             "rate_limit_period": "Limite de fréquence - période",
-                            "state_change_action": "Appeler une action quand l'état de l'alarme change"
+                            "state_change_action": "Action à appeler quand l'état de l'alarme change"
                         },
                         "data_description": {
                             "use_alarm_service": "Appelle les actions alarm_control_panel d'armement et de désarmement au lieu de définir l'état directement. Nécessaire pour les centrales comme Alarmo qui ont leur propre traitement, comme l'armement des zones enfants. Si la centrale exige un code, définissez-le ci-dessus.",

@@ -193,7 +193,7 @@
                             "use_alarm_service": "Change state using the alarm panel's actions",
                             "rate_limit_max_calls": "Rate limit - maximum changes",
                             "rate_limit_period": "Rate limit - period",
-                            "state_change_action": "Call Action When Alarm State Changes"
+                            "state_change_action": "Action to Call When Alarm State Changes"
                         },
                         "data_description": {
                             "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. If the panel requires a code, set it above.",
@@ -391,7 +391,7 @@
                             "use_alarm_service": "Change state using the alarm panel's actions",
                             "rate_limit_max_calls": "Rate limit - maximum changes",
                             "rate_limit_period": "Rate limit - period",
-                            "state_change_action": "Call Action When Alarm State Changes"
+                            "state_change_action": "Action to Call When Alarm State Changes"
                         },
                         "data_description": {
                             "use_alarm_service": "Call the alarm_control_panel arm and disarm actions instead of setting the state directly. Needed for panels such as Alarmo that do their own processing, like arming child areas. If the panel requires a code, set it above.",

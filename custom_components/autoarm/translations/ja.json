@@ -193,7 +193,7 @@
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
                             "rate_limit_max_calls": "レート制限 - 最大変更回数",
                             "rate_limit_period": "レート制限 - 期間",
-                            "state_change_action": "アラーム状態の変化時にアクションを呼び出す"
+                            "state_change_action": "アラーム状態の変化時に呼び出すアクション"
                         },
                         "data_description": {
                             "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、上で設定してください。",
@@ -391,7 +391,7 @@
                             "use_alarm_service": "アラームパネルのアクションで状態を変更",
                             "rate_limit_max_calls": "レート制限 - 最大変更回数",
                             "rate_limit_period": "レート制限 - 期間",
-                            "state_change_action": "アラーム状態の変化時にアクションを呼び出す"
+                            "state_change_action": "アラーム状態の変化時に呼び出すアクション"
                         },
                         "data_description": {
                             "use_alarm_service": "状態を直接設定する代わりに、alarm_control_panel の警戒・解除アクションを呼び出します。子エリアの警戒など独自の処理を行う Alarmo などのパネルに必要です。パネルがコードを要求する場合は、上で設定してください。",

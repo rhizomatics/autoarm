@@ -193,7 +193,7 @@
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
                             "rate_limit_max_calls": "Limite de frequência - alterações máximas",
                             "rate_limit_period": "Limite de frequência - período",
-                            "state_change_action": "Chamar ação quando o estado do alarme mudar"
+                            "state_change_action": "Ação a chamar quando o estado do alarme mudar"
                         },
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o acima.",
@@ -391,7 +391,7 @@
                             "use_alarm_service": "Alterar o estado com as ações do painel de alarme",
                             "rate_limit_max_calls": "Limite de frequência - alterações máximas",
                             "rate_limit_period": "Limite de frequência - período",
-                            "state_change_action": "Chamar ação quando o estado do alarme mudar"
+                            "state_change_action": "Ação a chamar quando o estado do alarme mudar"
                         },
                         "data_description": {
                             "use_alarm_service": "Chama as ações alarm_control_panel de armar e desarmar em vez de definir o estado diretamente. Necessário para painéis como o Alarmo que fazem o seu próprio processamento, como armar áreas filhas. Se o painel exigir um código, defina-o acima.",

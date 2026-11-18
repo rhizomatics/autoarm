@@ -193,7 +193,7 @@
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                             "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
                             "rate_limit_period": "Limite di frequenza - periodo",
-                            "state_change_action": "Chiama un'azione quando cambia lo stato dell'allarme"
+                            "state_change_action": "Azione da chiamare quando cambia lo stato dell'allarme"
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sopra.",
@@ -391,7 +391,7 @@
                             "use_alarm_service": "Cambia stato tramite le azioni della centrale d'allarme",
                             "rate_limit_max_calls": "Limite di frequenza - modifiche massime",
                             "rate_limit_period": "Limite di frequenza - periodo",
-                            "state_change_action": "Chiama un'azione quando cambia lo stato dell'allarme"
+                            "state_change_action": "Azione da chiamare quando cambia lo stato dell'allarme"
                         },
                         "data_description": {
                             "use_alarm_service": "Chiama le azioni alarm_control_panel di inserimento e disinserimento invece di impostare lo stato direttamente. Necessario per centrali come Alarmo con una propria elaborazione, ad esempio l'inserimento delle aree figlie. Se la centrale richiede un codice, impostalo qui sopra.",

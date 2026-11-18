@@ -193,7 +193,7 @@
                             "use_alarm_service": "Cambiar el estado con las acciones del panel de alarma",
                             "rate_limit_max_calls": "Límite de frecuencia - cambios máximos",
                             "rate_limit_period": "Límite de frecuencia - periodo",
-                            "state_change_action": "Llamar a una acción cuando cambie el estado de la alarma"
+                            "state_change_action": "Acción a llamar cuando cambie el estado de la alarma"
                         },
                         "data_description": {
                             "use_alarm_service": "Llama a las acciones alarm_control_panel de armado y desarmado en lugar de establecer el estado directamente. Necesario para paneles como Alarmo que hacen su propio procesamiento, como armar áreas hijas. Si el panel requiere un código, configúralo más arriba.",
@@ -391,7 +391,7 @@
                             "use_alarm_service": "Cambiar el estado con las acciones del panel de alarma",
                             "rate_limit_max_calls": "Límite de frecuencia - cambios máximos",
                             "rate_limit_period": "Límite de frecuencia - periodo",
-                            "state_change_action": "Llamar a una acción cuando cambie el estado de la alarma"
+                            "state_change_action": "Acción a llamar cuando cambie el estado de la alarma"
                         },
                         "data_description": {
                             "use_alarm_service": "Llama a las acciones alarm_control_panel de armado y desarmado en lugar de establecer el estado directamente. Necesario para paneles como Alarmo que hacen su propio procesamiento, como armar áreas hijas. Si el panel requiere un código, configúralo más arriba.",

@@ -193,7 +193,7 @@
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                             "rate_limit_max_calls": "Ratenbegrenzung - maximale Änderungen",
                             "rate_limit_period": "Ratenbegrenzung - Zeitraum",
-                            "state_change_action": "Aktion bei Änderung des Alarmzustands aufrufen"
+                            "state_change_action": "Aufzurufende Aktion bei Änderung des Alarmzustands"
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn oben fest.",
@@ -391,7 +391,7 @@
                             "use_alarm_service": "Status über die Aktionen der Alarmzentrale ändern",
                             "rate_limit_max_calls": "Ratenbegrenzung - maximale Änderungen",
                             "rate_limit_period": "Ratenbegrenzung - Zeitraum",
-                            "state_change_action": "Aktion bei Änderung des Alarmzustands aufrufen"
+                            "state_change_action": "Aufzurufende Aktion bei Änderung des Alarmzustands"
                         },
                         "data_description": {
                             "use_alarm_service": "Ruft die Aktionen alarm_control_panel zum Scharf- und Unscharfschalten auf, statt den Status direkt zu setzen. Erforderlich für Zentralen wie Alarmo mit eigener Verarbeitung, z. B. zum Scharfschalten von Unterbereichen. Verlangt die Zentrale einen Code, lege ihn oben fest.",

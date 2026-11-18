@@ -57,7 +57,7 @@ This only debounces the *notification*; the alarm panel's actual state still upd
 
 Call any Home Assistant action when the state changes, for example to display current alarm state on a screen, with optional Auto Arm template variables.
 
-**Call Action When Alarm State Changes**, in the **Advanced - Other** section of the options, runs any Home Assistant
+**Action to Call When Alarm State Changes**, in the **Advanced - Other** section of the options, runs any Home Assistant
 actions whenever the alarm panel changes state, whatever changed it. It uses the same action editor as
 automations, so each action's fields are there to fill in. Use it to show the alarm state somewhere, such as an
 e-ink shelf label or a smart display.

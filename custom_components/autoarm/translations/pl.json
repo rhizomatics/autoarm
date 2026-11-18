@@ -193,7 +193,7 @@
                             "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
                             "rate_limit_max_calls": "Limit częstotliwości - maksymalna liczba zmian",
                             "rate_limit_period": "Limit częstotliwości - okres",
-                            "state_change_action": "Wywołaj akcję przy zmianie stanu alarmu"
+                            "state_change_action": "Akcja do wywołania przy zmianie stanu alarmu"
                         },
                         "data_description": {
                             "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Jeśli panel wymaga kodu, ustaw go powyżej.",
@@ -391,7 +391,7 @@
                             "use_alarm_service": "Zmieniaj stan za pomocą akcji panelu alarmowego",
                             "rate_limit_max_calls": "Limit częstotliwości - maksymalna liczba zmian",
                             "rate_limit_period": "Limit częstotliwości - okres",
-                            "state_change_action": "Wywołaj akcję przy zmianie stanu alarmu"
+                            "state_change_action": "Akcja do wywołania przy zmianie stanu alarmu"
                         },
                         "data_description": {
                             "use_alarm_service": "Wywołuje akcje alarm_control_panel uzbrajania i rozbrajania zamiast ustawiać stan bezpośrednio. Wymagane dla paneli takich jak Alarmo, które mają własne przetwarzanie, np. uzbrajanie obszarów podrzędnych. Jeśli panel wymaga kodu, ustaw go powyżej.",

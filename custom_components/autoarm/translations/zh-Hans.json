@@ -193,7 +193,7 @@
                             "use_alarm_service": "使用报警面板的操作更改状态",
                             "rate_limit_max_calls": "速率限制 - 最大更改次数",
                             "rate_limit_period": "速率限制 - 周期",
-                            "state_change_action": "警报状态变化时调用动作"
+                            "state_change_action": "警报状态变化时要调用的动作"
                         },
                         "data_description": {
                             "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在上方设置。",
@@ -391,7 +391,7 @@
                             "use_alarm_service": "使用报警面板的操作更改状态",
                             "rate_limit_max_calls": "速率限制 - 最大更改次数",
                             "rate_limit_period": "速率限制 - 周期",
-                            "state_change_action": "警报状态变化时调用动作"
+                            "state_change_action": "警报状态变化时要调用的动作"
                         },
                         "data_description": {
                             "use_alarm_service": "调用 alarm_control_panel 的布防和撤防操作，而不是直接设置状态。对于 Alarmo 等有自身处理逻辑（例如布防子区域）的面板是必需的。如果面板要求密码，请在上方设置。",
