@@ -396,14 +396,15 @@ async def _section_fields(hass: HomeAssistant, options: Mapping[str, Any]) -> di
                         label_field=CONF_RULE_STATE,
                         description_field=CONF_RULE_CALENDAR,
                         translation_key="calendar_match_rule",
+                        # selectors as dicts, as HA before 2026.6 can't validate a rule against Selector objects
                         fields={
                             CONF_RULE_CALENDAR: {
-                                "selector": EntitySelector(EntitySelectorConfig(domain="calendar")),
+                                "selector": EntitySelector(EntitySelectorConfig(domain="calendar")).serialize()["selector"],
                                 "required": True,
                             },
-                            CONF_RULE_STATE: {"selector": _alarm_state_selector(), "required": True},
+                            CONF_RULE_STATE: {"selector": _alarm_state_selector().serialize()["selector"], "required": True},
                             CONF_RULE_PATTERNS: {
-                                "selector": TextSelector(TextSelectorConfig(multiple=True)),
+                                "selector": TextSelector(TextSelectorConfig(multiple=True)).serialize()["selector"],
                                 "required": True,
                             },
                         },
