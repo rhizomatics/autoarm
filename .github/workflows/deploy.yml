@@ -28,12 +28,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
     - name: Marketplace Action
-      uses: "hacs/action@1ebf01c408f29afcb6406bd431bc98fd8cbb15aa" # main
+      uses: "hacs/action@1ebf01c408f29afcb6406bd431bc98fd8cbb15aa"
       with:
         category: "integration"
     - name: Marketplace Hassfest
-      uses: "home-assistant/actions/hassfest@86d4564712fa02543c808e3a693dd04f9d3f8361" # master
+      uses: "home-assistant/actions/hassfest@86d4564712fa02543c808e3a693dd04f9d3f8361"
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       with:
@@ -85,6 +87,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       with:
@@ -112,8 +116,8 @@ jobs:
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         TEMP_DIR=$(mktemp -d)
         cd $TEMP_DIR
-        git clone --single-branch --branch badges https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git . 2>/dev/null
-        cp -r ${{ github.workspace }}/badges .
+        git clone --single-branch --branch badges https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git . 2>/dev/null
+        cp -r ${GITHUB_WORKSPACE}/badges .
         git add badges
         if git commit -m "Update badges [skip ci]"; then
           git push origin badges --force
@@ -125,6 +129,12 @@ jobs:
     - name: Deploy docs
       # only once the tests have passed, unlike the badges, which also show a failure
       if: ${{ needs.build.result == 'success' }}
-      run: uv run properdocs gh-deploy --force --config-file properdocs.yml
+      run: |
+        # The token as actions/checkout would give it, but in this step's environment only, not .git/config
+        export GIT_CONFIG_COUNT=1
+        export GIT_CONFIG_KEY_0="http.https://github.com/.extraheader"
+        GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)"
+        export GIT_CONFIG_VALUE_0
+        uv run properdocs gh-deploy --force --config-file properdocs.yml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
